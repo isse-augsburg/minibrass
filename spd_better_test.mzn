@@ -19,5 +19,7 @@ array[1..nEdges, 1..2] of CONSTRAINTS: edges = [| c2, c1
 
 constraint lhs != rhs;
 constraint spd_better(lhs,rhs, CONSTRAINTS, edges);
+%constraint spd_better({c1,c2,c3},rhs, CONSTRAINTS, edges);
+
 
 solve satisfy; 
