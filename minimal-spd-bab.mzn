@@ -43,7 +43,7 @@ array[1..nEdges, 1..2] of SOFTCONSTRAINTS: edges = [| c2, c1
 %constraint penC1 = 0 /\ penC2 = 0;
 %constraint penSum = 0;
 
-function ann: mybab(var set of SOFTCONSTRAINTS: violatedScs) =
+function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: violatedScs) =
        repeat(
          %  scope (
            if next() then
@@ -57,13 +57,30 @@ function ann: mybab(var set of SOFTCONSTRAINTS: violatedScs) =
            else break endif
         %   )
        );
-
+       
+function ann: onlyNotDominated(var set of SOFTCONSTRAINTS: violatedScs) =
+       repeat(
+         %  scope (
+           if next() then
+               let {
+                 set of SOFTCONSTRAINTS: ub = sol(violatedScs); 
+               } in (
+                 print("Violated scs now: \(ub)\n") /\
+                 print("Intermediate solution with objective \(sol(penSum))\n") /\
+                 commit() /\ post(not (spd_better(violatedScs, ub, SOFTCONSTRAINTS, edges) \/ violatedScs = ub ) )
+               )
+           else break endif
+        %   )
+       );
 
 solve 
 :: int_search(satisfied, input_order, indomain_min, complete)
 %:: int_search([penC1,penC2,penC3, x, y, z], input_order, indomain_min, complete)
 %minimize penSum;
-search time_limit(3000, mybab(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+% to find only strictly better solutions (perhaps more pruning)
+%search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+% to find all non-dominated solutions (less pruning, more optima)
+search time_limit(3000, onlyNotDominated(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];
