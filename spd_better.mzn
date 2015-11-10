@@ -32,5 +32,5 @@ let {
 } in (
   lhs != rhs /\
   alldifferent_except_0(witness) /\  forall(s in ub(rUndefined)) (s in rUndefined -> witness[s] = 0) /\ 
-  forall(s in ub(rSymDiff)) (s in rSymDiff -> (witness[s] in lSymDiff /\ witness[s] in lessThans[s]))     
+  forall(s in ub(rSymDiff)) (s in rSymDiff -> (witness[s] in lSymDiff /\ witness[s] in lessThans[s]))    
 );
