@@ -1,0 +1,29 @@
+To Check
+----
+Lexicographic products of c-semirings
+Algorithms (totality? supremum?):
+	russian doll
+	soft arc consistency
+How to replace p-norm by general ordering?
+CP nets: What cannot (easily) be expressed?
+
+To Do
+----
+Include "CR into Weighted" as a counter-example for optima simulation
+
+Plan
+----
+Why partiality?  Why do weight not suffice?
+- Distributed setting
+- Different specifiers, even when not distributed
+- Not comparable, even when total orderings (weights)
+Why modularity?
+- 
+Why heterogeneity?
+- Different specifiers, different formalism
+- Unifying framework
+
+What's not in?
+----
+Voting, market-based algorithms
+	

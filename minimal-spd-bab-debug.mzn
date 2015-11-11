@@ -1,6 +1,6 @@
 % my alltime favorite small example 
 include "link_set_to_booleans.mzn";
-include "minisearch.mzn"; % include the search minisearch lite
+%include "minisearch.mzn"; % include the search minisearch lite
 include "spd_better.mzn";
 var 1..3: x; 
 var 1..3: y;
@@ -42,43 +42,27 @@ array[1..nEdges, 1..2] of SOFTCONSTRAINTS: edges = [| c2, c1
 %constraint spd_better({c2,c3}, violatedScs,SOFTCONSTRAINTS,edges);
 %constraint penC1 = 0 /\ penC2 = 0;
 %constraint penSum = 0;
+% obtained after the first run 
+constraint not (spd_better(violatedScs, 1..2, SOFTCONSTRAINTS, edges) \/ violatedScs = 1..2 );
 
-function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: violatedScs) =
-       repeat(
-         %  scope (
-           if next() then %:: int_search(satisfied, input_order, indomain_min, complete) then
-               let {
-                 set of SOFTCONSTRAINTS: ub = sol(violatedScs); 
-               } in (
-                 print("Violated scs now (penalty: \(sol(penSum)): \(ub) x -> \(sol(x)), y -> \(sol(y)), z -> \(sol(z))\n") /\
-                 commit() /\ post(spd_better(ub, violatedScs, SOFTCONSTRAINTS, edges))
-               )
-           else break endif
-        %   )
-       );
-       
-function ann: onlyNotDominated(var set of SOFTCONSTRAINTS: violatedScs) =
-       repeat(
-         %  scope (
-           if next() then
-               let {
-                 set of SOFTCONSTRAINTS: ub = sol(violatedScs); 
-               } in (
-                 print("Violated scs now (penalty: \(sol(penSum)): \(ub) x -> \(sol(x)), y -> \(sol(y)), z -> \(sol(z))\n") /\
-                 commit() /\ post(not (spd_better(violatedScs, ub, SOFTCONSTRAINTS, edges) \/ violatedScs = ub ) )
-               )
-           else break endif
-        %   )
-       );
+constraint not (spd_better(violatedScs, 1..3, SOFTCONSTRAINTS, edges) \/ violatedScs = 1..3 );
+
+constraint not (spd_better(violatedScs, 1..1, SOFTCONSTRAINTS, edges) \/ violatedScs = 1..1 );
+
+constraint not (spd_better(violatedScs, {1,3}, SOFTCONSTRAINTS, edges) \/ violatedScs = {1,3} );
+
+constraint not (spd_better(violatedScs, {2}, SOFTCONSTRAINTS, edges) \/ violatedScs = {2} );
+
+constraint not (spd_better(violatedScs, {2,3}, SOFTCONSTRAINTS, edges) \/ violatedScs = {2,3} );
 
 solve 
 %:: int_search(satisfied, input_order, indomain_min, complete)
 %:: int_search([penC1,penC2,penC3, x, y, z], input_order, indomain_min, complete)
 %minimize penSum;
 % to find only strictly better solutions (perhaps more pruning)
-% search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 % to find all non-dominated solutions (less pruning, more optima)
-search time_limit(3000, onlyNotDominated(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
-
+%search time_limit(3000, onlyNotDominated(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+satisfy;
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];
