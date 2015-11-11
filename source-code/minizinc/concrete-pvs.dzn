@@ -1,0 +1,7 @@
+% now just some edge business as well as penalties
+% penalties for the weighted view
+% penalty for constraint i
+penalties = [3,1,1];
+
+nEdges = 2;
+edges = [| 2, 1 | 3, 1 |];
