@@ -25,12 +25,16 @@ let {
   % I need to make the dominance explicit by a function
   array[softConstraints] of var softConstraints0: witness; 
 
-  % collect all predecessors such that succ in lessThans[pred] iff succ less than pred
+  % collect all predecessors such that succ in lessThans[pred] 
+  % iff succ less than pred
   array[softConstraints] of set of softConstraints: lessThans = 
-    [ {succ | succ in softConstraints where exists(e in le..ue) (edges[e,1] = pred /\ edges[e,2] = succ)} | pred in softConstraints];
+    [ {succ | succ in softConstraints where exists(e in le..ue) 
+         (edges[e,1] = pred /\ edges[e,2] = succ)} | pred in softConstraints];
 
 } in (
   lhs != rhs /\
-  alldifferent_except_0(witness) /\  forall(s in ub(rUndefined)) (s in rUndefined -> witness[s] = 0) /\ 
-  forall(s in ub(rSymDiff)) (s in rSymDiff -> (witness[s] in lSymDiff /\ witness[s] in lessThans[s]))    
+  alldifferent_except_0(witness) /\  
+  forall(s in ub(rUndefined)) (s in rUndefined -> witness[s] = 0) /\ 
+  forall(s in ub(rSymDiff)) (s in rSymDiff -> (witness[s] in lSymDiff /\ 
+                                               witness[s] in lessThans[s]))    
 );

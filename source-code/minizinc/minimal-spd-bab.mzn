@@ -2,9 +2,6 @@
 include "link_set_to_booleans.mzn";
 include "minisearch.mzn"; % include the search minisearch lite
 include "spd_better.mzn";
-var 1..3: x; 
-var 1..3: y;
-var 1..3: z;
 
 int: pc1 = 3;
 int: pc2 = 1;
@@ -26,6 +23,10 @@ var int: penSum = sum(sc in SOFTCONSTRAINTS) (bool2int(not satisfied[sc]) * pena
 var set of SOFTCONSTRAINTS: violatedScs;
 
 constraint link_set_to_booleans(violatedScs,violated); 
+
+var 1..3: x; 
+var 1..3: y;
+var 1..3: z;
 
 constraint x + 1 = y <-> satisfied[1];
 constraint z = y + 2 <-> satisfied[2];
@@ -72,13 +73,13 @@ function ann: onlyNotDominated(var set of SOFTCONSTRAINTS: violatedScs) =
        );
 
 solve 
-%:: int_search(satisfied, input_order, indomain_min, complete)
+:: int_search(satisfied, input_order, indomain_max, complete)
 %:: int_search([penC1,penC2,penC3, x, y, z], input_order, indomain_min, complete)
 %minimize penSum;
 % to find only strictly better solutions (perhaps more pruning)
-% search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 % to find all non-dominated solutions (less pruning, more optima)
-search time_limit(3000, onlyNotDominated(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, onlyNotDominated(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];

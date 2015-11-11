@@ -1,0 +1,152 @@
+%%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is a general template file for the LaTeX package SVJour3
+% for Springer journals.          Springer Heidelberg 2010/09/16
+%
+% Copy it to a new file with a new name and use it as the basis
+% for your article. Delete % signs as needed.
+%
+% This template includes a few options for different layouts and
+% content for various journals. Please consult a previous issue of
+% your journal as needed.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+
+%
+\RequirePackage{fix-cm}
+%
+%\documentclass{svjour3}                     % onecolumn (standard format)
+\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
+%\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+%\documentclass[twocolumn]{svjour3}          % twocolumn
+%
+\smartqed  % flush right qed marks, e.g. at end of proof
+%
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{stmaryrd,amsmath,amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{times}
+%\usepackage{courier}
+\lstdefinelanguage{MiniZinc}
+{
+	morekeywords={array,let,tuple,diff,union,where,exists,set,min,max,float,int,var,predicate,minimize,sum,in,forall,include,to,card},
+	sensitive=false,
+	morecomment=[l]{\%},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]",
+}
+
+\definecolor{lightlightgray}{gray}{0.99}
+\definecolor{forestgreen}{HTML}{009B55}
+\definecolor{thermicred}{rgb}{0.82, 0.1, 0.26}
+
+\lstset
+{
+	basicstyle={\ttfamily\fontsize{7pt}{8pt}\selectfont},
+	commentstyle=\ttfamily\color{forestgreen},
+	stringstyle=\ttfamily\color{thermicred},
+	keywordstyle=\ttfamily\bfseries\color{blue},
+	tabsize=2,
+	showstringspaces=false,
+	stepnumber=5,
+	numberfirstline=false,
+	%flexiblecolumns=true,
+	firstnumber=1,
+	numbers=left,
+	captionpos=b,	
+	backgroundcolor=\color{lightlightgray},
+	frame=single,
+	%xleftmargin=\parindent,
+	numberstyle={\ttfamily\fontsize{6pt}{6pt}\selectfont}
+}
+
+\lstset{language=MiniZinc}
+%
+\usepackage{mathptmx}      % use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+%\usepackage{latexsym}
+% etc.
+%
+% please place your own definitions here and don't use \def but
+% \newcommand{}{}
+%
+% Insert the name of "your journal" with
+% \journalname{myjournal}
+%
+\begin{document}
+
+\title{Qualitative Soft Constraints\thanks{This research is partly sponsored by the 
+German Research Foundation (DFG) in the project ``OC-Trust'' (FOR 1085).}
+}
+%\subtitle{Do you have a subtitle?\\ If so, write it here}
+
+%\titlerunning{Short form of title}        % if too long for running head
+
+\author{Alexander Schiendorfer \and Alexander Knapp \and Wolfgang Reif %etc.
+}
+
+%\authorrunning{Short form of author list} % if too long for running head
+
+\institute{Alexander Schiendorfer \at
+              University of Augsburg\\
+              \email{schiendorfer@isse.de}           %  \\
+%             \emph{Present address:} of F. Author  %  if needed
+           \and
+           Alexander Knapp \at
+           University of Augsburg\\
+              \email{knapp@isse.de}   
+           \and
+           Wolfgang Reif \at
+           University of Augsburg\\
+              \email{reif@isse.de}  
+}
+
+\date{Received: date / Accepted: date}
+% The correct dates will be entered by the editor
+
+
+\maketitle
+
+\begin{abstract}
+Insert your abstract here. Include keywords, PACS and mathematical
+subject classification numbers as needed.
+\keywords{First keyword \and Second keyword \and More}
+% \PACS{PACS code1 \and PACS code2 \and more}
+% \subclass{MSC code1 \and MSC code2 \and more}
+\end{abstract}
+
+\section{Introduction}
+\label{intro}
+Your text comes here. Separate text sections with
+We started working on \cite{Schiendorfer13}
+
+\section{Foundations}
+
+\section{Implementation}
+
+\renewcommand{\lstlistingname}{Code}
+\lstinputlisting{../../source-code/minizinc/spd_better.mzn}
+\section{Evaluation}
+
+\section{Conclusion}
+
+%\begin{acknowledgements}
+%If you'd like to thank anyone, place your comments here
+%and remove the percent signs.
+%\end{acknowledgements}
+
+% BibTeX users please use one of
+%\bibliographystyle{spbasic}      % basic style, author-year citations
+\bibliographystyle{spmpsci}      % mathematics and physical sciences
+%\bibliographystyle{spphys}       % APS-like style for physics
+\bibliography{constraint-preferences}   % name your BibTeX data base
+
+\end{document}
+% end of file template.tex
+
