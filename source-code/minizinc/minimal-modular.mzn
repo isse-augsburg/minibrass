@@ -27,12 +27,6 @@ constraint x + y <= 3 <-> satisfied[3];
 
 solve 
 :: int_search(satisfied, input_order, indomain_max, complete)
-%:: int_search([penC1,penC2,penC3, x, y, z], input_order, indomain_min, complete)
-%minimize penSum;
-% to find only strictly better solutions (perhaps more pruning)
 search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
-% to find all non-dominated solutions (less pruning, more optima)
-%search time_limit(3000, onlyNotDominated(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
-
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];
