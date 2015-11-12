@@ -9,6 +9,7 @@ include "link_set_to_booleans.mzn";
 include "minisearch.mzn"; % include the search minisearch lite
 include "soft_constraints.mzn"; % model additions for soft constraint business
 include "spd_better.mzn"; % the actual isBetter predicate
+include "tpd_better.mzn"; % the actual isBetter predicate
 include "constraint_relationship_search.mzn"; % search strategies for SPD better
 include "concrete-pvs.mzn";
 
@@ -26,7 +27,10 @@ constraint z = y + 2 <-> satisfied[2];
 constraint x + y <= 3 <-> satisfied[3];
 
 solve 
-:: int_search(satisfied, input_order, indomain_max, complete)
+:: int_search(satisfied, input_order, indomain_min, complete)
 search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, strictlyBetterBAB_TPD(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, onlyNotDominated_TPD(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%satisfy;
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];

@@ -1,0 +1,9 @@
+\usepackage[colorinlistoftodos,prependcaption]{todonotes}
+
+% TODOs and Notes
+\newcommand{\todobox}[1]{\todo[inline]{#1}}                         % shorter version of "\todo[inline]" command
+\newcommand{\todot}[1]{\sethlcolor{yellow} \hl{\textbf{TODO:} #1}}  % yellow TODO in text
+\newcommand{\noteb}[1]{\sethlcolor{cyan} \hl{\textbf{NOTE:} #1}}    % blue Note in text
+\newcommand{\noteg}[1]{\sethlcolor{green} \hl{\textbf{NOTE:} #1}}   % green Note in text
+\newcommand{\removet}[1]{\sethlcolor{red} \hl{\textbf{remove?:} #1}} % green Note in text
+\newcommand{\remove}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{\textbf{Remove?}\newline\noindent#2}}

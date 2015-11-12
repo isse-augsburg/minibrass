@@ -4,3 +4,6 @@
 *.synctex.gz
 *.aux
 *.bbl
+*.run.xml
+*.toc
+*.out
