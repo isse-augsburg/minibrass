@@ -1,0 +1,40 @@
+\lstinputlisting{../../source-code/minizinc/spd_better.mzn}
+
+\lstinputlisting{../../source-code/minizinc/tpd_better.mzn}
+
+Some points that should be emphasized 
+
+\begin{enumerate}
+\item Variable ordering can be used to assign reified variables first.
+\item Order them decreasingly by importance (can be done using data manipulation in MiniZinc)
+\item Assign \texttt{true} first, hoping to find a solution to all soft constraints.
+\item Discuss/prove that this search tree, in a static ordering, assures that violation degrees
+are tried in TPD-order.
+\item SPD-order can probably achieved by using a restarts strategy $\rightarrow$ use new scope 
+every time, add only those soft constraints that are supposed to hold.
+\item Discuss similarities/differences to conflict-directed A* search.
+\item \emph{Quite a nifty point:} in addition to posting the constraint 
+\texttt{xpd\_better(lb, violatedScs)}, meaning that the set of violated soft constraints should
+be better in the next solution, we can post something like \texttt{penalty(lb) > penalty(violatedScs)}
+\emph{as well}! Why does that make sense?
+\begin{itemize}
+\item \emph{If} we find a solution $\theta_2$ that is XPD-better than $\theta_1$, then it is also penalty-better (by implication).
+\item \texttt{violatedScs} is a bounded set variable (at least below by $\emptyset$, above by \texttt{soft-constraints}).
+From these bounds, the solver can immediately derive bounds for \texttt{penalty(violatedScs)}. Propagation of reified variables
+during search (one satisfied constraint implying the violation of another etc.) is then properly handled. Search can stop,
+once the best case minimal penalty violation cannot go below the imposed upper bound for violation.
+\item This constraint is \emph{redundant}, i.e., if for any solution $\theta_2$ XPD-better $\theta_1$ holds, penalty better holds
+as well.
+\item But we do not have a \emph{propagator} for XPD-better. The set variable \texttt{violatedScs} is bounded below by the number
+of minimally (definitely, already) violated soft constraints, above by the maximally possible violations (cmp. $\alpha$, $\zeta$).
+We could, in principle, build a simple bounds propagator for XPD-better that restricts the domain of  \texttt{violatedScs}
+to values strictly above the last found lower bound.
+\item It's unreasonable to assume a default behavior like bounds propagation on a user-defined predicate such as XPD-better.
+It could be that the predicate is only true ``somewhere'' in the middle between lower and upper set-bound. Then bounds propagation
+would incorrectly cut partial assignments.
+\item But in lieu of a dedicated XPD-propagator, we can benefit from the redundant penalty constraint. For instance, suppose 
+we have seen a solution violating $\{c_2,c_3\}$, with penalty $2$. Assume we are in a search tree and the lower bound for our \texttt{violatedScs}
+is $\{c_1\}$ violated constraints, and the upper bound be $\{c_1,c_2,c_3\}$. Thus, the penalty is at least $3$, at most $5$. We can cut the
+search since we posted \texttt{penalty(violatedScs) < 2}.
+\end{itemize}
+\end{enumerate}

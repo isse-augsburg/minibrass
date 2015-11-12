@@ -113,18 +113,27 @@ German Research Foundation (DFG) in the project ``OC-Trust'' (FOR 1085).}
 
 \maketitle
 
+% This is not the actual abstract (much too boring)
+% but should serve as a rough outline
 \begin{abstract}
-Insert your abstract here. Include keywords, PACS and mathematical
-subject classification numbers as needed.
-\keywords{First keyword \and Second keyword \and More}
-% \PACS{PACS code1 \and PACS code2 \and more}
-% \subclass{MSC code1 \and MSC code2 \and more}
+Over-constrained problems are ubiquitous in industrial and other real-world problems.
+Plenty of formalisms have been proposed and abstracted in algebraic structures.
+Specialized areas diverged such as cost function networks or semiring-based soft constraints.
+Integration with conventional constraint problems are implemented using soft global constraints.
+Most of them involve a cost variable / cost functions. This is not good, if costs can be defined
+by different agents/modelers that lack a common currency idea. We propose a formalism that is purely 
+qualitative, relies on the satisfaction/dissatisfaction of soft constraints. Preferences are written
+as a directed acyclic graph. We show how to proceed from this graph by suggesting set orderings over
+sets of violated constraints, prove that these orderings are mathematically enforced by common axioms
+of monoidal soft constraints, discuss the relationship to other formalisms in terms of expressiveness,
+implement various optimization strategies using MiniZinc/MiniSearch, and provide experimental results.
+
+\keywords{Soft Constraints \and Over-constrained Problems \and Modeling Formalisms \and MiniZinc}
 \end{abstract}
 
 \section{Introduction}
-\label{intro}
-Your text comes here. Separate text sections with
-We started working on \cite{Schiendorfer13}
+\label{sec:introduction}
+\input{introduction}
 
 \section{Related Work}
 \label{sec:related-work}
@@ -132,10 +141,12 @@ We started working on \cite{Schiendorfer13}
 
 \section{Foundations}
 
+% -----------------------
 \section{Implementation}
+\label{sec:implementation}
+\input{implementation}
+% -----------------------
 
-\renewcommand{\lstlistingname}{Code}
-\lstinputlisting{../../source-code/minizinc/spd_better.mzn}
 \section{Evaluation}
 
 \section{Conclusion}

@@ -19,8 +19,9 @@ multiplication operator for \emph{combining} satisfaction degrees of
 several soft constraints as well as an addition operator (i.e., a supremum) that induces a partial order for ranking solutions.
 
 \begin{itemize}
-\item \todobox{T. Petit, J.C. Régin, and C. Bessière. Meta-constraints on violations for over constrained problems.} introduces reified variables for cost values, we rely
+\item \todobox{T. Petit, J.C. Régin, and C. Bessière. Meta-constraints on violations for over constrained problems.} \cite{petit2000meta} introduces reified variables for cost values, we rely
 on that technique
-\item \todobox{Conflict-Directed A* Search for Soft Constraints} based on reified variables, uses propagation in combination with A star, i.e., in principle a best first search where propagation of reified variables may lower the objective (if one satisfied soft constraint propagates the violation of many others, try another assignment first). Not a classical branch and bound approach since
-the node with the highest promising objective value is branched on. Requires quite some manual bookkeeping. Not clear how much benefit this brings over conventional search using variable/value heuristics. 
+\item \todobox{Conflict-Directed A* Search for Soft Constraints} \cite{sachenbacher2006conflict} based on reified variables, uses propagation in combination with A star, i.e., in principle a best first search where propagation of reified variables may lower the objective (if one satisfied soft constraint propagates the violation of many others, try another assignment first). Not a classical branch and bound approach since
+the node with the highest promising objective value is branched on. Requires quite some manual bookkeeping. Not clear how much benefit this brings over conventional search using variable/value heuristics.  
+\item \cite{van2011over} soft global constraints
 \end{itemize}
