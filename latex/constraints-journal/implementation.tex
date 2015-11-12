@@ -36,5 +36,9 @@ would incorrectly cut partial assignments.
 we have seen a solution violating $\{c_2,c_3\}$, with penalty $2$. Assume we are in a search tree and the lower bound for our \texttt{violatedScs}
 is $\{c_1\}$ violated constraints, and the upper bound be $\{c_1,c_2,c_3\}$. Thus, the penalty is at least $3$, at most $5$. We can cut the
 search since we posted \texttt{penalty(violatedScs) < 2}.
+\item It turns out that propagation is smarter than I thought \ldots since the witness is just a bunch of additional variables we get much more
+propagation than initially thought, which is nice.
+\item The penalty trick still cuts down the number of failures.
 \end{itemize}
+\item Global constraints aren't as easily reified. Probably in the future \todo{look for reification of global constraints paper}. Better use a restarts approach for now.
 \end{enumerate}
