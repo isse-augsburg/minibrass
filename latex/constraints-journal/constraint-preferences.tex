@@ -16,6 +16,12 @@
 
 %
 \RequirePackage{fix-cm}
+
+% unfortunately, we need this hack for cleref with svjour3
+\makeatletter
+\def\cl@chapter{}
+\makeatother
+
 %
 %\documentclass{svjour3}                     % onecolumn (standard format)
 \documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
@@ -24,17 +30,21 @@
 %
 \smartqed  % flush right qed marks, e.g. at end of proof
 %
-\input{preamble}
+
+\input{preamble}    % for useful commands
+\input{notation}    % should be rather exchangeable
+
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{stmaryrd,amsmath,amssymb}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{times}
 %\usepackage{courier}
 \lstdefinelanguage{MiniZinc}
 {
-	morekeywords={array,let,tuple,diff,union,where,exists,set,min,max,float,int,var,predicate,minimize,sum,in,forall,include,to,card},
+	morekeywords={array,solve,constraint,let,tuple,diff,function,repeat,union,where,exists,set,min,max,float,int,var,predicate,minimize,sum,in,forall,include,to,card,if,then,else,endif,print,search}, 
 	sensitive=false,
 	morecomment=[l]{\%},
 	morecomment=[s]{/*}{*/},
@@ -140,7 +150,8 @@ implement various optimization strategies using MiniZinc/MiniSearch, and provide
 \input{related-work}
 
 \section{Foundations}
-
+\label{sec:foundations}
+\input{foundations}
 % -----------------------
 \section{Implementation}
 \label{sec:implementation}

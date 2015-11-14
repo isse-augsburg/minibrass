@@ -10,7 +10,7 @@ include "alldifferent_except_0.mzn";
 predicate spd_better(var set of int: lhs, var set of int: rhs, 
                      set of int: softConstraints,
                      array[int, 1..2] of int: edges
-) :: promise_total = 
+) = 
 let {
   int: le = min(index_set_1of2(edges));
   int: ue = max(index_set_1of2(edges));

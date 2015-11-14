@@ -1,0 +1,45 @@
+% a sequence (list), e.g., values [1, 2, 3]
+\providecommand{\seq}[1]{\langle #1 \rangle}
+
+% a concrete variable (in an example)
+\providecommand{\concVar}[1]{\mathtt{#1}}
+
+% just shorthand for typing set braces
+\providecommand{\set}[1]{\{ #1 \}}
+
+% --------------------------------------------------
+% Elementary definitions
+\providecommand{\Vars}{X}
+% a generic variable for iterating etc
+\providecommand{\GenVar}{x}
+\providecommand{\Dom}{D}
+\providecommand{\Cons}{C}
+
+% problem identifier
+\providecommand{\Prob}{\mathit{CP}}
+
+% a generic constraint
+\providecommand{\GenCons}{c}
+
+% macro for the search space
+\providecommand{\SSpace}{[\Vars \to \Dom]}
+
+% macro for the set of boolean values
+\providecommand{\Bool}{\mathbb{B}}
+
+% a generic objective function
+\providecommand{\GenObj}{f}
+
+% --------------------------------------------------
+
+% a generic element of a meet monoid / PVS / c-semiring describing satisfaction, i.e., the "solution degree"
+\providecommand{\GenSolDegree}{m}
+
+% a generic variable assignment, i.e., an element taken from [X \to D]
+\providecommand{\GenAssignment}{\theta}
+
+% the solution operator giving the set of assignments that satisfy all hard constraints of a problem P
+\providecommand{\solns}{\mathrm{sol}}
+
+% the operator mapping assignments to their solution degrees
+\providecommand{\val}{\mathrm{val}}

@@ -1,0 +1,26 @@
+As usual, a constraint problem $\Prob = (\Vars, \Dom, \Cons)$ is described
+by a set of decision variables $\Vars$, their associated family of domains of possible values
+$\Dom = (\Dom_\GenVar)_{\GenVar \in \Vars}$, and a set of constraints $C$ that restrict valid assignments.
+An assignment $\GenAssignment$ is a mapping from $\Vars$ to $\Dom$, written as $\GenAssignment \in \SSpace$, such that each variable $\GenVar$ maps to
+a value in $\Dom_\GenVar$. A constraint $\GenCons \in \Cons$ is understood as a map $\GenCons : \SSpace \to \Bool$
+where we write $\GenAssignment \models \GenCons$ for $\GenCons(\GenAssignment) = \mathit{true}$. We call
+an assignment $\GenAssignment$ a solution if $\GenAssignment \models \GenCons$ holds for all $\GenCons \in \Cons$ and
+write the set of all solutions of a constraint problem $\Prob$ as $\solns(\Prob)$. If the main task of $\Prob$ is
+to find a solution, we call it a \emph{constraint satisfaction problem}~(CSP).
+
+We obtain \emph{constraint optimization problems}~(COP) by adding an objective function $\GenObj : \SSpace \to P$
+where $(P, \leq_P)$ is a partial order, i.e., $\leq_P$ is a reflexive, antisymmetric, and transitive relation over $P$.
+Elements of $P$ are interpreted as \emph{solution degrees}, denoting quality. Without loss of generality, we interpret
+$m <_P n$ as $m$ being inferior to $n$ and restrict our attention to maximization problems.
+Hence, a solution degree $\GenSolDegree$ is optimal with respect to a constraint problem $\Prob$, 
+if for all solutions $\GenAssignment \in \solns(\Prob)$ it holds either that $\GenObj(\GenAssignment) \leq_P \GenSolDegree$ or 
+$\GenObj(\GenAssignment) \parallel_P \GenSolDegree$, expressing incomparability.  It is \emph{reachable} if there is a solution $\GenAssignment \in \solns(\Prob)$ such that 
+$\GenObj(\GenAssignment) = \GenSolDegree$. 
+
+\begin{itemize}
+\item In a PVS, e.g., $\varepsilon_M$ is trivially optimal.
+\item Non-reachable optimal solution degrees emerge, e.g., as
+ upper bounds or from the supremum operator in c-semirings. 
+
+
+\end{itemize}
