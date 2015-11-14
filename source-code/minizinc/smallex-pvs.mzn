@@ -40,7 +40,7 @@ solve
 :: int_search(satisfied, input_order, indomain_min, complete)
 search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 %search time_limit(3000, strictlyBetterBAB_TPD(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
-%search time_limit(3000, onlyNotDominated_TPD(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, onlyNotDominatedBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 %satisfy;
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];

@@ -16,7 +16,7 @@ function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: violatedScs) =
            else break endif
        );
        
-function ann: onlyNotDominated(var set of SOFTCONSTRAINTS: violatedScs) =
+function ann: onlyNotDominatedBAB(var set of SOFTCONSTRAINTS: violatedScs) =
        repeat(
            if next() then
                let {
