@@ -1,6 +1,6 @@
 % pretty much only test code 
 % -------------------------------- 
-include "spd_better.mzn";
+include "tpd_better.mzn";
 
 int: nConstraints = 3;
 set of int: CONSTRAINTS = 1..nConstraints;
@@ -17,9 +17,7 @@ array[1..nEdges, 1..2] of CONSTRAINTS: edges = [| c2, c1
 %lhs = {3};
 %rhs ={2};
 
-constraint lhs != rhs;
-constraint spd_better(lhs,rhs, CONSTRAINTS, edges);
-%constraint spd_better({c1,c2,c3},rhs, CONSTRAINTS, edges);
-
+%constraint lhs != rhs;
+constraint tpd_worse(lhs,rhs, CONSTRAINTS, edges);
 
 solve satisfy; 

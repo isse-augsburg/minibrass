@@ -1,3 +1,5 @@
+include "link_set_to_booleans.mzn";
+
 % number of soft constraints 
 int: nScs; 
 set of int: SOFTCONSTRAINTS = 1..nScs;

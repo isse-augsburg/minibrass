@@ -4,7 +4,7 @@
 % dominance on sets of constraints
 % ---------------------------------
 
-predicate tpd_better(var set of int: lhs, var set of int: rhs, 
+predicate tpd_worse(var set of int: lhs, var set of int: rhs, 
                      set of int: softConstraints,
                      array[int, 1..2] of int: edges
 ) = 
