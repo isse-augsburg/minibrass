@@ -3,6 +3,7 @@
 % Implements transitive predecessor
 % dominance on sets of constraints
 % ---------------------------------
+include "cr-types.mzn";
 
 predicate tpd_worse(var set of int: lhs, var set of int: rhs, 
                      set of int: softConstraints,

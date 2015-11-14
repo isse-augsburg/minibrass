@@ -5,12 +5,16 @@
 %    * c3: x + y <= 3
 % -------------------------------------------
 
-include "minisearch.mzn"; % include the search minisearch lite
+%include "minisearch.mzn"; % include the search minisearch lite
 include "soft_constraints.mzn"; % model additions for soft constraint business
-include "spd_better.mzn"; % the actual isBetter predicate
-include "tpd_better.mzn"; % the actual isBetter predicate
-include "constraint_relationship_search.mzn"; % search strategies for SPD better
-include "concrete-pvs.mzn";
+include "spd_worse.mzn"; % the actual isBetter predicate
+include "tpd_worse.mzn"; % the actual isBetter predicate
+%include "constraint_relationship_search.mzn"; % search strategies for SPD better
+%include "pvs-spd.mzn";
+
+include "pvs-weighted.mzn";
+% choose aggregator for pvs-weighted: sumAggregator, maxAggregator, minAggregator
+include "sumAggregator.mzn";
 
 % soft constraint specific for this model
 nScs = 3;
@@ -25,11 +29,18 @@ constraint x + 1 = y <-> satisfied[1];
 constraint z = y + 2 <-> satisfied[2];
 constraint x + y <= 3 <-> satisfied[3];
 
+% for debug purposes 
+%constraint isWorse({1,2,3}, violatedScs);
+%constraint isWorse({1,2}, violatedScs);
+%constraint isWorse({1}, violatedScs);
+%constraint isWorse({2,3}, violatedScs);
+%constraint isWorse({2}, violatedScs);
+
 solve 
 :: int_search(satisfied, input_order, indomain_min, complete)
-search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 %search time_limit(3000, strictlyBetterBAB_TPD(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 %search time_limit(3000, onlyNotDominated_TPD(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
-%satisfy;
+satisfy;
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x), y  -> \(y), z -> \(z)"];

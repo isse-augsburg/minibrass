@@ -1,5 +1,8 @@
-% Constraint-relationship-specific search strategies
+% PVS-specific search strategies
 % ---------------------------------------------------
+
+% only declare predicate for worsening
+predicate isWorse(var set of int: leftViolatedScs, var set of int: rightViolatedScs); 
 
 function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: violatedScs) =
        repeat(
@@ -8,7 +11,7 @@ function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: violatedScs) =
                  set of SOFTCONSTRAINTS: lb = sol(violatedScs); 
                } in (
                  print("Intermediate solution:") /\ print() /\
-                 commit() /\ post(spd_better(lb, violatedScs, SOFTCONSTRAINTS, edges))
+                 commit() /\ post(isWorse(lb, violatedScs))
                )
            else break endif
        );
@@ -20,31 +23,8 @@ function ann: onlyNotDominated(var set of SOFTCONSTRAINTS: violatedScs) =
                  set of SOFTCONSTRAINTS: lb = sol(violatedScs); 
                } in (
                  print("Intermediate solution:") /\ print() /\
-                 commit() /\ post(not (spd_better(violatedScs, lb, SOFTCONSTRAINTS, edges) \/ violatedScs = lb ) )
+                 commit() /\ post(not (isWorse(violatedScs, lb) \/ violatedScs = lb ) )
                )
            else break endif
        );
 
-function ann: strictlyBetterBAB_TPD(var set of SOFTCONSTRAINTS: violatedScs) =
-       repeat(
-           if next() then %:: int_search(satisfied, input_order, indomain_min, complete) then
-               let {
-                 set of SOFTCONSTRAINTS: ub = sol(violatedScs); 
-               } in (
-                 print("Intermediate solution:") /\ print() /\
-                 commit() /\ post(tpd_better(ub, violatedScs, SOFTCONSTRAINTS, edges))
-               )
-           else break endif
-       );
-       
-function ann: onlyNotDominated_TPD(var set of SOFTCONSTRAINTS: violatedScs) =
-       repeat(
-           if next() then
-               let {
-                 set of SOFTCONSTRAINTS: ub = sol(violatedScs); 
-               } in (
-                 print("Intermediate solution:") /\ print() /\
-                 commit() /\ post(not (tpd_better(violatedScs, ub, SOFTCONSTRAINTS, edges) \/ violatedScs = ub ) )
-               )
-           else break endif
-       );

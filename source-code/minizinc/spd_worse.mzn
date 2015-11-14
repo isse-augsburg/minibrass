@@ -6,6 +6,7 @@
 %  order inversion)
 % ---------------------------------
 include "alldifferent_except_0.mzn";
+include "cr-types.mzn";
 
 predicate spd_worse(var set of int: lhs, var set of int: rhs, 
                      set of int: softConstraints,
