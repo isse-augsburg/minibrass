@@ -1,9 +1,7 @@
 % minimal example to explore propagation capabilities
-include "link_set_to_booleans.mzn";
-include "soft_constraints.mzn"; % model additions for soft constraint business
-include "spd_better.mzn"; % the actual isBetter predicate
-include "tpd_better.mzn"; % the actual isBetter predicate
-include "concrete-pvs.mzn";
+include "../soft_constraints.mzn"; % model additions for soft constraint business
+include "../spd_worse.mzn"; % the actual isBetter predicate
+include "../tpd_worse.mzn"; % the actual isBetter predicate
 
 nScs = 2;
 
@@ -13,12 +11,12 @@ array[1..3] of var bool: dummies;
 
 penalties = [2,1];
 
-nEdges = 1;
-edges = [| 2, 1 |];
+nCrEdges = 1;
+crEdges = [| 2, 1 |];
 
 constraint x = 2 <-> satisfied[1];
 constraint y = 2 <-> satisfied[2];
-constraint spd_better({1}, violatedScs,SOFTCONSTRAINTS,edges);
+constraint spd_worse({1}, violatedScs,SOFTCONSTRAINTS,crEdges);
 % how can the solver immediately deduce that x = 1 is a bad idea?
 % well quite simple, x = 1 -> violated[1] thus violatedScs \in 1..1, 1..2
 % but 1..1 is kicked from violatedScs' domain by the propagation of the simple 

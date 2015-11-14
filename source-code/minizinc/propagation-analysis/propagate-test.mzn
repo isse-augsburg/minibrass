@@ -1,9 +1,8 @@
 % minimal example to explore propagation capabilities
-include "link_set_to_booleans.mzn";
-include "soft_constraints.mzn"; % model additions for soft constraint business
-include "spd_better.mzn"; % the actual isBetter predicate
-include "tpd_better.mzn"; % the actual isBetter predicate
-include "concrete-pvs.mzn";
+
+include "../soft_constraints.mzn"; % model additions for soft constraint business
+include "../spd_worse.mzn"; % the actual isBetter predicate
+include "../tpd_worse.mzn"; % the actual isBetter predicate
 
 nScs = 3;
 
@@ -15,13 +14,13 @@ array[1..3] of var bool: dummies;
 
 penalties = [3,1,1];
 
-nEdges = 2;
-edges = [| 2, 1 | 3, 1 |];
+nCrEdges = 2;
+crEdges = [| 2, 1 | 3, 1 |];
 
 constraint x = 2 <-> satisfied[1];
 constraint y = 2 <-> satisfied[2];
 constraint z = 2 <-> satisfied[3];
-constraint spd_better({1}, violatedScs,SOFTCONSTRAINTS,edges);
+constraint spd_worse({1}, violatedScs,SOFTCONSTRAINTS,crEdges);
 constraint penSum < 3;
 %constraint spd_better({1}, lb(violatedScs),SOFTCONSTRAINTS,edges);
 % how can the solver immediately deduce that x = 1 is a bad idea?
