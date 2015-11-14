@@ -1,6 +1,6 @@
 % pretty much only test code 
 % -------------------------------- 
-include "tpd_worse.mzn";
+include "../tpd_worse.mzn";
 
 int: nConstraints = 3;
 set of int: CONSTRAINTS = 1..nConstraints;
