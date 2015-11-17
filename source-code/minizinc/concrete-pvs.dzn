@@ -1,7 +1,5 @@
 % now just some edge business as well as penalties
-% penalties for the weighted view
-% penalty for constraint i
-penalties = [3,1,1];
+
 % preprocessing in MiniSeach
 % check consistency
 nCrEdges = 2;

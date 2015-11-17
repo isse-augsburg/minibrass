@@ -22,7 +22,7 @@ constraint x = 2 <-> satisfied[1];
 constraint y = 2 <-> satisfied[2];
 constraint z = 2 <-> satisfied[3];
 constraint spd_worse({1}, violatedScs,SOFTCONSTRAINTS,crEdges);
-%constraint penSum < 2;
+constraint penSum < 2;
 %constraint spd_better({1}, lb(violatedScs),SOFTCONSTRAINTS,edges);
 % how can the solver immediately deduce that x = 1 is a bad idea?
 % well quite simple, x = 1 -> violated[1] thus violatedScs \in 1..1, 1..2
