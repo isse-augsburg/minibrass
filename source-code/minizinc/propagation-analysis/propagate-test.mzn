@@ -3,6 +3,7 @@
 include "../soft_constraints.mzn"; % model additions for soft constraint business
 include "../spd_worse.mzn"; % the actual isBetter predicate
 include "../tpd_worse.mzn"; % the actual isBetter predicate
+include "../cr-types.mzn";
 
 nScs = 3;
 
