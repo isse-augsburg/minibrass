@@ -6,12 +6,11 @@
 %  order inversion)
 % ---------------------------------
 include "alldifferent_except_0.mzn";
-include "cr-types.mzn";
 
 predicate spd_worse(var set of int: lhs, var set of int: rhs, 
                      set of int: softConstraints,
                      array[int, 1..2] of int: edges
-) = 
+) :: promise_total = 
 let {
   int: le = min(index_set_1of2(edges));
   int: ue = max(index_set_1of2(edges));
@@ -28,7 +27,7 @@ let {
 
   % collect all predecessors such that succ in lessThans[pred] 
   % iff succ less than pred
-  array[softConstraints] of set of softConstraints: lessThans = 
+  array[softConstraints] of set of softConstraints: dominators = 
     [ {succ | succ in softConstraints where exists(e in le..ue) 
          (edges[e,1] = pred /\ edges[e,2] = succ)} | pred in softConstraints];
 
@@ -37,5 +36,5 @@ let {
   alldifferent_except_0(witness) /\  
   forall(s in ub(rUndefined)) (s in rUndefined -> witness[s] = 0) /\ 
   forall(s in ub(rSymDiff)) (s in rSymDiff -> (witness[s] in lSymDiff /\ 
-                                               witness[s] in lessThans[s]))    
+                                               witness[s] in dominators[s]))    
 );

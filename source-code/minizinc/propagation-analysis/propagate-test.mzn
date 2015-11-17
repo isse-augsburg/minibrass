@@ -12,7 +12,7 @@ var 1..2: z;
 
 array[1..3] of var bool: dummies; 
 
-penalties = [3,1,1];
+penalties = [2,1,1];
 
 nCrEdges = 2;
 crEdges = [| 2, 1 | 3, 1 |];
@@ -21,7 +21,7 @@ constraint x = 2 <-> satisfied[1];
 constraint y = 2 <-> satisfied[2];
 constraint z = 2 <-> satisfied[3];
 constraint spd_worse({1}, violatedScs,SOFTCONSTRAINTS,crEdges);
-constraint penSum < 3;
+%constraint penSum < 2;
 %constraint spd_better({1}, lb(violatedScs),SOFTCONSTRAINTS,edges);
 % how can the solver immediately deduce that x = 1 is a bad idea?
 % well quite simple, x = 1 -> violated[1] thus violatedScs \in 1..1, 1..2

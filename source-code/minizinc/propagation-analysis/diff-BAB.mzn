@@ -33,8 +33,8 @@ constraint x = 3 <-> violated[3];
 
 solve 
 :: int_search([x], input_order, indomain_max, complete)
-search strictlyBetterBAB(violatedScs);% /\ if hasSol() then print("Final solution: ") /\ print() else print("No solution found\n") endif;
-%search onlyNotDominatedBAB(violatedScs) /\ if hasSol() then print("Final solution: ") /\ print() else print("No solution found\n") endif;
+%search strictlyBetterBAB(violatedScs);% /\ if hasSol() then print("Final solution: ") /\ print() else print("No solution found\n") endif;
+search onlyNotDominatedBAB(violatedScs) /\ if hasSol() then print("Final solution: ") /\ print() else print("No solution found\n") endif;
 %satisfy;
 
 output ["Obj: \(penSum) by violating {\(violatedScs) } : x -> \(x)"];
