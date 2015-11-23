@@ -21,7 +21,43 @@ $\GenObj(\GenAssignment) = \GenSolDegree$.
 \item In a PVS, e.g., $\varepsilon_M$ is trivially optimal.
 \item Non-reachable optimal solution degrees emerge, e.g., as
  upper bounds or from the supremum operator in c-semirings. 
+\item Thus, the answer returned from dynamic programming for c-semirings
+usually just returns an upper bound that is not necessarily reachable.
 
-\item Borrowed from Wikipedia, Abstract Algebra: \todobox{Algebraic structures, with their associated homomorphisms, form mathematical categories. Category theory is a powerful formalism for analyzing and comparing different algebraic structures.}
 \end{itemize}
 
+\subsection{Category Theory}
+\todobox{This is just verbatim from Wikipedia, Abstract Algebra, better reformulate}
+\begin{itemize}
+
+\item Algebraic structures, with their associated homomorphisms, form mathematical categories. 
+Category theory is a powerful formalism for analyzing and comparing different algebraic structures.
+
+\item Mathematical categories are composed of \emph{objects} (e.g,. algebraic structures) and
+\emph{arrows} (also called morphisms) between them. Each arrow $f$ admits a domain $A$
+and codomain $B$, both being objects, and is written as $f : A \to B$. For each arrow
+$f : A \to B$ and $g : B \to C$ there has to be a composite arrow $(g \circ f) : A \to C$.
+Arrow composition $\circ$ needs to be associative and for each object $A$, there has to be an identity arrow 
+$\idfun{A} : A \to A$ acting as ``neutral element'' with respect to composition, i.e., $\idfun{B} \circ f = f \circ \idfun{A} = f$.
+The most straightforward example is given by the category $\setcat$, where objects are sets, arrows are functions, 
+composition is function composition, and the identity arrows are just the identity function.
+A slightly more elaborate example is given by $\POcat$, the category of partially-ordered sets, that 
+has partial orders as objects and partial order homomorphisms (i.e., monotone functions) as arrows.
+Note that this definition is proper since monotone functions are closed under function composition, i.e., if $\varphi : |P| \to |Q|$ and 
+$\psi : |Q| \to |R|$ are monotone functions, so is $\psi \circ \varphi$.
+
+\item In categorical arguments, it is important to distinguish algebraic structures from their
+underlying components, e.g., underlying sets, functions, or relations. Taking
+partially-ordered sets as examples, we refer to the structure $P = (|P|, \leq_P)$ as 
+\emph{partial order}, to $|P|$ as the \emph{underlying set}, and to the binary, reflexive, antisymmetric, 
+and transitive relation $\leq_P {} \subseteq |P| \times |P|$
+as \emph{ordering} (relation). All applications dealt with in this paper are examples
+of so-called \emph{concrete categories} where objects are sets (perhaps) with additional structures
+and arrows are set-theoretic functions satisfying certain axioms (preserving structure as in homomorphisms).
+
+\item More technically, $| \cdot |$ is a an example of a \emph{functor}, i.e., a mapping $F$ between categories
+$C$ and $D$ that sends every $C$-object $A$ to a $D$-object $F(A)$ and every $C$-arrow $f : A \to B$ to 
+a $D$-arrow $F(f) : F(A) \to F(B)$. In this case, $| \cdot | : \POcat \to \setcat$ is a mapping such that if
+$P = (X, \leq_P)$, $|P| = X$ and each PO-homomorphism $\varphi : P \to Q$ is mapped to its underlying function $|\varphi| : |P| \to |Q|$.
+
+\end{itemize}
