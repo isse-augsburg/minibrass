@@ -1,0 +1,32 @@
+
+lemmas
+
+reflU: e ≤_U e;
+antisymmU: e ≤_U e0 ∧ e0 ≤_U e → e0 = e;
+transU: e ≤_U e0 ∧ e0 ≤_U e1 → e ≤_U e1;
+ 
+;; <name> : <sequent> ;
+;; used for : <some_flags> ; comment : <some_comment> ;
+
+;;; END
+
+;;;****************************************************************************************
+;;; This file is used to add additional theorems.
+;;; 1. Two semicolons start a line comment
+;;; 2. (: ... :) delimit a comment. They can be nested!
+;;; 3. Reading stops after ;;; END
+;;; 4. Theorems have the form
+
+<name> : <sequent> ; used for : <some_flags> ; comment : <some_comment> ;
+
+     'used for' and 'comment' are optional.
+     <some_comment> may be any text not containing a ;
+     <some_flags> is a comma separated list with information that the lemma should
+     be used as a simplifier rule or something like that. Since you can add or delete
+     simplifier rules etc. by menu commands, you can always omit 'used for' if you want.
+     Note: changing the flags or the comment only works if the sequent is also changed!!!
+     possible flags are:
+
+     s (simplifier rule), ls (local simplifier rule), f (forward), lf (local forward),
+     e (elimination), c (cut), lc (local cut)
+

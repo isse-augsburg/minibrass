@@ -1,0 +1,27 @@
+enrich element with
+
+;; sorts ;
+
+constants ε : element;
+
+functions . * . : element × element → element ;
+
+;; predicates ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;→·······×
+
+axioms
+  neutr: ε * e = e;
+  comm: e * e0 = e0 * e;
+  assoc: (e * e0) * e1 = e * (e0 * e1);
+;; declaration
+
+end enrich

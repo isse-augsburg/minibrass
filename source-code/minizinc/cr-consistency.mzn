@@ -87,9 +87,13 @@ array[int] of set of int: dominees) = let
 % Utility function that calculates the transitive 
 % closure of a given constraint relationship
 % - verifies that pred is a predecessor of succ
+% - does not check for cycles, this has to be
+%   done by consistentCR to avoid multiple 
+%   calculations
 function array[int, int] of int: 
                transClosure(set of int: softConstraints,
                             array[int, int] of int: edges) =
+                  % parameter range check is *not* done as of now by MZ
 let {
   array[softConstraints,softConstraints] of bool: tc = transClosureInt(softConstraints, edges); 
   int: nEdges = sum(s in softConstraints, p in softConstraints)(bool2int(tc[s,p]) );

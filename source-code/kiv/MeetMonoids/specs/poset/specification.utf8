@@ -1,0 +1,30 @@
+enrich element with
+
+;; sorts ;
+
+;; constants ;
+
+;; functions ;
+
+predicates
+
+. ≤ . : element × element ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+axioms
+  refl: e ≤ e;
+  antisym: e ≤ e0 ∧ e0 ≤ e → e = e0;
+  trans: e ≤ e0 ∧ e0 ≤ e1 → e ≤ e1; 
+  
+;; declaration
+
+end enrich

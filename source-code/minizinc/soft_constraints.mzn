@@ -13,3 +13,8 @@ var int: penSum = sum(sc in SOFTCONSTRAINTS) (bool2int(not satisfied[sc]) * pena
 
 var set of SOFTCONSTRAINTS: violatedScs;
 constraint link_set_to_booleans(violatedScs,violated); 
+
+% find the sorted permutation of soft constraint instances
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: sortPermScs = arg_sort(penalties);
+% invert, since arg_sort use <= and we need decreasing order
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: mostImpFirst = [ sortPermScs[nScs-s+1] | s in SOFTCONSTRAINTS]; 
