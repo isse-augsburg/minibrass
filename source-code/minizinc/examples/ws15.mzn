@@ -170,8 +170,115 @@ constraint worksAt[schmidt] = sap <-> satisfied[schmSap];
 constraint worksAt[schmidt] = siemens <-> satisfied[schmSiem];
 constraint worksAt[schmidt] = maiborn <-> satisfied[schmMaib];
 
-nScs = 44; % two soft constraints so far
-nCrEdges = 34; % only one true preference 
+% -------------------------------------------------------
+ 
+% Markus Schnappinger 
+
+% has three Equivalence classes ; leave third as hard for now 
+
+int: schnFavs = 45;
+int: schnOK = 46;
+int: schnBad = 47;
+
+constraint worksAt[schmidt] in {maiborn, capgemini}  <-> satisfied[schnFavs];
+constraint worksAt[schmidt] in {siemens,msg,zuehlke} <-> satisfied[schnOK];
+constraint worksAt[schmidt] in {sap,oracle} <-> satisfied[schnBad];
+
+% make the constraint strict
+constraint not satisfied[schnBad];
+
+% -------------------------------------------------------
+ 
+% Martin Hartmond
+int: harMaib = 48;
+int: harMsg = 49;
+int: harOracle = 50;
+int: harSiem = 51;
+int: harSap = 52;
+int: harZuehlke = 53;
+int: harCapg = 54;
+
+constraint worksAt[hartmond] = maiborn <-> satisfied[harMaib];
+constraint worksAt[hartmond] = msg <-> satisfied[harMsg];
+constraint worksAt[hartmond] = oracle <-> satisfied[harOracle];
+constraint worksAt[hartmond] = siemens <-> satisfied[harSiem];
+constraint worksAt[hartmond] = sap <-> satisfied[harSap];
+constraint worksAt[hartmond] = zuehlke <-> satisfied[harZuehlke];
+constraint worksAt[hartmond] = capgemini <-> satisfied[harCapg];
+
+% -------------------------------------------------------
+ 
+% Lukas Vogel
+
+int: vogMaib = 55;
+int: vogMsg = 56;
+int: vogOracle = 57;
+int: vogSiem = 58;
+int: vogSap = 59;
+int: vogZuehlke = 60;
+int: vogCapg = 61;
+
+constraint worksAt[vogel] = maiborn <-> satisfied[vogMaib];
+constraint worksAt[vogel] = msg <-> satisfied[vogMsg];
+constraint worksAt[vogel] = oracle <-> satisfied[vogOracle];
+constraint worksAt[vogel] = siemens <-> satisfied[vogSiem];
+constraint worksAt[vogel] = sap <-> satisfied[vogSap];
+constraint worksAt[vogel] = zuehlke <-> satisfied[vogZuehlke];
+constraint worksAt[vogel] = capgemini <-> satisfied[vogCapg];
+
+% -------------------------------------------------------
+ 
+% Martin Wurzer
+
+int: wurMaib = 62;
+int: wurMsg = 63;
+int: wurOracle = 64;
+int: wurSiem = 65;
+int: wurSap = 66;
+int: wurZuehlke = 67;
+int: wurCapg = 68;
+
+constraint worksAt[wurzer] = maiborn <-> satisfied[wurMaib];
+constraint worksAt[wurzer] = msg <-> satisfied[wurMsg];
+constraint worksAt[wurzer] = oracle <-> satisfied[wurOracle];
+constraint worksAt[wurzer] = siemens <-> satisfied[wurSiem];
+constraint worksAt[wurzer] = sap <-> satisfied[wurSap];
+constraint worksAt[wurzer] = zuehlke <-> satisfied[wurZuehlke];
+constraint worksAt[wurzer] = capgemini <-> satisfied[wurCapg];
+
+% -------------------------------------------------------
+ 
+% Stefan Fritsch
+
+int: friMaib = 69;
+int: friMsg = 70;
+int: friOracle = 71;
+int: friSiem = 72;
+int: friSap = 73;
+int: friZuehlke = 74;
+int: friCapg = 75;
+
+constraint worksAt[fritsch] = maiborn <-> satisfied[friMaib];
+constraint worksAt[fritsch] = msg <-> satisfied[friMsg];
+constraint worksAt[fritsch] = oracle <-> satisfied[friOracle];
+constraint worksAt[fritsch] = siemens <-> satisfied[friSiem];
+constraint worksAt[fritsch] = sap <-> satisfied[friSap];
+constraint worksAt[fritsch] = zuehlke <-> satisfied[friZuehlke];
+constraint worksAt[fritsch] = capgemini <-> satisfied[friCapg];
+
+% -------------------------------------------------------
+ 
+% Benedikt Jenik
+
+int: jenOracle = 76;
+int: jenSap = 77;
+
+constraint worksAt[jenik] = oracle  <-> satisfied[jenOracle];
+constraint worksAt[jenik] = sap <-> satisfied[jenSap];
+
+nScs = 77; % two soft constraints so far
+nCrEdges = 61; % only one true preference 
+
 % johnny being at msg points at (is less important than) johnny being at msg
 crEdges = [| pMaib, pSiem | pSiem, pMsg | pMsg, pSap | pSap, pOracle
            | schrOracle, schrMsg | schrMsg, schrMaib 
@@ -183,5 +290,10 @@ crEdges = [| pMaib, pSiem | pSiem, pMsg | pMsg, pSap | pSap, pOracle
            | kinOracle, kinSap | kinSap, kinSiem
            | woeZuehlke, woeCapg | woeCapg, woeOracle | woeOracle, woeSap | woeSap, woeMsg | woeMsg, woeMaib
            | schmMaib, schmSap | schmSap, schmOracle | schmOracle, schmSiem
-
+           | schnBad, schnOK | schnOK, schnFavs
+           | harZuehlke, harOracle | harOracle, harCapg | harCapg, harSap | harSap, harMsg | harMsg, harSiem | harSiem, harMaib
+           | vogCapg, vogSap | vogSap, vogMaib | vogMaib, vogZuehlke | vogZuehlke, vogSiem | vogSiem, vogOracle | vogOracle, vogMsg
+           | wurZuehlke, wurSap | wurSap, wurOracle | wurOracle, wurCapg | wurCapg, wurMsg | wurMsg, wurSiem | wurSiem, wurMaib
+           | friOracle, friSap | friSap, friCapg | friCapg, friMsg | friMsg, friSiem | friSiem, friZuehlke | friZuehlke, friMaib
+           | jenSap, jenOracle
  |]
