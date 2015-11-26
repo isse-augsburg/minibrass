@@ -43,3 +43,5 @@ solve
 %:: int_search(satisfied, input_order, indomain_max, complete)
 :: int_search([ satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS], input_order, indomain_max, complete)
 minimize penSum;
+
+output [ "worksAt = \(worksAt), penalty: \(penSum)"];
