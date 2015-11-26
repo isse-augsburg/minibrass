@@ -7,6 +7,8 @@ include "../soft_constraints.mzn";
 include "../spd_worse.mzn"; % the actual isBetter predicate
 include "../tpd_worse.mzn"; % the actual isBetter predicate
 
+include "../cr-consistency.mzn";
+
 % binding to the concrete PVS in use has to be
 % done using pvs-xyz.mzn
 include "../pvs-spd.mzn";
@@ -28,12 +30,14 @@ array[STUDENT] of var COMPANY: worksAt;
 int: minPerCompany; int: maxPerCompany;
 
 % some default values for now
-minPerCompany = 1; maxPerCompany = 2;
+minPerCompany = 1; maxPerCompany = 4;
 
 constraint global_cardinality_low_up ( worksAt, [c | c in COMPANY], [minPerCompany | c in COMPANY], [maxPerCompany | c in COMPANY]); 
 
 % hides the data (is however defined as .mzn since we want names)
-include "sample.mzn";
+include "ws15.mzn";
+
+constraint assert(consistentCR(SOFTCONSTRAINTS, crEdges), "Constraint relationship is not consistent");
 
 solve 
 %:: int_search(satisfied, input_order, indomain_max, complete)
