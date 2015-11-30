@@ -26,7 +26,11 @@ int: oracle = 5;
 int: siemens = 6;
 int: zuehlke = 7;
 % some user defined preferences
- 
+% first 2nd streak
+% [1, 1, 4, 3, 3, 2, 2, 3, 5, 7, 6, 6, 6, 5, 2, 5]
+% current optimum
+% [1, 1, 1, 4, 3, 2, 2, 3, 5, 7, 6, 6, 6, 5, 3, 5]
+%  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
 % raul persa 
 int: pOracle = 1;
 int: pSap = 2;
@@ -180,9 +184,9 @@ int: schnFavs = 45;
 int: schnOK = 46;
 int: schnBad = 47;
 
-constraint worksAt[schmidt] in {maiborn, capgemini}  <-> satisfied[schnFavs];
-constraint worksAt[schmidt] in {siemens,msg,zuehlke} <-> satisfied[schnOK];
-constraint worksAt[schmidt] in {sap,oracle} <-> satisfied[schnBad];
+constraint worksAt[schnappinger] in {maiborn, capgemini}  <-> satisfied[schnFavs];
+constraint worksAt[schnappinger] in {siemens,msg,zuehlke} <-> satisfied[schnOK];
+constraint worksAt[schnappinger] in {sap,oracle} <-> satisfied[schnBad];
 
 % make the constraint strict
 constraint not satisfied[schnBad];
@@ -276,24 +280,118 @@ int: jenSap = 77;
 constraint worksAt[jenik] = oracle  <-> satisfied[jenOracle];
 constraint worksAt[jenik] = sap <-> satisfied[jenSap];
 
-nScs = 77; % two soft constraints so far
-nCrEdges = 61; % only one true preference 
+%% and now for the companies
+%% =======================================================
 
-% johnny being at msg points at (is less important than) johnny being at msg
-crEdges = [| pMaib, pSiem | pSiem, pMsg | pMsg, pSap | pSap, pOracle
-           | schrOracle, schrMsg | schrMsg, schrMaib 
-           | weCapg, weZuehlke | weZuehlke, weSap | weSap, weSiem | weSiem, weOracle | weOracle, weMsg | weMsg, weMaib
-           | cimSap, cimSiem | cimSiem, cimMaib
-           | engZuehlke, engCap | engCap, engMaib
-           | bruSiem, bruMaib | bruMaib, bruCap
-           | riSiem, riZuehlke | riZuehlke, riCapg | riCapg, riMsg | riMsg, riSap | riSap, riMaib | riMaib, riOracle
-           | kinOracle, kinSap | kinSap, kinSiem
-           | woeZuehlke, woeCapg | woeCapg, woeOracle | woeOracle, woeSap | woeSap, woeMsg | woeMsg, woeMaib
-           | schmMaib, schmSap | schmSap, schmOracle | schmOracle, schmSiem
-           | schnBad, schnOK | schnOK, schnFavs
-           | harZuehlke, harOracle | harOracle, harCapg | harCapg, harSap | harSap, harMsg | harMsg, harSiem | harSiem, harMaib
-           | vogCapg, vogSap | vogSap, vogMaib | vogMaib, vogZuehlke | vogZuehlke, vogSiem | vogSiem, vogOracle | vogOracle, vogMsg
-           | wurZuehlke, wurSap | wurSap, wurOracle | wurOracle, wurCapg | wurCapg, wurMsg | wurMsg, wurSiem | wurSiem, wurMaib
-           | friOracle, friSap | friSap, friCapg | friCapg, friMsg | friMsg, friSiem | friSiem, friZuehlke | friZuehlke, friMaib
-           | jenSap, jenOracle
- |]
+% -------------------------------------------------------
+% MaibornWolff
+int: maibKind = 78;
+int: maibJen = 79;
+int: maibWoe = 80;
+int: maibCim = 81;
+int: maibSchn = 82;
+int: maibEng = 83;
+
+constraint worksAt[kindelsberger] = maiborn <-> satisfied[maibKind];
+constraint worksAt[jenik] = maiborn <-> satisfied[maibJen];
+constraint worksAt[woehrle] = maiborn <-> satisfied[maibWoe];
+constraint worksAt[cimander] = maiborn <-> satisfied[maibCim];
+constraint worksAt[schnappinger] = maiborn <-> satisfied[maibSchn];
+constraint worksAt[engel] = maiborn <-> satisfied[maibEng];
+
+% -------------------------------------------------------
+% Oracle
+int: oracKind = 84;
+int: oracJen = 85;
+int: oracWoe = 86;
+int: oracRie = 87;
+int: oracSchm = 88;
+int: oracWeb = 89;
+int: oracVog = 90;
+int: oracPers = 91;
+
+constraint worksAt[kindelsberger] = oracle <-> satisfied[oracKind];
+constraint worksAt[jenik] = oracle <-> satisfied[oracJen];
+constraint worksAt[woehrle] = oracle <-> satisfied[oracWoe];
+constraint worksAt[riedmann] = oracle <-> satisfied[oracRie];
+constraint worksAt[weber] = oracle <-> satisfied[oracWeb];
+constraint worksAt[schmidt] = oracle <-> satisfied[oracSchm];
+constraint worksAt[persa] = oracle <-> satisfied[oracPers];
+constraint worksAt[oracVog] = oracle <-> satisfied[oracVog];
+
+% -------------------------------------------------------
+% CapGemini
+
+% model this as a fully connected bipartite graph 
+int: capGSchnapp = 92;
+int: capGEng = 93;
+int: capGJen = 94;
+int: capGWurz = 95;
+int: capGKind = 96;
+int: capGPers = 97;
+
+constraint worksAt[kindelsberger] = capgemini <-> satisfied[capGKind];
+constraint worksAt[jenik] = capgemini <-> satisfied[capGJen];
+constraint worksAt[schnappinger] = capgemini <-> satisfied[capGSchnapp];
+constraint worksAt[wurzer] = capgemini <-> satisfied[capGWurz];
+constraint worksAt[persa] = capgemini <-> satisfied[capGPers];
+constraint worksAt[engel] = capgemini <-> satisfied[capGEng];
+
+% -------------------------------------------------------
+% SAP
+
+int: sapJen = 98;
+int: sapWoe = 99;
+int: sapKind = 100;
+int: sapVog = 101;
+int: sapSchnapp = 102;
+int: sapRie = 103;
+int: sapCim = 104;
+
+constraint worksAt[kindelsberger] = sap <-> satisfied[sapKind];
+constraint worksAt[jenik] = sap <-> satisfied[sapJen];
+constraint worksAt[schnappinger] = sap <-> satisfied[sapSchnapp];
+constraint worksAt[cimander] = sap  <-> satisfied[sapCim];
+constraint worksAt[woehrle] = sap <-> satisfied[sapWoe];
+constraint worksAt[riedmann] = sap <-> satisfied[sapRie];
+constraint worksAt[vogel] = sap <-> satisfied[sapVog];
+
+% -------------------------------------------------------
+% Siemens
+
+int: sieEng = 105;
+int: sieFri = 106;
+int: sieKind = 107;
+int: sieVog = 108;
+int: sieSchnapp = 109;
+int: sieRie = 110;
+int: sieWur = 111;
+
+constraint worksAt[kindelsberger] = siemens <-> satisfied[sieKind];
+constraint worksAt[engel] = siemens <-> satisfied[sieEng];
+constraint worksAt[schnappinger] = siemens <-> satisfied[sieSchnapp];
+constraint worksAt[fritsch] = siemens <-> satisfied[sieFri];
+constraint worksAt[wurzer] = siemens <-> satisfied[sieWur];
+constraint worksAt[riedmann] = siemens <-> satisfied[sieRie];
+constraint worksAt[vogel] = siemens <-> satisfied[sieVog];
+
+% -------------------------------------------------------
+% Zuehlke
+
+int: zueJen = 112;
+int: zueSchm = 113;
+int: zueWeb = 114;
+
+constraint worksAt[jenik] = zuehlke <-> satisfied[zueJen];
+constraint worksAt[schmidt] = zuehlke <-> satisfied[zueSchm];
+constraint worksAt[weber] = zuehlke <-> satisfied[zueWeb];
+
+nScs = 114;
+lastStudentPref = 77;
+
+include "true-edges.mzn";
+%include "toy-edges.mzn"; % for better testing
+
+
+
+% worksAt = [1, 6, 6, 4, 3, 3, 2, 3, 5, 6, 7, 3, 6, 5, 5, 5], penalty: 265
