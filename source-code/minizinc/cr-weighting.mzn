@@ -39,7 +39,8 @@ let {
 %   1 + sum(s_ in dominees[s]) (2*weightingTPD(s_, softConstraints, dominees)-1)
 function int: weightingTPD(int: s, set of int: softConstraints, 
                            array[int] of set of int: dominees) = (
-   1 + sum(s_ in dominees[s]) (weightingTPD(s_, softConstraints, dominees))
+1 + sum(s_ in dominees[s]) (2*weightingTPD(s_, softConstraints, dominees)-1)
+%   1 + sum(s_ in dominees[s]) (weightingTPD(s_, softConstraints, dominees))
 );
 
 % assigns weights such that the weight of a soft constraint
