@@ -4,6 +4,9 @@ include "globals.mzn";
 % some soft constraint business
 include "../soft_constraints.mzn";
 
+% for minisearch support
+%include "minisearch.mzn";
+
 int: n; 
 set of int: STUDENT = 1..n; 
 
@@ -32,9 +35,18 @@ nScs = n;
 penalties = [ 1 | n in STUDENT]; % they are equally important in this case 
 
 constraint forall(s in STUDENT) ( (scheduled[s] in possibles[s]) <-> satisfied[s] ) ;
+var DATE: scheduledDates;
+constraint  nvalue(scheduledDates, scheduled);
+var 0..nScs: violateds;
+constraint violateds = penSum;
+
+constraint penSum = 0;
 
 solve 
 :: int_search(satisfied, input_order, indomain_max, complete)
-minimize penSum;
+%search time_limit(3000, minimize_lex([scheduledDates, violateds])) /\ if hasSol() then print() else print("No solution found\n") endif;
+%search time_limit(3000, minimize_lex([violateds, scheduledDates])) /\ if hasSol() then print() else print("No solution found\n") endif;
 
-output [ "Penalties: \(penSum)\n ++ Scheduled: \(scheduled)" ];
+minimize scheduledDates;
+
+output [ "Penalties: \(violateds)\n ++ Scheduled: \(scheduled)\n ++ Distinct dates: \(scheduledDates)" ];
