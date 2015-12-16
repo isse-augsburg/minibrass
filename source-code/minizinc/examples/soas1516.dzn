@@ -1,5 +1,5 @@
 % actual SOAS user data
-n = 17;
+n = 33;
 m = 12;
 
 possibles = [
@@ -19,7 +19,23 @@ possibles = [
             3..12,
             1..12 diff {2,6,12},
             3..6,
-            {i | i in 1..12 where i mod 2 = 0}
+            {i | i in 1..12 where i mod 2 = 0},
+            3..12,
+            3..12,
+            1..6,
+            9..12,
+            9..12,
+            7..12,
+            7..12,
+            3..8,
+            10..12,
+            7..10,
+            {7,11,12},
+            4..6,
+            7..12,
+            1..12 diff {1,2, 7, 8},
+            7..12,
+            1..6
 ];
 
 impossibles = [
@@ -39,7 +55,23 @@ impossibles = [
             1..2,
             {2,6,12},
             {},
-            {i | i in 1..12 where i mod 2 = 1}           
+            {i | i in 1..12 where i mod 2 = 1},
+            1..2,
+            {},
+            7..12,
+            1..8,
+            3..6,
+            1..6,
+            1..6,
+            {},
+            {},
+            1..6,
+            1..12 diff {7,11,12},
+            1..12 diff 4..6,
+            1..6,
+            {1,2, 7, 8},
+            1..6,
+            7..12         
 ];
 
 studentNames = [
@@ -59,7 +91,23 @@ studentNames = [
   "Kevin Bichler",
   "Oliver Witthus",
   "Sebastian Witthus",
-  "Dominik Zehentbauer"
+  "Dominik Zehentbauer",
+  "Wolfgang Wermund",
+  "Linus Daniel Straub",
+  "Daniel Kraljevic",
+  "Robin Han",
+  "Simon Rittel",
+  "Fabian Sauerborn",
+  "Davin Geiger",
+  "Tobias Foth",
+  "Dominik Auer",
+  "Matthias Lieb",
+  "Fabian Schober",
+  "Antonio Grieco",
+  "Erich Glaser",
+  "Daniel Eckhard",
+  "Miriam Berschneider",
+  "Jan Brucher"
 ];
 
 dateNames = [
