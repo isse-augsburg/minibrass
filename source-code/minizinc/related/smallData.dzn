@@ -1,0 +1,11 @@
+minWindowLength = 2;
+maxWindowLength = 20;
+
+minJ = 0;
+maxJ = 140;
+
+dt = 100;
+
+T = 5;
+temperature = [11.5, 14.9, 12.5, 15.4, 23.9];
+altitude =    [50,   50,   50,   51,   51];
