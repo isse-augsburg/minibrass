@@ -40,13 +40,18 @@ constraint  nvalue(scheduledDates, scheduled);
 var 0..nScs: violateds;
 constraint violateds = penSum;
 
+% redundant constraint 
+int: lowerBound = (n div maxPerSlot) + ( n mod maxPerSlot > 0) * 1  ;
+constraint scheduledDates >= lowerBound;
+
 constraint penSum = 0;
 
 solve 
-:: int_search(satisfied, input_order, indomain_max, complete)
+%:: int_search(satisfied, input_order, indomain_max, complete)
+:: int_search(scheduled, dom_w_deg, indomain_max, complete)
 %search time_limit(3000, minimize_lex([scheduledDates, violateds])) /\ if hasSol() then print() else print("No solution found\n") endif;
 %search time_limit(3000, minimize_lex([violateds, scheduledDates])) /\ if hasSol() then print() else print("No solution found\n") endif;
 
 minimize scheduledDates;
 
-output [ "Penalties: \(violateds)\n ++ Scheduled: \(scheduled)\n ++ Distinct dates: \(scheduledDates)" ];
+output [ "lowerBound: \(lowerBound) Penalties: \(violateds)\n ++ Scheduled: \(scheduled)\n ++ Distinct dates: \(scheduledDates)" ];
