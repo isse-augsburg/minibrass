@@ -1,0 +1,49 @@
+\subsection{Tailoring MiniZinc to Accomodate Softness}
+Here we'll have a short introduction into how we actually 
+modeled our benchmark problems. Includes how we added several
+notions of constraints, different levels (few: 3-5, medium: 5-10, many: 10+)
+
+What are the aspects that need motivation?
+\begin{enumerate}
+\item Enhanced propagation by redundant constraints
+\item Search heuristics
+\item Comparing BaB with LNS (depending on MiniSearch's progress)
+\end{enumerate}
+
+\begin{enumerate}
+\item \textbf{Factors}: type of heuristics / variable ordering, enhanced propagation
+\item \textbf{Dependent Variables}: runtime / failures / nb. problems solved / optimal value after 5 minutes
+\end{enumerate}
+
+\subsection{Overhead from Softness}
+
+Here, we'll compare the plain MiniZinc problems with softened but more constrained problems.
+Central question: How much harder / slower will it be to find (optimal) solutions?
+We shall, of course, present the altered models online! Including some documentation about
+how we modified the original problems.
+
+\begin{enumerate}
+\item Measure if a problem that was easy in the beginning is still easy
+\item Measure if hard problems get tremendously harder (play a bit with search heuristics)
+\end{enumerate}
+
+\subsection{Comparison with Related Work}
+
+Here, we'll demonstrate that we do not really have a competing product, since no solver
+truly implements algebraic structures for soft constraints. So nothing is
+really offered in a qualitative setting.
+
+But in the quantitative realm (with all its disadvantages), there are two competing solvers that 
+offer bespoke solutions for weighted CSP. Even though we do not want to really compete in
+terms of runtime, we hope to see the differences
+
+\begin{enumerate}
+\item WSimply 
+\item Toulbar2, perhaps interfaced by Numberjack
+\end{enumerate}
+
+\todo[inline]{Figure out workflow of WSimply with MiniZinc models -- that'd be ideal!}
+\todo[inline]{Try a model with Numberjack}
+\todo[inline]{Find a cool scheduling/packing problem involving lots of global constraints 
+and make a translation to WCSP/Numberjack Format for toulbar2}
+

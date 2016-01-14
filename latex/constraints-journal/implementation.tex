@@ -40,7 +40,8 @@ search since we posted \texttt{penalty(violatedScs) < 2}.
 propagation than initially thought, which is nice.
 \item The penalty trick still cuts down the number of failures.
 \end{itemize}
-\item Global constraints aren't as easily reified. Probably in the future \todo{look for reification of global constraints paper}. Better use a restarts approach for now.
+\item Global constraints aren't as easily reified. Probably in the future \todo{look for reification of global constraints paper, 
+there is also something about that in one of the MZ functions papers!}. Better use a restarts approach for now.
 \item It turns out that, since XDP-better is formulated as a MiniZinc predicate in terms of a conjunction of other (global) constraints, we inherit some propagation capability.
 \item MiniZinc is expressive enough to encapsulate utility methods as MiniZinc functions. That includes a consistency check
 to guarantee that the entered graph is not cyclic, that edges and vertex sets are consistent (no edge pointing to an integer
