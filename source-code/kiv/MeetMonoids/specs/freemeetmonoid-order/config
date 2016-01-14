@@ -1,0 +1,161 @@
+;;; this is a comment
+
+;; heuristics:
+
+;; ### heuristic sets ###
+;;   PL Heuristics + Struct. Ind.
+;;   PL Heuristics + Case Splitting
+;;   PL Heuristics
+;;   Cntex Heuristics
+;;   SC Heuristics
+;;   DL Heuristics + Induction
+;;   DL Heuristics + Case Splitting
+;;   DL Heuristics
+;;   DL Heuristics + Induction
+;;   DL Heuristics + Case Splitting
+;;   DL Heuristics
+;;   TL Heuristics
+;;   TL Heuristics + Case Splitting
+;;   TL Heuristics + Exec
+;;   TL Heuristics + Exec + CS
+;;   TL Heuristics + Breadth First Exec
+;; ### single heuristics
+  ;;   symbolic execution
+;;   conditional right split
+;;   conditional left split
+;;   conditional
+;;   split
+;;   contract and execute
+;;   use patterns
+;;   induction
+;;   unfold
+;;   strong unfold
+;;   weak unfold
+;;   calls nonrecursive
+;;   calls nonrec nowhile
+;;   calls concrete
+;;   calls flat
+;;   bounded calls
+;;   omega
+;;   loop exit
+;;   unwind
+;;   execute loop
+;;   exec loop
+;;   simplifier
+;;   cntex batch mode
+;;   strong simplifier
+;;   Quantifier closing
+;;   axiom cut
+;;   rewrite
+;;   constructor cut
+;;   forward
+;;   elimination
+;;   var elimination
+;;   if-then-else split
+;;   dl case distinction
+;;   pl case distinction
+;;   strong pl case distinction
+;;   cut
+;;   weak cut
+;;   Quantifier
+;;   lemma closing
+;;   apply ind once
+;;   apply ind
+;;   apply ind closing
+;;   structural induction
+;;   batch mode
+;;   proof lemma
+;;   apply VD induction
+;;   annotation
+;;   smt (100ms)
+;;   smt (500ms)
+
+;;   ### heuristics for basicrules (usebasicrules? options) = T ###
+;;   axiom
+;;   prop simplification
+;;   insert equation
+;;   prop split
+;;   smart basic case distinction
+;;   discard quantifier
+
+;;   ###  heuristics for TL ###
+;;   tl call
+;;   tl nosplit
+;;   tl split
+;;   tl unwind
+;;   tl step nosplit
+;;   tl step split
+;;   tl step
+;;   tl switch
+;;   tl weaken
+;;   tl prefix cut
+;;   tl extract vars
+
+;;   ### Java heuristics ###
+;;   simple java stuff
+;;   after simplify java stuff
+;;   always doit java stuff
+;;   java jump
+;;   Java: new <exception>
+
+;; options:
+
+;;   Simplifier: No positive/negative tests
+;;   Simplifier: Use only proved local simps
+;;   Simplifier: No automatic closing test
+;;   Tree: Keep old versions of proofs
+;;   Tree: Show local simprules.
+;;   Tree: collapse symbolic execution.
+;;   Replay: Don't save replayed proofs
+;;   Replay: Use extra heuristics
+;;   Replay: Use simprules of old proof only
+;;   Replay: Use simprules of old proofsteps only
+;;   Context: Ask if only one rule
+;;   Context: Show all rules
+;;   Context: Add abbrev command
+;;   Context: Add weakening command
+;;   Context: Add insert DL lemma
+;;   Context: Don't show info command
+;;   Context: Don't abbreviate long rewrite rules
+;;   Context: Don't show TL rules
+;;   Ruleset: Use basic rules
+;;   Ruleset: Do not rename program variables
+;;   Ruleset: Use heap assignments
+;;   Ruleset: Use partial DL rules
+;;   Single User: Ignore all locks
+;;   View: Pretty print formulas on single lines
+;;   View: Show Ind-Hyp
+;;   View: Pretty print Java
+;;   View: Pretty print html
+;;   View: Show no specs in hot lemmas
+;;   Java: accept native
+;;   Java: natives use no static fields
+;;   Java: no predefined classes
+;;   Java: hide generated axioms
+;;   Java: use bounded integers
+;;   Java: no auto simplify
+;;   Java: allow delete axioms
+;;   Config: Allow only proved local lemmas
+;;   Config: Compute partial matches for quantifiers
+;;   Config: Don't warn about subsignature
+;;   Config: Use kodkod
+
+;; simplifier:
+
+;;       simp add <feature>
+;;       simp delete <feature>
+;;       forward add <feature>
+;;       forward delete <feature>
+
+configs:
+
+;;    load libraries
+;;    new spec names
+;;    no exit all
+;;    no work on library
+;;    no proof locks for library
+;;    hide library
+;;    no directory locks
+;;    ignore all errors
+;;    update code
+

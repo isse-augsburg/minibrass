@@ -1,6 +1,6 @@
 
 lemmas
-  l1 : e * e0 ≤ e;
+  l1 : a * b ≤ a;
 ;; <name> : <sequent> ;
 ;; used for : <some_flags> ; comment : <some_comment> ;
 

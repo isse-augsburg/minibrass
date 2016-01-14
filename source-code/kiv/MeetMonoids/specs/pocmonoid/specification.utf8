@@ -19,7 +19,7 @@ enrich cmonoid, poset with
 ;; induction ;
 
 axioms
-  mono: e ≤  e0 → e * e1 ≤ e0 * e1; 
+  mono: a ≤  b → a * c ≤ b * c; 
 
 ;; declaration
 

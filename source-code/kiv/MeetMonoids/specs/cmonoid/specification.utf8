@@ -1,10 +1,10 @@
-enrich element with
+enrich gelem with
 
 ;; sorts ;
 
-constants ε : element;
+constants ε : elem;
 
-functions . * . : element × element → element ;
+functions . * . : elem × elem → elem ;
 
 ;; predicates ;
 
@@ -19,9 +19,9 @@ functions . * . : element × element → element ;
 ;; induction ;→·······×
 
 axioms
-  neutr: ε * e = e;
-  comm: e * e0 = e0 * e;
-  assoc: (e * e0) * e1 = e * (e0 * e1);
+  neutr: ε * a = a;
+  comm: a * b = b * a;
+  assoc: (a * b) * c = a * (b * c);
 ;; declaration
 
 end enrich
