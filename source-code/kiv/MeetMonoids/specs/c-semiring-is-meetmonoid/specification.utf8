@@ -1,0 +1,5 @@
+instantiate meetmonoid with c-semiring by mapping
+* → *_s;
+≤ → ≤_s ;
+ε → 1_s;
+end instantiate

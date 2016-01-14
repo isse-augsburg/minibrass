@@ -1,7 +1,7 @@
 
 lemmas
 
-rightNeutr : e * ε = e; 
+rightNeutr : a * ε = a; 
 ;; <name> : <sequent> ;
 ;; used for : <some_flags> ; comment : <some_comment> ;
 

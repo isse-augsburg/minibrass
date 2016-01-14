@@ -1,16 +1,17 @@
-enrich element with
+enrich gelem with
 
 ;; sorts ;
 
-constants ⊥ : element;
+constants ⊥ : elem;
 
 functions 
-. + . : element × element → element 
+. + . : elem × elem → elem 
 ;
 
 predicates 
-. ≤_U . : element × element 
+. ≤_U . : elem × elem 
 ;
+;;
 
 ;; procedures ;
 
@@ -23,13 +24,13 @@ predicates
 ;; induction ;
 
 axioms
-idemp : e + e = e;
-comm: e + e0 = e0 + e;
-assoc: (e + e0) + e1 = e + (e0 + e1);
+idemp : a + a = a;
+comm: a + b = b + a;
+assoc: (a + b) + c = a + (b + c);
 
-neutral : e + ⊥ = e;
+neutral : a + ⊥ = a;
 
-defOrder : e ≤_U e0 ↔ e + e0 = e0;
+defOrder : a ≤_U b ↔ a + b = b;
 ;; declaration
 
 end enrich

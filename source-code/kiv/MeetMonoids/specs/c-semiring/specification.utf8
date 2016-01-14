@@ -1,0 +1,28 @@
+enrich gelem with
+
+constants 0_s : elem;
+          1_s : elem;
+
+functions 
+ . +_s . : elem × elem → elem;
+ . *_s . : elem × elem → elem;
+
+predicates 
+  . ≤_s . : elem × elem;
+
+axioms
+  assocPlus : (a +_s b) +_s c = a +_s (b +_s c); used for: s, ls;
+  commPlus : a +_s b = b +_s a;  used for: s, ls;
+  anniPlus : a +_s 1_s = 1_s; used for: s, ls;
+  neutrPlus : a +_s 0_s = a; used for: s, ls;
+  assocTimes  : (a *_s b) *_s c = a *_s (b *_s c); used for: s, ls;
+  commTimes : a *_s b = b *_s a;  used for: s, ls;
+  anniTimes : a *_s 0_s = 0_s; used for: s, ls;
+  neutrTimes : a *_s 1_s = a; used for: s, ls;
+  distr: a *_s (b +_s c) = (a *_s b) +_s (a *_s c);
+  
+  ;; now for the ordering:
+  ordering : a ≤_s b ↔ a +_s b = b;
+;; declaration
+
+end enrich

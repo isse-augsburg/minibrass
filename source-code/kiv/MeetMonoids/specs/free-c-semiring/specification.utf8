@@ -1,0 +1,26 @@
+enrich meetmonoid with
+
+;; sorts ;
+
+;; constants ;
+
+functions . +s . : elem × elem → elem ;
+          . *s . : elem × elem → elem ;
+
+;; predicates ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+;; axioms
+
+;; declaration
+
+end enrich

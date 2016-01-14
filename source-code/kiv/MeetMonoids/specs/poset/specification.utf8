@@ -1,4 +1,4 @@
-enrich element with
+enrich gelem with
 
 ;; sorts ;
 
@@ -8,7 +8,7 @@ enrich element with
 
 predicates
 
-. ≤ . : element × element ;
+. ≤ . : elem × elem ;
 
 ;; procedures ;
 
@@ -21,9 +21,9 @@ predicates
 ;; induction ;
 
 axioms
-  refl: e ≤ e;
-  antisym: e ≤ e0 ∧ e0 ≤ e → e = e0;
-  trans: e ≤ e0 ∧ e0 ≤ e1 → e ≤ e1; 
+  refl: a ≤ a;
+  antisym: a ≤ b ∧ b ≤ a → a = b;
+  trans: a ≤ b ∧ b ≤ c → a ≤ c; 
   
 ;; declaration
 

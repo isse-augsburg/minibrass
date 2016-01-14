@@ -1,0 +1,25 @@
+enrich freemeetmonoid-order with
+
+;; sorts ;
+
+;; constants ;
+
+;; functions ;
+
+;; predicates ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+;; axioms
+
+;; declaration
+
+end enrich

@@ -1,0 +1,34 @@
+enrich bag-union, poset with
+
+;; sorts ;
+
+;; constants ;
+
+;; functions ;
+
+predicates 
+  . worseThan . : bag × bag ;; smyth ordering
+;
+
+;; procedures ;
+
+variables bag3 : bag;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+axioms
+
+ smyth-worsening : bag0 worseThan bag1 ↔ bag1 ⊆ bag0
+                           ∨  ∃ bag, a, b .
+                               bag0 = bag ∪ {a} ∧
+                               bag1 = bag ∪ {b} ∧ 
+                               a ≤ b 
+                            ; 
+
+;; declaration
+
+end enrich

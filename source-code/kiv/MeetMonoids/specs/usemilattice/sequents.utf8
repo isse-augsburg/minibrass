@@ -1,10 +1,7 @@
 
 lemmas
 
-reflU: e ≤_U e;
-antisymmU: e ≤_U e0 ∧ e0 ≤_U e → e0 = e;
-transU: e ≤_U e0 ∧ e0 ≤_U e1 → e ≤_U e1;
- 
+
 ;; <name> : <sequent> ;
 ;; used for : <some_flags> ; comment : <some_comment> ;
 

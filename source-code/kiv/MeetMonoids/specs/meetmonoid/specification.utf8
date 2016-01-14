@@ -19,7 +19,7 @@ enrich pocmonoid with
 ;; induction ;
 
 axioms
-  neutop: e ≤ ε;
+  neutop: a ≤ ε;
 ;; declaration
 
 end enrich
