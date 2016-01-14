@@ -12,9 +12,7 @@ var {0, pc1}: penC1;
 var {0, pc2}: penC2;
 var {0, pc3}: penC3;
 
-
 var int: penSum = penC1 + penC2 + penC3;
-
 
 constraint x + 1 = y <-> penC1 = 0;
 constraint z = y + 2 <-> penC2 = 0;
