@@ -288,7 +288,7 @@ public class MinizincWCSPParser {
 		// fileName = "mprime03ac.wcsp";
 		// fileName ="mprime03ac.wcsp";
 		// fileName = "warehouse0.wcsp";
-		 fileName = "16wqueens.wcsp";
+		// fileName = "16wqueens.wcsp";
 		// fileName = "slangford_3_11.wcsp";
 		//fileName = "langford_2_4.wcsp";
 		//fileName = "langford_3_11.wcsp";

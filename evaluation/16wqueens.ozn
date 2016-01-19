@@ -1,0 +1,6 @@
+output ["x = array1d(0..15 ,",show(x),");\n","v = array1d(1..136 ,",show(v),");\n","OBJ = ",show(OBJ),";\n"];
+set of int: VARS = 0..15;
+set of int: CFNS = 1..136;
+array [VARS] of int: x;
+array [CFNS] of bool: v;
+int: OBJ;
