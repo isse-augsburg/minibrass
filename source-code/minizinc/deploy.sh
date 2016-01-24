@@ -32,4 +32,4 @@ cp sum_aggregator.mzn "$EXP_LIB"
 cp tpd_worse.mzn "$EXP_LIB"
 cp minizinc_bundle.mzn "$EXP_LIB"
 cp minisearch_bundle.mzn "$EXP_LIB"
-
+cp soft_constraints_noset.mzn "$EXP_LIB"
