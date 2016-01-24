@@ -1,4 +1,4 @@
-% cr-weighting.mzn --------------
+% cr_weighting.mzn --------------
 % -------------------------------
 % This library offers methods
 % to calculate integer weightings

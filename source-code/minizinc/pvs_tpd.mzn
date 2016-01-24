@@ -1,6 +1,6 @@
 % instantiating isWorse-predicate
-include "cr-types.mzn";
-include "cr-weighting.mzn";
+include "cr_types.mzn";
+include "cr_weighting.mzn";
 
 % ground penalties using the appropriate weighting
 penalties = [weighting(s, SOFTCONSTRAINTS, crEdges, false) | s in SOFTCONSTRAINTS];
