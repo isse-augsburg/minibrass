@@ -4,7 +4,7 @@
 #   ./deploy.sh SOFT-CONSTRAINT-DIRECTORY
 # -------------------------------------------
 
-EXP_LIB="soft-constraints"
+EXP_LIB="soft_constraints"
 
 if [ $# -ge 1 ] 
 then
@@ -19,17 +19,17 @@ mkdir "$EXP_LIB"
 # enter all files of the utility library here 
 
 cp constraint_relationship_search.mzn "$EXP_LIB"
-cp cr-consistency.mzn "$EXP_LIB"
-cp cr-types.mzn "$EXP_LIB"
-cp cr-weighting.mzn "$EXP_LIB"
+cp cr_consistency.mzn "$EXP_LIB"
+cp cr_types.mzn "$EXP_LIB"
+cp cr_weighting.mzn "$EXP_LIB"
 cp lessthan.mzn "$EXP_LIB"
-cp pvs-spd.mzn "$EXP_LIB"
-cp pvs-tpd.mzn "$EXP_LIB"
-cp pvs-weighted.mzn "$EXP_LIB"
+cp pvs_spd.mzn "$EXP_LIB"
+cp pvs_tpd.mzn "$EXP_LIB"
+cp pvs_weighted.mzn "$EXP_LIB"
 cp soft_constraints.mzn "$EXP_LIB"
 cp spd_worse.mzn "$EXP_LIB"
-cp sum-aggregator.mzn "$EXP_LIB"
+cp sum_aggregator.mzn "$EXP_LIB"
 cp tpd_worse.mzn "$EXP_LIB"
-cp minizinc-bundle.mzn "$EXP_LIB"
-cp minisearch-bundle.mzn "$EXP_LIB"
+cp minizinc_bundle.mzn "$EXP_LIB"
+cp minisearch_bundle.mzn "$EXP_LIB"
 
