@@ -10,12 +10,12 @@ include "soft_constraints.mzn"; % model additions for soft constraint business
 include "spd_worse.mzn"; % the actual isBetter predicate
 include "tpd_worse.mzn"; % the actual isBetter predicate
 %include "constraint_relationship_search.mzn"; % search strategies for SPD better
-include "cr-types.mzn";
-include "pvs-spd.mzn";
+include "cr_types.mzn";
+include "pvs_spd.mzn";
 
-%include "pvs-weighted.mzn";
+%include "pvs_weighted.mzn";
 % choose aggregator for pvs-weighted: sumAggregator, maxAggregator, minAggregator
-%include "sum-aggregator.mzn";
+%include "sum_aggregator.mzn";
 
 % soft constraint specific for this model
 nScs = 3;
