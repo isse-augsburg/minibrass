@@ -1,0 +1,61 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: c-semirings.aux
+The style file: biblatex.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: c-semirings-blx.bib
+Database file #2: c-semirings.bib
+Biblatex version: 3.0
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+You've used 11 entries,
+            6047 wiz_defined-function locations,
+            1205 strings with 10052 characters,
+and the built_in function-call counts, 39293 in all, are:
+= -- 1477
+> -- 1621
+< -- 430
++ -- 659
+- -- 722
+* -- 3357
+:= -- 2619
+add.period$ -- 0
+call.type$ -- 11
+change.case$ -- 200
+chr.to.int$ -- 38
+cite$ -- 20
+duplicate$ -- 4140
+empty$ -- 3707
+format.name$ -- 915
+if$ -- 8806
+int.to.chr$ -- 0
+int.to.str$ -- 29
+missing$ -- 0
+newline$ -- 352
+num.names$ -- 533
+pop$ -- 3268
+preamble$ -- 1
+purify$ -- 246
+quote$ -- 0
+skip$ -- 2364
+stack$ -- 0
+substring$ -- 936
+swap$ -- 1480
+text.length$ -- 371
+text.prefix$ -- 10
+top$ -- 1
+type$ -- 405
+warning$ -- 0
+while$ -- 235
+width$ -- 0
+write$ -- 340
