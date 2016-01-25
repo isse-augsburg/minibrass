@@ -21,7 +21,9 @@ showmover=false}
 \usepackage{tikz}
 
 \usepackage[absolute,overlay]{textpos}
-\usetikzlibrary{trees,arrows}
+
+\usetikzlibrary{trees,calc,shapes,arrows,matrix,shadows,decorations.markings}
+
 \mdfdefinestyle{theoremstyle}{
 linecolor=red,linewidth=2pt,
 frametitlerule=true,
@@ -1136,7 +1138,6 @@ Illustrative case studies
 \item Mentor Matching
 \item Exam Scheduling
 \item Power Plant Scheduling
-\item Multi-User Multi-Displays
 \end{itemize}
 \end{frame}
 
@@ -1289,7 +1290,101 @@ Here, company 1 (cupgainini) wanted to have student 3, and company 2 (APS) did n
 
 
 \begin{frame}[fragile]{Exam Scheduling}
-a
+
+\textbf{Goal}: Assign exam dates to students such that 
+\begin{itemize}
+\item Each student likes their appoints (\emph{approves of it})
+\item The number of distinct dates is minimized (to reduce time investment of teachers)
+\end{itemize}
+
+\vspace*{2ex}
+
+Illustrates some core ideas of constraint relationships:
+
+\begin{itemize}
+\item No preference of any student should be weighted higher than another one's
+\item Solution (exam schedule) is a shared decision
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Scheduling: Core Model}
+See \texttt{exam-scheduling-approval.mzn}:
+\begin{lstlisting}
+% Exam scheduling example with just a set of 
+% approved dates and *impossible* ones
+include "globals.mzn";
+include "soft_constraints/soft_constraints.mzn";
+
+int: n; set of int: STUDENT = 1..n; 
+int: m; set of int: DATE = 1..m;
+array[STUDENT] of set of DATE: possibles;
+array[STUDENT] of set of DATE: impossibles;
+
+% the actual decisions
+array[STUDENT] of var DATE: scheduled;
+
+int: minPerSlot = 0; int: maxPerSlot = 4;
+constraint global_cardinality_low_up(scheduled % minPerSlot, maxPerSlot
+constraint forall(s in STUDENT) (not (scheduled[s] in impossibles[s])); 
+ 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Scheduling: Preferences}
+See \texttt{exam-scheduling-approval.mzn}:
+\begin{lstlisting}
+% have a soft constraint for every student
+nScs = n;
+penalties = [ 1 | n in STUDENT]; % equally important in this case 
+
+constraint forall(s in STUDENT) ( 
+     (scheduled[s] in possibles[s]) <-> satisfied[s] ) ;
+var DATE: scheduledDates;
+% constrains that "scheduledDates" different 
+% values (appointments) appear in "scheduled"
+constraint  nvalue(scheduledDates, scheduled);
+
+% search variants 
+solve 
+:: int_search(satisfied, input_order, indomain_max, complete)
+search minimize_lex([scheduledDates, violateds]);   % pro teachers
+%search minimize_lex([violateds, scheduledDates]); % pro students
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Exam Scheduling: Real Instance}
+
+\begin{itemize}
+\item Collected preferences of 33 students
+\item over 12 possible dates (6 days, morning and afternoon)
+\begin{itemize}
+\item[-] \emph{Approval} set 
+\item[-] \emph{Impossible} set 
+\end{itemize}
+
+\vspace*{2ex}
+
+\item Aggregated via \alert{approval voting} (has nice voting-theoretical properties!)
+\item At most 4 per appointment
+
+\item Immediately (61 msec) found an optimal solution that
+\begin{itemize}
+\item[-] Is approved by \emph{every} student
+\item[-] Is achieved with the minimal number of 9 dates 
+\end{itemize}
+\item Used Strategy:
+\end{itemize}
+\begin{lstlisting}
+search minimize_lex([violateds, scheduledDates]); % pro students
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Power Plant Scheduling}
+\textbf{Goal}: Schedule plants such that they meet the \alert{demand}; See \texttt{unitCommitment.mzn}
+
+\input{img/problem}
 \end{frame}
 
 \begin{frame}[fragile]{Power Plant Scheduling: Core Model}
@@ -1311,14 +1406,13 @@ array[PLANTS] of float: pMax  = [15.0, 11.3, 9.7];
 array[WINDOW, PLANTS] of var 0.0..15.0: supply; 
 var float: obj;
 
-% minimize the absolute error between supply and demand
 constraint obj = sum(w in WINDOW) ( abs( sum(p in PLANTS) 
            (supply[w, p]) - demand[w] ) );
 
 \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Power Plant Scheduling: Core Model}
+\begin{frame}[fragile]{Power Plant Scheduling: Soft Constraints}
 \begin{lstlisting}
 % ground penalties using the appropriate weighting
 penalties = [weighting(s, SOFTCONSTRAINTS, crEdges, true) 
@@ -1337,10 +1431,7 @@ crEdges = [| 2, 1 |];
 % could do something more sophisticated here
 solve minimize obj + penSum;
 \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{Multi-User Multi-Display}
-a
+$\rightarrow$ Library works with MIP (\emph{Mixed Integer Programming}) as well!
 \end{frame}
 
 
