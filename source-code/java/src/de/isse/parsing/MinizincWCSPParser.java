@@ -237,9 +237,9 @@ public class MinizincWCSPParser {
 			
 			String reification ="";
 			if(defaultCost == 0) { // all extensions were violated
-				reification = "xor v["+(i+1)+"] ";
-			} else { // all extensions were good
 				reification = "<-> v["+(i+1)+"] ";
+			} else { // all extensions were good
+				reification = "xor v["+(i+1)+"] ";
 			}
 			
 			sb.append("constraint table(" + mzVars.toString() +  ", "+extensionBuilder.toString() +")  "+reification+ ";\n");
