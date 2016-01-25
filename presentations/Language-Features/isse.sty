@@ -1,0 +1,125 @@
+% depends on default beamer theme
+\usetheme{default}
+
+% useful commands
+
+% produce titleframe (like maketitle)
+\newcommand{\titleframe}{\frame[plain,t]{\titlepage}}
+
+% produce enumeration-style bulletpoints
+\newcommand{\itembullet}[1]{
+  \usebeamercolor[bg]{item projected}%
+  \begin{pgfpicture}{-1ex}{0ex}{1ex}{2ex}
+    \pgfpathcircle{\pgfpoint{0pt}{.75ex}}{1.2ex}
+    \pgfusepath{fill}
+    \pgftext[base]{\color{fg}#1}
+  \end{pgfpicture}%
+}
+
+
+\newcommand{\lazycite}[2]{{\color{issegrey}[#1 #2]}}
+\newcommand{\Appendix}[1]{
+    \frame[plain]{\begin{center}#1\end{center}}
+    \newcounter{finalframe}
+    \setcounter{finalframe}{\value{framenumber}}
+    \appendix
+}
+
+\newcommand{\End}{
+    \setcounter{framenumber}{\value{finalframe}}
+}
+
+% predefined logos
+\institute{\includegraphics[height=0.15\paperheight]{uni}}
+\logo{\includegraphics[width=2cm]{isse}}
+
+\setbeamertemplate{caption}{\insertcaption}
+
+% isse colors (TODO: check)
+\definecolor{isseorange}{RGB}{255,147,10}
+\definecolor{issegrey}{RGB}{80,85,82}
+\definecolor{isseblue}{RGB}{4,6,76}
+
+% hacks for block body
+\mode<beamer>{\setbeamertemplate{blocks}[rounded][shadow=false]}
+\setbeamercovered{invisible}
+\setbeamercolor{block title}{bg=issegrey!35}%issegrey!60}
+\setbeamercolor{block body}{fg=black, bg=issegrey!10}
+
+% black headings and black circle items
+\setbeamercolor{structure}{fg=black}
+\setbeamertemplate{items}[circle]
+
+% emphasize, slightly darker than isseorange for better readability
+\setbeamercolor{alerted text}{fg=isseorange!80!red}
+
+% suppress navigation
+\setbeamertemplate{navigation symbols}{}
+
+% reduce left/right margins
+\setbeamersize{text margin left=0.3cm}
+\setbeamersize{text margin right=0.3cm}
+
+% enable the left sidebar
+\setbeamersize{sidebar width left=0.3cm}
+
+% these are predefined
+\setbeamercolor{sidebar left}{bg=isseorange}
+\setbeamercolor{title in head/foot}{bg=issegrey,fg=white}
+
+% these are only used in this style
+\setbeamercolor{isse grey}{fg=white,bg=issegrey}
+\setbeamercolor{front title}{fg=black,bg=isseorange}
+
+% create footline with
+% date ... author: title ... #/pages
+\defbeamertemplate*{footline}{}
+{%
+\hbox{%
+\begin{beamercolorbox}[wd=0.3cm,ht=3ex,dp=1.5ex,leftskip=1cm,rightskip=1cm plus1fil]{sidebar left}% footer is paperwidth wide, so leftmost part is continuation of the sidebar
+\end{beamercolorbox}%
+\begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1.5ex,leftskip=1cm,rightskip=1cm plus1fil]{title in head/foot}%
+\usebeamerfont{title in head/foot}%
+\insertshortauthor % 
+\hfill\insertshorttitle%
+\hfill\insertframenumber%
+\end{beamercolorbox}}%
+}
+
+% logo at the top (instead of bottom originally)
+% right sidebar is still 0 wide, \llap does the magic here
+\setbeamertemplate{sidebar right}{%
+\vskip.3cm%
+\llap{\insertlogo\hskip.1cm}%
+\vfill%
+}
+
+% frame header
+\setbeamertemplate{frametitle}{%
+\vskip0.2cm%
+\begin{beamercolorbox}[wd=\paperwidth]{frametitle}%
+\hskip0.4cm%
+\usebeamerfont{frametitle}%
+\insertframetitle%
+\end{beamercolorbox}%
+\vskip-0.195cm% these values are determined experimentally
+\hskip-0.15cm%
+\begin{beamercolorbox}[wd=0.79\paperwidth,ht=0.03cm]{isse grey}% line under the title
+\end{beamercolorbox}%
+}
+
+% title page
+\setbeamertemplate{title page}{%
+\vskip-0.2cm% compensate top offset and sidebar
+\hskip-0.3cm% apparently the "plain" frame attribute does not remove the sidebar entirely
+\begin{beamercolorbox}[wd=\paperwidth,ht=0.5\paperheight]{isse grey}%
+\vfill\hfill\includegraphics[height=0.2\paperheight]{isse-inverted-notext}%
+\end{beamercolorbox}%
+\vskip-0.1cm% does not align for some reason
+\hskip-0.3cm% again, compensate sidebar
+\begin{beamercolorbox}[wd=\paperwidth,ht=1.2cm,dp=.5cm,leftskip=1cm,rightskip=1cm plus1fil]{front title}%
+\usebeamerfont{frametitle}\inserttitle\par%
+\usebeamerfont{framesubtitle}\insertauthor%
+\end{beamercolorbox}% TODO: insert subtitle below, maybe use columns to position institute
+\vfill\hfill\insertinstitute%
+}
