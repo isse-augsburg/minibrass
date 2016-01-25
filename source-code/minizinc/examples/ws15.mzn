@@ -389,8 +389,8 @@ constraint worksAt[weber] = zuehlke <-> satisfied[zueWeb];
 nScs = 114;
 lastStudentPref = 77;
 
-include "true-edges.mzn";
-%include "toy-edges.mzn"; % for better testing
+%include "true-edges.mzn";
+include "toy-edges.mzn"; % for better testing
 
 
 

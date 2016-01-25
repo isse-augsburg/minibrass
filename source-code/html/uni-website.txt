@@ -1,0 +1,211 @@
+<h1>Constraint Relationships</h1>
+<p><img src="cr.png" style="float: right; margin: 10px; " alt="Logo" /></p>
+
+<p>
+Many combinatorial optimization problems are conveniently expressed using a constraint-based modeling language.
+They are then solved by powerful constraint programming or mathematical programming solvers.
+</p>
+
+<p>
+We provide support for over-constrained problems or problems where desirable properties can be modeled as optional (soft) constraints. Importance is expressed only by means of relations between constraints (see <a href="constraint-relationships.pdf">this 1 slide</a> to get an idea). Our library extensions are built on top of <a href="http://www.minizinc.org">MiniZinc</a> that facilitates modeling combinatorial optimization problems for various solvers. The library includes:
+<ul>
+<li>Convenient expression of soft constraint problems using constraint relationships</li>
+<li>Automatic translation to weighted CSP</li>
+<li>Generic search heuristics</li>
+<li>Consistency checks of the specified relationships</li>
+</ul>
+</p>
+<h2>Quick Example</h2>
+<!-- CODE LISTING ---->
+<style type="text/css">
+ 
+/* start css.sty */
+.ectt-1000{ font-family: monospace;}
+.ectt-1000{ font-family: monospace;}
+.ectt-1000{ font-family: monospace;}
+.ectt-1000{ font-family: monospace;}
+.ectt-1000{ font-family: monospace;}
+.ecss-1000{ font-family: sans-serif;}
+.ecss-1000{ font-family: sans-serif;}
+.ecss-1000{ font-family: sans-serif;}
+.ecss-1000{ font-family: sans-serif;}
+.ecss-1000{ font-family: sans-serif;}
+.ecbx-1000{ font-weight: bold;}
+.ecbx-1000{ font-weight: bold;}
+.ecbx-1000{ font-weight: bold;}
+.ecbx-1000{ font-weight: bold;}
+.ecbx-1000{ font-weight: bold;}
+.ecit-1000{ font-style: italic; font-family: monospace;}
+.ecit-1000{ font-style: italic; font-family: monospace;}
+.ecit-1000{ font-style: italic; font-family: monospace;}
+.ecit-1000{ font-style: italic; font-family: monospace;}
+.ecit-1000{ font-style: italic; font-family: monospace;}
+p.noindent { text-indent: 0em }
+td p.noindent { text-indent: 0em; margin-top:0em; }
+p.nopar { text-indent: 0em; }
+p.indent{ text-indent: 1.5em }
+@media print {div.crosslinks {visibility:hidden;}}
+a img { border-top: 0; border-left: 0; border-right: 0; }
+center { margin-top:1em; margin-bottom:1em; }
+td center { margin-top:0em; margin-bottom:0em; }
+.Canvas { position:relative; }
+img.math{vertical-align:middle;}
+li p.indent { text-indent: 0em }
+li p:first-child{ margin-top:0em; }
+li p:last-child, li div:last-child { margin-bottom:0.5em; }
+li p~ul:last-child, li p~ol:last-child{ margin-bottom:0.5em; }
+.enumerate1 {list-style-type:decimal;}
+.enumerate2 {list-style-type:lower-alpha;}
+.enumerate3 {list-style-type:lower-roman;}
+.enumerate4 {list-style-type:upper-alpha;}
+div.newtheorem { margin-bottom: 2em; margin-top: 2em;}
+.obeylines-h,.obeylines-v {white-space: nowrap; }
+div.obeylines-v p { margin-top:0; margin-bottom:0; }
+.overline{ text-decoration:overline; }
+.overline img{ border-top: 1px solid black; }
+td.displaylines {text-align:center; white-space:nowrap;}
+.centerline {text-align:center;}
+.rightline {text-align:right;}
+div.verbatim {font-family: monospace; white-space: nowrap; text-align:left; clear:both; }
+.fbox {padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
+div.fbox {display:table}
+div.center div.fbox {text-align:center; clear:both; padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
+div.minipage{width:100%;}
+div.center, div.center div.center {text-align: center; margin-left:1em; margin-right:1em;}
+div.center div {text-align: left;}
+div.flushright, div.flushright div.flushright {text-align: right;}
+div.flushright div {text-align: left;}
+div.flushleft {text-align: left;}
+.underline{ text-decoration:underline; }
+.underline img{ border-bottom: 1px solid black; margin-bottom:1pt; }
+.framebox-c, .framebox-l, .framebox-r { padding-left:3.0pt; padding-right:3.0pt; text-indent:0pt; border:solid black 0.4pt; }
+.framebox-c {text-align:center;}
+.framebox-l {text-align:left;}
+.framebox-r {text-align:right;}
+span.thank-mark{ vertical-align: super }
+span.footnote-mark sup.textsuperscript, span.footnote-mark a sup.textsuperscript{ font-size:80%; }
+div.tabular, div.center div.tabular {text-align: center; margin-top:0.5em; margin-bottom:0.5em; }
+table.tabular td p{margin-top:0em;}
+table.tabular {margin-left: auto; margin-right: auto;}
+td p:first-child{ margin-top:0em; }
+td p:last-child{ margin-bottom:0em; }
+div.td00{ margin-left:0pt; margin-right:0pt; }
+div.td01{ margin-left:0pt; margin-right:5pt; }
+div.td10{ margin-left:5pt; margin-right:0pt; }
+div.td11{ margin-left:5pt; margin-right:5pt; }
+table[rules] {border-left:solid black 0.4pt; border-right:solid black 0.4pt; }
+td.td00{ padding-left:0pt; padding-right:0pt; }
+td.td01{ padding-left:0pt; padding-right:5pt; }
+td.td10{ padding-left:5pt; padding-right:0pt; }
+td.td11{ padding-left:5pt; padding-right:5pt; }
+table[rules] {border-left:solid black 0.4pt; border-right:solid black 0.4pt; }
+.hline hr, .cline hr{ height : 1px; margin:0px; }
+.tabbing-right {text-align:right;}
+span.TEX {letter-spacing: -0.125em; }
+span.TEX span.E{ position:relative;top:0.5ex;left:-0.0417em;}
+a span.TEX span.E {text-decoration: none; }
+span.LATEX span.A{ position:relative; top:-0.5ex; left:-0.4em; font-size:85%;}
+span.LATEX span.TEX{ position:relative; left: -0.4em; }
+div.float, div.figure {margin-left: auto; margin-right: auto;}
+div.float img {text-align:center;}
+div.figure img {text-align:center;}
+.marginpar {width:20%; float:right; text-align:left; margin-left:auto; margin-top:0.5em; font-size:85%; text-decoration:underline;}
+.marginpar p{margin-top:0.4em; margin-bottom:0.4em;}
+table.equation {width:100%;}
+.equation td{text-align:center; }
+td.equation { margin-top:1em; margin-bottom:1em; } 
+td.equation-label { width:5%; text-align:center; }
+td.eqnarray4 { width:5%; white-space: normal; }
+td.eqnarray2 { width:5%; }
+table.eqnarray-star, table.eqnarray {width:100%;}
+div.eqnarray{text-align:center;}
+div.array {text-align:center;}
+div.pmatrix {text-align:center;}
+table.pmatrix {width:100%;}
+span.pmatrix img{vertical-align:middle;}
+div.pmatrix {text-align:center;}
+table.pmatrix {width:100%;}
+span.bar-css {text-decoration:overline;}
+img.cdots{vertical-align:middle;}
+.partToc a, .partToc, .likepartToc a, .likepartToc {line-height: 200%; font-weight:bold; font-size:110%;}
+.index-item, .index-subitem, .index-subsubitem {display:block}
+div.caption {text-indent:-2em; margin-left:3em; margin-right:1em; text-align:left;}
+div.caption span.id{font-weight: bold; white-space: nowrap; }
+h1.partHead{text-align: center}
+p.bibitem { text-indent: -2em; margin-left: 2em; margin-top:0.6em; margin-bottom:0.6em; }
+p.bibitem-p { text-indent: 0em; margin-left: 2em; margin-top:0.6em; margin-bottom:0.6em; }
+.paragraphHead, .likeparagraphHead { margin-top:2em; font-weight: bold;}
+.subparagraphHead, .likesubparagraphHead { font-weight: bold;}
+.quote {margin-bottom:0.25em; margin-top:0.25em; margin-left:1em; margin-right:1em; text-align:justify;}
+.verse{white-space:nowrap; margin-left:2em}
+div.maketitle {text-align:center;}
+h2.titleHead{text-align:center;}
+div.maketitle{ margin-bottom: 2em; }
+div.author, div.date {text-align:center;}
+div.thanks{text-align:left; margin-left:10%; font-size:85%; font-style:italic; }
+div.author{white-space: nowrap;}
+.quotation {margin-bottom:0.25em; margin-top:0.25em; margin-left:1em; }
+.abstract p {margin-left:5%; margin-right:5%;}
+div.abstract {width:100%;}
+.lstlisting .label{margin-right:0.5em; }
+div.lstlisting{font-family: monospace; white-space: nowrap; margin-top:0.5em; margin-bottom:0.5em; }
+div.lstinputlisting{ font-family: monospace; white-space: nowrap; }
+.lstinputlisting .label{margin-right:0.5em;}
+div.lstlisting .ecit-1000 {font-family: monospace;color:darkred; font-style:normal;}
+div.lstlisting .ectt-1000 {font-family: monospace;color:black}
+div.lstlisting .ecss-1000 {font-family: monospace;color:red}
+div.lstlisting .ecbx-1000 {font-family: monospace;color:forestgreen}
+div.lstlisting { background-color: #F0F0F0; border: 1px solid black; padding: 5px;  } 
+/* end css.sty */
+
+    </style>
+
+      <div class="lstlisting" id="listing-1"><span class="label"><a id="x1-2r1"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">A</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">really</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">simplistic</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">over</span><span class="cmsy-10">-</span><span class="ecss-1000">constrained</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">model</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-3r2"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">X</span><span class="ecss-1000">:</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">{</span><span class="ecss-1000">x</span><span class="ecss-1000">,</span><span class="ecss-1000">y</span><span class="ecss-1000">,</span><span class="ecss-1000">z</span><span class="ecss-1000">}</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">D_i</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">=</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">{1,2,3},</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">i</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">in</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">X</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-4r3"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x00A0;</span><span class="cmsy-10">*</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c1</span><span class="ecss-1000">:</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">x</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">+</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">1</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">=</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">y</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-5r4"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x00A0;</span><span class="cmsy-10">*</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c2</span><span class="ecss-1000">:</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">z</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">=</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">y</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">+</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">2</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-6r5"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x00A0;</span><span class="cmsy-10">*</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c3</span><span class="ecss-1000">:</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">x</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">+</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">y</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x003C;=</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">3</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-7r6"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="cmsy-10">-</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-8r7"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-9r8"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">import</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">libraries</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">as</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">bundle</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">for</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">a</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">quick</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">start</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-10r9"></a></span><span class="ecbx-1000">include</span><span class="ectt-1000">&#x00A0;</span><span class="ecit-1000">"</span><span class="ecit-1000">soft</span><span class="ecit-1000">_</span><span class="ecit-1000">constraints</span><span class="ecit-1000">/</span><span class="ecit-1000">minizinc</span><span class="ecit-1000">_</span><span class="ecit-1000">bundle</span><span class="ecit-1000">.</span><span class="ecit-1000">mzn</span><span class="ecit-1000">"</span><span class="ectt-1000">;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-11r10"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-12r11"></a></span><span class="ecbx-1000">var</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">1..3:</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">x</span><span class="ectt-1000">;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-13r12"></a></span><span class="ecbx-1000">var</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">1..3:</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">y</span><span class="ectt-1000">;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-14r13"></a></span><span class="ecbx-1000">var</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">1..3:</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">z</span><span class="ectt-1000">;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-15r14"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-16r15"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">read</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">as</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">"</span><span class="ecss-1000">soft</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">constraint</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c1</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">is</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">satisfied</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">iff</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">x</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">+</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">1</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">=</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">y</span><span class="ecss-1000">"</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-17r16"></a></span><span class="ecbx-1000">constraint</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">x</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">+</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">1</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">=</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">y</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">&#x003C;-&#x003E;</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">satisfied</span><span class="ectt-1000">[1];</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-18r17"></a></span><span class="ecbx-1000">constraint</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">z</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">=</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">y</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">+</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">2</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">&#x003C;-&#x003E;</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">satisfied</span><span class="ectt-1000">[2];</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-19r18"></a></span><span class="ecbx-1000">constraint</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">x</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">+</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">y</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">&#x003C;=</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">3</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">&#x003C;-&#x003E;</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">satisfied</span><span class="ectt-1000">[3];</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-20r19"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-21r20"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">soft</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">constraint</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">specific</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">for</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">this</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">model</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-22r21"></a></span><span class="ectt-1000">nScs</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">=</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">3;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-23r22"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-24r23"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">constraint</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">relationships</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-25r24"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c1</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-26r25"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c2</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c3</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-27r26"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">three</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">soft</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">constraints</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c1</span><span class="ecss-1000">,</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c2</span><span class="ecss-1000">,</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c3</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-28r27"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c2</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">less</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">imp</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">than</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c1</span><span class="ecss-1000">,</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-29r28"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c3</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">less</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">imp</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">than</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">c1</span><span class="ecss-1000">,</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-30r29"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-31r30"></a></span><span class="ectt-1000">nCrEdges</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">=</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">2;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-32r31"></a></span><span class="ectt-1000">crEdges</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">=</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">[|</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">2,</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">1</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">|</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">3,</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">1</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">|];</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-33r32"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-34r33"></a></span><span class="ecss-1000">%</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">uses</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">a</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">specific</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">branch</span><span class="cmsy-10">-</span><span class="ecss-1000">and</span><span class="cmsy-10">-</span><span class="ecss-1000">bound</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">search</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">to</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">perform</span><span class="ecss-1000">&#x00A0;</span><span class="ecss-1000">optimization</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-35r34"></a></span><span class="ecbx-1000">solve</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-36r35"></a></span><span class="ectt-1000">::</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">int_search</span><span class="ectt-1000">(</span><span class="ectt-1000">satisfied</span><span class="ectt-1000">,</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">input_order</span><span class="ectt-1000">,</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">indomain_min</span><span class="ectt-1000">,</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">complete</span><span class="ectt-1000">)</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-37r36"></a></span><span class="ecbx-1000">minimize</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">penSum</span><span class="ectt-1000">;</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-38r37"></a></span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-39r38"></a></span><span class="ecbx-1000">output</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">[</span><span class="ecit-1000">"</span><span class="ecit-1000">Obj</span><span class="ecit-1000">:</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">\(</span><span class="ecit-1000">penSum</span><span class="ecit-1000">)</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">by</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">violating</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">{\(</span><span class="ecit-1000">violatedScs</span><span class="ecit-1000">)</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">}</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">"</span><span class="ectt-1000">&#x00A0;</span><span class="ectt-1000">++</span><span class="ectt-1000">&#x00A0;</span><br /><span class="label"><a id="x1-40r39"></a></span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">"</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">:</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">x</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">-&#x003E;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">\(</span><span class="ecit-1000">x</span><span class="ecit-1000">),</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">y</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">-&#x003E;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">\(</span><span class="ecit-1000">y</span><span class="ecit-1000">),</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">z</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">-&#x003E;</span><span class="ecit-1000">&#x00A0;</span><span class="ecit-1000">\(</span><span class="ecit-1000">z</span><span class="ecit-1000">)</span><span class="ecit-1000">"</span><span class="ectt-1000">];</span>
+      
+   </div>
+
+<!-- END CODE LISTING ---->
+
+<h2>Download and Installation</h2>
+Quickest start:
+<ol>
+<li>Download and install the newest MiniZinc IDE version from <a href="http://www.minizinc.org/">http://www.minizinc.org/</a></li>
+<li>Download <a href="soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
+<li>Locate the directory "./share/minizinc/std" of your MiniZinc installation</li>
+<li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
+<li>Run the above code (smallexample_minizinc.mzn in  <a href="codeexamples.zip">codeexamples.zip</a>)</li>
+</ol>
+
+Slightly slower start:
+<ol>
+<li>Build MiniSearch according to the instructions at <a href="http://www.minizinc.org/minisearch/">MiniSearch</a></li>
+<li>Download <a href="soft_constraints.zip">soft-constraints.zip</a> and unpack it</li>
+<li>Locate the directory "./share/minizinc/std" of your MiniSearch installation</li>
+<li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
+<li>Run the above code (smallexample.mzn in  <a href="codeexamples.zip">codeexamples.zip</a>) to see custom search and variable ordering heuristics in action.</li>
+</ol>
+
+<h2>Citing</h2>
+
+If you plan to use constraint relationships in your research, please consider citing
+ 
+<textarea style="width: 100%; font-size: 0.95em;
+height: 10em;" readonly="readonly">
+@inproceedings{knapp-schiendorfer2014ictai,
+  author = {Alexander Knapp and
+            Alexander Schiendorfer and Wolfgang Reif},
+  title = {{Quality over Quantity in Soft Constraints}},
+  booktitle={Proc.\ 26\textsuperscript{th} Int. Conf. Tools with Artificial Intelligence (ICTAI'2014)},
+  year = {2014},
+  pages = {453-460}
+}
+</textarea>
+
+Background material can be found in the papers:
+<ul>
+<li><a href="../../publications/reif/2013-OC-SGAI-Constraint-Relationships/index.html">SGAI'13 Paper</a></li>
+<li><a href="../../publications/reif/2014-OC-ICTAI-Soft-Constraints/index.html">ICTAI'14 Paper</a></li>
+<li><a href="../../publications/reif/2014-OC-Wirsing-Festschrift-Soft-Constraints/index.html">Festschrift'15 Paper</a></li>
+</ul>
+<h2>Contact</h2>
+For general information and support please contact <a href="../../staff/schiendorfer/index.html">Alexander Schiendorfer</a>.

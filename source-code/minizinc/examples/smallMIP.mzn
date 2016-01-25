@@ -1,25 +1,19 @@
-include "soft-constraints/soft_constraints_nj.mzn";
-include "soft-constraints/cr-types.mzn";
-include "soft-constraints/cr-weighting.mzn";
-
+include "soft_constraints/soft_constraints_noset.mzn";
+include "soft_constraints/cr_types.mzn";
+include "soft_constraints/cr_weighting.mzn";
 % ground penalties using the appropriate weighting
 penalties = [weighting(s, SOFTCONSTRAINTS, crEdges, true) | s in SOFTCONSTRAINTS];
 
-int: T = 5;
-set of int: WINDOW = 1..T;
-
+int: T = 5; set of int: WINDOW = 1..T;
 array[WINDOW] of float: demand = [10.0, 11.3, 15.2, 20.7, 19.2];
 
-int: P = 3; 
-set of int: PLANTS = 1..P;
+int: P = 3; set of int: PLANTS = 1..P;
 
 array[PLANTS] of float: pMin  = [12.0, 5.0, 7.3];
 array[PLANTS] of float: pMax  = [15.0, 11.3, 9.7];
 array[PLANTS] of float: price = [3.2, 4.8, 2.9];
 
 array[WINDOW, PLANTS] of var 0.0..15.0: supply; 
-
-
 var float: obj;
 constraint obj = sum(w in WINDOW) ( abs( sum(p in PLANTS) (supply[w, p]) - demand[w] ) );
 
