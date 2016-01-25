@@ -2,16 +2,16 @@
 include "globals.mzn";
 
 % some soft constraint business
-include "../soft_constraints.mzn";
+include "soft_constraints/soft_constraints.mzn";
 
-include "../spd_worse.mzn"; % the actual isBetter predicate
-include "../tpd_worse.mzn"; % the actual isBetter predicate
+include "soft_constraints/spd_worse.mzn"; % the actual isBetter predicate
+include "soft_constraints/tpd_worse.mzn"; % the actual isBetter predicate
 
-include "../cr-consistency.mzn";
+include "soft_constraints/cr_consistency.mzn";
 
 % binding to the concrete PVS in use has to be
-% done using pvs-xyz.mzn
-include "../pvs-spd.mzn";
+% done using pvs_xyz.mzn
+include "soft_constraints/pvs_spd.mzn";
 
 int: n; % number of students 
 set of int: STUDENT = 1..n;

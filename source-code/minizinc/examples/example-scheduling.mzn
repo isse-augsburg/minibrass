@@ -2,7 +2,7 @@
 include "globals.mzn";
 
 % some soft constraint business
-include "../soft_constraints.mzn";
+include "soft_constraints/soft_constraints.mzn";
 
 % for minisearch support
 %include "minisearch.mzn";

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class MinizincWCSPParser {
@@ -108,14 +109,18 @@ public class MinizincWCSPParser {
 
 			StringBuilder mzVars = new StringBuilder("[");
 			int nTuples = 1; // for the whole table
-			
+			boolean fVar = true;
 			for (int variable = 0; variable < scopeSize; ++variable) {
 				int nextVarIndex = scanner.nextInt();
 				originalLine.append(nextVarIndex);
 				originalLine.append(' ');
 				
+				if(fVar)
+					fVar = false;
+				else 
+					mzVars.append(", ");
 				mzVars.append("x["); mzVars.append(nextVarIndex);
-				mzVars.append("], ");
+				mzVars.append("]");
 				scope[variable] = nextVarIndex;
 				
 				nTuples *= domainSizes[nextVarIndex];
@@ -123,8 +128,8 @@ public class MinizincWCSPParser {
 				if (debug)
 					System.out.print(nextVarIndex + " ");
 			}
-			
-			mzVars.append("v["); mzVars.append(i+1); mzVars.append("]]");
+			mzVars.append("]");
+			// mzVars.append("v["); mzVars.append(i+1); mzVars.append("]]");
 			
 			if (debug)
 				System.out.println();
@@ -135,8 +140,12 @@ public class MinizincWCSPParser {
 			
 			occurredCosts.add(defaultCost);
 
-			Map<List<Integer>, Integer> extensionMap = getExtensionMap(nTuples, scope, domainSizes, defaultCost); 
 			int exceptions = scanner.nextInt();
+
+			Set<List<Integer>> extensionSet = new HashSet<List<Integer>>(exceptions);
+
+		    // necessary if you need the full extension!
+		    // getExtensionMap(nTuples, scope, domainSizes, defaultCost); 
 			if (debug)
 				System.out.println("Def. Cost " + defaultCost + " but "
 						+ exceptions + " exceptions");
@@ -175,21 +184,24 @@ public class MinizincWCSPParser {
 				occurredCosts.add(deviatingCost);
 				costs[e] = deviatingCost;
 				
-				extensionMap.put(tupleAsList, deviatingCost > 0 ? 1 : 0);
+				extensionSet.add(tupleAsList);
 			}
 			
 			StringBuilder extensionBuilder = new StringBuilder("[| ");
 			boolean first = true;
-			for(Entry<List<Integer>, Integer> entry : extensionMap.entrySet()) {
+			for(List<Integer> entry : extensionSet) {
 				if(first)
 					first = false;
 				else 
 					extensionBuilder.append(" | ");
-				for(Integer ii : entry.getKey() ) {
+				boolean f2 = true;
+				for(Integer ii : entry ) {
+					if(f2)
+						f2 = false;
+					else
+						extensionBuilder.append(", ");
 					extensionBuilder.append(ii);
-					extensionBuilder.append(", ");
 				}
-				extensionBuilder.append(entry.getValue());
 				extensionBuilder.append("\n");
 			}
 			extensionBuilder.append(" |]");
@@ -223,7 +235,14 @@ public class MinizincWCSPParser {
 			sumVio += costVio;
 			costViolations[i] = costVio;
 			
-			sb.append("constraint table(" + mzVars.toString() +  ", "+extensionBuilder.toString() +");\n");
+			String reification ="";
+			if(defaultCost == 0) { // all extensions were violated
+				reification = "xor v["+(i+1)+"] ";
+			} else { // all extensions were good
+				reification = "<-> v["+(i+1)+"] ";
+			}
+			
+			sb.append("constraint table(" + mzVars.toString() +  ", "+extensionBuilder.toString() +")  "+reification+ ";\n");
 
 		}
 		
@@ -288,8 +307,8 @@ public class MinizincWCSPParser {
 		// fileName = "mprime03ac.wcsp";
 		// fileName ="mprime03ac.wcsp";
 		// fileName = "warehouse0.wcsp";
-		 fileName = "16wqueens.wcsp";
-		// fileName = "slangford_3_11.wcsp";
+		// fileName = "16wqueens.wcsp";
+		fileName = "slangford_3_11.wcsp";
 		//fileName = "langford_2_4.wcsp";
 		//fileName = "langford_3_11.wcsp";
 		
@@ -300,6 +319,7 @@ public class MinizincWCSPParser {
 		FileWriter fw = new FileWriter(new  File(reduced+".mzn"));
 		fw.write(sb.toString());
 		fw.close();
+		System.out.println(sb.toString());
 	}
 
 	public boolean isDebug() {
