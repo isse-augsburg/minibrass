@@ -25,3 +25,5 @@ minisearch --solver fzn-ort soft-queens.mzn soft-queens.dzn
 minisearch --solver fzn-ort golomb_mybab.mzn
 # it works in JaCoP as well
 minisearch --solver fzn-jacop soft-queens.mzn soft-queens.dzn
+
+minisearch --solver flatzinc -Glinear smallMIP.mzn smallMIP.dzn
