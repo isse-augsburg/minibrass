@@ -14,8 +14,7 @@
 \usepackage{mdframed}
 \usepackage{xskak}
 \usepackage{marvosym}
-\setchessboard{
-showmover=false}
+\setchessboard{showmover=false}
 \usepackage[noend]{algpseudocode}   % package for algorithms
 \usepackage{algorithm}
 \usepackage{tikz}
@@ -283,12 +282,95 @@ Applied to domains where
 
 \vspace*{2ex}
 
-Illustrative case studies 
+Illustrative case studies (found in \texttt{example-problems})
 \begin{itemize}
 \item Mentor Matching
 \item Exam Scheduling
 \item Power Plant Scheduling
 \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Mentor Matching}
+
+\textbf{Goal}: Assign mentees (e.g. students) to mentors (e.g. companies) such that 
+\begin{itemize}
+\item Students are most satisfied with their mentors 
+\item Companies are satisfied with their mentees
+\item Two-sided preferences
+\end{itemize}
+
+\vspace*{2ex}
+
+So far, sounds like a typical \emph{stable matching} problem, but:
+
+\begin{itemize}
+\item We do not have a 1:1 mapping (companies advise several students)
+\item Additional constraints are present
+\begin{itemize}
+\item[-] Each company has to advise at least $l$, at most $u$ students
+\item[-] The number of advised students \emph{should} be roughly equal per company (fairness)
+\item[-] Students actually despising a company should not be forced to go there (\emph{hard exclusion} of solutions)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Mentor Matching: Example}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{highlight2}=[CornflowerBlue,ultra thick,rounded corners]
+\tikzstyle{defaultStyle}=[white,ultra thick,rounded corners]
+
+\tikzstyle{impo}=[dashed]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+%text depth=.5ex,
+%text height=2ex,
+%minimum height=2ex,
+align=center,
+rectangle,
+text width=2em
+}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.4cm,column sep=1.5cm]
+{
+\node[draw,defaultStyle, onslide={<3->{highlight2}}](s1){\includegraphics[width=\textwidth]{img/businessman.png}}; \& \& \& \node[text width=4em, defaultStyle, draw, onslide={<3->{highlight2}}](c1) {\includegraphics[width=\textwidth]{img/airplane.png}}; \\
+\node(s2){\includegraphics[width=\textwidth]{img/woman.png}};       \& \& \& \node(c2) {\includegraphics[width=2\textwidth]{img/logistics.png}}; \\
+\node(s3){\includegraphics[width=\textwidth]{img/man.png}};         \& \& \& \node(c3) {\includegraphics[width=2\textwidth]{img/enrgy.png}}; \\
+\node[defaultStyle, draw, onslide={<3->{highlight2}}](s4){\includegraphics[width=\textwidth]{img/woman2.png}};      \& \\
+};
+
+\draw[onslide={<2->{highlight}}] (s1) -- (c1);
+\draw[] (s1) -- (c2);
+
+\draw[onslide={<2->{highlight}}] (s2) -- (c1);
+\draw[] (s2) -- (c3);
+
+\draw[onslide={<2->{highlight}}] (s3) -- (c2);
+
+\draw[onslide={<2->{highlight}}] (s4) -- (c3);
+\draw[] (s4) -- (c2);
+%
+%\draw[onslide={<1-2>{highlight}}] (z) -- (3);
+%\draw[onslide={<3>{highlight}}] (z) -- (2);
+%
+%\draw[onslide={<1-2>{highlight}}] (t) -- (2);
+%\draw[] (t) -- (1);
+%\draw[onslide={<3>{highlight}}] (t) -- (5);
+%\draw[] (t) -- (3);
+%\draw[] (t) -- (4);
+%\draw[onslide={<1>{highlight}}] (u) -- (4);
+%\draw[] (u) -- (3);
+%\draw[] (u) -- (5);
+%\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+\onslide<2->{This \alert{assignment} respects the students' preferences (edges) \onslide<3->{but ignores the {\color{CornflowerBlue} companies' preferences}.}}
+\onslide<4->{\tiny ok, it's not really a \emph{matching} since companies supervise more than one student \ldots }
 \end{frame}
 
 \begin{frame}[fragile]{Mentor Matching: Model}
@@ -447,9 +529,14 @@ Here, company 1 (cupgainini) wanted to have student 3, and company 2 (APS) did n
 \item The number of distinct dates is minimized (to reduce time investment of teachers)
 \end{itemize}
 
-\vspace*{2ex}
-
-Illustrates some core ideas of constraint relationships:
+%\vspace*{2ex}
+%\begin{parchment}
+\begin{center}
+\includegraphics[width=.15\textwidth]{img/voting.png}
+\hspace*{4ex}
+\includegraphics[width=.5\textwidth]{img/Voting.pdf}
+\end{center}
+%\end{parchment}
 
 \begin{itemize}
 \item No preference of any student should be weighted higher than another one's
