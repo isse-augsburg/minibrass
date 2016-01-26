@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Constraint Relationships : A utility library for constraint relationships on top of the MiniZinc/MiniSearch toolchain as well as native utils for JaCoP.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Constraint Relationships</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/isse-augsburg/constraint-relationships">View on GitHub</a>
+
+          <h1 id="project_title">Constraint Relationships</h1>
+          <h2 id="project_tagline">A utility library for constraint relationships on top of the MiniZinc/MiniSearch toolchain as well as native utils for JaCoP.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/isse-augsburg/constraint-relationships/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/isse-augsburg/constraint-relationships/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="what-are-constraint-relationships-about" class="anchor" href="#what-are-constraint-relationships-about" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Constraint Relationships about?</h1>
+
+<p><img src="http://www.isse.uni-augsburg.de/software/constraint-relationships/cr.png" alt="Constraint Relationships indicate priorities over constraints"></p>
+
+<p>Many combinatorial optimization problems are conveniently expressed using a constraint-based modeling language. They are then solved by powerful constraint programming or mathematical programming solvers.</p>
+
+<p>We provide support for over-constrained problems or problems where desirable properties can be modeled as optional (soft) constraints. Importance is expressed only by means of relations between constraints (see <a href="http://www.isse.uni-augsburg.de/software/constraint-relationships/constraint-relationships.pdf">this 1 slide</a> to get an idea). Our library extensions are built on top of <a href="http://www.minizinc.org/">MiniZinc</a> that facilitates modeling combinatorial optimization problems for various solvers. The library includes:</p>
+
+<ul>
+<li>Convenient expression of soft constraint problems using constraint relationships</li>
+<li>Automatic translation to weighted CSP</li>
+<li>Generic search heuristics</li>
+<li>Consistency checks of the specified relationships</li>
+</ul>
+
+<h2>
+<a id="quick-example" class="anchor" href="#quick-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quick Example</h2>
+
+<pre><code>% A really simplistic over-constrained model
+% X: {x,y,z} D_i = {1,2,3}, i in X
+%    * c1: x + 1 = y 
+%    * c2: z = y + 2
+%    * c3: x + y &lt;= 3
+% -------------------------------------------
+
+% import libraries as bundle for a quick start
+include "minisearch.mzn"; % include the search minisearch lite
+include "soft_constraints/minisearch_bundle.mzn";
+
+var 1..3: x; 
+var 1..3: y;
+var 1..3: z;
+
+% read as "soft constraint c1 is satisfied iff x + 1 = y"
+constraint x + 1 = y &lt;-&gt; satisfied[1];
+constraint z = y + 2 &lt;-&gt; satisfied[2];
+constraint x + y &lt;= 3 &lt;-&gt; satisfied[3];
+
+% soft constraint data specific to this model
+nScs = 3; % number of soft constraints
+
+% Constraint Relationships: 
+%    c1
+%  c2  c3
+% -----------------------------------------
+% three soft constraints c1, c2, c3
+%    c2 less imp than c1,
+%    c3 less imp than c1,  
+
+nCrEdges = 2;
+crEdges = [| 2, 1 | 3, 1 |];
+
+% uses a specific branch-and-bound search to perform optimization
+solve 
+:: seq_search( [
+    % generic soft constraint search heuristic 
+    int_search([satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS], 
+               input_order, indomain_max, complete),
+    % problem-specific heuristic
+    int_search([x,y,z], input_order, indomain_max, complete)] )
+
+
+search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ 
+       if hasSol() then print() 
+       else print("No solution found\n") endif;
+
+output ["Obj: \(penSum) by violating {\(violatedScs) } : " ++
+        " x -&gt; \(x), y  -&gt; \(y), z -&gt; \(z)"];
+</code></pre>
+
+<h2>
+<a id="download-and-installation" class="anchor" href="#download-and-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Download and Installation</h2>
+
+<h3>
+<a id="quickest-start" class="anchor" href="#quickest-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quickest start:</h3>
+
+<ol>
+<li>Download and install the newest MiniZinc IDE version from <a href="http://www.minizinc.org/">http://www.minizinc.org/</a>
+</li>
+<li>Download <a href="http://www.isse.uni-augsburg.de/software/constraint-relationships/soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
+<li>Locate the directory "./share/minizinc/std" of your MiniZinc installation</li>
+<li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
+<li>Run the above code (smallexample_minizinc.mzn in <a href="http://www.isse.uni-augsburg.de/software/constraint-relationships/codeexamples.zip">codeexamples.zip</a>)</li>
+</ol>
+
+<h3>
+<a id="slightly-slower-start" class="anchor" href="#slightly-slower-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Slightly slower start:</h3>
+
+<ol>
+<li>Build MiniSearch according to the instructions at <a href="http://www.minizinc.org/minisearch/">MiniSearch</a>
+</li>
+<li>Download <a href="http://www.isse.uni-augsburg.de/software/constraint-relationships/soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
+<li>Locate the directory "./share/minizinc/std" of your MiniSearch installation</li>
+<li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
+<li>Run the above code (smallexample.mzn in <a href="http://www.isse.uni-augsburg.de/software/constraint-relationships/codeexamples.zip">codeexamples.zip</a>) to see custom search and variable ordering heuristics in action.</li>
+</ol>
+
+<h3>
+<a id="after-starting" class="anchor" href="#after-starting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>After starting:</h3>
+
+<p>Have a look at these case studies to get a better idea. We will continously improve these pages, but for starters please refer to the slides.</p>
+
+<ol>
+<li><a href="http://www.isse.uni-augsburg.de/software/constraint-relationships/Case-Studies.zip">Case Studies</a></li>
+<li>Step-by-step conversion of a MiniZinc problem (coming soon) </li>
+<li>Language Features (coming soon)</li>
+</ol>
+
+<h2>
+<a id="citing" class="anchor" href="#citing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Citing</h2>
+
+<p>If you plan to use constraint relationships in your research, please consider citing </p>
+
+<pre><code>@inproceedings{knapp-schiendorfer2014ictai,
+  author = {Alexander Knapp and
+            Alexander Schiendorfer and Wolfgang Reif},
+  title = {{Quality over Quantity in Soft Constraints}},
+  booktitle={Proc.\ 26\textsuperscript{th} Int. Conf. Tools with Artificial Intelligence (ICTAI'2014)},
+  year = {2014},
+  pages = {453-460}
+}
+</code></pre>
+
+<h2>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h2>
+
+<ul>
+<li>Alexander Schiendorfer (<a href="https://github.com/Alexander-Schiendorfer" class="user-mention">@Alexander-Schiendorfer</a>)</li>
+<li>Alexander Knapp </li>
+</ul>
+
+<h2>
+<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h2>
+
+<p>For general information and support please contact <a href="https://github.com/Alexander-Schiendorfer" class="user-mention">@Alexander-Schiendorfer</a>. </p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Constraint Relationships maintained by <a href="https://github.com/isse-augsburg">isse-augsburg</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
