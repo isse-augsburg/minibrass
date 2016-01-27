@@ -1,0 +1,28 @@
+Tutorial for using our soft constraint extensions
+-------------------------------------------------
+
+1. Start with your usual MiniZinc model
+2. Add types for soft constraints (based on reification) 
+   by typing
+   
+include "../soft_constraints.mzn";   
+   
+   Note that you now already have to provide values 
+   for nScs (number of soft constraints) and their 
+   penalties.
+   
+3. To have SPD-worse and TPD-worse available as predicates,
+   include "xpd_worse.mzn"
+   This will NOT automatically bind the "isWorse"-predicate
+   to XPD-worse.
+   
+4. To bind isWorse to XPD-worse (and obtain penalties 
+   from a constraint relationship graph), 
+   include "pvs-xpd.mzn" 
+   This step will have you enter the constraint 
+   relationship as a graph
+
+5. Bind soft constraint violation indicator variables
+   to your original model constraints
+   
+   "x + 1 = y <-> satisfied[1];"

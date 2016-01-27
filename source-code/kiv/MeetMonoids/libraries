@@ -1,0 +1,9 @@
+rtc-rel        spec     lib-basic
+elem-rel       spec     lib-basic
+oelem          spec     lib-basic
+bag-union      spec     lib-basic
+bag-basic      spec     lib-basic
+nat            spec     lib-basic
+nat-basic2     spec     lib-basic
+elem           spec     lib-basic
+nat-basic1     spec     lib-basic

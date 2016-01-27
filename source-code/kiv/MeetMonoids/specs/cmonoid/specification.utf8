@@ -1,0 +1,27 @@
+enrich gelem with
+
+;; sorts ;
+
+constants ε : elem;
+
+functions . * . : elem × elem → elem ;
+
+;; predicates ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;→·······×
+
+axioms
+  neutr: ε * a = a;
+  comm: a * b = b * a;
+  assoc: (a * b) * c = a * (b * c);
+;; declaration
+
+end enrich

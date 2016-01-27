@@ -1,0 +1,9 @@
+instantiate meetmonoid with freemeetmonoid by mapping
+: elem → bag;
+* → ∪;
+≤ → ⊑_P ;
+ε → ∅;
+a → bag;
+b → bag0;
+c → bag1;
+end instantiate

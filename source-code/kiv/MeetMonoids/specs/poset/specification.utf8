@@ -1,0 +1,30 @@
+enrich gelem with
+
+;; sorts ;
+
+;; constants ;
+
+;; functions ;
+
+predicates
+
+. ≤ . : elem × elem ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+axioms
+  refl: a ≤ a;
+  antisym: a ≤ b ∧ b ≤ a → a = b;
+  trans: a ≤ b ∧ b ≤ c → a ≤ c; 
+  
+;; declaration
+
+end enrich

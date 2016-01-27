@@ -1,0 +1,25 @@
+enrich pocmonoid with
+
+;; sorts ;
+
+;; constants ;
+
+;; functions ;
+
+;; predicates ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+axioms
+  neutop: a ≤ ε;
+;; declaration
+
+end enrich
