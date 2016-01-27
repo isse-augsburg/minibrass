@@ -1,0 +1,23 @@
+
+;;;****************************************************************************************
+;;;
+;;; This file contains rules for the patterns heuristic
+;;;
+;;; An entry to this list has the following form:
+;;;
+;;; pattern: <sequent> ;
+;;; [forbidden: <sequent> ;]
+;;; rule: <name> [rulearg];
+;;; [apply rule: (1 | 11 | once | unique | always);]
+;;;
+;;; rulearg can be e.g.:
+;;;
+;;; for insert lemma: <lemmaname> with [<variables>] -> [substitution];
+;;;
+;;;****************************************************************************************
+
+patterns
+
+;; pattern:
+;; rule:
+

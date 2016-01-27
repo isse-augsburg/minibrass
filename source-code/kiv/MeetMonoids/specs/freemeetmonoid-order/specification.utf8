@@ -1,0 +1,14 @@
+instantiate parameter elem-rel < rtc-rel with smyth-worsening by mapping
+: elem → bag;
+
+p → worseThan ;
+
+a → bag;
+b → bag0;
+c → bag1;
+
+rename
+
+p* → . ⊑_P . prio 5;
+
+end instantiate
