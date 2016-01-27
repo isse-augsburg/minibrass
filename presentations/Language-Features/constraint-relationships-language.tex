@@ -37,7 +37,7 @@ innertopmargin=\topskip,
 \usepackage{listings}
 \lstdefinelanguage{mzn}
 {
-	morekeywords={var,int,solve,not,search,satisfy,endif,maximize,minimize,float,constraint,sum,forall,exists,array,of,include,predicate,then,commit,post,set,function,if,else,repeat,next,ann,break},
+	morekeywords={var,int,solve,bool,not,search,satisfy,endif,maximize,minimize,float,constraint,sum,forall,exists,array,of,include,predicate,then,commit,post,set,function,if,else,repeat,next,ann,break},
 	sensitive=false,
 	morecomment=[l]{\%},
 	morecomment=[s]{/*}{*/},
@@ -325,6 +325,21 @@ The whole valuation space (partially ordered)
 %  3. Repeat
 \end{lstlisting}
 %}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-8.5cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
 \end{frame}
 
 
@@ -394,6 +409,21 @@ function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: vScs)
              post(isWorse(sol(vScs), vScs))
            else break endif       );
 \end{lstlisting}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-8.5cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
 \end{frame}
 
 \begin{frame}[fragile]{Search types: Only not dominated}
@@ -442,13 +472,28 @@ The whole valuation space (partially ordered)
 \label{fig:nosuprema}
 \end{figure}
 \begin{lstlisting}
-function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: vScs) 
+function ann: onlyNotDominatedBAB(var set of SOFTCONSTRAINTS: vScs) 
       = repeat(
            if next() then 
              commit() /\ 
              post((isWorse(vScs, sol(vScs)) \/ vScs = sol(vScs)))
            else break endif       );
 \end{lstlisting}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-8.5cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
 \end{frame}
 
 
