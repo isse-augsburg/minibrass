@@ -1,0 +1,7 @@
+;; This file is used to add additional formulas (e.g. invariants, cut formulas, etc.)
+;; Two semicolons start a line comment
+;; (: ... :) delimit a comment. They can be nested!
+
+
+;;; END <- reading stops here
+

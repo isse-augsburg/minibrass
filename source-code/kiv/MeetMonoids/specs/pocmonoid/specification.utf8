@@ -1,0 +1,26 @@
+enrich cmonoid, poset with
+
+;; sorts ;
+
+;; constants ;
+
+;; functions ;
+
+;; predicates ;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+axioms
+  mono: a ≤  b → a * c ≤ b * c; 
+
+;; declaration
+
+end enrich

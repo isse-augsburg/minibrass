@@ -1,0 +1,36 @@
+enrich gelem with
+
+;; sorts ;
+
+constants ⊥ : elem;
+
+functions 
+. + . : elem × elem → elem 
+;
+
+predicates 
+. ≤_U . : elem × elem 
+;
+;;
+
+;; procedures ;
+
+;; variables ;
+
+;; partial functions ;
+
+;; partial predicates ;
+
+;; induction ;
+
+axioms
+idemp : a + a = a;
+comm: a + b = b + a;
+assoc: (a + b) + c = a + (b + c);
+
+neutral : a + ⊥ = a;
+
+defOrder : a ≤_U b ↔ a + b = b;
+;; declaration
+
+end enrich

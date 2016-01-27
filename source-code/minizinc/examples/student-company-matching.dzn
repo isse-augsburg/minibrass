@@ -1,0 +1,4 @@
+% data file for student company matching
+
+n = 3; % students 1 2 3 
+m = 4; % companies

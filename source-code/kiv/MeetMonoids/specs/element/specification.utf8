@@ -1,0 +1,24 @@
+specification
+
+sorts element;
+
+;; constants ;
+
+;; functions ;
+
+;; predicates ;
+
+;; procedures ;
+
+variables e,e0,e1 : element ; 
+
+;; partial functions ;
+
+;; partial predicates ;
+
+
+;; induction ;
+
+;; axioms
+
+end specification

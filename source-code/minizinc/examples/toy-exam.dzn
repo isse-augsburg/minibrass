@@ -1,0 +1,33 @@
+% example data for exam scheduling
+n = 2;
+m = 12;
+
+possibles = [
+            {3,4,5},
+            {1,5,7}
+];
+
+impossibles = [
+            {6},
+            {8}
+];
+
+studentNames = [
+  "Alex",
+  "Bertrand"
+];
+
+dateNames = [
+           "12. Februar 2016 - Vormittag",
+           "12. Februar 2016 - Nachmittag",
+           "18. Februar 2016 - Vormittag",
+           "18. Februar 2016 - Nachmittag",
+           "19. Februar 2016 - Vormittag",
+           "19. Februar 2016 - Nachmittag",
+           "24. Februar 2016 - Vormittag",
+           "24. Februar 2016 - Nachmittag",
+           "25. Februar 2016 - Vormittag",
+           "25. Februar 2016 - Nachmittag",           
+           "26. Februar 2016 - Vormittag",
+           "26. Februar 2016 - Nachmittag"
+];
