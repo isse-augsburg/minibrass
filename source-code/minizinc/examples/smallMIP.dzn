@@ -1,0 +1,4 @@
+% small MIP data
+nScs = 1;
+
+penalties = [1];

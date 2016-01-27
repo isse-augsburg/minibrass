@@ -1,0 +1,8 @@
+instantiate pocmonoid with usemilattice by mapping
+
+≤ → ≤_U ;
+* → + :: (elem × elem → elem) ;
+ε → ⊥;
+
+
+end instantiate

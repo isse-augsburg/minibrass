@@ -1,0 +1,10 @@
+rule specification using poset, bag-union
+
+rule operators 
+ . ⊆_P . : bag × bag ;
+ 
+rules
+  r1: bag1 ⊆ bag0 ⊦ bag0 ⊆_P bag1; 
+  r2: a ≤ b ⊦ bag0 ∪ {a} ⊆_P bag0 ∪ {b};
+  
+end rule specification
