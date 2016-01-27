@@ -14,7 +14,7 @@ function array[int] of set of int:
           getDominees(set of int: softConstraints,
                       array[int, int] of int: edges) = (
              [ {succ | succ in softConstraints where exists(e in index_set_1of2(edges)) 
-              (edges[e,1] = succ /\ edges[e,2] = pred)} | pred in SOFTCONSTRAINTS]
+              (edges[e,1] = succ /\ edges[e,2] = pred)} | pred in softConstraints]
  );
 
 % a generic weighting function to assign
@@ -47,5 +47,5 @@ function int: weightingTPD(int: s, set of int: softConstraints,
 % is higher than the heaviest of all its predecessors' weights
 function int: weightingSPD(int: s, set of int: softConstraints, 
                            array[int] of set of int: dominees) = (
-  1 +  ( if dominees[s] = {} then 0 else max(s_ in dominees[s]) (weightingSPD(s_, SOFTCONSTRAINTS, dominees)) endif)
+  1 +  ( if dominees[s] = {} then 0 else max(s_ in dominees[s]) (weightingSPD(s_, softConstraints, dominees)) endif)
 );
