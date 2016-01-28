@@ -149,99 +149,117 @@ innertopmargin=\topskip,
 
 \titleframe
 
-\begin{frame}
-\frametitle{Preferences in Constraint Solving}
-
-Constraint problem $(X, D, C)$ 
-\begin{itemize}
-  \item \cemph{Variables} $X$,
-\cemph{Domains} $D = (D_x)_{x \in X}$,
-\cemph{Constraints} $C$
-\end{itemize}
-
-\vspace*{1ex}
-
-How to deal with \cemph{over-constrained} problems?
-
-\vspace*{2ex}
-
-$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
-\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
-\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
-\mathrm{c}_2, \mathrm{c}_3 \})$ mit 
-\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
-\begin{align*}
-  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
-\\[-.4ex]
-  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
-\\[-.4ex]
-  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
-\end{align*}
-\egroup
-
-\begin{itemize}
-  \item Not all constraints can be satisfied simultaneously
-\begin{itemize} \pause
-  \item e.\,g., $\mathrm{c}_2$ forces $\mathrm{z} = 3$ and $\mathrm{y} = 1$, conflicting $\mathrm{c}_1$
-\end{itemize}
-
-  \item We can \cemph{choose} between assignments satisfying $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ or $\{ \mathrm{c}_2, \mathrm{c}_3 \}$.
-\end{itemize}
-
-\vspace*{2ex}
-
-Which assignments $v \in [X \to D]$ should be \alert{preferred} by an agent/several agents?
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Constraint Relationships}
-
-Approach~\cite{Schiendorfer13}
-\begin{itemize}
-  \item Define relation $R$ over constraints $C$ to denote which constraints are more important than others, e.\,g.
-\begin{itemize}
-  \item $\mathrm{c}_1$ is more important than  $\mathrm{c}_2$
-
-  \item $\mathrm{c}_1$ is more important than $\mathrm{c}_3$
-\end{itemize}
-\end{itemize}
-\begin{textblock*}{2.5cm}[1,1](\textwidth-1.5cm,\textheight-4.03cm)
-\begin{tikzpicture}[auto,
-                    ->,>=stealth',shorten >=1pt,thick,
-                    node distance=.7cm,inner sep=2pt,
-                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
-\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
-\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
-\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
-%  
-\path[every node/.style={font=\sffamily\tiny}]
-  (2) edge (1)
-  (3) edge (1)
-  ;
-\end{tikzpicture}
-\end{textblock*}
-
-\vspace*{5.6ex}
-
-Benefits
-\begin{itemize}
-  \item \cemph{Qualitative} formalism --- easy to specify
-  \item Graphical interpretation 
-\begin{itemize}
- \item Semantics (\alert{how} much more important is a constraint) regulated by 
-  \item \cemph{dominance properties} that are either ``hierarchical'' or ``egalitarian''
-  \item Single-Predecessors-Dominance (SPD) vs. Transitive-Predecessors-Dominance (TPD)
-\end{itemize}
-
-\end{itemize}
-
+%\begin{frame}
+%\frametitle{Preferences in Constraint Solving}
+%
+%Constraint problem $(X, D, C)$ 
+%\begin{itemize}
+%  \item \cemph{Variables} $X$,
+%\cemph{Domains} $D = (D_x)_{x \in X}$,
+%\cemph{Constraints} $C$
+%\end{itemize}
+%
+%\vspace*{1ex}
+%
+%How to deal with \cemph{over-constrained} problems?
+%
 %\vspace*{2ex}
-%\begin{small}
-%A.~Schiendorfer, J.-Ph.~Steghöfer, A.~Knapp, F.~Nafz, W.~Reif (2013)
-%\end{small}
+%
+%$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
+%\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
+%\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
+%\mathrm{c}_2, \mathrm{c}_3 \})$ mit 
+%\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
+%\begin{align*}
+%  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
+%\\[-.4ex]
+%  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
+%\\[-.4ex]
+%  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
+%\end{align*}
+%\egroup
+%
+%\begin{itemize}
+%  \item Not all constraints can be satisfied simultaneously
+%\begin{itemize} \pause
+%  \item e.\,g., $\mathrm{c}_2$ forces $\mathrm{z} = 3$ and $\mathrm{y} = 1$, conflicting $\mathrm{c}_1$
+%\end{itemize}
+%
+%  \item We can \cemph{choose} between assignments satisfying $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ or $\{ \mathrm{c}_2, \mathrm{c}_3 \}$.
+%\end{itemize}
+%
+%\vspace*{2ex}
+%
+%Which assignments $v \in [X \to D]$ should be \alert{preferred} by an agent/several agents?
+%
+%\end{frame}
+%
+%\begin{frame}
+%\frametitle{Constraint Relationships}
+%
+%Approach~\cite{Schiendorfer13}
+%\begin{itemize}
+%  \item Define relation $R$ over constraints $C$ to denote which constraints are more important than others, e.\,g.
+%\begin{itemize}
+%  \item $\mathrm{c}_1$ is more important than  $\mathrm{c}_2$
+%
+%  \item $\mathrm{c}_1$ is more important than $\mathrm{c}_3$
+%\end{itemize}
+%\end{itemize}
+%\begin{textblock*}{2.5cm}[1,1](\textwidth-1.5cm,\textheight-4.03cm)
+%\begin{tikzpicture}[auto,
+%                    ->,>=stealth',shorten >=1pt,thick,
+%                    node distance=.7cm,inner sep=2pt,
+%                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+%\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+%\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+%\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%%  
+%\path[every node/.style={font=\sffamily\tiny}]
+%  (2) edge (1)
+%  (3) edge (1)
+%  ;
+%\end{tikzpicture}
+%\end{textblock*}
+%
+%\vspace*{5.6ex}
+%
+%Benefits
+%\begin{itemize}
+%  \item \cemph{Qualitative} formalism --- easy to specify
+%  \item Graphical interpretation 
+%\begin{itemize}
+% \item Semantics (\alert{how} much more important is a constraint) regulated by 
+%  \item \cemph{dominance properties} that are either ``hierarchical'' or ``egalitarian''
+%  \item Single-Predecessors-Dominance (SPD) vs. Transitive-Predecessors-Dominance (TPD)
+%\end{itemize}
+%
+%\end{itemize}
+%
+%%\vspace*{2ex}
+%%\begin{small}
+%%A.~Schiendorfer, J.-Ph.~Steghöfer, A.~Knapp, F.~Nafz, W.~Reif (2013)
+%%\end{small}
+%\end{frame}
+
+\begin{frame}{Overview}
+These slides show some features of the language/library
+
+
+\vspace*{2ex}
+
+To familiarize yourself with basics, consider looking at:
+\begin{itemize}
+\item Step-by-Step enhancing a MiniZinc model (establishes the core elements)
+\item Case Studies (for some specific examples)
+\end{itemize}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/constraint-relationships/}
 \end{frame}
-\begin{frame}[fragile]{SoftConstraints in MiniZinc}
+
+\begin{frame}[fragile]{SoftConstraints in MiniZinc (HelloWorld)}
 \begin{lstlisting}
 % X: {x,y,z} D_i = {1,2,3}, i in X
 %    * c1: x + 1 = y   * c2: z = y + 2 * c3: x + y <= 3
@@ -262,7 +280,70 @@ crEdges = [| 2, 1 | 3, 1 |]; % read c2 is less important than c1
 
 solve minimize penSum; % minimize the sum of penalties
 \end{lstlisting}
+\end{frame}
 
+\begin{frame}[fragile]{Step 4: Switch to PVS Architecture}
+\textbf{Idea} Many soft constraint formalisms are generalized by \alert{partial valuation structures}~\cite{Gadducci2013} that
+give the codomain of the objective function an \emph{algebraic structure}.
+\begin{itemize}
+\item A partially ordered valuation structure is described by $(M, \oplus_M, \leq_M, \varepsilon_M)$ where 
+\begin{itemize}
+\item $M$ \ldots is a set of violation/satisfaction degrees, e.g., $\mathbb{N}$ for weights, $[0,1]$ for probabilities etc.
+\item $\oplus_M$ \ldots is a binary \emph{combination} operation to aggregate values from $M$, e.g., $3 \oplus_M  5 \equiv 3 + 5$
+\item $\leq_M$ \ldots is a partial \emph{order} over $M$ operation to rank values from $M$, e.g., $5 \leq_M  3 \equiv 5 \geq 3$, $m \leq_M n$ means $m$ \emph{is worse} than $n$
+\item $m \leq_M \varepsilon_M$ \ldots for every $m \in M$, i.e. $\varepsilon_M$ is the \emph{best} possible solution, e.g. $0$ violation 
+\end{itemize}
+\item Similar~\cite{Bistarelli1999}: c-semirings and (total) valuation structures (\texttt{toulbar2})
+\end{itemize}
+%\small
+%\begin{verbatim}
+%queens = array1d(1..8 ,[4, 6, 1, 5, 2, 8, 3, 7]);
+%----------
+%\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{PVS--Idea}
+\begin{center}
+\begin{tabular}{l|c|c|c|c}
+\textbf{Concrete PVS} & $M$ & $\oplus_M$ & $\leq_M$ & $\varepsilon_M$ \\ 
+\hline 
+Weighted CSP & $\mathbb{N}$ & $+$ & $\geq$ & $0$ \\ 
+Fuzzy CSP & $[0,1]$ & $\min$ & $\leq$  & 1 \\ 
+Constraint Relationships\footnote{$C_s$ is the set of soft constraints, $\subseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$2^{C_s}$ & $\cup$ & $\subseteq_{\mathsf{SPD}}$ & $\emptyset$ \\ 
+\end{tabular} 
+\end{center}
+
+\begin{parchment}[Main Idea]
+Implement search strategies (BaB and LNS) for partially ordered valuation structures. Instantiate for concrete problems.
+\end{parchment}
+\alert{From now on we rely on MiniSearch (\url{www.minizinc.org/minisearch/}).}
+\end{frame}
+
+\begin{frame}[fragile]{Step 5: Use PVS-based Search}
+\begin{lstlisting}
+% only declare predicate for worsening
+predicate isWorse(var set of int: leftViolatedScs, 
+                    var set of int: rightViolatedScs); 
+function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: violatedScs) 
+=      repeat(
+           if next() then 
+               let { set of SOFTCONSTRAINTS: lb = sol(violatedScs);} in (
+                 print("Intermediate solution:") /\ print() /\
+                 commit() /\ post(isWorse(lb, violatedScs))
+               )
+           else break endif);
+\end{lstlisting}
+\small
+Only relies on \texttt{isWorse}!
+
+\begin{lstlisting}
+[... inside pvs_spd.mzn]
+predicate isWorse(var set of int: leftViolatedScs, 
+                  var set of int: rightViolatedScs) = (
+  spd_worse(leftViolatedScs, rightViolatedScs, SOFTCONSTRAINTS, crEdges)
+);
+
+\end{lstlisting}
 \end{frame}
 
 \begin{frame}[fragile]{Search types}
@@ -496,17 +577,199 @@ function ann: onlyNotDominatedBAB(var set of SOFTCONSTRAINTS: vScs)
 \end{textblock*}
 \end{frame}
 
-
-\begin{frame}{Language Features}
-a
+\begin{frame}[fragile]{Search Demo: Model}
+\lstinputlisting{models/diff-BAB.mzn}
 \end{frame}
 
-\begin{frame}{Language Features: Suitable Weighting}
-a
+\begin{frame}[fragile]{Search Demo: Strictly better}
+Execute \texttt{minisearch diff-BAB-sb.mzn } 
+
+(explores in order $\{c_3\}, \{c_2\}, \{c_1\}$)
+
+
+
+\begin{figure}[!t]
+\begin{center}
+\begin{tikzpicture}[scale=0.7,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {$\{c_1, c_2\}$};
+\node (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {$\{c_1\}$};
+\node (c2) at (-2,4) {$\{c_2\}$};
+\node (c3) at (2,4) {\alert<2->{$\{c_3\}$}};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+      edge[onslide={<2->{highlight}}] (c3)
+(c1c2) edge (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge (c3)
+(c1c2) edge (c1)
+(c1c2) edge (c2)
+(c1) edge (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+%(a) edge (b)
+%(b) edge (top)
+%(bot) edge (c)
+%(c) edge (top)
+;
+
+\end{tikzpicture}
+\end{center}
+\label{fig:nosuprema}
+\end{figure}
+\small
+\begin{lstlisting}
+% just sees {c_3} then finds no better solution and stops
+% 
+Intermediate solution: Obj: 1 violating {3..3}: x=3
+----------
+==========
+%
+\end{lstlisting}
+
+\begin{textblock*}{2.5cm}[1,1](\textwidth-8.5cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
 \end{frame}
 
-\begin{frame}{Language Features: Consistency Checks}
-a
+
+\begin{frame}[fragile]{Search Demo: Only not dominated}
+Execute \texttt{minisearch smallexample-ond.mzn}
+
+\begin{figure}[!t]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {\alert<2->{$\{c_1, c_2\}$}};
+\node[onslide={<4->{highlight2}}] (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {\alert<3->{$\{c_1\}$}};
+\node (c2) at (-2,4) {\alert<5->{$\{c_2\}$}};
+\node [onslide={<6->{highlight2}}](c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[onslide={<2->{highlight}}] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge[onslide={<4->{highlight2}}] (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge[onslide={<6->{highlight2}}] (c3)
+(c1c2) edge[onslide={<3->{highlight}}] (c1)
+(c1c2) edge (c2)
+(c1) edge[onslide={<5->{highlight}}] (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+
+\end{tikzpicture}
+\end{center}
+\label{fig:nosuprema}
+\end{figure}
+\begin{lstlisting}
+function ann: onlyNotDominatedBAB(var set of SOFTCONSTRAINTS: vScs) 
+      = repeat(
+           if next() then 
+             commit() /\ 
+             post((isWorse(vScs, sol(vScs)) \/ vScs = sol(vScs)))
+           else break endif       );
+\end{lstlisting}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-8.5cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
+\end{frame}
+
+
+\begin{frame}[fragile]{Switching PVS Type}
+Concrete PVS are instantiated by importing the appropriate \texttt{pvs\_x.mzn} file.
+\lstinputlisting{models/m1.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks}
+Vital, when designing constraint relationships: \alert{avoid cycles!}
+
+\texttt{model-inconsistent.mzn}
+\lstinputlisting{models/model-inconsistent.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks}
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/errorMz.png}
+\end{center}
+Better: Add model checks to detect cyclic relationships!
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks: Assertions}
+\texttt{model-inconsistent-safe.mzn}
+\lstinputlisting{models/model-inconsistent-safe.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks: Assertions}
+\texttt{minisearch model-inconsistent-safe.mzn}
+
+\vspace*{2ex}
+
+\begin{verbatim}
+minizinc/std/soft_constraints/cr_consistency.mzn:46:
+  in call 'assert'
+  Assertion failed: Relationship is cyclic!
+
+\end{verbatim}
 \end{frame}
 
 \begin{frame}{Language Features: Variable Ordering}
@@ -521,11 +784,27 @@ a
 a
 \end{frame}
 
+\begin{frame}{Summary}
+This concludes our overview of some language features
+
+
+\vspace*{2ex}
+
+Make sure to check out our other slides about:
+\begin{itemize}
+\item Step-by-Step enhancing a MiniZinc model (establishes the core elements)
+\item Case Studies (for some specific examples)
+\end{itemize}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/constraint-relationships/}
+\end{frame}
 
 \begin{frame}[allowframebreaks]
-        \frametitle{Quellen}
+        \frametitle{References}
         \bibliographystyle{apalike}
-        \bibliography{references.bib}
+        \bibliography{references.bib,../common.bib}
 \end{frame}
 
 
