@@ -585,7 +585,7 @@ predicate isWorse(var set of int: leftViolatedScs,
 Similar for large neighborhood search
 \begin{lstlisting}
 % adapted from lns_max an objective value 
-function ann: lns_cr (var set of SOFTCONSTRAINTS: violatedScs, 
+function ann: lns_pvs (var set of SOFTCONSTRAINTS: violatedScs, 
                       array[int] of var int: x,
                    int: iterations, float: d) = 
     repeat (i in 1..iterations) (

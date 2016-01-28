@@ -10,7 +10,9 @@ include "alldifferent_except_0.mzn";
 predicate spd_worse(var set of int: lhs, var set of int: rhs, 
                      set of int: softConstraints,
                      array[int, 1..2] of int: edges
-) :: promise_total = 
+) % we cannot promise_total here since spd_worse must not be used in a
+  % negated context due to the local variables witness (so no onlyNotDominatedSearch)
+ = 
 let {
   int: le = min(index_set_1of2(edges));
   int: ue = max(index_set_1of2(edges));
