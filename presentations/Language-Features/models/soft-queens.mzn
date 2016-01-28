@@ -19,6 +19,8 @@ include "soft_constraints/pvs_tpd.mzn";
 int: n;
 array[1..n] of var 1..n: queens;
 
+nCrEdges = 2;
+crEdges = [| 2, 1 | 3, 1 |];
 
 
 solve :: 

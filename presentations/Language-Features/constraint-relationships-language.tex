@@ -611,6 +611,7 @@ Execute \texttt{minisearch diff-BAB-sb.mzn }
 (bot) edge (c1c2)
       edge (c2c3)
       edge (c1c3)
+      edge (c2)
       edge[onslide={<2->{highlight}}] (c3)
 (c1c2) edge (c2c3)
 (c1c3) edge (c2c3)
@@ -665,21 +666,23 @@ Intermediate solution: Obj: 1 violating {3..3}: x=3
 
 
 \begin{frame}[fragile]{Search Demo: Only not dominated}
-Execute \texttt{minisearch smallexample-ond.mzn}
+Execute \texttt{minisearch diff-BAB-ond.mzn}
+
+(explores in order $\{c_3\}, \{c_2\}, \{c_1\}$)
 
 \begin{figure}[!t]
 \begin{center}
-\begin{tikzpicture}[scale=0.77,auto]
+\begin{tikzpicture}[scale=0.7,auto]
 
 % single PVS
 \node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
-\node (c1c2) at (-2,1) {\alert<2->{$\{c_1, c_2\}$}};
-\node[onslide={<4->{highlight2}}] (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c2) at (-2,1) {$\{c_1, c_2\}$};
+\node (c2c3) at (0,2) {$\{c_2, c_3\}$};
 \node (c1c3) at (2,1) {$\{c_1, c_3\}$};
 
-\node (c1) at (0,3) {\alert<3->{$\{c_1\}$}};
-\node (c2) at (-2,4) {\alert<5->{$\{c_2\}$}};
-\node [onslide={<6->{highlight2}}](c3) at (2,4) {$\{c_3\}$};
+\node (c1) at (0,3) {$\{c_1\}$};
+\node [onslide={<3->{highlight2}}] (c2) at (-2,4) {$\{c_2\}$};
+\node [onslide={<2->{highlight}}] (c3) at (2,4) {$\{c_3\}$};
 %\node (a) at (-1,0.5) {$a$};
 %\node (b) at (-1,1.5) {$b$};
 %\node (c) at (1,1) {$c$};
@@ -687,18 +690,20 @@ Execute \texttt{minisearch smallexample-ond.mzn}
 
 
 \path[-]
-(bot) edge[onslide={<2->{highlight}}] (c1c2)
+(bot) edge (c1c2)
       edge (c2c3)
       edge (c1c3)
-(c1c2) edge[onslide={<4->{highlight2}}] (c2c3)
+      edge[onslide={<2->{highlight}}] (c3)
+      edge[onslide={<3->{highlight2}}] (c2)
+(c1c2) edge (c2c3)
 (c1c3) edge (c2c3)
 (c1c3) edge (c1)
 (c1c3) edge (c3)
 (c2c3) edge (c2)
-(c2c3) edge[onslide={<6->{highlight2}}] (c3)
-(c1c2) edge[onslide={<3->{highlight}}] (c1)
+(c2c3) edge (c3)
+(c1c2) edge (c1)
 (c1c2) edge (c2)
-(c1) edge[onslide={<5->{highlight}}] (c2)
+(c1) edge (c2)
 (c1) edge (c3)
 (c2) edge (top)
 (c1) edge (top)
@@ -710,12 +715,12 @@ Execute \texttt{minisearch smallexample-ond.mzn}
 \label{fig:nosuprema}
 \end{figure}
 \begin{lstlisting}
-function ann: onlyNotDominatedBAB(var set of SOFTCONSTRAINTS: vScs) 
-      = repeat(
-           if next() then 
-             commit() /\ 
-             post((isWorse(vScs, sol(vScs)) \/ vScs = sol(vScs)))
-           else break endif       );
+% lists both solutions
+Intermediate solution: Obj: 1 violating {3..3}: x=3
+----------
+Intermediate solution: Obj: 1 violating {2..2}: x=2
+----------
+==========
 \end{lstlisting}
 \begin{textblock*}{2.5cm}[1,1](\textwidth-8.5cm,\textheight-4.03cm)
 \begin{tikzpicture}[auto,
@@ -770,18 +775,162 @@ minizinc/std/soft_constraints/cr_consistency.mzn:46:
   Assertion failed: Relationship is cyclic!
 
 \end{verbatim}
+
 \end{frame}
 
-\begin{frame}{Language Features: Variable Ordering}
-a
+\begin{frame}[fragile]{Transitive Closure}
+\vspace*{2ex}
+
+For larger constraint relationships, it can be more convenient 
+to just specify a directed acyclic graph and have the closure (all transitive edges)
+be calculated automatically.
+
+\centering
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (1, 0) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 2, 0) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (2)
+  (3) edge[dashed,bend right] (1)
+  ;
+\end{tikzpicture}
+\lstinputlisting{models/cr_trans_example.mzn}
 \end{frame}
 
-\begin{frame}{Language Features: Redundant Constraints}
-a
+\begin{frame}[fragile]{Variable Ordering}
+Recall that \texttt{soft\_constraints.mzn} defines a variable ordering with 
+weights in descending order:
+
+\vspace*{1ex}
+
+\begin{lstlisting}
+% find the sorted permutation of soft constraint instances
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: sortPermScs = 
+    arg_sort(penalties);
+% invert, since arg_sort use <= and we need decreasing order
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: mostImpFirst = 
+    [ sortPermScs[nScs-s+1] | s in SOFTCONSTRAINTS]; 
+
+\end{lstlisting}
+
+\vspace*{1ex}
+
+We can use this ordering to try out important constraints early on in search.
 \end{frame}
 
-\begin{frame}{Language Features: Custom Search}
-a
+\begin{frame}[fragile]{Variable Ordering: Demo}
+\texttt{smallexample.mzn}:
+
+\lstinputlisting{models/smallexample.mzn}
+\small 
+\begin{verbatim}
+Obj: 4 by x=1, y=1,z=1
+----------
+Obj: 3 by x=1, y=1,z=3
+----------
+Obj: 1 by x=1, y=2,z=1
+----------
+==========
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering: Demo}
+\texttt{smallexample-mif.mzn}:
+
+\lstinputlisting{models/smallexample-mif.mzn}
+\small 
+\begin{verbatim}
+Obj: 1 by x=1, y=2,z=1
+----------
+==========
+\end{verbatim}
+(finds the optimal solution at first try)
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering: Demo}
+This ordering can of course be combined with problem-specific heuristics 
+(e.g. large rectangles first in packing problems, here first-fail on a queens problem).
+
+\vspace*{2ex}
+Example: \texttt{minisearch soft-queens.mzn}
+\begin{lstlisting}
+solve :: seq_search([
+         int_search([satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS], 
+                     input_order, indomain_max, complete),
+         int_search(
+           queens, 
+           first_fail,
+           indomain_median,
+           complete
+       )] ) 
+     minimize penSum;
+\end{lstlisting}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Redundant Constraints}
+If we are mostly interested in performance (for constraint-relationship-based search), 
+we can add \emph{redundant constraints}, if we use \emph{strictlyBetter} search.
+
+\vspace*{2ex}
+
+From \texttt{redundant-constraints.mzn}:
+\begin{lstlisting}
+constraint spd_worse({1}, violatedScs,SOFTCONSTRAINTS,crEdges);
+% if we need to find an actually better solution than {1}
+% (with violation 2), the penalty sum has to be strictly
+% less than 2
+constraint penSum < 2;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Redundant Constraints}
+
+\begin{center}
+Without redundant constraint (\texttt{redundant-constraints.mzn}):
+
+\includegraphics[width=.6\textwidth]{img/withoutred.png}
+
+\vspace*{3ex}
+
+With redundant weight constraint -- less failures (\texttt{redundant-constraints-weighted.mzn}):
+
+\includegraphics[width=.4\textwidth]{img/withred.png}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Custom Search}
+Search strategies based on PVS are defined in \texttt{soft\_constraints/pvs\_search.mzn}.
+
+\vspace*{2ex}
+
+Currently supported:
+\begin{itemize}
+\item Branch and bound (BAB)
+\item Large Neighborhood Search (LNS)
+\end{itemize}
+
+\vspace*{2ex}
+
+for \emph{strictly better} and \emph{only not dominated}
+
+\begin{lstlisting}
+%[... in m2.mzn]
+solve
+search strictlyBetterBAB(violatedScs) /\ print();
+
+%[... in m2-lns.mzn]
+solve 
+search lns_pvs(violatedScs, dummies, 2, 0.5) /\ print();
+\end{lstlisting}
+
 \end{frame}
 
 \begin{frame}{Summary}
