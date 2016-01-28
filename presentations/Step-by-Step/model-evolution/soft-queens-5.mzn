@@ -3,7 +3,7 @@ include "soft_constraints/soft_constraints.mzn";
 include "soft_constraints/spd_worse.mzn"; %  solution ordering
 include "soft_constraints/pvs_spd.mzn"; %  concrete PVS
 include "minisearch.mzn"; % custom search combinators
-include "soft_constraints/constraint_relationship_search.mzn";
+include "soft_constraints/pvs_search.mzn";
 int: n; array[1..n] of var 1..n: queens; n = 8; nScs = 3; 
 output["queens= \(queens), obj = \(violatedScs) "];
 solve :: int_search(queens, first_fail, indomain_median, complete) 
