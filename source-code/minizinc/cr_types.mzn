@@ -1,3 +1,7 @@
 % constraint-relationship-types
 int: nCrEdges;
-array[1..nCrEdges, 1..2] of SOFTCONSTRAINTS: crEdges;
+
+% switched to "int" for first axis so we can write
+% crEdges = transClosure(SOFTCONSTRAINTS, crTempEdges);
+% nCrEdges = max(crEdges); 
+array[int, 1..2] of SOFTCONSTRAINTS: crEdges;

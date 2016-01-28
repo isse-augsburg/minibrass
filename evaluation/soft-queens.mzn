@@ -4,20 +4,21 @@
 % Using alldifferent. 
 %
 % 
-% This MiniZinc model was created by Hakan Kjellerstrand, hakank@bonetmail.com
+% This MiniZinc model was originally created by Hakan Kjellerstrand, hakank@bonetmail.com
 % See also my MiniZinc page: http://www.hakank.org/minizinc
 %
 include "globals.mzn";
 
 include "minisearch.mzn"; % include the search minisearch lite
-include "soft-constraints/soft_constraints.mzn"; % model additions for soft constraint business
-include "soft-constraints/spd_worse.mzn"; % the actual isBetter predicate
-include "soft-constraints/tpd_worse.mzn"; % the actual isBetter predicate
-include "soft-constraints/constraint_relationship_search.mzn"; % search strategies for SPD better
-include "soft-constraints/pvs-tpd.mzn";
+include "soft_constraints/soft_constraints.mzn"; % model additions for soft constraint business
+include "soft_constraints/spd_worse.mzn"; % the actual isBetter predicate
+include "soft_constraints/tpd_worse.mzn"; % the actual isBetter predicate
+include "soft_constraints/pvs_search.mzn"; % search strategies for SPD better
+include "soft_constraints/pvs_tpd.mzn";
 
 int: n;
 array[1..n] of var 1..n: queens;
+
 
 
 solve :: 
@@ -29,23 +30,16 @@ solve ::
            indomain_median,
            complete
        )] ) 
-%     satisfy;
-%search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
-search time_limit(3000, onlyNotDominatedBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
+search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ if hasSol() then print() else print("No solution found\n") endif;
 
-% solve satisfy;
-
-% Chuffed (with --free) seems to perform better without :: domain
-% on the first constraint.
-constraint all_different(queens); % :: domain;
-constraint all_different([queens[i]+i | i in 1..n]); % :: domain;
-constraint all_different([queens[i]-i | i in 1..n]); % :: domain;
+constraint all_different(queens); 
+constraint all_different([queens[i]+i | i in 1..n]); 
+constraint all_different([queens[i]-i | i in 1..n]); 
 
 % soft constraints 
 
 % it should be desirable to have queen[n/2] be in pos n/2
 nScs = 3;
-
 constraint queens[n div 2] = n div 2 <-> satisfied[1] ; 
 constraint queens[2] = queens[1] + 2 <-> satisfied[2];
 constraint queens[3] = queens[2] + 2 <-> satisfied[3];
@@ -72,5 +66,4 @@ output
 ["\n"]
 ;
 
-% data
 n = 8;
