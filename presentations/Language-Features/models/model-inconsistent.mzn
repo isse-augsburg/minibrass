@@ -1,8 +1,6 @@
-%include "minisearch.mzn";
 include "soft_constraints/soft_constraints.mzn";
 include "soft_constraints/spd_worse.mzn";
 include "soft_constraints/pvs_spd.mzn";
-%include "soft_constraints/pvs_search.mzn";
 
 var 0..10: x; var 0..10:y;
 
@@ -12,5 +10,5 @@ constraint x < y <-> satisfied[1];
 constraint x + 4 = y <-> satisfied[2]; 
 
 solve satisfy;
-%search strictlyBetterBAB(violatedScs) /\ print();
+
 output["x = \(x), y = \(y), violatedScs = \(violatedScs)"];
