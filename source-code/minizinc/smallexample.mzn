@@ -9,7 +9,7 @@ include "minisearch.mzn"; % include the search minisearch lite
 include "soft_constraints.mzn"; % model additions for soft constraint business
 include "spd_worse.mzn"; % the actual isBetter predicate
 include "tpd_worse.mzn"; % the actual isBetter predicate
-include "constraint_relationship_search.mzn"; % search strategies for SPD better
+include "pvs_search.mzn"; % search strategies for SPD better
 include "pvs_spd.mzn";
 
 
