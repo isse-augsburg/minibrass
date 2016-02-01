@@ -1,0 +1,7 @@
+include "defs.mbr" ;
+
+% defines a constraint relationship as type
+type constraintRelationship = PVS("Constraint-Relationship", set of int);
+
+% defines weighted CSP as type
+type weightedCsp = PVS("Weighted-CSP", int);
