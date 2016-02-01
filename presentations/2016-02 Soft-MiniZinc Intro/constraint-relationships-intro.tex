@@ -1,5 +1,5 @@
-\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
-%\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
 \usepackage{isse}
 
 
@@ -150,20 +150,21 @@ innertopmargin=\topskip,
 \titleframe
 
 \begin{frame}
-    \frametitle{Einordnung}
- \alert{Bisher:}
+    \frametitle{Agenda}
+ \alert{Grundlagen:}
     \begin{itemize}
-    \item Mechanismen für eigennützige Agenten
-    \item Optimierungsprobleme bei Auszahlung
-    \item Systematische Ansätze für SOAS
-    \item RIA: Zustände über Constraints beschrieben
+    \item Constraint Satisfaction (Optimisation) Problems
+    \item Funktionsweise von Constraint-Lösern und Sprachen (MiniZinc)
+    \item Einsatz im Scheduling
     \end{itemize}
-\alert{In dieser Vorlesung:}
+
+    \vspace*{3ex}
+    
+\alert{ISSE-Entwicklungen:}
     \begin{itemize} 
-    \item Prinzipien Diskreter Optimierung
-    \item Constraint Programming
-    \item Propagationen
-    \item Suchstrategien + Heuristiken
+    \item Constraint Relationships für Soft Constraints
+    \item Entwickelte Fallstudien
+    \item Sprachunterstützung / Features
      \end{itemize}
 \end{frame}
 \graphicspath{{img/}}
@@ -176,7 +177,7 @@ innertopmargin=\topskip,
 \begin{itemize}
 \item Im Gegensatz z.B. zu \emph{linearer Programmierung}, \emph{konvexe Optimierung}
 \item Verallgemeinert Boolesche Erfüllbarkeitsprobleme (SAT)
-\item Scheduling-Probleme
+\item \textbf{Scheduling-Probleme}
 \item Reorganisationen
 \item Zuweisungsprobleme (z.B. Frequenzen an Sender, Energie and Produzenten, \ldots)
 \end{itemize} \pause
@@ -202,28 +203,24 @@ Ein \alert{Constraint-Problem} $(X, D, C)$ ist beschrieben durch
 \begin{itemize}
   \item \emph{Variablen} $X$,
 \emph{Domänen} $D = (D_x)_{x \in X}$ (endlich),
-\emph{Constraints} $C$
+\emph{Constraints} $C$ 
 \end{itemize} 
+
 \end{definition}
 \pause
 
+Domänen typischerweise: \texttt{int}, \texttt{bool}, (\texttt{float})
 \vspace*{2ex}
 
-Technisch ist ein Constraint $c \in C$ mit \emph{Scope} $\mathrm{sc}(c) \subseteq X$ eine
-Einschränkung auf gültige Tupel des kartesischen Produktes der Domänen des Scopes:
-$c \subseteq \prod_{x \in \mathrm{sc}(c)} D_x$. \pause
+Was ist ein \textbf{Constraint}? Ein \emph{boolesches} Prädikat über einer Belegung von $X$:
 
-\vspace*{2ex}
-
-Constraints sind entweder:
+$X = \{x, y, z \}$
 \begin{itemize}
-\item \textbf{Extensional}; direkte Auflistung der Menge (z.B. $\{1, 2\}, \{2, 3\}$
-\item \textbf{Intensional}; Syntaktische Vorschrift gegeben (z.B. $x + 1 = y$)
-\end{itemize} \pause 
-
-Wir verwenden beide in \emph{funktionaler} Form: 
-$c : [X \to D] \to \mathbb{B} = \{ \mathsf{tt}, \mathsf{ff} \}$, wobei $[X \to D]$ die Menge aller Abbildungen
-von $X$ nach $D$ ist.
+\item $x < y$
+\item $x + 5 = z - y$
+\item $\texttt{alldifferent}([x,y,z])$
+\item $\forall$ und $\exists$ nur über endlichen Wertebereichen 
+\end{itemize}
 \end{frame} 
 %
 %\begin{frame}{Das eigentliche Erfüllbarkeitsproblem}
@@ -484,23 +481,289 @@ Entfernen von Werten, die zu keiner Lösung führen können.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Globale Constraints: Beispiele}
-Häufig auftretende Constraints samt Propagierungsalgorithmen. Gesammelt im \emph{Global Constraints Catalogue}\footnote{\url{http://www.emn.fr/z-info/sdemasse/gccat/sec5.html}}
+\begin{frame}{Task-Zuweisung in Practice}
+\begin{itemize}
+\item Taskzuweisungsproblem (\emph{task allocation problem})
 
-\vspace*{2ex}
-
-\begin{description}
-\item[{\tt \textbf{alldifferent(VARIABLES)}}] Erfordert, dass alle Variablen \alert{unterschiedliche} Werte haben, z.B: $[1,2,3]$ \pause
-
-\item[{\tt \textbf{allequal(VARIABLES)}}] Erfordert, dass alle Variablen den \alert{gleichen} Wert haben, z.B: $[5,5,5]$ \pause
-
-\item[{\tt \textbf{nvalue(VARIABLES, N)}}] Erfordert, dass genau $N$ verschiedene Werte vorkommen, z.B: $([1,2,1],2)$ \pause
-
-\item[{\tt \textbf{at\_most(N, VARIABLES, V)}}] Erfordert, dass höchstens $N$ Variablen den Wert $V$ annehmen z.B: $(2,[2,2,4],2)$
-
-
-\end{description}
+\begin{itemize}
+\item [-] $n$ Roboter
+\item [-] $m$ Tasks
+\item [-] Gebe jedem Roboter einen \emph{unterschiedlichen} Task, um den Gewinn zu maximieren (Unterschied zu Kompensation und Strafe)
+\end{itemize}
+\item Beispielproblem:
+\begin{itemize}
+\item[-] $n = 4$, $m = 5$
+\end{itemize}
+\end{itemize}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+ & t1 & t2 & t3 & t4 & t5 \\ 
+\hline 
+r1 & 7 & 1 & 3 & 4 & 6 \\ 
+\hline 
+r2 & 8 & 2 & 5 & 1 & 4 \\ 
+\hline 
+r3 & 4 & 3 & 7 & 2 & 5 \\ 
+\hline 
+r4 & 3 & 1 & 6 & 3 & 6 \\ 
+\hline 
+\end{tabular} 
 \end{frame}
+
+
+\begin{frame}[fragile]{Task-Zuweisung: Modell}
+\begin{lstlisting}
+% problem data 
+int: n; set of int: ROBOTS = 1..n;
+int: m; set of int: TASKS = 1..m;
+array[ROBOTS,TASKS] of int: profit;
+
+% decisions
+array[ROBOTS] of var TASKS: allocation;
+
+% goal
+solve maximize sum(r in ROBOTS) (profit[r, allocation[r]] );
+
+% have robots work on different tasks
+constraint alldifferent(allocation);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{AllDifferent -- Machbarkeit}
+\begin{itemize}
+\item Erster bekannter Propagator
+\item Basiert auf Matching in bipartiten Graphen
+\item Laufzeit ist polynomiell!
+\end{itemize}
+
+\begin{lstlisting}
+var {1,2,3}: x;       var {2,3}: y;      var {2,3}: z;
+var {1,2,3,4,5}: t; var {3,4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\vspace*{-15ex}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+text width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, circle](x){$x$}; \& \node[draw, circle](y){$y$};  \& \node[draw, circle](z){$z$};  \& \node[draw, circle](t){$t$};  \& \node[draw, circle](u){$u$};  \\
+ \& \\
+\& \\
+\& \\
+\node[draw, circle](1){$1$};  \& \node[draw, circle](2){$2$};  \& \node[draw, circle](3){$3$};  \& \node[draw, circle](4){$4$};  \& \node[draw, circle](5){$5$};  \& \node[draw, circle](6){$6$};  \\
+};
+
+\draw[onslide={<2>{highlight}}] (x) -- (1);
+\draw[] (x) -- (2);
+\draw[] (x) -- (3);
+
+\draw[onslide={<2>{highlight}}] (y) -- (3);
+\draw[] (y) -- (2);
+
+\draw[onslide={<2>{highlight}}] (z) -- (2);
+\draw[] (z) -- (3);
+
+\draw[onslide={<2>{highlight}}] (t) -- (5);
+\draw[] (t) -- (1);
+\draw[] (t) -- (2);
+\draw[] (t) -- (3);
+\draw[] (t) -- (4);
+\draw[onslide={<2>{highlight}}] (u) -- (4);
+\draw[] (u) -- (3);
+\draw[] (u) -- (5);
+\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{AllDifferent -- Propagierung}
+
+\begin{lstlisting}
+var {1,2,3}: x;       var {2,3}: y;      var {2,3}: z;
+var {1,2,3,4,5}: t; var {3,4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\vspace*{-15ex}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{impo}=[dashed]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+text width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, circle](x){$x$}; \& \node[draw, circle](y){$y$};  \& \node[draw, circle](z){$z$};  \& \node[draw, circle](t){$t$};  \& \node[draw, circle](u){$u$};  \\
+ \& \\
+\& \\
+\& \\
+\node[draw, circle](1){$1$};  \& \node[draw, circle](2){$2$};  \& \node[draw, circle](3){$3$};  \& \node[draw, circle](4){$4$};  \& \node[draw, circle](5){$5$};  \& \node[draw, circle](6){$6$};  \\
+};
+
+\draw[onslide={<2>{highlight}}] (x) -- (1);
+\draw[onslide={<2>{impo}}] (x) -- (2);
+\draw[onslide={<2>{impo}}] (x) -- (3);
+
+\draw[onslide={<2>{highlight}}] (y) -- (3);
+\draw[] (y) -- (2);
+
+\draw[onslide={<2>{highlight}}] (z) -- (2);
+\draw[] (z) -- (3);
+
+\draw[onslide={<2>{highlight}}] (t) -- (5);
+\draw[onslide={<2>{impo}}] (t) -- (1);
+\draw[onslide={<2>{impo}}] (t) -- (2);
+\draw[onslide={<2>{impo}}] (t) -- (3);
+\draw[] (t) -- (4);
+\draw[onslide={<2>{highlight}}] (u) -- (4);
+\draw[onslide={<2>{impo}}] (u) -- (3);
+\draw[] (u) -- (5);
+\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+\vspace*{-15ex}
+\begin{lstlisting}
+var {1}: x;       var {2,3}: y;      var {2,3}: z;
+var {4,5}: t;      var {4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{AllDifferent -- Algorithmus}
+
+\begin{lstlisting}
+var {1,2,3}: x;       var {2,3}: y;      var {2,3}: z;
+var {1,2,3,4,5}: t; var {3,4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\vspace*{-15ex}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{impo}=[dashed]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+text width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, circle](x){$x$}; \& \node[draw,onslide={<2->{highlight}}, circle](y){$y$};  \& \node[draw, onslide={<2->{highlight}}, circle](z){$z$};  \& \node[draw, onslide={<2->{highlight}}, circle](t){$t$};  \& \node[draw, circle](u){$u$};  \\
+ \& \\
+\& \\
+\& \\
+\node[draw, circle](1){$1$};  \& \node[draw, onslide={<2->{highlight}}, circle](2){$2$};  \& \node[draw, onslide={<2->{highlight}}, circle](3){$3$};  \& \node[draw, circle](4){$4$};  \& \node[draw, onslide={<2->{highlight}},circle](5){$5$};  \& \node[draw, circle](6){$6$};  \\
+};
+
+\draw[onslide={<1->{highlight}}] (x) -- (1);
+\draw[] (x) -- (2);
+\draw[] (x) -- (3);
+
+\draw[onslide={<3>{highlight}}] (y) -- (3);
+\draw[] (y) -- (2);
+
+\draw[onslide={<1-2>{highlight}}] (z) -- (3);
+\draw[onslide={<3>{highlight}}] (z) -- (2);
+
+\draw[onslide={<1-2>{highlight}}] (t) -- (2);
+\draw[] (t) -- (1);
+\draw[onslide={<3>{highlight}}] (t) -- (5);
+\draw[] (t) -- (3);
+\draw[] (t) -- (4);
+\draw[onslide={<1>{highlight}}] (u) -- (4);
+\draw[] (u) -- (3);
+\draw[] (u) -- (5);
+\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+\vspace*{-15ex}
+Augmentierender Pfad:
+
+$y \to 3 \to z \to 2 \to t \to 5$
+\end{frame}
+
+\tikzset{
+    process/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30},
+    file/.style={rectangle,draw=black}
+}
+
+\begin{frame}{How can we actually use all that?}
+\alert{Architecture}
+
+\begin{center}
+\vspace*{-20ex}
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+minimum width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, file,isseorange,thick](cr){\texttt{cr.dzn}};  \\
+\node[draw, file](f1){\texttt{f1.dzn}}; \& \& \node[draw, process](mzn2fzn){\texttt{mzn2fzn}}; \& \& \node[draw, file](output){\emph{output}};  \\
+\node[draw, file](f2){\texttt{f2.dzn}};   \&  \&  \node(inv){}; \& \node[draw, process](globals){solver-specific globals};  \\
+\node[draw, file](mod){\texttt{model.mzn}}; \& \&  \\
+\& \& \node[draw, file](fzn){\texttt{compiled.fzn}}; \& \& \node[draw, process](solve){\texttt{solve}};  \\
+\& \\
+};
+
+\draw[dashed,->] (f1) -- (mzn2fzn);
+\draw[dashed,->] (f2) -- (mzn2fzn);
+\draw[dashed,->] (cr) -- (mzn2fzn);
+\draw[dashed,->] (mod) -- (mzn2fzn);
+\draw[dashed,->] (fzn) -- (solve);
+\draw[->] (mzn2fzn) -- (fzn);
+\draw[->] (solve) -- (output);
+\draw[dashed] (globals) -- (inv);
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+%\begin{frame}[fragile]{Globale Constraints: Beispiele}
+%Häufig auftretende Constraints samt Propagierungsalgorithmen. Gesammelt im \emph{Global Constraints Catalogue}\footnote{\url{http://www.emn.fr/z-info/sdemasse/gccat/sec5.html}}
+%
+%\vspace*{2ex}
+%
+%\begin{description}
+%\item[{\tt \textbf{alldifferent(VARIABLES)}}] Erfordert, dass alle Variablen \alert{unterschiedliche} Werte haben, z.B: $[1,2,3]$ \pause
+%
+%\item[{\tt \textbf{allequal(VARIABLES)}}] Erfordert, dass alle Variablen den \alert{gleichen} Wert haben, z.B: $[5,5,5]$ \pause
+%
+%\item[{\tt \textbf{nvalue(VARIABLES, N)}}] Erfordert, dass genau $N$ verschiedene Werte vorkommen, z.B: $([1,2,1],2)$ \pause
+%
+%\item[{\tt \textbf{at\_most(N, VARIABLES, V)}}] Erfordert, dass höchstens $N$ Variablen den Wert $V$ annehmen z.B: $(2,[2,2,4],2)$
+%
+%
+%\end{description}
+%\end{frame}
 
 \begin{frame}{Scheduling \& Packing}
 
@@ -606,16 +869,16 @@ Benefits
 \begin{frame}
 \frametitle{Single-Predecessor-Dominance (SPD) Lifting}
 
-\cemph{Worsening}-Relation für Mengen verletzter Constraints
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
 %
-\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
-\begin{gather*}
-  V \SPDrel{R} V \uplus \{ c \} 
-\\
-  V \uplus \{ c \} \SPDrel{R} V \uplus \{ c' \}
-\quad\text{if $c \rightarrow_R c'$}
-\end{gather*}
-\egroup
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \SPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c \} \SPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $c \rightarrow_R c'$}
+%\end{gather*}
+%\egroup
 
 \begin{center}
 \begin{tikzpicture}[auto,
@@ -663,13 +926,13 @@ Benefits
 \node (R) at (3.05, -1.4) {$\SPDrel{R}$};
 \end{tikzpicture}
 \end{center}
-
-\cemph{Ordnungs}relation über Zuweisungen 
-\bgroup\abovedisplayskip4pt
-\begin{equation*}
-  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
-\end{equation*}
-\egroup
+%
+%\cemph{Ordnungs}relation über Zuweisungen 
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
 
 \end{frame}
 
@@ -677,16 +940,16 @@ Benefits
 \begin{frame}
 \frametitle{Transitive-Predecessors-Dominance (TPD) Lifting}
 
-\cemph{Worsening}-Relation für Mengen verletzter Constraints
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
 %
-\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
-\begin{gather*}
-  V \TPDrel{R} V \uplus \{ c \} 
-\\
-  V \uplus \{ c_1, \ldots, c_k \} \TPDrel{R} V \uplus \{ c' \}
-\quad\text{if $\forall c \in \{ c_1, \ldots, c_k \} \,.\, c \rightarrow_{R}^{+} c'$}
-\end{gather*}
-\egroup
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \TPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c_1, \ldots, c_k \} \TPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $\forall c \in \{ c_1, \ldots, c_k \} \,.\, c \rightarrow_{R}^{+} c'$}
+%\end{gather*}
+%\egroup
 
 \begin{center}
 \begin{tikzpicture}[auto,
@@ -735,12 +998,12 @@ Benefits
 \end{tikzpicture}
 \end{center}
 
-\cemph{Ordnungs}relation über Zuweisungen
-\bgroup\abovedisplayskip4pt
-\begin{equation*}
-  w \TPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\TPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
-\end{equation*}
-\egroup
+%\cemph{Ordnungs}relation über Zuweisungen
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \TPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\TPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
 
 \end{frame}
 
