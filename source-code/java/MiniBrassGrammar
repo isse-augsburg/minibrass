@@ -1,0 +1,13 @@
+Grammar of MiniBrass
+
+MiniBrassFile = (SolveStatement (PVSStatement)+ (IncludeStatement)* (TypeStatement)*) in any order
+MiniBrassFile = Statement (";" Statement)
+
+Statement = PVSStatement | IncludeStatement | TypeStatement | SolveStatement
+
+SolveStatement = "solve" PVS ";"
+PVS = ref | PVSConstructor | PVSOperator
+IncludeStatement = "include" {ident} ";"
+
+TypeStatement = "type" {ident} "=" TypeIdent( String  )
+
