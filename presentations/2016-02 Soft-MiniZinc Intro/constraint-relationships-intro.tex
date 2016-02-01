@@ -1,5 +1,5 @@
-\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
-%\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
 \usepackage{isse}
 
 
@@ -707,6 +707,45 @@ Augmentierender Pfad:
 $y \to 3 \to z \to 2 \to t \to 5$
 \end{frame}
 
+\tikzset{
+    process/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30},
+    file/.style={rectangle,draw=black}
+}
+
+\begin{frame}{How can we actually use all that?}
+\alert{Architecture}
+
+\begin{center}
+\vspace*{-20ex}
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+minimum width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, file,isseorange,thick](cr){\texttt{cr.dzn}};  \\
+\node[draw, file](f1){\texttt{f1.dzn}}; \& \& \node[draw, process](mzn2fzn){\texttt{mzn2fzn}}; \& \& \node[draw, file](output){\emph{output}};  \\
+\node[draw, file](f2){\texttt{f2.dzn}};   \&  \&  \node(inv){}; \& \node[draw, process](globals){solver-specific globals};  \\
+\node[draw, file](mod){\texttt{model.mzn}}; \& \&  \\
+\& \& \node[draw, file](fzn){\texttt{compiled.fzn}}; \& \& \node[draw, process](solve){\texttt{solve}};  \\
+\& \\
+};
+
+\draw[dashed,->] (f1) -- (mzn2fzn);
+\draw[dashed,->] (f2) -- (mzn2fzn);
+\draw[dashed,->] (cr) -- (mzn2fzn);
+\draw[dashed,->] (mod) -- (mzn2fzn);
+\draw[dashed,->] (fzn) -- (solve);
+\draw[->] (mzn2fzn) -- (fzn);
+\draw[->] (solve) -- (output);
+\draw[dashed] (globals) -- (inv);
+\end{tikzpicture}
+\end{center}
+\end{frame}
 
 %\begin{frame}[fragile]{Globale Constraints: Beispiele}
 %Häufig auftretende Constraints samt Propagierungsalgorithmen. Gesammelt im \emph{Global Constraints Catalogue}\footnote{\url{http://www.emn.fr/z-info/sdemasse/gccat/sec5.html}}
@@ -830,16 +869,16 @@ Benefits
 \begin{frame}
 \frametitle{Single-Predecessor-Dominance (SPD) Lifting}
 
-\cemph{Worsening}-Relation für Mengen verletzter Constraints
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
 %
-\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
-\begin{gather*}
-  V \SPDrel{R} V \uplus \{ c \} 
-\\
-  V \uplus \{ c \} \SPDrel{R} V \uplus \{ c' \}
-\quad\text{if $c \rightarrow_R c'$}
-\end{gather*}
-\egroup
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \SPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c \} \SPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $c \rightarrow_R c'$}
+%\end{gather*}
+%\egroup
 
 \begin{center}
 \begin{tikzpicture}[auto,
@@ -887,13 +926,13 @@ Benefits
 \node (R) at (3.05, -1.4) {$\SPDrel{R}$};
 \end{tikzpicture}
 \end{center}
-
-\cemph{Ordnungs}relation über Zuweisungen 
-\bgroup\abovedisplayskip4pt
-\begin{equation*}
-  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
-\end{equation*}
-\egroup
+%
+%\cemph{Ordnungs}relation über Zuweisungen 
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
 
 \end{frame}
 
@@ -901,16 +940,16 @@ Benefits
 \begin{frame}
 \frametitle{Transitive-Predecessors-Dominance (TPD) Lifting}
 
-\cemph{Worsening}-Relation für Mengen verletzter Constraints
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
 %
-\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
-\begin{gather*}
-  V \TPDrel{R} V \uplus \{ c \} 
-\\
-  V \uplus \{ c_1, \ldots, c_k \} \TPDrel{R} V \uplus \{ c' \}
-\quad\text{if $\forall c \in \{ c_1, \ldots, c_k \} \,.\, c \rightarrow_{R}^{+} c'$}
-\end{gather*}
-\egroup
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \TPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c_1, \ldots, c_k \} \TPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $\forall c \in \{ c_1, \ldots, c_k \} \,.\, c \rightarrow_{R}^{+} c'$}
+%\end{gather*}
+%\egroup
 
 \begin{center}
 \begin{tikzpicture}[auto,
@@ -959,12 +998,12 @@ Benefits
 \end{tikzpicture}
 \end{center}
 
-\cemph{Ordnungs}relation über Zuweisungen
-\bgroup\abovedisplayskip4pt
-\begin{equation*}
-  w \TPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\TPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
-\end{equation*}
-\egroup
+%\cemph{Ordnungs}relation über Zuweisungen
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \TPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\TPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
 
 \end{frame}
 
