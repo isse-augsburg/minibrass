@@ -1,0 +1,95 @@
+\begin{frame}{Systematische Suche I}
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=2.7cm,inner sep=0pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node (1) at (0, 0)                   {
+\def\svgwidth{.15\columnwidth}
+\input{img/australia.pdf_tex}
+};
+
+\node[below of=1] (3) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-red.pdf_tex}
+};  
+
+\node[left of=3] (2) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-blue.pdf_tex}
+};  
+
+
+\node[right of=3] (4) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-green.pdf_tex}
+};
+
+\path[every node/.style={font=\sffamily\tiny}]
+  (1) edge (2)
+  (1) edge (3)
+  (1) edge (4)
+ ;
+
+\node[below left of=2] (5) {
+\def\svgwidth{.15\columnwidth}
+\input{img/blue-red.pdf_tex}
+};
+
+\node[below right of=2] (6) {
+\def\svgwidth{.15\columnwidth}
+\input{img/blue-green.pdf_tex}
+};
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (5)
+  (2) edge (6)
+  ;
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{Systematische Suche II}
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=2.7cm,inner sep=0pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node (1) at (0, 0)                   {
+\def\svgwidth{.15\columnwidth}
+\input{img/blue-red.pdf_tex}
+};
+
+\node[below left of=1] (2) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-red-green.pdf_tex}
+
+{\huge
+\alert{\Lightning}
+}
+};  
+
+\node[below right of=1] (3) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-red-blue.pdf_tex}
+};  
+
+\path[every node/.style={font=\sffamily\tiny}]
+  (1) edge (2)
+  (1) edge (3)
+ ;
+
+\node[below of=3] (5) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-red-green-blue.pdf_tex}
+};
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (3) edge (5)
+  ;
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
