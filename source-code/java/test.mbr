@@ -1,7 +1,25 @@
 include "defs.mbr" ;
 
 % defines a constraint relationship as type
-type constraintRelationship = PVS("Constraint-Relationship", set of int);
+type constraintRelationship = PVS("Constraint-Relationship" , set of int,
+                                  "union",
+                                  "isWorse",
+                                  "{}" ) =
+  let {
+    array[int, 1..2] of 1..nScs: crEdges;
+    constraint forall(i in 1..nScs) (scVal[i] in {{}, {i} } ); 
+  };
 
 % defines weighted CSP as type
-type weightedCsp = PVS("Weighted-CSP", int);
+type weightedCsp = PVS("Weighted-CSP", int, "sum", "ge", "0") = 
+  let {
+    array[1..nScs] of int: weights;
+    constraint forall(i in 1..nScs) (scVal[i] in {0, weights[i]} ); 
+  };
+  
+% defines weighted CSP as type
+type fuzzyCsp = PVS("Fuzzy-CSP", float, "min", "le", "1.0") = 
+  let {
+    array[1..nScs] of int: weights;
+     
+  };

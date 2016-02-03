@@ -95,9 +95,7 @@ public class MiniBrassLexer {
 				}
 				
 				lastIdent = sb.toString();
-				if(currentChar == initChar)
-					readNextChar();
-
+			
 				return mv(MiniBrassSymbol.StringLitSy);
 			}
 			else if (Character.isLetter(currentChar)) { // either an ident or

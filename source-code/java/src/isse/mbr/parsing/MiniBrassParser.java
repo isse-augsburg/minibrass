@@ -70,7 +70,6 @@ public class MiniBrassParser {
 	 * @throws MiniBrassParseException 
 	 */
 	private void miniBrassFile() throws MiniBrassParseException {
-		item();
 		while(currSy != MiniBrassSymbol.EofSy) {
 			item();
 		}
@@ -96,28 +95,42 @@ public class MiniBrassParser {
 		String reference = lexer.getLastIdent();
 		getNextSy();
 		
-		expectSymbol(MiniBrassSymbol.EqualsSy);
-		getNextSy();
-		
-		expectSymbol(MiniBrassSymbol.PVSSy);
-		getNextSy();
-		
-		expectSymbol(MiniBrassSymbol.LeftParenSy);
-		getNextSy();
-		
+		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
+		expectSymbolAndNext(MiniBrassSymbol.PVSSy);
+				
+		expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);		
 		expectSymbol(MiniBrassSymbol.StringLitSy);
 		String name = lexer.getLastIdent();
 		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 		
 		MiniZincVarType elementType = MiniZincVarType();
+		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 		
-		expectSymbol(MiniBrassSymbol.RightParenSy);
+		expectSymbol(MiniBrassSymbol.StringLitSy);
+		String combination = lexer.getLastIdent();
 		getNextSy();
-		expectSymbol(MiniBrassSymbol.SemicolonSy);
+		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
+		
+		expectSymbol(MiniBrassSymbol.StringLitSy);
+		String order = lexer.getLastIdent();
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
+		
+		expectSymbol(MiniBrassSymbol.StringLitSy);
+		String top = lexer.getLastIdent();
 		getNextSy();
 		
-		PVSType nextPVSType = new PVSType(elementType, name);
+		expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+		
+		PVSType nextPVSType = new PVSType(elementType, name, combination,order,top);
 		model.registerPVSType(reference, nextPVSType);
+	}
+
+	private void expectSymbolAndNext(MiniBrassSymbol sy) throws MiniBrassParseException {
+		expectSymbol(sy);
+		getNextSy();
 	}
 
 	/**
