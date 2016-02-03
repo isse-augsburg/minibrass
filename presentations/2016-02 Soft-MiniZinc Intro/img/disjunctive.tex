@@ -1,0 +1,103 @@
+\begin{frame}[fragile]{Non-overlaps (Manually)}
+
+\tikzset{
+    task/.style={rounded corners, minimum height=3.8ex,rectangle,anchor=south west},
+    task1/.style={task,draw=black, top color=isseorange!5, bottom color=isseorange!30},    
+    task2/.style={task,draw=black, top color=issegrey!5, bottom color=issegrey!30},
+    task3/.style={task,draw=black, top color=BrickRed!5, bottom color=BrickRed!30},
+}
+ 
+%\vspace*{-6ex}
+\begin{figure}
+\begin{tikzpicture}[scale=1.0]
+    % Draw axes
+    \draw [<->,thick] (0,2) node (yaxis) [above] {}
+        |- (4.0,0) node (xaxis) [right] {$t$};    
+
+    \draw [<->,thick] (6,2) node (yaxis) [above] {}
+        |- (10.0,0) node (xaxis) [right] {$t$};      
+% first slide
+
+    \node[task1] at (1,0.5) { cut onions };        
+    \node[task2] at (1.5,1.1) { cook onions };         
+
+    \node[task1] at (6,0.5) { cut onions };        
+    \node[task2] at (8,1.1) { cook onions };          
+ 
+  %  \node[task3] at (2,1.5) { cook spaghetti };  
+
+	\node at (1.9, 2.6) {\color{BrickRed} \Huge \Lightning };
+	\node at (7.9, 2.6) {\color{ForestGreen} \Huge \checkmark };
+	
+	\node[text centered, anchor=north] at (1,0) { 1 }; \draw[thick] (1,0.05) -- (1,-.05);
+	\node[text centered, anchor=north] at (2,0) { 2 }; \draw[thick] (2,0.05) -- (2,-.05);
+	\node[text centered, anchor=north] at (3,0) { 3 }; \draw[thick] (3,0.05) -- (3,-.05);	
+%	\node[text centered, anchor=north] at (4,0) { 4 }; \draw[thick] (4,0.05) -- (4,-.05);
+	\node[text centered, anchor=north] at (7,0) { 1 }; \draw[thick] (7,0.05) -- (7,-.05);	
+	\node[text centered, anchor=north] at (8,0) { 2 }; \draw[thick] (8,0.05) -- (8,-.05);
+	\node[text centered, anchor=north] at (9,0) { 3 }; \draw[thick] (9,0.05) -- (9,-.05);
+	   
+\end{tikzpicture}
+\end{figure}
+
+\begin{lstlisting}
+predicate nonoverlap(var TASK: task1, var TASK: task2) = 
+             s[task1] + d[task1] <= s[task2] \/ 
+             s[task2] + d[task2] <= s[task1];
+             
+             
+constraint nonoverlap(cut_on, cook_on);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Non-overlaps (Global Constraint)}
+
+\tikzset{
+    task/.style={rounded corners, minimum height=3.8ex,rectangle,anchor=south west},
+    task1/.style={task,draw=black, top color=isseorange!5, bottom color=isseorange!30},    
+    task2/.style={task,draw=black, top color=issegrey!5, bottom color=issegrey!30},
+    task3/.style={task,draw=black, top color=BrickRed!5, bottom color=BrickRed!30},
+}
+ 
+%\vspace*{-6ex}
+\begin{figure}
+\begin{tikzpicture}[scale=1.0]
+    % Draw axes
+    \draw [<->,thick] (0,2) node (yaxis) [above] {}
+        |- (4.0,0) node (xaxis) [right] {$t$};    
+
+    \draw [<->,thick] (6,2) node (yaxis) [above] {}
+        |- (10.0,0) node (xaxis) [right] {$t$};      
+% first slide
+
+    \node[task1] at (1,0.5) { cut onions };        
+    \node[task2] at (1.5,1.1) { cook onions };         
+
+    \node[task1] at (6,0.5) { cut onions };        
+    \node[task2] at (8,1.1) { cook onions };          
+ 
+  %  \node[task3] at (2,1.5) { cook spaghetti };  
+
+	\node at (1.9, 2.6) {\color{BrickRed} \Huge \Lightning };
+	\node at (7.9, 2.6) {\color{ForestGreen} \Huge \checkmark };
+	
+	\node[text centered, anchor=north] at (1,0) { 1 }; \draw[thick] (1,0.05) -- (1,-.05);
+	\node[text centered, anchor=north] at (2,0) { 2 }; \draw[thick] (2,0.05) -- (2,-.05);
+	\node[text centered, anchor=north] at (3,0) { 3 }; \draw[thick] (3,0.05) -- (3,-.05);	
+%	\node[text centered, anchor=north] at (4,0) { 4 }; \draw[thick] (4,0.05) -- (4,-.05);
+	\node[text centered, anchor=north] at (7,0) { 1 }; \draw[thick] (7,0.05) -- (7,-.05);	
+	\node[text centered, anchor=north] at (8,0) { 2 }; \draw[thick] (8,0.05) -- (8,-.05);
+	\node[text centered, anchor=north] at (9,0) { 3 }; \draw[thick] (9,0.05) -- (9,-.05);
+	   
+\end{tikzpicture}
+\end{figure}
+
+\begin{lstlisting}
+include "disjunctive.mzn"; % global definition from standard library
+predicate disjunctive(array [int] of var int: s,
+                      array [int] of var int: d)
+             
+constraint nonoverlap( [ s[cut_on], s[cook_on] ], 
+                          [ du[cut_on], du[cook_on] ]);
+\end{lstlisting}
+\end{frame}

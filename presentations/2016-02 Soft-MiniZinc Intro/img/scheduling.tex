@@ -1,0 +1,67 @@
+\tikzset{
+    task/.style={rounded corners, minimum height=3.8ex,rectangle,anchor=south west},
+    task1/.style={task,draw=black, top color=isseorange!5, bottom color=isseorange!30},    
+    task2/.style={task,draw=black, top color=ForestGreen!5, bottom color=ForestGreen!30},
+    task3/.style={task,draw=black, top color=BrickRed!5, bottom color=BrickRed!30},
+} 
+\vspace*{-6ex}
+\begin{figure}
+\begin{tikzpicture}[scale=1.0]
+    % Draw axes
+    \draw [<->,thick] (0,3) node (yaxis) [above] {Workers}
+        |- (8.5,0) node (xaxis) [right] {$t$};    
+    
+% first slide
+
+\onslide<1>{
+    \node[task1] at (-3,2.1) { cut onions };        
+    \node[task2] at (-3,1.4) { cook onions };          
+    \node[task3] at (-3,0.7) { cook spaghetti };  
+}
+    
+\onslide<2->{    
+    \node[task1] at (2,0.5) { cut onions };        
+    \node[task2] at (4,0.5) { cook onions };          
+    \node[task3] at (2,1.5) { cook spaghetti };  
+}
+
+\onslide<3->{
+	\node at (1.5,1.75) {\footnotesize \texttt{s[t]}};  
+	}
+
+\onslide<5->{
+	\node at (4.85,1.75) {\footnotesize \texttt{e[t]}};  
+}
+
+\onslide<4->{	
+\draw [decorate,decoration={brace,amplitude=10pt,raise=4pt},yshift=0pt]
+(2,2.0) -- (4.3,2.0) node [black,midway,yshift=20pt] {\footnotesize \texttt{dur[t]}};
+    }
+    
+    \node[text centered, anchor=center] at (-0.3,0.8) { $P_1$ }; \draw[thick] (-0.1,0.8) -- (0.1,0.8);
+	\node[text centered, anchor=center] at (-0.3,1.8) { $P_2$ }; \draw[thick] (-0.1,1.8) -- (0.1,1.8);
+	
+	\node[text centered, anchor=north] at (1,0) { 1 }; \draw[thick] (1,0.05) -- (1,-.05);
+	\node[text centered, anchor=north] at (2,0) { 2 }; \draw[thick] (2,0.05) -- (2,-.05);
+	\node[text centered, anchor=north] at (3,0) { 3 }; \draw[thick] (3,0.05) -- (3,-.05);	
+	\node[text centered, anchor=north] at (4,0) { 4 }; \draw[thick] (4,0.05) -- (4,-.05);
+	\node[text centered, anchor=north] at (5,0) { 5 }; \draw[thick] (5,0.05) -- (5,-.05);
+	\node[text centered, anchor=north] at (6,0) { 6 }; \draw[thick] (6,0.05) -- (6,-.05);
+	\node[text centered, anchor=north] at (7,0) { 7 }; \draw[thick] (7,0.05) -- (7,-.05);	
+	\node[text centered, anchor=north] at (8,0) { 8 }; \draw[thick] (8,0.05) -- (8,-.05);
+	   
+\end{tikzpicture}
+\end{figure}
+
+\pause \pause \pause \pause \pause
+
+\begin{lstlisting}
+int: T; set of int: TASK = 1..T; set of int: HORIZON = 0..10;
+
+array[TASK] of var HORIZON: s; % start times
+array[TASK] of var HORIZON: e; % end times 
+array[TASK] of HORIZON: du;    % durations (fixed as constants!)
+
+constraint forall(t in TASK) (s[t] + du[t] = e[t]); % consistency
+constraint e[cut_on] <= s[cook_on]; % precedence
+\end{lstlisting}
