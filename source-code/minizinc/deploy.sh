@@ -33,3 +33,7 @@ cp tpd_worse.mzn "$EXP_LIB"
 cp minizinc_bundle.mzn "$EXP_LIB"
 cp minisearch_bundle.mzn "$EXP_LIB"
 cp soft_constraints_noset.mzn "$EXP_LIB"
+
+# global constraints 
+cp globals/soft_alldifferent.mzn "$EXP_LIB"
+cp globals/soft_all_different.mzn "$EXP_LIB"
