@@ -2,6 +2,9 @@
 # exports all relevant MZN files into a dedicated directory
 # call with argument to specify dir name
 #   ./deploy.sh SOFT-CONSTRAINT-DIRECTORY
+# For instance you could pass 
+# your MiniZinc-std dir directly
+# /> ./deploy.sh "/home/alexander/Documents/minisearch/share/minizinc/std/soft_constraints"
 # -------------------------------------------
 
 EXP_LIB="soft_constraints"
