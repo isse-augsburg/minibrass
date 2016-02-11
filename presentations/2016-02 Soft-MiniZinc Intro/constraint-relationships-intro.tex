@@ -1,5 +1,5 @@
-%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
-\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+%\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
 \usepackage{isse}
 
 
@@ -828,6 +828,73 @@ satisfaction may serve as a bridge between them
  
 \input{img/cumulative}
 
+\begin{frame}{Packing}
+Another popular type of problem, supported by global constraints:
+
+\begin{center}
+\includegraphics[width=.4\textwidth]{img/cookie_cutting.jpg}
+\hfill
+\includegraphics[width=.35\textwidth]{img/cfk.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}{Square Packing}
+Simple \alert{benchmark} variant:
+\begin{itemize}
+\item Parameter $n \in \mathbb{N}$
+\item Find the minimal area to place the squares from $1$ to $n$ without overlap
+\end{itemize}
+
+\tikzset{
+    task/.style={rounded corners, minimum height=3.8ex,rectangle,anchor=south west},
+    task1/.style={task,draw=black, top color=isseorange!5, bottom color=isseorange!30},    
+    task2/.style={task,draw=black, top color=issegrey!5, bottom color=issegrey!30},
+    task3/.style={task,draw=black, top color=BrickRed!5, bottom color=BrickRed!30},
+}
+ 
+%\vspace*{-6ex}
+\begin{figure}
+\begin{tikzpicture}[scale=1.0,x=.5cm,y=.5cm]
+    % Draw axes
+    
+     \node[draw, fill=issegrey!20,anchor=south west, text width=2.73cm,text height=3.73cm] at (0,0) { };  
+     
+    \draw [<->,thick] (0,8) node (yaxis) [above] {\texttt{height}}
+        |- (6,0) node (xaxis) [right] {\texttt{width}};    
+
+% first slide
+
+     \node[task1,text width=.5cm,text height=.5cm] at (4.45,1) { 1 };       
+     \node[task1,text width=1cm,text height=1cm] at (3.45,5.45) { 2  };   
+     \node[task1,text width=2cm,text height=2cm] at (0,0) { 4  };  
+     \node[task1,text width=1.5cm,text height=1.5cm] at (0,4.45) { 3 };  
+     
+% 
+%    \node[task1,text width=1.8cm,text height=2cm] at (0,0) {  };        
+%    \node[task1,text width=2.3cm,text height=.5cm] at (0,2.25) { };         
+%    \node[task1,text width=2.5cm,text height=.2cm] at (2.05,0) {  }; 
+%    \node[task1,text width=1.cm,text height=.2cm] at (2.05,0.6) {  };         
+   
+	
+\end{tikzpicture}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Results}
+\begin{center}
+\includegraphics[width=.9\textwidth]{img/results.pdf}
+\end{center}
+
+\end{frame}
+\begin{frame}{Geost}
+Almost counts as a special type of ``solver'':
+
+\begin{center}
+\includegraphics[width=.5\textwidth]{img/geost1.png}
+\end{center}
+\end{frame}
+
 \begin{frame}{Port Scheduling}
 Combines many scheduling and packing constraints:
 \begin{center}
@@ -948,6 +1015,20 @@ Benefits
 %\begin{small}
 %A.~Schiendorfer, J.-Ph.~Steghöfer, A.~Knapp, F.~Nafz, W.~Reif (2013)
 %\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{MiniBrass}
+
+\begin{center}
+
+\includegraphics[width=.5\textwidth]{img/minibrass.png}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/constraint-relationships/}
+
+\end{center}
+
 \end{frame}
 
 \begin{frame}
@@ -1871,30 +1952,119 @@ $\rightarrow$ Library works with MIP (\emph{Mixed Integer Programming}) as well!
 \end{frame}
 
 
-\begin{frame}{Language Features}
-a
+
+\begin{frame}[fragile]{Switching PVS Type}
+Concrete PVS are instantiated by importing the appropriate \texttt{pvs\_x.mzn} file.
+\lstinputlisting{models/m1.mzn}
 \end{frame}
 
-\begin{frame}{Language Features: Suitable Weighting}
-a
+\begin{frame}[fragile]{Consistency Checks}
+Vital, when designing constraint relationships: \alert{avoid cycles!}
+
+\texttt{model-inconsistent.mzn}
+\lstinputlisting{models/model-inconsistent.mzn}
 \end{frame}
 
-\begin{frame}{Language Features: Consistency Checks}
-a
+\begin{frame}[fragile]{Consistency Checks}
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/errorMz.png}
+\end{center}
+Better: Add model checks to detect cyclic relationships!
 \end{frame}
 
-\begin{frame}{Language Features: Variable Ordering}
-a
+\begin{frame}[fragile]{Consistency Checks: Assertions}
+\texttt{model-inconsistent-safe.mzn}
+\lstinputlisting{models/model-inconsistent-safe.mzn}
 \end{frame}
 
-\begin{frame}{Language Features: Redundant Constraints}
-a
+\begin{frame}[fragile]{Consistency Checks: Assertions}
+\texttt{minisearch model-inconsistent-safe.mzn}
+
+\vspace*{2ex}
+
+\begin{verbatim}
+minizinc/std/soft_constraints/cr_consistency.mzn:46:
+  in call 'assert'
+  Assertion failed: Relationship is cyclic!
+
+\end{verbatim}
+
 \end{frame}
 
-\begin{frame}{Language Features: Custom Search}
-a
+\begin{frame}[fragile]{Transitive Closure}
+\vspace*{2ex}
+
+For larger constraint relationships, it can be more convenient 
+to just specify a directed acyclic graph and have the closure (all transitive edges)
+be calculated automatically.
+
+\centering
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (1, 0) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 2, 0) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (2)
+  (3) edge[dashed,bend right] (1)
+  ;
+\end{tikzpicture}
+\lstinputlisting{models/cr_trans_example.mzn}
 \end{frame}
 
+\begin{frame}[fragile]{Variable Ordering}
+Recall that \texttt{soft\_constraints.mzn} defines a variable ordering with 
+weights in descending order:
+
+\vspace*{1ex}
+
+\begin{lstlisting}
+% find the sorted permutation of soft constraint instances
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: sortPermScs = 
+    arg_sort(penalties);
+% invert, since arg_sort use <= and we need decreasing order
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: mostImpFirst = 
+    [ sortPermScs[nScs-s+1] | s in SOFTCONSTRAINTS]; 
+
+\end{lstlisting}
+
+\vspace*{1ex}
+
+We can use this ordering to try out important constraints early on in search.
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering: Demo}
+\texttt{smallexample.mzn}:
+
+\lstinputlisting{models/smallexample.mzn}
+\small 
+\begin{verbatim}
+Obj: 4 by x=1, y=1,z=1
+----------
+Obj: 3 by x=1, y=1,z=3
+----------
+Obj: 1 by x=1, y=2,z=1
+----------
+==========
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering: Demo}
+\texttt{smallexample-mif.mzn}:
+
+\lstinputlisting{models/smallexample-mif.mzn}
+\small 
+\begin{verbatim}
+Obj: 1 by x=1, y=2,z=1
+----------
+==========
+\end{verbatim}
+(finds the optimal solution at first try)
+\end{frame}
 
 \begin{frame}[allowframebreaks]
         \frametitle{References}
