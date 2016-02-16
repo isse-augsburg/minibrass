@@ -1,0 +1,624 @@
+%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+\usepackage{isse}
+
+
+\usepackage{apalike}
+\usepackage[utf8]{inputenc}
+\usepackage{pdfpages}
+%\usepackage{ngerman}
+\usepackage{stmaryrd,amsmath,amssymb}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage[makeroom]{cancel}
+\usepackage{mdframed}
+\usepackage{xskak}
+
+\usepackage{fancyvrb}
+\usepackage{fixltx2e}
+%\usepackage{bera}
+
+\usepackage{marvosym}
+\setchessboard{
+showmover=false}
+\usepackage[noend]{algpseudocode}   % package for algorithms
+\usepackage{algorithm}
+\usepackage{tikz}
+
+\usepackage[absolute,overlay]{textpos}
+
+\usetikzlibrary{trees,calc,shapes,arrows,matrix,shadows,decorations.markings}
+
+\mdfdefinestyle{theoremstyle}{
+linecolor=red,linewidth=2pt,
+frametitlerule=true,
+frametitlebackgroundcolor=gray!20,
+innertopmargin=\topskip,
+}
+\definecolor{LRed}{rgb}{1,.8,.8}
+\definecolor{MRed}{rgb}{1,.6,.6}
+\definecolor{HRed}{rgb}{1,.2,.2}
+
+\usepackage{listings}
+\lstdefinelanguage{mzn}
+{
+	morekeywords={var,int,solve,bool,not,search,satisfy,endif,maximize,minimize,float,constraint,sum,forall,exists,array,of,include,predicate,then,commit,post,set,function,if,else,repeat,next,ann,break},
+	sensitive=false,
+	morecomment=[l]{\%},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]",
+}
+
+\definecolor{lightlightgray}{gray}{0.95}
+\definecolor{forestgreen}{HTML}{009B55}
+\definecolor{thermicred}{rgb}{0.82, 0.1, 0.26}
+\lstset
+{
+	basicstyle=\ttfamily\small,
+	commentstyle=\ttfamily\color{thermicred},
+	stringstyle=\ttfamily\color{isseorange},
+	keywordstyle=\ttfamily\color{blue},
+	tabsize=2,
+	showstringspaces=false,
+	flexiblecolumns=true,
+	captionpos=b,	
+	backgroundcolor=\color{lightlightgray},
+	frame=single,
+	 xleftmargin=\parindent,
+}
+
+\lstset{language=mzn}
+\interfootnotelinepenalty=10000
+
+% ====== custom commands
+
+\newcommand{\prosumer}[1]{\ensuremath{\mathtt{#1}}}
+% Soft Constraint Example
+\newcommand{\constraintName}[1]{\ensuremath{\mathtt{#1}}}
+% Biogas Constraints
+\newcommand{\biogas}{biogas}
+\newcommand{\biogasShort}{bio}
+\newcommand{\gasFull}{\ensuremath{\constraintName{gasFull}_\mathtt{\biogasShort}}}
+\newcommand{\ecoSweet}{\ensuremath{\constraintName{ecoSweet}_\mathtt{\biogasShort}}}
+\newcommand{\onOff}{\ensuremath{\constraintName{onOff}_\mathtt{\biogasShort}}}
+% Thermal Plant Constraints
+\newcommand{\thermal}{thermal}
+\newcommand{\thermalShort}{therm}
+\newcommand{\ecoOpt}{\ensuremath{\constraintName{ecoOpt}_\mathtt{\thermalShort}}}
+\newcommand{\inertia}{\ensuremath{\constraintName{inertia}_\mathtt{\thermalShort}}}
+\newcommand{\ecoGood}{\ensuremath{\constraintName{ecoGood}_\mathtt{\thermalShort}}}
+\newcommand{\hLevelThermal}[1]{$H_#1^\mathtt{\thermalShort}$}
+% Electric Vehicle
+\newcommand{\ev}{EV}
+\newcommand{\limitBatteryUsage}{\ensuremath{\constraintName{limitBU}_\mathtt{\ev}}}
+\newcommand{\prefBatteryLevel}{\ensuremath{\constraintName{prefBL}_\mathtt{\ev}}}
+\newcommand{\earlyBird}{\ensuremath{\constraintName{earlyBird}_\mathtt{\ev}}}
+% Organization
+\newcommand{\org}{org}
+\newcommand{\minMaxViolation}{\ensuremath{\constraintName{violation}_\mathtt{\org}}}
+\newcommand{\hLevelOrg}[1]{$H_#1^\mathtt{\org}$}
+
+\newcommand{\Variable}{X}
+\newcommand{\LocalVariable}{\widehat{\Variable}}
+\newcommand{\Domain}{D}
+\newcommand{\Constraint}{C}
+\newcommand{\ConstraintRelationship}{\mathcal{R}}
+
+\newcommand{\valuation}{v}
+\newcommand{\constraint}[1]{\mathrm{#1}}
+
+\newcommand{\plantconstraint}[3]{  
+\ifx#1b \constraint{best}[#3]
+\else \ifx#1g \constraint{good}[#3]
+\else \ifx#1a \constraint{acc}[#3]
+\else \ifx#1d \constraint{diff}
+\else \ifx#1l \constraint{low}[#3]
+\else \ifx#1h \constraint{high}[#3]
+\else \ifx#1o \constraint{org}[#3]
+   \else
+   \constraint{#1}_{#2}^{#3} 
+   
+   
+\fi \fi \fi \fi \fi \fi \fi}
+\input{notespreamble}
+
+\renewcommand{\submseteq}{%
+\mathrel{\mathchoice%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{0.0pt}{\fontsize{7.5pt}{7.5pt}\selectfont\rotatebox{90}{$-$}\hspace{1.6pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{0.0pt}{\fontsize{7.5pt}{7.5pt}\selectfont\rotatebox{90}{$-$}\hspace{1.6pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{-0.3pt}{\fontsize{7pt}{7pt}\selectfont\rotatebox{90}{$-$}\hspace{1pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{-0.3pt}{\fontsize{7pt}{7pt}\selectfont\rotatebox{90}{$-$}\hspace{1pt}}}}}%
+}}
+
+
+\tikzset{
+   main node/.style={circle,fill=black!15,draw,font=\sffamily},
+   constraint node/.style={main node, circle, inner sep=2pt,font=\sffamily\small},   
+   treestyle/.style={rectangle,fill=black!15,draw,font=\sffamily}
+}
+
+
+\mdtheorem[style=theoremstyle]{definition}{Definition}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\tupleOf}[1]{\langle #1 \rangle}
+\newcommand{\cemph}[1]{\alert{#1}}
+\input{common}
+
+\title{MiniBrass}
+\author{Cost Function Networks}
+
+\date{\today}
+
+\begin{document}
+
+\titleframe
+
+%\begin{frame}
+%\frametitle{Preferences in Constraint Solving}
+%
+%Constraint problem $(X, D, C)$ 
+%\begin{itemize}
+%  \item \cemph{Variables} $X$,
+%\cemph{Domains} $D = (D_x)_{x \in X}$,
+%\cemph{Constraints} $C$
+%\end{itemize}
+%
+%\vspace*{1ex}
+%
+%How to deal with \cemph{over-constrained} problems?
+%
+%\vspace*{2ex}
+%
+%$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
+%\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
+%\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
+%\mathrm{c}_2, \mathrm{c}_3 \})$ mit 
+%\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
+%\begin{align*}
+%  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
+%\\[-.4ex]
+%  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
+%\\[-.4ex]
+%  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
+%\end{align*}
+%\egroup
+%
+%\begin{itemize}
+%  \item Not all constraints can be satisfied simultaneously
+%\begin{itemize} \pause
+%  \item e.\,g., $\mathrm{c}_2$ forces $\mathrm{z} = 3$ and $\mathrm{y} = 1$, conflicting $\mathrm{c}_1$
+%\end{itemize}
+%
+%  \item We can \cemph{choose} between assignments satisfying $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ or $\{ \mathrm{c}_2, \mathrm{c}_3 \}$.
+%\end{itemize}
+%
+%\vspace*{2ex}
+%
+%Which assignments $v \in [X \to D]$ should be \alert{preferred} by an agent/several agents?
+%
+%\end{frame}
+%
+%\begin{frame}
+%\frametitle{Constraint Relationships}
+%
+%Approach~\cite{Schiendorfer13}
+%\begin{itemize}
+%  \item Define relation $R$ over constraints $C$ to denote which constraints are more important than others, e.\,g.
+%\begin{itemize}
+%  \item $\mathrm{c}_1$ is more important than  $\mathrm{c}_2$
+%
+%  \item $\mathrm{c}_1$ is more important than $\mathrm{c}_3$
+%\end{itemize}
+%\end{itemize}
+%\begin{textblock*}{2.5cm}[1,1](\textwidth-1.5cm,\textheight-4.03cm)
+%\begin{tikzpicture}[auto,
+%                    ->,>=stealth',shorten >=1pt,thick,
+%                    node distance=.7cm,inner sep=2pt,
+%                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+%\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+%\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+%\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%%  
+%\path[every node/.style={font=\sffamily\tiny}]
+%  (2) edge (1)
+%  (3) edge (1)
+%  ;
+%\end{tikzpicture}
+%\end{textblock*}
+%
+%\vspace*{5.6ex}
+%
+%Benefits
+%\begin{itemize}
+%  \item \cemph{Qualitative} formalism --- easy to specify
+%  \item Graphical interpretation 
+%\begin{itemize}
+% \item Semantics (\alert{how} much more important is a constraint) regulated by 
+%  \item \cemph{dominance properties} that are either ``hierarchical'' or ``egalitarian''
+%  \item Single-Predecessors-Dominance (SPD) vs. Transitive-Predecessors-Dominance (TPD)
+%\end{itemize}
+%
+%\end{itemize}
+%
+%%\vspace*{2ex}
+%%\begin{small}
+%%A.~Schiendorfer, J.-Ph.~Steghöfer, A.~Knapp, F.~Nafz, W.~Reif (2013)
+%%\end{small}
+%\end{frame}
+
+\begin{frame}{Overview}
+These few slides show how to use cost functions (also known as weighted constraints) in your model
+such that a dedicated solver (\alert{toulbar2}) can access them
+
+
+\vspace*{2ex}
+
+To familiarize yourself with the basics, consider looking at:
+\begin{itemize}
+\item Step-by-Step enhancing a MiniZinc model (establishes the core elements)
+\item Language Features 
+\item Case Studies (for some specific examples)
+\item Soft Global Constraints (\texttt{soft-alldiff}, \texttt{soft-regular}, \texttt{soft-gcc})
+\end{itemize}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/constraint-relationships/}
+\end{frame}
+
+\begin{frame}{Cost Functions}
+\begin{itemize}
+\item Different underlying model than pure constraint satisfaction and optimization~(CSOP)
+\item Assumes a \emph{decomposable} cost function that represents the \alert{violation} of a constraint
+\item Ranges from 0 (no violation) to some upper bound $k$ (maximally possible violation) 
+\begin{itemize}
+\item The objective of the CSOP is $F(x)$
+\item i.e., for $x \in X$, $F(x) = \sum_{f \in F} f(x)$
+\item Integer domains, integer objectives 
+\end{itemize}
+\vspace*{2ex}
+\item Algorithmic support (\texttt{toulbar2}\footnote{\url{https://mulcyber.toulouse.inra.fr/projects/toulbar2/}} \cite{allouche2010toulbar2})
+\begin{itemize}
+\item Soft local consistency (specialized propagation)
+\item Limited discrepancy search
+\item Russian Doll Search, Branch-and-Bound etc
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Example Cost Function}
+Idea: Variables $X = \{x, y \}$, assign cost to every assignment (i.e., the cartesian product of the domains)
+\begin{center}
+\begin{tabular}{cc|c}
+$x$ & $y$ & $c$ \\ 
+\hline 
+0 & 0 & 4 \\ 
+0 & 1 & 3 \\ 
+1 & 0 & 2 \\ 
+1 & 1 & 4 \\ 
+\end{tabular} 
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Example Usage}
+Assume you choose dinner and wine and let your friends 
+rate dinner/wine combinations, as well as the wine individually
+and you want to find the solution minimizing the overall \emph{dissatisfaction}.
+
+\begin{lstlisting}
+int: steak = 1; int: fish = 2; int: pizza = 3;
+int: red = 1; int: white = 2;
+set of int: MEAL = {steak, fish, pizza};
+set of int: WINE = {red, white};
+var MEAL: meal; var WINE: wine; 
+
+var 0..4: mealA; var 0..4: mealB; var 0..4: mealC;
+var 0..4: wineA; var 0..4: wineB; var 0..5: wineC;
+
+include "soft_constraints/cost_functions.mzn";
+\end{lstlisting}
+%
+%\begin{verbatim}
+%----------
+%meal = 2; % fish
+%wine = 2; % white 
+%\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Example Usage}
+
+\begin{lstlisting}
+% Albert
+constraint cost_function_binary(meal, wine, 
+ [
+   /* steak, red */       2,
+   /* steak, white */     10,
+   /* fish, red */        20,
+   /* fish, white */      3,
+   /* pizza, red */       5,
+   /* pizza, white */     5
+ ]
+ , mealA);
+
+constraint cost_function_unary(wine, [2, 1], wineA);
+% analogously for Berta and Carl (see dinner.mzn)
+\end{lstlisting}
+
+\begin{verbatim}
+----------
+meal = 2; % fish
+wine = 2; % white
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Native Support}
+\begin{itemize}
+\item Cost functions are \alert{first-class citizen} in \texttt{toulbar2}, accessed by \texttt{wcsp} files.
+\item Classical constraints are cost functions that map to a value higher than some $k$ -- to denote unacceptable violation. 
+\item Example:
+\end{itemize}
+\small
+\begin{verbatim}
+wcsp 2 2 1 100000000
+2 2
+2 0 1 0 4
+0 0 4
+0 1 3
+1 0 2
+1 1 4
+\end{verbatim}
+A simple WCSP file with $2$ variables, at most $2$ domain values, precisely $1$ cost function and an upper bound $k = 100000000$.\footnote{Read more about the WCSP format at \url{http://costfunction.org/mobyle/htdocs/portal/help/wcsp.html}} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Access via Numberjack}
+\begin{itemize}
+\item Numberjack\footnote{\url{http://numberjack.ucc.ie/}}\cite{hebrard2010constraint} is a modeling package for multiple solvers, written in Python
+\item Interfaces to toulbar2 using the \alert{objective} function!
+\begin{itemize}
+\item If the objective function (\texttt{Minimize}, \texttt{Maximize} objects) is a \emph{sum},
+every sub-expression is translated to a cost function.
+\item Very useful for \emph{weighted constraints}, in the sense that satisfaction maps to 0 and violation 
+to a specific weight for all assignments of the variables in the scope of the cost function
+\end{itemize}
+\end{itemize}
+
+\lstset{language=python}
+\begin{lstlisting}
+from Numberjack import * 
+x,y,z = VarArray(3,0,2) # three variables, each with domain {0,1,2}
+# state desirable constraints, and minimize their violation
+# --> their negation being true
+model = Model(
+    Minimise( 2 * (x + 1 != y) +  # x + 1 = y should hold with weight 2
+              (z != y + 2)   )) # z = y + 2 should hold with weight 1
+solver.solve()
+\end{lstlisting}
+
+\lstset{language=mzn}
+
+\end{frame}
+
+\begin{frame}[fragile]{Generated WCSP}
+\lstset{language=python}
+\begin{lstlisting}
+from Numberjack import * 
+x,y,z = VarArray(3,0,2) # three variables, each with domain {0,1,2}
+model = Model(
+    Minimise( 2 * (x + 1 != y) +  # x + 1 = y should hold with weight 2
+              (z != y + 2)   )) # z = y + 2 should hold with weight 1
+solver.solve()
+\end{lstlisting}
+
+\lstset{language=mzn}
+
+\small 
+%\renewcommand{\ttdefault}{lmtt}
+\begin{columns}[T]
+    \begin{column}{.4\textwidth}
+% Your image included here
+\begin{semiverbatim}
+wcsp 3 3 5 100000000
+3 3 3 # order is z, y, x
+2 0 1 0 9 # z = y + 2
+0 0 1
+0 1 1
+0 2 1
+1 0 1
+1 1 1
+1 2 1
+\textcolor{isseorange}{2 0 0}
+2 1 1
+2 2 1
+\end{semiverbatim}
+    \end{column}
+    \begin{column}{.4\textwidth}
+\begin{Verbatim}[commandchars=\\\{\}]
+2 1 2 0 9 # y = x + 1
+0 0 2
+0 1 2
+0 2 2
+\textcolor{isseorange}{1 0 0}
+1 1 2
+1 2 2
+2 0 2
+\textcolor{isseorange}{2 1 0}
+\end{Verbatim}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Accessing Toulbar2 via MiniZinc}
+
+\lstset{language=python}
+\begin{lstlisting}
+from Numberjack import * 
+x,y,z = VarArray(3,0,2) # three variables, each with domain {0,1,2}
+model = Model(
+    Minimise( 2 * (x + 1 != y) +  # x + 1 = y should hold with weight 2
+              (z != y + 2)   )) # z = y + 2 should hold with weight 1
+solver.solve()
+\end{lstlisting}
+The same model, written in MiniZinc\footnote{Compile using \texttt{mzn\_numberjack} with other solvers than \texttt{toulbar2} commented out in the portfolio solver \texttt{fzn/njportfolio.py} of the Numberjack source.}
+
+\lstset{language=mzn}
+\begin{lstlisting}
+var 0..2: x; var 0..2: y; var 0..2: z;
+
+var bool: sc1 = (x + 1 = y);
+var bool: sc2 = (z = y + 2);
+
+solve minimize 2 * (not sc1) + (not sc2); 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Explicit Cost Function Modeling}
+\begin{itemize}
+\item Internally, the Cartesian product of the domains 
+of the involved variables is built and an expression evaluated (e.g., $x + 1 = y$).
+\item However, it is not possible to inject arbitrary cost functions from MiniZinc
+\begin{itemize}
+\item Enumerate support and cost function \emph{explicitly}
+\item Use, e.g., MiniZinc functions and comprehensions to calculate cost vector
+\end{itemize}
+\end{itemize}
+\begin{parchment}[Proposal]
+\alert{Add cost functions as special global constraints to MiniZinc}
+\end{parchment}
+\end{frame}
+
+\begin{frame}[fragile]{Decomposition in MiniZinc}
+Provides a \emph{default implementation} of \texttt{cost\_function} that \emph{encodes}
+cost functions using table constraints for any solver.
+\small
+\begin{lstlisting}
+% e.g. x \in 0..2 ->, costs = [4, 1, 3] leads to 
+% f(x -> 0) = 4, f(x -> 1) = 1, f(x -> 2) = 3
+% costVariable takes the value of f(x)
+predicate cost_function_unary(var int: x, 
+                              array[int] of int: costs, 
+                              var int: costVariable ) = 
+let {
+  array[int] of int: folded = [ x_ | x_ in dom(x)];
+}
+in ( cost_function_unary_safe(folded, costs, x, costVariable)); 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Safe Cost Function Encoding}
+\small
+\begin{lstlisting}
+predicate cost_function_unary_safe(array[int] of int: folded, 
+                                   array[int] of int: costs, 
+                                   var int: x, var int: costVar) = 
+assert(max(index_set(folded)) == max(index_set(costs)), 
+"Dimensions of cost vector and flattened domains must agree", 
+let {
+   array[int] of int: tableDecomp = [ if(j == 1) then folded[i] 
+                                      else  costs[i] endif 
+                                      | i in index_set(costs), j in 1..2 ];
+} in table([x,costVar], array2d(index_set(costs), 1..2, tableDecomp)));
+\end{lstlisting}
+Analogously (as of now) for \texttt{cost\_function\_binary} and \texttt{cost\_function\_ternary}.
+All definitions are found in \texttt{soft\_constraints/cost\_functions.mzn}.
+\end{frame}
+
+\begin{frame}[fragile]{Example Usage}
+\texttt{bincost-functions.mzn}
+\begin{lstlisting}
+array[1..2] of var 0..1: x; 
+% default definitions from MiniBrass lib
+include "soft_constraints/cost_functions.mzn";
+
+var 0..10: cVar;
+% 0, 0 -> 4; 0, 1 -> 3; 1, 0 -> 2; 1, 1 -> 4
+constraint cost_function_binary(x[1], x[2], [4, 3, 2, 4], cVar);
+
+solve minimize cVar;
+
+\end{lstlisting}
+\small
+\begin{verbatim}
+x = array1d(1..2 ,[0, 0]);
+cVar = 4;
+----------
+x = array1d(1..2 ,[1, 0]);
+cVar = 2;
+----------
+==========
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Usage with MiniZinc Functions}
+\texttt{comprehensions.mzn}
+\begin{lstlisting}
+include "soft_constraints/cost_functions.mzn";
+
+% shows an exemplary comprehension based cost function
+var 0..1: x; var 0..1: y; var 0..10: costVar;
+% x y | 4 - (x + y)   : (0,0) -> 4, (0,1) -> 3, (1, 0) -> 3, (1, 1) -> 2
+
+function int: f(int: x, int: y) = (   4 - (x + y) );
+
+constraint cost_function_binary(x, y, 
+   [f(x_,y_) | x_ in dom(x), y_ in dom(y)], costVar);
+solve minimize costVar;
+\end{lstlisting}
+\small
+\begin{verbatim}
+x = 1;
+y = 1;
+costVar = 2;
+----------
+==========
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Native Cost Function} \small
+Toulbar2 supports \texttt{cost\_function} \emph{natively}. We should use this!\footnote{Experimentally
+implemented in the forked Numberjack repository \url{https://github.com/Alexander-Schiendorfer/Numberjack} on the \texttt{feature/wcsp-encoding} branch.}
+
+\vspace*{2ex}
+
+Define \texttt{soft\_constraints/cost\_functions.mzn} in Numberjack's \texttt{mzn-lib} dir:
+\begin{lstlisting}
+predicate cost_function_binary(var int: x, var int: y, 
+                               array[int] of int: costs, 
+                               var int: costVariable );
+\end{lstlisting}
+such that \texttt{cost\_function\_binary} does not get decomposed but sent to Numberjack.
+
+\vspace*{2ex}
+On Numberjack's side, we need to treat \texttt{cost\_function\_binary} in \texttt{fzn2py}:
+\lstset{language=python}
+\begin{lstlisting}
+def cost_function_binary(var1, var2, costs, costVar):
+    return PostBinary(var1, var2, costs)
+\end{lstlisting}
+\lstset{language=mzn}
+\texttt{costVar} is ignored since it is directly posted to the cost function.
+\end{frame}
+
+\begin{frame}[fragile]{How to use it?} \small
+\begin{itemize}
+\item Install MiniBrass from \url{http://isse-augsburg.github.io/constraint-relationships/}
+\item Write models using \texttt{cost\_function}
+\item Get the experimental Numberjack from \url{https://github.com/Alexander-Schiendorfer/Numberjack} (for now)
+\item Try it!
+\end{itemize}
+\begin{lstlisting}
+git clone -b feature/wcsp-encoding 
+  https://github.com/Alexander-Schiendorfer/Numberjack.git 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+        \frametitle{References}
+        \bibliographystyle{apalike}
+        \bibliography{references.bib,../common.bib}
+\end{frame}
+
+
+\end{document}
+
