@@ -311,6 +311,7 @@ public class MinizincWCSPParser {
 		fileName = "slangford_3_11.wcsp";
 		//fileName = "langford_2_4.wcsp";
 		//fileName = "langford_3_11.wcsp";
+		fileName = "genfrommin.wcsp";
 		
 		StringBuilder sb = parser
 				.parse("problems/"+fileName);
