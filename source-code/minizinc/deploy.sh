@@ -2,6 +2,9 @@
 # exports all relevant MZN files into a dedicated directory
 # call with argument to specify dir name
 #   ./deploy.sh SOFT-CONSTRAINT-DIRECTORY
+# For instance you could pass 
+# your MiniZinc-std dir directly
+# /> ./deploy.sh "/home/alexander/Documents/minisearch/share/minizinc/std/soft_constraints"
 # -------------------------------------------
 
 EXP_LIB="soft_constraints"
@@ -18,11 +21,10 @@ mkdir "$EXP_LIB"
 
 # enter all files of the utility library here 
 
-cp constraint_relationship_search.mzn "$EXP_LIB"
+cp pvs_search.mzn "$EXP_LIB"
 cp cr_consistency.mzn "$EXP_LIB"
 cp cr_types.mzn "$EXP_LIB"
 cp cr_weighting.mzn "$EXP_LIB"
-cp lessthan.mzn "$EXP_LIB"
 cp pvs_spd.mzn "$EXP_LIB"
 cp pvs_tpd.mzn "$EXP_LIB"
 cp pvs_weighted.mzn "$EXP_LIB"
@@ -38,3 +40,4 @@ cp soft_constraints_noset.mzn "$EXP_LIB"
 cp globals/soft_alldifferent.mzn "$EXP_LIB"
 cp globals/soft_all_different.mzn "$EXP_LIB"
 cp globals/soft_all_different_int.mzn "$EXP_LIB"
+cp globals/cost_functions.mzn "$EXP_LIB"
