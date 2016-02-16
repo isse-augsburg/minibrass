@@ -11,4 +11,4 @@ var 0..10: cVar;
 
 constraint cost_function_binary(x[1], x[2], [4, 3, 2, 4], cVar);
 
-solve minimize cVar;
+solve satisfy;
