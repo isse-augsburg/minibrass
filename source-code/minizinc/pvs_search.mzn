@@ -1,6 +1,8 @@
 % PVS-specific search strategies
 % ---------------------------------------------------
 
+include "minisearch.mzn";
+
 % only declare predicate for worsening
 predicate isWorse(var set of int: leftViolatedScs, var set of int: rightViolatedScs); 
 
