@@ -11,5 +11,5 @@ include "soft_constraints/weighting_spd.mzn";
 predicate isWorse(var set of int: leftViolatedScs, var set of int: rightViolatedScs) = 
 (
   spd_worse(leftViolatedScs, rightViolatedScs, SOFTCONSTRAINTS, crEdges) /\
-  if propagateWeights then sum(sc in SOFTCONSTRAINTS) (bool2int(sc in leftViolatedScs) * penalties[sc]) > penSum else true endif
+  if propagateWeights then sum(sc in SOFTCONSTRAINTS) (bool2int(sc in leftViolatedScs) * penalties[sc]) > sum(sc in SOFTCONSTRAINTS) (bool2int(sc in rightViolatedScs) * penalties[sc]) else true endif
 );
