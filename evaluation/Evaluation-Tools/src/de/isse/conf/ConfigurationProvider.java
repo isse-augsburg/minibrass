@@ -33,12 +33,10 @@ public class ConfigurationProvider<ConfClass> {
 		HashMap<Field, DependsOn> rawDependencies = new HashMap<>();
 
 		for (Field f : confClass.getFields()) {
-			System.out.println(f.getName());
 			dependencyGraph.addVertex(f);
 
 			parameters.put(f.getName(), f);
 			if (f.isAnnotationPresent(DependsOn.class)) {
-				System.out.println("Annotated ... ");
 				DependsOn depOn = f.getAnnotation(DependsOn.class);
 				rawDependencies.put(f, depOn);
 			}
@@ -59,6 +57,7 @@ public class ConfigurationProvider<ConfClass> {
 
 		Collection<ConfClass> configurations = enumerateConfigurations(confObject, consistentOrdering, parameters,
 				props);
+		
 		return configurations;
 	}
 
@@ -82,7 +81,7 @@ public class ConfigurationProvider<ConfClass> {
 	private void enumerateConfigurationsRec(ConfClass currInstance, int index, Collection<ConfClass> configurations,
 			List<Field> consistentOrdering, HashMap<String, Field> parameters, Properties props)
 					throws IllegalArgumentException, IllegalAccessException, InstantiationException {
-		System.out.println("Index: "+index);
+
 		if (index == consistentOrdering.size()) { // make a new instance and
 													// store it
 			Class<? extends Object> confClass = currInstance.getClass();
@@ -93,7 +92,6 @@ public class ConfigurationProvider<ConfClass> {
 			for (Field f : confClass.getFields()) {
 				f.set(newObj, f.get(currInstance));
 			}
-			System.out.println("NewObj: " + newObj);
 			configurations.add(newObj);
 
 		} else {
@@ -171,13 +169,11 @@ public class ConfigurationProvider<ConfClass> {
 			TopologicalOrderIterator<Field, DefaultEdge> orderIterator;
 			Field f;
 			orderIterator = new TopologicalOrderIterator<Field, DefaultEdge>(dependencyGraph);
-			System.out.println("\nOrdering:");
-
+		
 			List<Field> output = new ArrayList<>(dependencyGraph.vertexSet().size());
 
 			while (orderIterator.hasNext()) {
 				f = orderIterator.next();
-				System.out.println(f.getName());
 				output.add(f);
 			}
 
