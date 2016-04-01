@@ -1,0 +1,5 @@
+soft_constraints.zip
+soft_constraints/
+experimental/*
+*~
+deploy-locally*
