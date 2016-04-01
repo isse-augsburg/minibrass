@@ -1,0 +1,3 @@
+solve 
+:: finalAnn
+minimize penSum;
