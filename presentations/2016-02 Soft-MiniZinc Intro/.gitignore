@@ -1,3 +1,6 @@
+workbench.pdf
+Constraints-Feb-2016.zip
+models/*
 *.aux
 *.glo
 *.idx
@@ -24,3 +27,4 @@
 *.nav
 *.vrb
 *.synctex.gz
+literature/*
