@@ -68,6 +68,7 @@ include "evaluation-heuristics.mzn";
 include "evaluation-search.mzn";
 
 output [
+    "\nOBJ = \(penSum)\n",
     "pos = ", show(pos), "\n",
     "penSum = ", show(penSum), "\n",
     "penalties = ", show(penalties), "\n",
