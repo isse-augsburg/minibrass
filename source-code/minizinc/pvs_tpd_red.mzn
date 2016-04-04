@@ -1,5 +1,6 @@
 % instantiating isWorse-predicate (including redundant constraint for weights!)
 include "soft_constraints/soft_constraints.mzn";
+include "soft_constraints/pvs_set_based.mzn";
 include "soft_constraints/cr_types.mzn";
 include "soft_constraints/cr_weighting.mzn";
 include "soft_constraints/tpd_worse.mzn";
