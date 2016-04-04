@@ -2,6 +2,7 @@
 % ---------------------------------------------------
 
 include "minisearch.mzn";
+include "soft_constraints/pvs_set_based.mzn";
 
 % only declare predicate for worsening
 predicate isWorse(var set of int: leftViolatedScs, var set of int: rightViolatedScs); 
