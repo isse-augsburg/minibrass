@@ -3,12 +3,18 @@ package de.isse;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +28,10 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import de.isse.conf.ConfigurationProvider;
 import de.isse.conf.MiniBrassConfig;
 import de.isse.conf.Solver;
+import de.isse.jobs.Job;
+import de.isse.jobs.JobResult;
+import de.isse.results.MiniBrassResult;
+import de.isse.time.Timer;
 
 /**
  * This class is responsible for actually starting the experiments Loads all
@@ -34,10 +44,13 @@ public class ExperimentRunner {
 
 	private File evalDir;
 	private File resultsDir;
-	private File workingDir;
-	private File problemDir;
+	private File workingDir; 
+	private File problemDir; // base dir for all problems
 	private Solver[] solvers;
-	private File hookDir;
+	private File hookDir; // the directory where all search-specific model parts are stored
+
+	private final static String EVAL_CONF_FILE = "evaluation-conf.dzn";
+	private final static int JOB_TIME_IDENT = 0; // identifier for timer 
 
 	public static void main(String[] args) throws IOException {
 		String propertiesFile = "experiments/experiment.properties";
@@ -55,7 +68,7 @@ public class ExperimentRunner {
 		problemDir = new File("../problems/");
 		workingDir = new File("./");
 		final String workAbsPath = workingDir.getCanonicalPath();
-		
+
 		// 1) Read problems
 		final Pattern p = Pattern.compile(props.getProperty("problemsRegex", ".*"));
 		File[] problemDirectories = problemDir.listFiles(new FilenameFilter() {
@@ -69,30 +82,30 @@ public class ExperimentRunner {
 		System.out.println("Testing with problems:");
 		System.out.println(Arrays.toString(problemDirectories));
 		System.out.println("------------");
-		
-		// 2) Read solvers 
+
+		// 2) Read solvers
 		String solverString = props.getProperty("solvers");
 		String[] solverStrings = solverString.split(",");
 		solvers = new Solver[solverStrings.length];
-		
-		for(int i = 0; i < solverStrings.length;++i) {
+
+		for (int i = 0; i < solverStrings.length; ++i) {
 			solvers[i] = Solver.valueOf(solverStrings[i].trim());
 		}
-		
-		// 3) Read configurations 
+
+		// 3) Read configurations
 		ConfigurationProvider<MiniBrassConfig> prov = new ConfigurationProvider<>();
 		Collection<MiniBrassConfig> configurations = prov.getConfigurations(new MiniBrassConfig(), props);
 
 		evalDir = new File("./eval");
 		resultsDir = new File("./results");
 		hookDir = new File("../eval-model-hooks");
-		
+
 		try {
-			if(!evalDir.exists())
+			if (!evalDir.exists())
 				evalDir.mkdir();
-			if(!resultsDir.exists())
+			if (!resultsDir.exists())
 				resultsDir.mkdir();
-			
+
 			mainLoop(problemDirectories, configurations);
 		} finally {
 			// FileUtils.deleteDirectory(evalDir);
@@ -112,24 +125,22 @@ public class ExperimentRunner {
 			for (MiniBrassConfig mbConfig : configurations) {
 				buildModel(problem, mbConfig);
 				// for instance in instances
-				final Pattern p = Pattern.compile(".*dzn");
+				final Pattern p = Pattern.compile(".*\\.dzn");
 				File[] dataFiles = evalDir.listFiles(new FilenameFilter() {
 
 					@Override
 					public boolean accept(File dir, String name) {
 						Matcher m = p.matcher(name);
-						return !name.contains("evaluation-conf") && m.matches();
+						return !name.contains(EVAL_CONF_FILE) && m.matches();
 					}
 				});
 				System.out.println("Instances: " + Arrays.toString(dataFiles));
 
 				for (File instance : dataFiles) {
-					System.out.println("Trying instance ... " + instance.getName());
 					// for solver in solvers: execute(solver)
-					for(Solver s : solvers) {
-						System.out.println("   Solved by : "+s);
+					for (Solver s : solvers) {
+						executeJob(problem, instance, s, mbConfig);
 					}
-
 				}
 
 				break; // this is just to inspect only one config (for starters)
@@ -139,9 +150,169 @@ public class ExperimentRunner {
 
 	}
 
+	private void executeJob(File problem, File instance, Solver s, MiniBrassConfig mbConfig) {
+		Job evalJob = new Job(problem, instance, s, mbConfig);
+		String jobFileName = evalJob.toFileName() + ".ser";
+		File jobFile = new File(resultsDir, jobFileName);
+
+		System.out.println(jobFileName);
+		if (jobFile.exists()) {
+			JobResult resJob = null;
+			Job writtenJob = null;
+			FileInputStream fis = null;
+			ObjectInputStream ois = null;
+
+			try {
+				fis = new FileInputStream(jobFile);
+				ois = new ObjectInputStream(fis);
+				resJob = (JobResult) ois.readObject();
+				writtenJob = resJob.getJob();
+			} catch (Exception e) {
+				e.printStackTrace();
+				// failed to properly read serialized object - better start job
+				// again
+			} finally {
+				if (fis != null || ois != null)
+					try {
+						ois.close();
+						fis.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+			}
+			if (writtenJob != null) {
+				if (evalJob.equals(writtenJob)) {
+					System.out.println("Well, we already performed that job so skip it ... ");
+					System.out.println("Last time: " +resJob.getResult());
+					return;
+				}
+			}
+		}
+
+		// perform actual work ...
+		System.out.println("Seems like I gotta take this one ... ");
+		MiniBrassResult result = runJob(evalJob, instance);
+		
+		
+		// serialize job afterwards
+		JobResult jobRes = new JobResult();
+		jobRes.setJob(evalJob);
+		jobRes.setResult(result);
+		
+		FileOutputStream fos = null;
+		ObjectOutputStream oos = null;
+		try {
+			fos = new FileOutputStream(jobFile);
+			oos = new ObjectOutputStream(fos);
+			// oos.writeObject(jobRes); //TODO comment in
+			oos.close();
+			fos.close();
+			jobFile.delete(); // TODO remove
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private MiniBrassResult runJob(Job evalJob, File instanceFile) {
+		File modelFile = new File(evalDir, evalJob.problem + ".mzn");
+		File confFile = new File(evalDir, EVAL_CONF_FILE);
+
+		String flatzincExecutable = evalJob.solver.getFlatzincExec();
+		String minizincGlobals = evalJob.solver.getMznGlobals();
+
+		// TODO note, we could also use *minizinc* when only using native search (better stats)
+		// String underlyingCommand = "/home/alexander/Documents/Projects/git-new/practice/minisearch-build/minisearch --solver "+flatzincExecutable + " -G"+minizincGlobals + " " + modelFile.getPath() + " " + instanceFile.getPath() + " "+confFile.getPath();
+		String underlyingCommand = "minisearch --solver "+flatzincExecutable + " -G"+minizincGlobals + " " + modelFile.getPath() + " " + instanceFile.getPath() + " "+confFile.getPath();
+		
+		//String cmd = "whoami; echo $PATH; /home/alexander/.bashrc; " + underlyingCommand;
+		String cmd = underlyingCommand;
+		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-l", "-c", cmd);
+		
+		System.out.println("About to start: " + pb.command());
+
+		File log = new File("log");
+		if(log.exists())
+			log.delete();
+		
+		pb.redirectErrorStream(true);
+		pb.redirectOutput(Redirect.appendTo(log));
+//		pb.environment().put("JCP", "/home/alexander/Documents/Projects/git-new/practice/jacop/target/classes");
+		Process p;
+		Timer t = new Timer();
+		
+		// prepare result object
+		MiniBrassResult result = new MiniBrassResult();
+		try {
+			p = pb.start();
+			t.tick(JOB_TIME_IDENT);
+			p.waitFor();
+			t.tock(JOB_TIME_IDENT);
+			assert pb.redirectInput() == Redirect.PIPE;
+			assert pb.redirectOutput().file() == log;
+			assert p.getInputStream().read() == -1;
+			
+			// compile results object 
+			processResult(result, log, t);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Completed job; Result: "+result);
+		return result;
+	}
+
+	/**
+	 * Reads the output of a minisearch execution 
+	 * @param result
+	 * @param log
+	 * @param t 
+	 */
+	private void processResult(MiniBrassResult result, File log, Timer t) {
+		Scanner sc = null;
+		final String optimalitySep = "==========";
+		final String solutionSep = "----------";
+		
+		try {
+			sc = new Scanner(log);
+
+			int noSolutions = 0; // how many solutions did we actually see during optimization
+			while(sc.hasNextLine()) {
+				String line = sc.nextLine();
+				if(line.contains("OBJ =")) {
+					Scanner miniScan = new Scanner(line);
+					miniScan.next(); miniScan.next();
+					int nextObj = miniScan.nextInt();
+					result.objective = Math.min(result.objective, nextObj);
+					result.solved = true;
+					
+					miniScan.close();
+				}
+				
+				if(line.contains(optimalitySep)){
+					result.solvedOptimally = true;
+				}
+				
+				if(line.contains(solutionSep)) {
+					++noSolutions;
+				}
+			}
+			result.noSolutions = noSolutions;
+			result.elapsedSeconds = t.getElapsedSecs(JOB_TIME_IDENT);
+			result.valid = true;
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			result.valid = false;
+		} finally {
+			if(sc != null)
+				sc.close();
+		}
+	}
+
 	private void copyPlainModel(File problem) {
 		// 1) copy all mzn and dzn files from the source directory
-		
+
 		// delete old evalDir
 		try {
 			FileUtils.deleteDirectory(evalDir);
@@ -149,24 +320,24 @@ public class ExperimentRunner {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
-	    IOFileFilter dznSuffixFilter = FileFilterUtils.suffixFileFilter(".dzn");
-	    IOFileFilter mznSuffixFilter = FileFilterUtils.suffixFileFilter(".mzn");
-	    
-	    IOFileFilter mznFiles = FileFilterUtils.and(FileFileFilter.FILE, mznSuffixFilter);
-	    IOFileFilter dznFiles = FileFilterUtils.and(FileFileFilter.FILE, dznSuffixFilter);
-	    
-	    // Create a filter for either mzn or dzn files
-	    FileFilter filter = FileFilterUtils.or(mznFiles, dznFiles); 
-	    
-	    // Copy using the filter
-	    try {
+
+		IOFileFilter dznSuffixFilter = FileFilterUtils.suffixFileFilter(".dzn");
+		IOFileFilter mznSuffixFilter = FileFilterUtils.suffixFileFilter(".mzn");
+
+		IOFileFilter mznFiles = FileFilterUtils.and(FileFileFilter.FILE, mznSuffixFilter);
+		IOFileFilter dznFiles = FileFilterUtils.and(FileFileFilter.FILE, dznSuffixFilter);
+
+		// Create a filter for either mzn or dzn files
+		FileFilter filter = FileFilterUtils.or(mznFiles, dznFiles);
+
+		// Copy using the filter
+		try {
 			FileUtils.copyDirectory(problem, evalDir, filter, false);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
-	    File[] modelAndDataFiles = problem.listFiles(filter);
+
+		File[] modelAndDataFiles = problem.listFiles(filter);
 		System.out.println(Arrays.toString(modelAndDataFiles));
 
 	}
@@ -177,8 +348,8 @@ public class ExperimentRunner {
 		StringBuilder sb = new StringBuilder();
 		sb.append("mostImportantFirst = " + mbConfig.mostImportantFirst.toString() + ";\n");
 		sb.append("propagateRedundant = " + mbConfig.propagateRedundant.toString() + ";\n");
-		
-		File confDzn = new File(evalDir, "evaluation-conf.dzn");
+
+		File confDzn = new File(evalDir, EVAL_CONF_FILE);
 		FileWriter fw = null;
 		try {
 			fw = new FileWriter(confDzn);
@@ -196,44 +367,42 @@ public class ExperimentRunner {
 
 		File pvsDir = null;
 		File searchDir = null;
-		
-		if(mbConfig.useSPD) {
-			pvsDir = new File(hookDir, "/pvs/spd/"); 
+
+		if (mbConfig.useSPD) {
+			pvsDir = new File(hookDir, "/pvs/spd/");
 		} else {
-			pvsDir = new File(hookDir, "/pvs/tpd/"); 
+			pvsDir = new File(hookDir, "/pvs/tpd/");
 		}
-		
-		
-		switch(mbConfig.search){
+
+		switch (mbConfig.search) {
 		case BAB_NATIVE:
-			searchDir = new File(hookDir, "/search/bab-native/"); 
+			searchDir = new File(hookDir, "/search/bab-native/");
 			break;
 		case LNS:
-			searchDir = new File(hookDir, "/search/lns/"); 
+			searchDir = new File(hookDir, "/search/lns/");
 			break;
 		case BAB_NONDOM:
-			searchDir = new File(hookDir, "/search/bab-non-dom/"); 
+			searchDir = new File(hookDir, "/search/bab-non-dom/");
 			break;
 		case BAB_STRICT:
-			searchDir = new File(hookDir, "/search/bab-strict/"); 
+			searchDir = new File(hookDir, "/search/bab-strict/");
 			break;
 		case BAB_WEIGHTED:
 			if (mbConfig.useSPD) {
-				pvsDir = new File(hookDir, "/pvs/weighted_spd/"); 
+				pvsDir = new File(hookDir, "/pvs/weighted_spd/");
 			} else {
-				pvsDir = new File(hookDir, "/pvs/weighted_tpd/"); 
+				pvsDir = new File(hookDir, "/pvs/weighted_tpd/");
 			}
-			searchDir = new File(hookDir, "/search/bab-strict/"); 
+			searchDir = new File(hookDir, "/search/bab-strict/");
 			break;
 		default:
 		}
-		
-		File pvsFile = new File(pvsDir,"evaluation-pvs.mzn");
-		File searchFile = new File(searchDir,"evaluation-search.mzn");
+
+		File pvsFile = new File(pvsDir, "evaluation-pvs.mzn");
+		File searchFile = new File(searchDir, "evaluation-search.mzn");
 		File confSpec = new File(hookDir, "evaluation-config.mzn");
 		File evalHeur = new File(hookDir, "evaluation-heuristics.mzn");
-		
-		
+
 		try {
 			FileUtils.copyFileToDirectory(pvsFile, evalDir);
 			FileUtils.copyFileToDirectory(searchFile, evalDir);
