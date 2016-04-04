@@ -38,7 +38,7 @@ cp sum_aggregator.mzn "$EXP_LIB"
 cp tpd_worse.mzn "$EXP_LIB"
 cp minizinc_bundle.mzn "$EXP_LIB"
 cp minisearch_bundle.mzn "$EXP_LIB"
-cp soft_constraints_noset.mzn "$EXP_LIB"
+cp pvs_set_based.mzn "$EXP_LIB"
 
 # global constraints 
 cp globals/soft_alldifferent.mzn "$EXP_LIB"
