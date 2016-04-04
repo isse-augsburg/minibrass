@@ -52,7 +52,7 @@ public class MiniBrassResult implements Serializable {
 			return "Invalid result";
 		StringBuilder sb = new StringBuilder("Solved: ");
 		sb.append(solved); sb.append(", ");
-		sb.append("Optimally: "); sb.append(solved); sb.append(", ");
+		sb.append("Optimally: "); sb.append(solvedOptimally); sb.append(", ");
 		sb.append("Objective: "); sb.append(objective); sb.append(", ");
 		sb.append("NoSolutions: "); sb.append(noSolutions); sb.append(", ");
 		sb.append("Seconds: "); sb.append(elapsedSeconds); sb.append(", ");

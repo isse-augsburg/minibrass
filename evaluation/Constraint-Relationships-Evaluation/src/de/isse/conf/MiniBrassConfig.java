@@ -9,7 +9,7 @@ public class MiniBrassConfig implements Serializable {
 	private static final long serialVersionUID = 5208010108613287651L;
 	
 	public SearchType search;
-	public Integer timeout; 
+	public Integer timeout; // given in *milliseconds* (conforming to MiniSearch)
 	public Boolean mostImportantFirst;
 
 	// if I chose BAB_NON_DOM, I (currently) can't use SPD!
