@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Timer;
@@ -27,6 +28,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 
 import de.isse.conf.ConfigurationProvider;
 import de.isse.conf.MiniBrassConfig;
+import de.isse.conf.SearchType;
 import de.isse.conf.Solver;
 import de.isse.jobs.Job;
 import de.isse.jobs.JobResult;
@@ -118,7 +120,7 @@ public class ExperimentRunner {
 
 			mainLoop(problemDirectories, configurations);
 		} finally {
-			FileUtils.deleteDirectory(evalDir);
+			//FileUtils.deleteDirectory(evalDir);
 		}
 	}
 
@@ -235,6 +237,11 @@ public class ExperimentRunner {
 		String underlyingCommand = "minisearch --solver " + flatzincExecutable + " -G" + minizincGlobals + " "
 				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
 
+		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag
+			underlyingCommand = "minizinc -a -f " + flatzincExecutable + " -G" + minizincGlobals + " "
+					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
+
+		}
 		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-l", "-c", underlyingCommand);
 
 		System.out.println("About to start: " + pb.command());
@@ -299,6 +306,27 @@ public class ExperimentRunner {
 			FileUtils.copyDirectory(evalDir, exportDir);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		List<String> command = pb.command();
+		StringBuilder commandBuilder = new StringBuilder("#!/bin/bash\n");
+		for(String c : command)  {
+			commandBuilder.append(c);
+			commandBuilder.append(" ");
+		}
+		File commandFile = new File(exportDir, "command.sh");
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(commandFile);
+			fw.write(commandBuilder.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if(fw != null)
+				try {
+					fw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 		}
 		
 	}
@@ -419,6 +447,12 @@ public class ExperimentRunner {
 
 		switch (mbConfig.search) {
 		case BAB_NATIVE:
+			if (mbConfig.useSPD) {
+				pvsDir = new File(hookDir, "/pvs/spd-native/");
+			} else {
+				pvsDir = new File(hookDir, "/pvs/tpd-native/");
+			}
+
 			searchDir = new File(hookDir, "/search/bab-native/");
 			break;
 		case LNS:
