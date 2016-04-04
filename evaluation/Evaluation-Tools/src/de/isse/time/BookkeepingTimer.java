@@ -5,16 +5,16 @@ package de.isse.time;
  * @author Alexander Schiendorfer
  *
  */
-public class Timer {
+public class BookkeepingTimer {
 	private static final int MAX_IND = 15;
 	private long startTimes[];
 	private long endTimes[];
 
-	public Timer() {
+	public BookkeepingTimer() {
 		this(MAX_IND);
 	}
 	
-	public Timer(int maxInd) {
+	public BookkeepingTimer(int maxInd) {
 		startTimes = new long[maxInd + 1];
 		endTimes = new long[maxInd + 1];
 	}
