@@ -46,6 +46,7 @@ constraint queens[3] = queens[2] + 2 <-> satisfied[3];
 
 output 
 [
+  "\nOBJ = \(penSum)\n"++
   show(violatedScs) ++  " (\(penSum)) " ++ " ; "
 ]
 ++
