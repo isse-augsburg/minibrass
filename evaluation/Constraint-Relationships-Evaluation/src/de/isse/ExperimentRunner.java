@@ -15,10 +15,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.security.auth.login.Configuration;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -31,7 +31,7 @@ import de.isse.conf.Solver;
 import de.isse.jobs.Job;
 import de.isse.jobs.JobResult;
 import de.isse.results.MiniBrassResult;
-import de.isse.time.Timer;
+import de.isse.time.BookkeepingTimer;
 
 /**
  * This class is responsible for actually starting the experiments Loads all
@@ -43,14 +43,18 @@ import de.isse.time.Timer;
 public class ExperimentRunner {
 
 	private File evalDir;
+	private File zipModelDir;
 	private File resultsDir;
-	private File workingDir; 
+	private File workingDir;
 	private File problemDir; // base dir for all problems
 	private Solver[] solvers;
-	private File hookDir; // the directory where all search-specific model parts are stored
+	private File hookDir; // the directory where all search-specific model parts
+							// are stored
 
 	private final static String EVAL_CONF_FILE = "evaluation-conf.dzn";
-	private final static int JOB_TIME_IDENT = 0; // identifier for timer 
+	private final static int JOB_TIME_IDENT = 0; // identifier for timer
+
+	private static boolean EXPORT_MODELS_ZIP = true;
 
 	public static void main(String[] args) throws IOException {
 		String propertiesFile = "experiments/experiment.properties";
@@ -96,8 +100,12 @@ public class ExperimentRunner {
 		ConfigurationProvider<MiniBrassConfig> prov = new ConfigurationProvider<>();
 		Collection<MiniBrassConfig> configurations = prov.getConfigurations(new MiniBrassConfig(), props);
 
+		
 		evalDir = new File("./eval");
 		resultsDir = new File("./results");
+		zipModelDir = new File(resultsDir, "zipModels");
+		// should models be exported?
+		EXPORT_MODELS_ZIP  = Boolean.parseBoolean(props.getProperty("exportModels", "false"));
 		hookDir = new File("../eval-model-hooks");
 
 		try {
@@ -105,10 +113,12 @@ public class ExperimentRunner {
 				evalDir.mkdir();
 			if (!resultsDir.exists())
 				resultsDir.mkdir();
+			if (!zipModelDir.exists())
+				zipModelDir.mkdir();
 
 			mainLoop(problemDirectories, configurations);
 		} finally {
-			// FileUtils.deleteDirectory(evalDir);
+			FileUtils.deleteDirectory(evalDir);
 		}
 	}
 
@@ -150,6 +160,7 @@ public class ExperimentRunner {
 
 	}
 
+
 	private void executeJob(File problem, File instance, Solver s, MiniBrassConfig mbConfig) {
 		Job evalJob = new Job(problem, instance, s, mbConfig);
 		String jobFileName = evalJob.toFileName() + ".ser";
@@ -183,7 +194,7 @@ public class ExperimentRunner {
 			if (writtenJob != null) {
 				if (evalJob.equals(writtenJob)) {
 					System.out.println("Well, we already performed that job so skip it ... ");
-					System.out.println("Last time: " +resJob.getResult());
+					System.out.println("Last time: " + resJob.getResult());
 					return;
 				}
 			}
@@ -192,13 +203,12 @@ public class ExperimentRunner {
 		// perform actual work ...
 		System.out.println("Seems like I gotta take this one ... ");
 		MiniBrassResult result = runJob(evalJob, instance);
-		
-		
+
 		// serialize job afterwards
 		JobResult jobRes = new JobResult();
 		jobRes.setJob(evalJob);
 		jobRes.setResult(result);
-		
+
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;
 		try {
@@ -220,92 +230,126 @@ public class ExperimentRunner {
 		String flatzincExecutable = evalJob.solver.getFlatzincExec();
 		String minizincGlobals = evalJob.solver.getMznGlobals();
 
-		// TODO note, we could also use *minizinc* when only using native search (better stats)
-		// String underlyingCommand = "/home/alexander/Documents/Projects/git-new/practice/minisearch-build/minisearch --solver "+flatzincExecutable + " -G"+minizincGlobals + " " + modelFile.getPath() + " " + instanceFile.getPath() + " "+confFile.getPath();
-		String underlyingCommand = "minisearch --solver "+flatzincExecutable + " -G"+minizincGlobals + " " + modelFile.getPath() + " " + instanceFile.getPath() + " "+confFile.getPath();
-		
-		//String cmd = "whoami; echo $PATH; /home/alexander/.bashrc; " + underlyingCommand;
-		String cmd = underlyingCommand;
-		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-l", "-c", cmd);
-		
+		// TODO note, we could also use *minizinc* when only using native search
+		// (better stats)
+		String underlyingCommand = "minisearch --solver " + flatzincExecutable + " -G" + minizincGlobals + " "
+				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
+
+		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-l", "-c", underlyingCommand);
+
 		System.out.println("About to start: " + pb.command());
 
 		File log = new File("log");
-		if(log.exists())
+		if (log.exists())
 			log.delete();
-		
+
 		pb.redirectErrorStream(true);
-		pb.redirectOutput(Redirect.appendTo(log));
-//		pb.environment().put("JCP", "/home/alexander/Documents/Projects/git-new/practice/jacop/target/classes");
-		Process p;
-		Timer t = new Timer();
-		
+
+		pb.redirectOutput(Redirect.to(log));
+		// pb.environment().put("JCP",
+		// "/home/alexander/Documents/Projects/git-new/practice/jacop/target/classes");
+		final Process p;
+		BookkeepingTimer t = new BookkeepingTimer();
+
 		// prepare result object
+		int timeoutInMillisecs = evalJob.config.timeout;
+		
 		MiniBrassResult result = new MiniBrassResult();
 		try {
 			p = pb.start();
 			t.tick(JOB_TIME_IDENT);
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+
+				@Override
+				public void run() {
+					System.out.println("Destroyed by timeout ... ");
+					p.destroy();
+				}
+			}, timeoutInMillisecs);
+
 			p.waitFor();
 			t.tock(JOB_TIME_IDENT);
+			timer.cancel();
+
 			assert pb.redirectInput() == Redirect.PIPE;
 			assert pb.redirectOutput().file() == log;
 			assert p.getInputStream().read() == -1;
-			
-			// compile results object 
+
+			// compile results object
 			processResult(result, log, t);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Completed job; Result: "+result);
+		System.out.println("Completed job; Result: " + result);
+
+		// zip model file for debug purposes TODO for now only copy directory, not really zipping
+		if (EXPORT_MODELS_ZIP) {
+			exportZippedModel(evalJob, pb);
+		}
 		return result;
 	}
 
+	private void exportZippedModel(Job evalJob, ProcessBuilder pb) {
+		String fileName = evalJob.toFileName();
+		File exportDir = new File(zipModelDir, fileName);
+		try {
+			FileUtils.copyDirectory(evalDir, exportDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
 	/**
-	 * Reads the output of a minisearch execution 
+	 * Reads the output of a minisearch execution
+	 * 
 	 * @param result
 	 * @param log
-	 * @param t 
+	 * @param t
 	 */
-	private void processResult(MiniBrassResult result, File log, Timer t) {
+	private void processResult(MiniBrassResult result, File log, BookkeepingTimer t) {
 		Scanner sc = null;
 		final String optimalitySep = "==========";
 		final String solutionSep = "----------";
-		
+
 		try {
 			sc = new Scanner(log);
 
-			int noSolutions = 0; // how many solutions did we actually see during optimization
-			while(sc.hasNextLine()) {
+			int noSolutions = 0; // how many solutions did we actually see
+									// during optimization
+			while (sc.hasNextLine()) {
 				String line = sc.nextLine();
-				if(line.contains("OBJ =")) {
+				if (line.contains("OBJ =")) {
 					Scanner miniScan = new Scanner(line);
-					miniScan.next(); miniScan.next();
+					miniScan.next();
+					miniScan.next();
 					int nextObj = miniScan.nextInt();
 					result.objective = Math.min(result.objective, nextObj);
 					result.solved = true;
-					
+
 					miniScan.close();
 				}
-				
-				if(line.contains(optimalitySep)){
+
+				if (line.contains(optimalitySep)) {
 					result.solvedOptimally = true;
 				}
-				
-				if(line.contains(solutionSep)) {
+
+				if (line.contains(solutionSep)) {
 					++noSolutions;
 				}
 			}
 			result.noSolutions = noSolutions;
 			result.elapsedSeconds = t.getElapsedSecs(JOB_TIME_IDENT);
 			result.valid = true;
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			result.valid = false;
 		} finally {
-			if(sc != null)
+			if (sc != null)
 				sc.close();
 		}
 	}
@@ -339,7 +383,6 @@ public class ExperimentRunner {
 
 		File[] modelAndDataFiles = problem.listFiles(filter);
 		System.out.println(Arrays.toString(modelAndDataFiles));
-
 	}
 
 	private void buildModel(File problem, MiniBrassConfig mbConfig) {
