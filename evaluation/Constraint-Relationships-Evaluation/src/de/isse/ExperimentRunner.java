@@ -216,10 +216,18 @@ public class ExperimentRunner {
 		try {
 			fos = new FileOutputStream(jobFile);
 			oos = new ObjectOutputStream(fos);
-			// oos.writeObject(jobRes); //TODO comment in
+			oos.writeObject(jobRes); //TODO comment in
 			oos.close();
 			fos.close();
-			jobFile.delete(); // TODO remove
+			// jobFile.delete(); // TODO remove
+			
+			// also write the normal text output for quick inspection
+			String resultTxt = evalJob.toFileName() + ".txt";
+			FileWriter fw = new FileWriter(new File(resultsDir, resultTxt));
+			fw.write(evalJob.config.toString());
+			fw.write("\n-------------------------\n");
+			fw.write(jobRes.getResult().toString());
+			fw.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -231,16 +239,22 @@ public class ExperimentRunner {
 
 		String flatzincExecutable = evalJob.solver.getFlatzincExec();
 		String minizincGlobals = evalJob.solver.getMznGlobals();
+		// prepare result object
+		int timeoutInMillisecs = evalJob.config.timeout;
 
-		// TODO note, we could also use *minizinc* when only using native search
-		// (better stats)
+		// Numberjack expects timeout in seconds but as int
+		long timeOutInSeconds = Math.round(timeoutInMillisecs / 1000.0);
+		
 		String underlyingCommand = "minisearch --solver " + flatzincExecutable + " -G" + minizincGlobals + " "
 				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
 
-		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag
-			underlyingCommand = "minizinc -a -f " + flatzincExecutable + " -G" + minizincGlobals + " "
+		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag TODO make numberjack more tolerant regarding that
+			underlyingCommand = "minizinc "+(evalJob.solver == Solver.NUMBERJACK ? "": "-a")+" -f " + flatzincExecutable + " -G" + minizincGlobals + " "
 					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
-
+			if(evalJob.solver == Solver.NUMBERJACK) { // Numberjack, unfortunately, needs some special treatment
+				underlyingCommand = "mzn_numberjack " + modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() + " -t "+timeOutInSeconds;
+					
+			} 
 		}
 		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-l", "-c", underlyingCommand);
 
@@ -258,8 +272,6 @@ public class ExperimentRunner {
 		final Process p;
 		BookkeepingTimer t = new BookkeepingTimer();
 
-		// prepare result object
-		int timeoutInMillisecs = evalJob.config.timeout;
 		
 		MiniBrassResult result = new MiniBrassResult();
 		try {
@@ -350,7 +362,7 @@ public class ExperimentRunner {
 									// during optimization
 			while (sc.hasNextLine()) {
 				String line = sc.nextLine();
-				if (line.contains("OBJ =")) {
+				if (line.contains("penSum =")) {
 					Scanner miniScan = new Scanner(line);
 					miniScan.next();
 					miniScan.next();
