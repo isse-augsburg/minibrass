@@ -37,7 +37,7 @@ function ann: lns_pvs (var set of SOFTCONSTRAINTS: violatedScs, array[int] of va
     repeat (i in 1..iterations) (
         scope(
             post(neighbourhoodCts(x,d)) /\
-            next() /\ %bab_min(obj) /\ % strictlyBetterBAB(obj)
+            next() /\ strictlyBetterBAB(obj)
             commit() /\ 
             print("Intermediate solution with objective \(sol(violatedScs))\n") /\
             print()
