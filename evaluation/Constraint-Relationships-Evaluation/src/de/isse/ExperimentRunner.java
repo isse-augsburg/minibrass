@@ -57,7 +57,8 @@ public class ExperimentRunner {
 	private final static int JOB_TIME_IDENT = 0; // identifier for timer
 
 	private static boolean EXPORT_MODELS_ZIP = true;
-
+	private static boolean FORCE_OVERRIDE = false;
+	
 	public static void main(String[] args) throws IOException {
 		String propertiesFile = "experiments/experiment.properties";
 		if (args.length > 0) {
@@ -151,11 +152,13 @@ public class ExperimentRunner {
 				for (File instance : dataFiles) {
 					// for solver in solvers: execute(solver)
 					for (Solver s : solvers) {
-						executeJob(problem, instance, s, mbConfig);
+						if(jobExecutable(mbConfig,s)) {
+							executeJob(problem, instance, s, mbConfig);							
+						}
 					}
 				}
 
-				break; // this is just to inspect only one config (for starters)
+				//break; // this is just to inspect only one config (for starters)
 						// TODO remove later on
 			}
 		}
@@ -163,13 +166,21 @@ public class ExperimentRunner {
 	}
 
 
+	private boolean jobExecutable(MiniBrassConfig mbConfig, Solver s) {
+		if(s == Solver.CHOCO || s == Solver.NUMBERJACK || s == Solver.OR_TOOLS || s == Solver.G12) {
+			if(mbConfig.search != SearchType.BAB_NATIVE)
+				return false; // at the moment, this only works with native search
+		}
+		return true;
+	}
+
 	private void executeJob(File problem, File instance, Solver s, MiniBrassConfig mbConfig) {
 		Job evalJob = new Job(problem, instance, s, mbConfig);
 		String jobFileName = evalJob.toFileName() + ".ser";
 		File jobFile = new File(resultsDir, jobFileName);
 
 		System.out.println(jobFileName);
-		if (jobFile.exists()) {
+		if (jobFile.exists() && !FORCE_OVERRIDE) {
 			JobResult resJob = null;
 			Job writtenJob = null;
 			FileInputStream fis = null;
@@ -216,10 +227,9 @@ public class ExperimentRunner {
 		try {
 			fos = new FileOutputStream(jobFile);
 			oos = new ObjectOutputStream(fos);
-			oos.writeObject(jobRes); //TODO comment in
+			oos.writeObject(jobRes); 
 			oos.close();
 			fos.close();
-			// jobFile.delete(); // TODO remove
 			
 			// also write the normal text output for quick inspection
 			String resultTxt = evalJob.toFileName() + ".txt";
@@ -249,8 +259,8 @@ public class ExperimentRunner {
 				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
 
 		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag TODO make numberjack more tolerant regarding that
-			underlyingCommand = "minizinc "+(evalJob.solver == Solver.NUMBERJACK ? "": "-a")+" -f " + flatzincExecutable + " -G" + minizincGlobals + " "
-					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
+			underlyingCommand = "minizinc "+ (evalJob.solver == Solver.NUMBERJACK ? "": "-a") +" -f " + flatzincExecutable + " -G" + minizincGlobals + " "
+					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() ;
 			if(evalJob.solver == Solver.NUMBERJACK) { // Numberjack, unfortunately, needs some special treatment
 				underlyingCommand = "mzn_numberjack " + modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() + " -t "+timeOutInSeconds;
 					
@@ -267,6 +277,7 @@ public class ExperimentRunner {
 		pb.redirectErrorStream(true);
 
 		pb.redirectOutput(Redirect.to(log));
+		pb.environment().put("TIMELIMIT", Integer.toString(timeoutInMillisecs));
 		// pb.environment().put("JCP",
 		// "/home/alexander/Documents/Projects/git-new/practice/jacop/target/classes");
 		final Process p;
