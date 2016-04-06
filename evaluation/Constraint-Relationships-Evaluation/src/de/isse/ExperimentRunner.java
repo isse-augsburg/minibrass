@@ -207,7 +207,7 @@ public class ExperimentRunner {
 					}
 			}
 			if (writtenJob != null) {
-				if (evalJob.equals(writtenJob)) {
+				if (evalJob.equals(writtenJob) && resJob.getResult().valid) {
 					System.out.println("Well, we already performed that job so skip it ... ");
 					System.out.println("Last time: " + resJob.getResult());
 					return;
