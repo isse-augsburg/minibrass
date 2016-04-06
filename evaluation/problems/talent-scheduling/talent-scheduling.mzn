@@ -160,7 +160,8 @@ include "evaluation-search.mzn";
 %  satisfy;  
 %   minimize cost;
 
-output ["penSum = \(penSum)\n",
+output ["\npenSum = \(penSum)\n",
+		"\nviolatedScs= \(violatedScs)\n",
        "cost = ", show(cost), ";\ns = ", show(s), 
        ";\nslot = ", show(slot), 
        ";\nfirstSlot = ", show(firstSlot), 
