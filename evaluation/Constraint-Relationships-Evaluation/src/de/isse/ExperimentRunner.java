@@ -55,10 +55,11 @@ public class ExperimentRunner {
 
 	private final static String EVAL_CONF_FILE = "evaluation-conf.dzn";
 	private final static int JOB_TIME_IDENT = 0; // identifier for timer
-
-	private static boolean EXPORT_MODELS_ZIP = true;
-	private static boolean FORCE_OVERRIDE = false;
 	
+	private static boolean EXPORT_MODELS_ZIP = true;
+	private static final boolean FORCE_OVERRIDE = false;
+	private static final boolean ONLY_ONE_CONFIG = false;
+
 	public static void main(String[] args) throws IOException {
 		String propertiesFile = "experiments/experiment.properties";
 		if (args.length > 0) {
@@ -158,8 +159,9 @@ public class ExperimentRunner {
 					}
 				}
 
-				//break; // this is just to inspect only one config (for starters)
-						// TODO remove later on
+				if (ONLY_ONE_CONFIG)
+					break; // this is just to inspect only one config (for starters)
+
 			}
 		}
 
@@ -391,12 +393,16 @@ public class ExperimentRunner {
 				if (line.contains(solutionSep)) {
 					++noSolutions;
 				}
+				
+				if(line.toLowerCase().contains("error") ) {
+					throw new Exception("Apparently, an error happened.");
+				}
 			}
 			result.noSolutions = noSolutions;
 			result.elapsedSeconds = t.getElapsedSecs(JOB_TIME_IDENT);
 			result.valid = true;
 
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			result.valid = false;
 		} finally {

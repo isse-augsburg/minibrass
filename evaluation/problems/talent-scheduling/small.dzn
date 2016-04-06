@@ -1,0 +1,12 @@
+numScenes = 6;
+numActors = 4;
+% cost = 54; was found to be originally optimal; 
+% allow 10% slack --> 113
+slackedCost = 50000;
+ia = [|
+1,0,0,0,1,1|
+1,1,0,1,0,0|
+0,1,1,0,1,0|
+0,0,1,1,0,1|];
+c = [1,1,1,1];
+d = [1,2,3,4,5,6];
