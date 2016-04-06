@@ -10,7 +10,6 @@
 include "globals.mzn";
 include "evaluation-config.mzn";
 
-include "minisearch.mzn"; % include the search minisearch lite
 include "soft_constraints/soft_constraints.mzn"; % model additions for soft constraint business
 % include PVS-specific libraries 
 
