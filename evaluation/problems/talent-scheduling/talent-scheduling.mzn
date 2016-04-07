@@ -12,6 +12,7 @@ int: numScenes; % numer of scenes
 % -- MiniBrass ----------------------------------------------------------------
 include "evaluation-config.mzn";
 include "soft_constraints/soft_constraints.mzn";
+include "soft_constraints/cr_consistency.mzn";
 
 % include PVS-specific libraries 
 include "evaluation-pvs.mzn";
@@ -50,21 +51,54 @@ array[Actors] of var DUR: firstJob = [ cumDur[firstSlot[a]] | a in Actors];
 array[Actors] of var DUR: lastJob = [ cumDur[lastSlot[a] + 1] | a in Actors];
 
 % constraints will be along the lines:
-% constraint firstJob[1] >= 4;
-% constraint lastJob[2] <= 9;
+
+%-- Soft Constraints early and late preferences -------------------------------
+int: earliestPrefs;
+set of int: EARLY = 1..earliestPrefs;
+
+array[EARLY] of Actors: actorEarl;
+array[EARLY] of DUR: durEarl;
+array[EARLY] of SOFTCONSTRAINTS: scEarl;
+
+int: latestPrefs;
+set of int: LATE = 1..latestPrefs;
+
+array[LATE] of Actors: actorLate;
+array[LATE] of DUR: durLate;
+array[LATE] of SOFTCONSTRAINTS: scLate;
+
+% constraint firstJob[1] >= 4 <-> satisfied[3];
+constraint forall(e in EARLY) (lastJob[ actorEarl[e] ] >= durEarl[e] <-> satisfied[scEarl[e]] );
+
+% constraint lastJob[2] <= 9 <-> satisfied[4];
+constraint forall(l in LATE) (lastJob[ actorLate[l] ] <= durLate[l] <-> satisfied[scLate[l]] );
+
+%-- Soft Constraints longest scene at front ------------------------------------
 
 % and to have a longest scene at front ? 
-
 constraint satisfied[1] <-> (d[ s[1] ] = max(sc in Scenes) (d[sc])); 
+
 % latest scheduled should be the shortest
 constraint satisfied[2] <-> (d[ s[numScenes] ] = min(sc in Scenes) (d[sc])); 
 
-nScs = 2; % only those two for now 
-nCrEdges = 1;
-crEdges = [| 2, 1 |]; % earliest is more important 
-
-
 % and to have beef with colleagues ? 
+% define pairs of adversaries :
+%  for each adversary pair, post soft constraint meeting said person 
+%constraint satisfied[5] = true;
+int: adversarials;
+set of int: ADV = 1..adversarials;
+
+array[ADV] of Actors: actorAdv;
+array[ADV] of Actors: adversaryAdv;
+array[ADV] of SOFTCONSTRAINTS: scAdv;
+
+array[int, 1..2] of int: crTempEdges;
+crEdges = transClosure(SOFTCONSTRAINTS, crTempEdges);
+nCrEdges = max(crEdges);
+
+% constraint meetsAdversary(1, 2, ia, slot,satisfied[5]);
+
+constraint forall(a in ADV) (meetsAdversary(actorAdv[a], adversaryAdv[a], ia, slot, satisfied[ scAdv[a] ]) ); 
 
 var 0..slackedCost: cost;
 
@@ -72,12 +106,27 @@ int: slackedCost;
 %constraint cost <= slackedCost;
 %-- Predicates ---------------------------------------------------------------
 
+%-- Predicate to capture adversaries 
+predicate meetsAdversary(par Actors: actor, par Actors: adversary,
+                         array[Actors,Scenes] of 0..1: ia,
+                         array[Scenes] of var Scenes: slot, 
+                         var bool: sc) =
+     let {
+        set of Scenes: actorScenes = {s | s in Scenes where ia[actor,s] == 1};
+        set of Scenes: advScenes = {s | s in Scenes where ia[adversary,s] == 1};
+        set of Scenes: adversAlone = advScenes diff actorScenes;
+        set of Scenes: actorAlone = actorScenes diff advScenes;        
+     } in 
+    sc <-> ( forall(s_a in actorAlone, s_adv in adversAlone)  ( abs(slot[s_a] - slot[s_adv]) > 1 ) );
+    %trace("Adversaries (\(actor), \(adversary)): actorAlone \(actorAlone), adversAlone\(adversAlone)", 
+    %sc <-> ( forall(s_a in actorAlone, s_adv in adversAlone)  ( abs(slot[s_a] - slot[s_adv]) > 1 ) ) );
+
 %-- Predicate to set up firstSlot and lastSlot
 
 predicate firstlast(Actors: actor, 
                     array[Actors,Scenes] of 0..1: ia,
                     array[Scenes] of var Scenes: slot, 
-	            var Scenes: first, 
+      	            var Scenes: first, 
                     var Scenes: last) = 
      let {
          int: n = card({ i | i in Scenes where ia[actor,i] == 1 }),
@@ -150,11 +199,6 @@ array[Scenes] of var Scenes: lnsVars = s;
 
 include "evaluation-heuristics.mzn";
 include "evaluation-search.mzn";
-
-
-% only for testing! (should be removed)
-%mostImportantFirst = true;
-%propagateRedundant = true;
 
 %solve :: 
 %  satisfy;  
