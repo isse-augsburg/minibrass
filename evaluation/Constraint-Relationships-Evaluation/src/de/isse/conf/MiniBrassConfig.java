@@ -16,7 +16,7 @@ public class MiniBrassConfig implements Serializable {
 	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT", "LNS", "BAB_NATIVE"})
 	public Boolean useSPD;
 	
-	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT"})
+	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT", "LNS"})
 	public Boolean propagateRedundant; 
 	
 	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"LNS"})
