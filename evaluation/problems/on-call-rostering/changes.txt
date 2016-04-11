@@ -1,0 +1,3 @@
+# We need to modify adjacent day on-call and wednesday-before-weekend to work with our framework
+# Add soft constraints for desired *free* days
+# Add soft constraints for desired *on-call* days
