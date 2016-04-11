@@ -36,9 +36,16 @@ include "soft_constraints/cr_consistency.mzn";
 % include PVS-specific libraries (always a constraint relationship) 
 include "evaluation-pvs.mzn";
 
-array[int, 1..2] of int: crTempEdges;
-crEdges = transClosure(SOFTCONSTRAINTS, crTempEdges);
-nCrEdges = max(crEdges);
+array[int, 1..2] of int: crCustomEdges;
+array[int] of int: crCustomEdgesFlat = [ crCustomEdges[r,c] | r in index_set_1of2(crCustomEdges), c in 1..2] ;
+array[int] of int: crossEdges = [if k = 1 then i else j endif | i in 1..custPref, j in custPref+1 .. nScs, k in 1..2 ];
+array[int] of int: joined = crCustomEdgesFlat ++ crossEdges;
+int: nCrRawEdges = max(index_set(joined)) div 2 ;
+
+
+array[int, 1..2] of int: crTempEdges = array2d(1..nCrRawEdges, 1..2, joined);
+crEdges = crTempEdges; %transClosure(SOFTCONSTRAINTS, crTempEdges); left out for performance reasons 
+nCrEdges = max(index_set_1of2(crEdges));
 
 
 % soft constraints:
@@ -126,7 +133,7 @@ par 0..num_days: max_weekend_bt; % found by previous runs with the original mode
 
 array[int] of STAFF: staffWork;
 array[int] of set of DAYS: desiredWork;
-array[int] of STAFF: scWork;
+array[int] of SOFTCONSTRAINTS: scWork;
 
 
 
@@ -137,7 +144,7 @@ constraint forall(i in 1..lastPrefWorkDay) (
 
 array[int] of STAFF: staffNotWork;
 array[int] of set of DAYS: desiredNotWork;
-array[int] of STAFF: scNotWork;
+array[int] of SOFTCONSTRAINTS: scNotWork;
 
 
 constraint forall(i in 1..lastPrefNotWorkDay) (
@@ -364,8 +371,10 @@ output [
     "roster     = ", show(roster), ";\n",
     "weekday bt = ", show(week_day_bt), ";\n",
     "weekend bt = ", show(weekend_bt), ";\n",
-    "penSum  = ", show(penSum), ";\n",
-    "weekend_days = \(weekend_days);\n"
+    "penSum  = ", show(penSum), "\n",
+    "weekend_days = \(weekend_days);\n", 
+    "nScs = \(nScs);\n",
+    "nCrEdges = \(nCrEdges );\n",
 ];
 
 %-----------------------------------------------------------------------------%
