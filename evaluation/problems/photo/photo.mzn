@@ -30,6 +30,7 @@ nScs = m;
 
 array[PREFS, 0..1] of PEOPLE: prefs; % given as an array of pairs denoting people that would like to stand next to each other
 include "soft_constraints/soft_constraints.mzn";
+include "soft_constraints/cr_consistency.mzn";
 
 % include PVS-specific libraries 
 include "evaluation-pvs.mzn";
@@ -58,6 +59,9 @@ constraint
 constraint
   pos[1] < pos[2];
 
+array[int, 1..2] of int: crTempEdges;
+crEdges = transClosure(SOFTCONSTRAINTS, crTempEdges);
+nCrEdges = max(crEdges);
 
 % include search heuristic to be used with model 
 ann: custSearch = int_search([penSum], first_fail, indomain_min, complete);
