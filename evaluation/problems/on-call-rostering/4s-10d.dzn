@@ -30,4 +30,4 @@ desiredNotWork = [{3}];
 scNotWork =      [ 3 ];
 
 
-crTempEdges = [| 2, 1 |];
+crCustomEdges = [| 2, 1 |];

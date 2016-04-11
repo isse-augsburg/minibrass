@@ -18,7 +18,15 @@ adj_days_str = 1;
 wed_before_weekend_str = 1;
 
 
-crTempEdges = [| 2, 1 |];
+staffWork =   [1,   1,  3];
+desiredWork = [{3},{4},{5}];
+scWork =      [ 1 , 2, 3];
 
+staffNotWork =   [2   , 4];
+desiredNotWork = [{3}, {2}];
+scNotWork =      [ 4,   5 ];
+
+
+crCustomEdges = [| 2, 1 | 4, 5 | 3, 4 |];
 max_week_day_bt = 1;
 max_weekend_bt = 1; % found by previous runs with the original model
