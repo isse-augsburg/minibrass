@@ -2,8 +2,6 @@ n = 4;
 m = 3;
 %penalties = [1, 1, 1];
 prefs = array2d(1..3, 0..1,
-        [| 1,2 | 2, 3 | 4, 2 |]);
+        [| 1, 2 | 2, 3 | 4, 2 |]);
 
-
-nCrEdges = 2;
-crEdges = [| 1, 2 | 3, 2 |];
+crTempEdges = [| 1, 2 | 3, 2 |];
