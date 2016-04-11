@@ -360,6 +360,8 @@ ann: custSearch = seq_search([
         int_search([week_day_bt, weekend_bt], input_order, indomain_split, complete)
     ]);
 
+array[int] of var int: lnsVars = roster;
+
 include "evaluation-heuristics.mzn";
 
 include "evaluation-search.mzn";
