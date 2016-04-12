@@ -112,7 +112,7 @@ constraint
                             exists(k in has_skills[j])(rr[k, i] > 0)
                 }
         } in (
-            if card(WTasks) > 1 then
+            if card(WTasks) > 1 /\ propagateRedundant then
                 cumulative(
                     [ s[i]              | i in WTasks ],
                     [ d[i]              | i in WTasks ],
@@ -133,7 +133,7 @@ constraint
 	where 
 		i < j /\ not(j in suc[i]) /\ not(i in suc[j])
 	)(
-        if exists( k in Skills )( rr[k,i] + rr[k,j] > rc[k] ) then
+        if exists( k in Skills )( rr[k,i] + rr[k,j] > rc[k] ) /\ propagateRedundant then
             let { var bool: before } in (
 		        (     before  -> s[i] + d[i] <= s[j] )
             /\  ( not(before) -> s[j] + d[j] <= s[i] )
@@ -152,7 +152,7 @@ constraint
             set of int: RTasks = { i | i in Tasks where rr[k, i] > 0 },
             int: sum_rr = sum(i in RTasks)( rr[k,i] )
         } in (
-            if card(RTasks) > 1 /\ sum_rr > rc[k] then
+            if card(RTasks) > 1 /\ sum_rr > rc[k] /\ propagateRedundant then
                 cumulative(
                     [ s[i]    | i in RTasks ],
                     [ d[i]    | i in RTasks ],
@@ -176,35 +176,37 @@ constraint
 %-----------------------------------------------------------------------------%
 % Soft Constraints.
 nScs = togethers + notTogethers + nDesireds + nAvoideds ;
-crTempEdges = [| 2, 1 |];
 
 % 1.) Work with some other agent
-array[int] of set of Workers: workTogether = [{1,2}, {3,4}];
+array[int] of set of Workers: workTogether;
+array[1..togethers] of SOFTCONSTRAINTS: scWorkTogether;
+
 int: togethers = max(index_set(workTogether));
-array[1..togethers] of SOFTCONSTRAINTS: scWorkTogether = [1, 2];
 
 constraint forall(i in 1..togethers)(satisfied[scWorkTogether[i]] <-> exists(t in Tasks)(forall(w_ in workTogether[i]) (w[w_,t] ) ) );
 
 % 2.) Do not work with other agent
-array[int] of set of Workers: workNotTogether = [{1,4}, {2,3}];
+array[int] of set of Workers: workNotTogether;
+array[1..notTogethers] of SOFTCONSTRAINTS: scWorkNotTogether;
+
 int: notTogethers = max(index_set(workNotTogether));
-array[1..notTogethers] of SOFTCONSTRAINTS: scWorkNotTogether = [3, 4];
 
 constraint forall(i in 1..notTogethers)(satisfied[scWorkNotTogether[i]] <-> not ( exists(t in Tasks)(forall(w_ in workNotTogether[i]) (w[w_,t] ) ) ));
 
 % 3.) Work on certain task preferably
-array[int] of Workers: desiredTaskWorkers = [5, 6];
-array[1..nDesireds] of Tasks: desiredTasks = [17, 3];
-int: nDesireds = max(index_set(desiredTaskWorkers ));
-array[1..nDesireds] of SOFTCONSTRAINTS: scDesireds = [5, 6];
+array[int] of Workers: desiredTaskWorkers;
+array[1..nDesireds] of Tasks: desiredTasks;
+array[1..nDesireds] of SOFTCONSTRAINTS: scDesireds;
 
+int: nDesireds = max(index_set(desiredTaskWorkers ));
 constraint forall(i in 1..nDesireds) (satisfied[scDesireds[i]] <-> w[desiredTaskWorkers[i],desiredTasks[i]] );
 
-% 4.) Do not apply certain skill preferably  
-array[int] of Workers: avoidedTaskWorkers = [3, 4];
-array[1..nAvoideds] of Tasks: avoidedTasks = [2, 3];
+% 4.) Do not work on a certain task preferably    
+array[int] of Workers: avoidedTaskWorkers;
+array[1..nAvoideds] of Tasks: avoidedTasks;
+array[1..nAvoideds] of SOFTCONSTRAINTS: scAvoideds;
+
 int: nAvoideds = max(index_set(avoidedTaskWorkers ));
-array[1..nAvoideds] of SOFTCONSTRAINTS: scAvoideds = [7, 8];
 
 constraint forall(i in 1..nAvoideds) (satisfied[scAvoideds[i]] <-> not w[avoidedTaskWorkers[i],avoidedTasks[i]] );
 
