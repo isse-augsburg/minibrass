@@ -133,7 +133,7 @@ constraint
 	where 
 		i < j /\ not(j in suc[i]) /\ not(i in suc[j])
 	)(
-        if exists( k in Skills )( rr[k,i] + rr[k,j] > rc[k] ) /\ propagateRedundant then
+        if exists( k in Skills )( rr[k,i] + rr[k,j] > rc[k] )  then
             let { var bool: before } in (
 		        (     before  -> s[i] + d[i] <= s[j] )
             /\  ( not(before) -> s[j] + d[j] <= s[i] )
@@ -152,7 +152,7 @@ constraint
             set of int: RTasks = { i | i in Tasks where rr[k, i] > 0 },
             int: sum_rr = sum(i in RTasks)( rr[k,i] )
         } in (
-            if card(RTasks) > 1 /\ sum_rr > rc[k] /\ propagateRedundant then
+            if card(RTasks) > 1 /\ sum_rr > rc[k] then
                 cumulative(
                     [ s[i]    | i in RTasks ],
                     [ d[i]    | i in RTasks ],
@@ -245,6 +245,7 @@ solve
 output [
     "% mspsp\n",
     "penSum = \(penSum)\n",
+    "penalties = \(penalties)\n",
 %    "s = "         ++ show( s         ) ++ ";\n",
 %    "w = "         ++ show( w         ) ++ ";\n",
     "objective = " ++ show( objective ) ++ ";\n"
