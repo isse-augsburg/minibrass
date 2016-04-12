@@ -1,2 +1,2 @@
 mostImportantFirst = false;
-propagateRedundant = true;
+propagateRedundant = false;
