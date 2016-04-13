@@ -236,9 +236,12 @@ constraint forall(w_ in Workers, t in Tasks)(w[w_,t] = lnsVars[ (w_ - 1) * n_tas
 
 %     1 2 3 4 5 6    
 % --> a b c d e f 
-solve
-  :: custSearch    
-    minimize penSum;
+%solve
+%  :: custSearch    
+%    minimize penSum;
+
+include "evaluation-heuristics.mzn";
+include "evaluation-search.mzn";
 
 %-----------------------------------------------------------------------------%
 % Output.
@@ -247,6 +250,8 @@ output [
     "% mspsp\n",
     "penSum = \(penSum)\n",
     "penalties = \(penalties)\n",
+    "violatedScs = \(violatedScs)\n",
+    "lnsVars = \(lnsVars)\n",
 %    "s = "         ++ show( s         ) ++ ";\n",
 %    "w = "         ++ show( w         ) ++ ";\n",
     "objective = " ++ show( objective ) ++ ";\n"
