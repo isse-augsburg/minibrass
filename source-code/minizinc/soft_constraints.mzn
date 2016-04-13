@@ -18,3 +18,4 @@ array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: sortPermScs = arg_sort(penalties);
 array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: mostImpFirst = [ sortPermScs[nScs-s+1] | s in SOFTCONSTRAINTS]; 
 
 array[SOFTCONSTRAINTS] of var bool: mifSatisfied = [ satisfied[mostImpFirst[s]] | s in SOFTCONSTRAINTS]; 
+ann: mifAnn = int_search(mifSatisfied, input_order, indomain_max, complete);
