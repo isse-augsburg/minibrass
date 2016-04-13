@@ -33,11 +33,13 @@ function ann: onlyNotDominatedBAB(var set of SOFTCONSTRAINTS: violatedScs) =
        
 % adapted from lns_max an objective value (the set of violated constraints towards {}, in our case)
 function ann: lns_pvs (var set of SOFTCONSTRAINTS: violatedScs, array[int] of var int: x,
-                   int: iterations, float: d) = 
+                   int: iterations, float: d, int: exploreTime) = 
     repeat (i in 1..iterations) (
+        print("Starting iteration ... \(i)\n") /\
         scope(
             post(neighbourhoodCts(x,d)) /\
-            next() /\ strictlyBetterBAB(obj)
+            time_limit(exploreTime,
+                strictlyBetterBAB(violatedScs)) /\
             commit() /\ 
             print("Intermediate solution with objective \(sol(violatedScs))\n") /\
             print()
@@ -48,4 +50,27 @@ function ann: lns_pvs (var set of SOFTCONSTRAINTS: violatedScs, array[int] of va
           ) 
         )
    );
+   
+   
+function ann: adaptive_lns_pvs(var set of SOFTCONSTRAINTS: violatedScs, array[int] of var int: vars,
+                        int: iterations, int: initRate, int: exploreTime) =
+  let { int: adaRate = initRate, int: step = 1; } in
+  repeat (i in 1..iterations) (
+    print("Starting iteration ... \(i)\n") /\
+    scope(
+         (post(uniformNeighbourhood(vars,adaRate/100.0)) /\
+          time_limit(exploreTime,
+                strictlyBetterBAB(violatedScs)) /\ 
+          commit() /\ 
+          print("Intermediate solution with objective \(sol(violatedScs))\n") /\
+          print() )
+      \/ (adaRate := adaRate + step /\ fail)
+    )
+    /\ 
+    let { set of SOFTCONSTRAINTS: lb = sol(violatedScs); } in 
+        ( post(
+           isWorse(lb, violatedScs) 
+          ) 
+        )
+  );
 
