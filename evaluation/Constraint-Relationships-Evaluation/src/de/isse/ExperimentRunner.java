@@ -46,6 +46,7 @@ public class ExperimentRunner {
 
 	private File evalDir;
 	private File zipModelDir;
+	private File errorDir; 
 	private File resultsDir;
 	private File workingDir;
 	private File problemDir; // base dir for all problems
@@ -56,7 +57,7 @@ public class ExperimentRunner {
 	private final static String EVAL_CONF_FILE = "evaluation-conf.dzn";
 	private final static int JOB_TIME_IDENT = 0; // identifier for timer
 	
-	private static boolean EXPORT_MODELS_ZIP = true;
+	private static boolean EXPORT_MODELS_ZIP = false;
 	private static final boolean FORCE_OVERRIDE = false;
 	private static final boolean ONLY_ONE_CONFIG = false;
 
@@ -108,6 +109,7 @@ public class ExperimentRunner {
 		evalDir = new File("./eval");
 		resultsDir = new File("./results");
 		zipModelDir = new File(resultsDir, "zipModels");
+		errorDir = new File(resultsDir, "errors");
 		// should models be exported?
 		EXPORT_MODELS_ZIP  = Boolean.parseBoolean(props.getProperty("exportModels", "false"));
 		hookDir = new File("../eval-model-hooks");
@@ -119,6 +121,8 @@ public class ExperimentRunner {
 				resultsDir.mkdir();
 			if (!zipModelDir.exists())
 				zipModelDir.mkdir();
+			if (!errorDir.exists())
+				errorDir.mkdir();
 
 			mainLoop(problemDirectories, configurations);
 		} finally {
@@ -254,8 +258,9 @@ public class ExperimentRunner {
 		// prepare result object
 		int timeoutInMillisecs = evalJob.config.timeout;
 
-		// Numberjack expects timeout in seconds but as int
-		long timeOutInSeconds = Math.round(timeoutInMillisecs / 1000.0);
+		// Numberjack expects timeout in seconds but as int (give it a little less time to account for compilation 
+		// and make sure it outputs at least some solution before being killed
+		long timeOutInSeconds = Math.round( (timeoutInMillisecs / 1000.0) * 0.9);
 		
 		String underlyingCommand = "minisearch --solver " + flatzincExecutable + " -G" + minizincGlobals + " "
 				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
@@ -310,6 +315,12 @@ public class ExperimentRunner {
 
 			// compile results object
 			processResult(result, log, t);
+			
+			if(!result.valid) {
+				File errorCopy = new File(errorDir, evalJob.toFileName()+".log");
+				FileUtils.copyFile(log, errorCopy);
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -375,7 +386,7 @@ public class ExperimentRunner {
 									// during optimization
 			while (sc.hasNextLine()) {
 				String line = sc.nextLine();
-				if (line.contains("penSum =")) {
+				if (line.contains("penSum")) {
 					Scanner miniScan = new Scanner(line);
 					miniScan.next();
 					miniScan.next();
