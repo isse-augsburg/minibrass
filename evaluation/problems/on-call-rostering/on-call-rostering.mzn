@@ -373,7 +373,7 @@ output [
     "roster     = ", show(roster), ";\n",
     "weekday bt = ", show(week_day_bt), ";\n",
     "weekend bt = ", show(weekend_bt), ";\n",
-    "penSum  = ", show(penSum), "\n",
+    "penSum = ", show(penSum), "\n",
     "weekend_days = \(weekend_days);\n", 
     "nScs = \(nScs);\n",
     "nCrEdges = \(nCrEdges );\n",
