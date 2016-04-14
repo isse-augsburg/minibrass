@@ -39,6 +39,7 @@ cp tpd_worse.mzn "$EXP_LIB"
 cp minizinc_bundle.mzn "$EXP_LIB"
 cp minisearch_bundle.mzn "$EXP_LIB"
 cp pvs_set_based.mzn "$EXP_LIB"
+cp fuzzy_encoding.mzn "$EXP_LIB"
 
 # global constraints 
 cp globals/soft_alldifferent.mzn "$EXP_LIB"
