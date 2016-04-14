@@ -2,4 +2,4 @@ include "soft_constraints/pvs_search.mzn";
 
 solve 
 :: finalAnn
-search onlyNotDominatedBAB(violatedScs) /\ print();
+search time_limit(timeLimitMs,  onlyNotDominatedBAB(violatedScs)) /\ print(); 
