@@ -263,7 +263,13 @@ public class ExperimentRunner {
 		// and make sure it outputs at least some solution before being killed
 		long timeOutInSeconds = Math.round( (timeoutInMillisecs / 1000.0) * 0.9);
 		
-		String underlyingCommand = "minisearch --solver " + flatzincExecutable + " -G" + minizincGlobals + " "
+		String globalsCmd = " -G" + minizincGlobals;
+		if(evalJob.config.search  == SearchType.BAB_NONDOM && evalJob.solver == Solver.GECODE) { // this is an ugly workaround 
+			// executing minisearch with gecode and globals specified returns a "clause / reified" error, we avoid this by not specifying globals
+			globalsCmd = "";
+			
+		}
+		String underlyingCommand = "minisearch --solver " + flatzincExecutable + globalsCmd + " "
 				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
 
 		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag TODO make numberjack more tolerant regarding that
