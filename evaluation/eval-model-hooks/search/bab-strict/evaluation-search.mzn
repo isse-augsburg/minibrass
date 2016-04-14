@@ -2,4 +2,4 @@ include "soft_constraints/pvs_search.mzn";
 
 solve 
 :: finalAnn
-search strictlyBetterBAB(violatedScs) /\ print();
+search time_limit(timeLimitMs, strictlyBetterBAB(violatedScs)) /\ print(); 
