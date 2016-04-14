@@ -41,11 +41,12 @@ array[SOFTCONSTRAINTS] of var VAL: scValuations;
 % here: tie scValuations (functionally!) to other model variables ...
 % this could be generated:
 constraint scValuations[1] = f_1();
+constraint scValuations[2] = f_2(x,y);
 constraint scValuations[3] = f_3();
 
 include "table.mzn";
 
-% the extensional form 
+% the extensional form - less cluttered, based on global variables
 function var VAL: f_1() = 
 let {
   array[int, 1..3] of int: costFunc = [| 0, 0, 4 | 0, 1, 3 | 1, 0, 2 | 1, 1, 3|] ;
@@ -53,12 +54,12 @@ let {
   constraint table([x,y,value], costFunc);
 } in ( value );
 
-% another extensional
-function var VAL: f_2() = 
+% another extensional form - with formal parameters (maybe nicer to see the scope) 
+function var VAL: f_2(var int: x_, var int: y_) = 
 let {
   array[int, 1..3] of int: costFunc = [| 0, 0, 4 | 0, 1, 3 | 1, 0, 2 | 1, 1, 3|] ;
   var VAL: value;
-  constraint table([x,y,value], costFunc);
+  constraint table([x_,y_,value], costFunc);
 } in ( value );
 
 % the intensional form 
