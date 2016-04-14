@@ -374,6 +374,7 @@ output [
     "weekday bt = ", show(week_day_bt), ";\n",
     "weekend bt = ", show(weekend_bt), ";\n",
     "penSum = ", show(penSum), "\n",
+    "violatedScs = \(violatedScs)\n",
     "weekend_days = \(weekend_days);\n", 
     "nScs = \(nScs);\n",
     "nCrEdges = \(nCrEdges );\n",
