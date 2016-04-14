@@ -57,8 +57,8 @@ public class ExperimentRunner {
 	private final static String EVAL_CONF_FILE = "evaluation-conf.dzn";
 	private final static int JOB_TIME_IDENT = 0; // identifier for timer
 	
-	private static boolean EXPORT_MODELS_ZIP = false;
-	private static final boolean FORCE_OVERRIDE = false;
+	private static boolean EXPORT_MODELS_ZIP = true;
+	private static boolean FORCE_OVERRIDE = false;
 	private static final boolean ONLY_ONE_CONFIG = false;
 
 	public static void main(String[] args) throws IOException {
@@ -111,7 +111,8 @@ public class ExperimentRunner {
 		zipModelDir = new File(resultsDir, "zipModels");
 		errorDir = new File(resultsDir, "errors");
 		// should models be exported?
-		EXPORT_MODELS_ZIP  = Boolean.parseBoolean(props.getProperty("exportModels", "false"));
+		EXPORT_MODELS_ZIP  = Boolean.parseBoolean(props.getProperty("exportModels", EXPORT_MODELS_ZIP ? "true":"false"));
+		FORCE_OVERRIDE = Boolean.parseBoolean(props.getProperty("forceOverride", FORCE_OVERRIDE ? "true":"false"));
 		hookDir = new File("../eval-model-hooks");
 
 		try {
@@ -303,7 +304,7 @@ public class ExperimentRunner {
 					System.out.println("Destroyed by timeout ... ");
 					p.destroy();
 				}
-			}, timeoutInMillisecs);
+			}, Math.round(timeoutInMillisecs * 1.05));
 
 			p.waitFor();
 			t.tock(JOB_TIME_IDENT);
@@ -459,6 +460,7 @@ public class ExperimentRunner {
 		StringBuilder sb = new StringBuilder();
 		sb.append("mostImportantFirst = " + mbConfig.mostImportantFirst.toString() + ";\n");
 		sb.append("propagateRedundant = " + mbConfig.propagateRedundant.toString() + ";\n");
+		sb.append("timeLimitMs = " + mbConfig.timeout.toString() + ";\n");
 
 		File confDzn = new File(evalDir, EVAL_CONF_FILE);
 		FileWriter fw = null;
