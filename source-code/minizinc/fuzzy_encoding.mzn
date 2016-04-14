@@ -8,6 +8,17 @@
 
 include "table.mzn";
 
+predicate binary_fuzzy_rational(array[int] of int: values, int: denominator, var int: x, var int: y, var float: value ) = 
+let {
+  int: vals = card(dom(x)) * card(dom(y));
+  array[1..vals] of 1..vals: idMap = [i | i in 1..vals];
+  set of int: TABLE_INDEX = index_set(values);
+  var TABLE_INDEX: chosenRow;   
+ } in 
+(
+  encode_cost_function_binary(x,y,idMap, chosenRow) /\ values[chosenRow]/denominator = value
+);
+
 predicate binary_fuzzy(array[int] of float: values, var int: x, var int: y, var float: value ) = 
 let {
   int: vals = card(dom(x)) * card(dom(y));
