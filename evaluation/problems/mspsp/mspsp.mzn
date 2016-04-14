@@ -191,7 +191,8 @@ array[1..notTogethers] of SOFTCONSTRAINTS: scWorkNotTogether;
 
 int: notTogethers = max(index_set(workNotTogether));
 
-constraint forall(i in 1..notTogethers)(satisfied[scWorkNotTogether[i]] <-> not ( exists(t in Tasks)(forall(w_ in workNotTogether[i]) (w[w_,t] ) ) ));
+constraint forall(i in 1..notTogethers)(satisfied[scWorkNotTogether[i]] <-> 
+forall (t in Tasks)( sum(w_ in workNotTogether[i]) (bool2int(w[w_,t])) <= card(workNotTogether[i]) ) );
 
 % 3.) Work on certain task preferably
 array[int] of Workers: desiredTaskWorkers;
