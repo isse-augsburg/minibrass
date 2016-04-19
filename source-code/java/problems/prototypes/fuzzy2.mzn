@@ -34,7 +34,7 @@ some intensional form
 f_3 = 3 + y * 5
 */
 % type of PVS: int, best: 0, order >=, combination sum
-int: bound = 8;
+float: bound = 0.0;
 int: nScs = 3;
 set of int: SOFTCONSTRAINTS = 1..nScs; 
 
