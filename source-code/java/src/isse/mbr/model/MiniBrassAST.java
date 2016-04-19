@@ -13,11 +13,11 @@ import isse.mbr.model.types.PVSType;
  * @author Alexander Schiendorfer
  *
  */
-public class MiniBrassModel {
+public class MiniBrassAST {
 
 	private Map<String, PVSType> pvsTypes;
 	
-	public MiniBrassModel() {
+	public MiniBrassAST() {
 		pvsTypes = new HashMap<String, PVSType>();
 	}
 	
