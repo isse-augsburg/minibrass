@@ -1,5 +1,7 @@
 package isse.mbr.model.types;
 
+import java.util.Collection;
+
 /**
  * Holds all information that is necessary to instantiate 
  * a particular PVS; Examples are constraint relationships,
@@ -9,14 +11,17 @@ package isse.mbr.model.types;
  *
  */
 public class PVSType {
+	private MiniZincVarType specType;
 	private MiniZincVarType elementType;
 	private String name;
 	private String combination;
 	private String order;
 	private String top;
+	private Collection<Object> pvsParameters;
 	
-	public PVSType(MiniZincVarType elementType, String name, String combination, String order, String top) {
+	public PVSType(MiniZincVarType specType, MiniZincVarType elementType, String name, String combination, String order, String top) {
 		super();
+		this.setSpecType(specType);
 		this.elementType = elementType;
 		this.name = name;
 		this.combination = combination;
@@ -24,6 +29,11 @@ public class PVSType {
 		this.top = top;
 	}
 
+	// empty constructor to be filled by parser
+	public PVSType() {
+		
+	}
+	
 	@Override
 	public String toString() {
 		return "PVS-Type: "+name + " <" + elementType.toString() +"("+combination+", "+order+", "+top+ ")"+">";
@@ -67,5 +77,13 @@ public class PVSType {
 
 	public void setTop(String top) {
 		this.top = top;
+	}
+
+	public MiniZincVarType getSpecType() {
+		return specType;
+	}
+
+	public void setSpecType(MiniZincVarType specType) {
+		this.specType = specType;
 	}
 }
