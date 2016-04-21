@@ -53,8 +53,11 @@ type ConstraintRelationships = PVSType<bool, set of 1..nScs> =
     % bot -> 1..nScs;
   };
     
-morphism ConstraintRelationships -> WeightedCsp: ToWeighted = weight_cr;
+morph ConstraintRelationships -> WeightedCsp: ToWeighted = weight_cr;
    
+
+PVS: fuzzyInstance = new FuzzyCsp(3); 
+
 /*
 This should look something like that:
 
