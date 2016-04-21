@@ -11,11 +11,13 @@ import java.util.Set;
 import com.sun.org.apache.xalan.internal.extensions.ExpressionContext;
 
 import isse.mbr.model.MiniBrassAST;
+import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
 import isse.mbr.model.types.IntType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NamedRef;
+import isse.mbr.model.types.PVSParameter;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.model.types.SetType;
@@ -55,7 +57,7 @@ public class MiniBrassParser {
 				
 				// top level non-terminal, initialize before
 				getNextSy();
-				miniBrassFile();
+				miniBrassFile(model);
 				
 				visited.add(next);
 			}
@@ -73,29 +75,91 @@ public class MiniBrassParser {
 
 	/**
 	 * statement (statement)+
+	 * @param model2 
 	 * @throws MiniBrassParseException 
 	 */
-	private void miniBrassFile() throws MiniBrassParseException {
+	private void miniBrassFile(MiniBrassAST model) throws MiniBrassParseException {
 		
 		while(currSy != MiniBrassSymbol.EofSy) {
-			item();
+			item(model);
 		}
 	}
 
-	private void item() throws MiniBrassParseException {
+	private void item(MiniBrassAST model) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.IncludeSy) {
 			getNextSy();
 			includeItem();
 		} else if(currSy == MiniBrassSymbol.TypeSy) {
 			getNextSy();
 			PVSType pvsType = typeItem();
+			model.registerPVSType(pvsType.getName(), pvsType);
 		} else if (currSy == MiniBrassSymbol.MorphismSy) {
 			getNextSy();
 			morphismItem();
+		} else if (currSy == MiniBrassSymbol.SolveSy) {
+			if(model.getSolveInstance() != null) {
+				throw new MiniBrassParseException("More than one solve item specified !");
+			}
+			getNextSy();
+			String solveInstance = solveItem();
+			model.setSolveInstance(solveInstance); 
+		} else if(currSy == MiniBrassSymbol.PvsSy) { 
+			getNextSy();
+			pvsInstItem();
 		}
 		else {
 			throw new MiniBrassParseException("Unexpected symbol when looking for item: "+currSy);
 		}
+	}
+
+	/**
+	 * PVS: fuzzyInstance = new FuzzyCsp(3); 
+	 * PVS: weightedInstance = new WeightedCsp(3, 8, [2,1,2]);
+	 * PVS: cr = new ConstraintRelationships(2, [| 1, 2 |]);
+	 * PVS: hierarchy = cr lex fuzzyInstance
+	 *    
+	 * PVSItem -> "PVS" ":" ident "=" PVSInst
+	 * PVSInst -> "new" ident "(" int ("," MZNLiteral)* ")" ";"
+	 *          |  ident
+	 *          |  PVSInst "lex" PVSInst
+	 *          |  PVSAtom "*" PVSAtom
+	 *          
+	 * pvs1, pvs2, pvs3
+	 * pvs1 lex pvs2 * pvs3 (should be read as pvs1 lex (pvs2 * pvs3) 
+	 * pvs1 * pvs2 lex pvs3 
+	 * @throws MiniBrassParseException
+	 */
+	private void pvsInstItem() throws MiniBrassParseException {
+		if(currSy == MiniBrassSymbol.ColonSy) { // tolerated, but not required
+			getNextSy();
+		}
+		expectSymbol(MiniBrassSymbol.IdentSy);
+		String newPvsIdent = lexer.getLastIdent();
+		getNextSy();
+		
+		if(currSy == MiniBrassSymbol.NewSy) {
+			
+		} else if (currSy == MiniBrassSymbol.IdentSy) {
+			
+			
+		} // maybe else if (function sym) 
+		
+		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
+		if(currSy == MiniBrassSymbol.NewSy) { // tolerated, but not required
+			getNextSy();
+		}
+	}
+
+	/**
+	 * solve ident ;
+	 * @throws MiniBrassParseException 
+	 */
+	private String solveItem() throws MiniBrassParseException {
+		expectSymbol(MiniBrassSymbol.IdentSy);
+		String identifier = lexer.getLastIdent();
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+		return identifier;
 	}
 
 	/**
@@ -165,7 +229,8 @@ public class MiniBrassParser {
 			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 			
 			while(currSy != MiniBrassSymbol.RightCurlSy) {
-				parameterDecl();
+				PVSParameter par = parameterDecl();
+				newType.getPvsParameters().add(par);
 			}
 			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
 			System.out.println("Standing here, which symbol? " + currSy + " ; " + lexer.getLastIdent());
@@ -175,13 +240,15 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.InstantiatesSy);
 		expectSymbolAndNext(MiniBrassSymbol.WithSy);
 		expectSymbol(MiniBrassSymbol.StringLitSy);
+		
 		String fileName = lexer.getLastIdent();
 		System.out.println("Look for in file : "+ fileName);
+		newType.setImplementationFile(fileName);
 		
 		getNextSy();
 		expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 		while(currSy != MiniBrassSymbol.RightCurlSy) {
-			mapping();
+			mapping(newType);
 		}
 		getNextSy();
 		if(currSy == MiniBrassSymbol.SemicolonSy) 
@@ -195,16 +262,26 @@ public class MiniBrassParser {
 	 *    int: k; 
    	 *    array[1..nScs] of 1..k: weights;
    	 *    array[int, 1..2] of 1..nScs: crEdges;
+	 * @return 
 	 * @throws MiniBrassParseException 
 	 */
-	private void parameterDecl() throws MiniBrassParseException {
+	private PVSParameter parameterDecl() throws MiniBrassParseException {
+		PVSParameter returnParameter;
 		if(currSy == MiniBrassSymbol.ArraySy) {
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
+			
+			ArrayType arrayType = new ArrayType();
+					
 			MiniZincVarType indexType = MiniZincVarType();
+			IntType asIntType = null;
 			if (!(indexType instanceof IntType)) {
 				throw new MiniBrassParseException("Index type has to be an integer range! " + indexType);
+			}  else {
+				asIntType = (IntType) indexType;
 			}
+			
+			arrayType.getIndexSets().add(asIntType);
 			
 			System.out.println("Main index: "+indexType);
 			while(currSy != MiniBrassSymbol.RightBracketSy) { 
@@ -214,17 +291,23 @@ public class MiniBrassParser {
 				System.out.println("  Next index: "+indexType);
 				if (!(indexType instanceof IntType)) {
 					throw new MiniBrassParseException("Index type has to be an integer range! " + indexType);
+				} else {
+					asIntType = (IntType) indexType;
 				}
-				
+				arrayType.getIndexSets().add(asIntType);				
 			}
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.OfSy);
 			MiniZincVarType varType = MiniZincVarType();
+			arrayType.setType(varType);
+			
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
 			expectSymbol(MiniBrassSymbol.IdentSy);
-			
+			String name = lexer.getLastIdent();
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			
+			returnParameter = new PVSParameter(name, arrayType);
 		} else {
 			MiniZincVarType varType = MiniZincVarType(); // could be int
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
@@ -235,19 +318,24 @@ public class MiniBrassParser {
 		
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			returnParameter = new PVSParameter(ident, varType);
 		}
+		return returnParameter;
 	}
 
 	/**
 	 * Is either of times -> xyz, is_worse ..., top ... 
 	 * PVS-Sym "->" AnyCharacters 
+	 * @param newType 
 	 * @throws MiniBrassParseException 
 	 */
-	private void mapping() throws MiniBrassParseException {
+	private void mapping(PVSType newType) throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		// must be either times, is_worse, top or bot
 		List<String> validIdents = Arrays.asList("times", "is_worse", "top", "bot");
 		String readIdent = lexer.getLastIdent();
+		String targetFunction = null;
+		
 		if(validIdents.contains(readIdent)) {
 			getNextSy();
 			expectSymbol(MiniBrassSymbol.ArrowSy);
@@ -259,10 +347,15 @@ public class MiniBrassParser {
 			} else {
 				getNextSy();
 				expectSymbol(MiniBrassSymbol.IdentSy);
-				String function = lexer.getLastIdent();
-				System.out.println("Read function: "+function);
+				targetFunction = lexer.getLastIdent();
+				System.out.println("Read function: "+targetFunction);
 				getNextSy();
 				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			}
+			switch(readIdent) {
+			case "times":
+				newType.setCombination(targetFunction);
+				break;
 			}
 			// map.put(readIdent, targetExpression)
 		} else {
