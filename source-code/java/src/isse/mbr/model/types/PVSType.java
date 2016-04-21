@@ -1,6 +1,7 @@
 package isse.mbr.model.types;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Holds all information that is necessary to instantiate 
@@ -17,7 +18,9 @@ public class PVSType {
 	private String combination;
 	private String order;
 	private String top;
-	private Collection<Object> pvsParameters;
+	private Collection<PVSParameter> pvsParameters;
+	private String implementationFile; 
+	private boolean isBounded; 
 	
 	public PVSType(MiniZincVarType specType, MiniZincVarType elementType, String name, String combination, String order, String top) {
 		super();
@@ -27,11 +30,13 @@ public class PVSType {
 		this.combination = combination;
 		this.order = order;
 		this.top = top;
+
+		this.pvsParameters = new LinkedList<PVSParameter>();
 	}
 
 	// empty constructor to be filled by parser
 	public PVSType() {
-		
+		this.pvsParameters = new LinkedList<PVSParameter>();
 	}
 	
 	@Override
@@ -85,5 +90,29 @@ public class PVSType {
 
 	public void setSpecType(MiniZincVarType specType) {
 		this.specType = specType;
+	}
+
+	public Collection<PVSParameter> getPvsParameters() {
+		return pvsParameters;
+	}
+
+	public void setPvsParameters(Collection<PVSParameter> pvsParameters) {
+		this.pvsParameters = pvsParameters;
+	}
+
+	public String getImplementationFile() {
+		return implementationFile;
+	}
+
+	public void setImplementationFile(String implementationFile) {
+		this.implementationFile = implementationFile;
+	}
+
+	public boolean isBounded() {
+		return isBounded;
+	}
+
+	public void setBounded(boolean isBounded) {
+		this.isBounded = isBounded;
 	}
 }
