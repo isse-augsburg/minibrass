@@ -19,4 +19,8 @@ public class NamedRef<T> {
 	public String toString() {
 		if(name == null) return literal.toString(); else return name;
 	}
+
+	public void update(Object object) {
+		literal = (T) object;
+	}
 }

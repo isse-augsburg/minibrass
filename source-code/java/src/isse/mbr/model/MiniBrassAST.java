@@ -3,6 +3,8 @@ package isse.mbr.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.PVSType;
 
 /**
@@ -16,10 +18,16 @@ import isse.mbr.model.types.PVSType;
 public class MiniBrassAST {
 
 	private Map<String, PVSType> pvsTypes;
-	private String solveInstance;
+	private Map<String, AbstractPVSInstance> pvsInstances; // here by identifier
+	private Map<String, AbstractPVSInstance> pvsReferences; // here by reference
+	
+
+	private NamedRef<AbstractPVSInstance> solveInstance;
 	
 	public MiniBrassAST() {
 		pvsTypes = new HashMap<String, PVSType>();
+		pvsInstances = new HashMap<>();
+		pvsReferences =  new HashMap<>();
 	}
 	
 	public void registerPVSType(String reference, PVSType type) {
@@ -27,12 +35,36 @@ public class MiniBrassAST {
 		pvsTypes.put(reference, type);
 	}
 
-	public String getSolveInstance() {
+	public NamedRef<AbstractPVSInstance> getSolveInstance() {
 		return solveInstance;
 	}
 
-	public void setSolveInstance(String solveInstance) {
+	public void setSolveInstance(NamedRef<AbstractPVSInstance> solveInstance) {
 		this.solveInstance = solveInstance;
+	}
+
+	public Map<String, AbstractPVSInstance> getPvsInstances() {
+		return pvsInstances;
+	}
+
+	public void setPvsInstances(Map<String, AbstractPVSInstance> pvsInstances) {
+		this.pvsInstances = pvsInstances;
+	}
+
+	public Map<String, AbstractPVSInstance> getPvsReferences() {
+		return pvsReferences;
+	}
+
+	public void setPvsReferences(Map<String, AbstractPVSInstance> pvsReferences) {
+		this.pvsReferences = pvsReferences;
+	}
+
+	public Map<String, PVSType> getPvsTypes() {
+		return pvsTypes;
+	}
+
+	public void setPvsTypes(Map<String, PVSType> pvsTypes) {
+		this.pvsTypes = pvsTypes;
 	}
 }
 
