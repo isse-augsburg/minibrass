@@ -40,6 +40,8 @@ public class MiniBrassLexer {
 			switch (currentChar) {
 			case ',':
 				return mv(MiniBrassSymbol.CommaSy);
+			case '*':
+				return mv(MiniBrassSymbol.AsteriskSy);
 			case ';':
 				return mv(MiniBrassSymbol.SemicolonSy);
 			case ':':
@@ -153,6 +155,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.ParamsSy;
 				case "instantiates":
 					return MiniBrassSymbol.InstantiatesSy;
+				case "lex":
+					return MiniBrassSymbol.LexSy;
 				case "morph":
 					return MiniBrassSymbol.MorphismSy;
 				case "new":

@@ -18,6 +18,8 @@ public enum MiniBrassSymbol {
 	ArrowSy,            // ->
 	LeftCurlSy,         // {
 	RightCurlSy,        // }
+	AsteriskSy,         // *
+	LexSy,              // lex
 	EqualsSy,           // =
 	StringLitSy,        // any string literal enclosed by ' or "
 	IdentSy, 

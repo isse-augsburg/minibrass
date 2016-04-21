@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import com.sun.org.apache.xalan.internal.extensions.ExpressionContext;
-
 import isse.mbr.model.MiniBrassAST;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.ProductType;
+import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
@@ -35,11 +38,12 @@ public class MiniBrassParser {
 	private MiniBrassLexer lexer;
 	private Set<File> visited;
 	private Set<File> worklist;
-	private MiniZincVarType lastType;
 	private MiniBrassAST model; 
+	private ReferenceManager refManager;
 	
 	public MiniBrassAST parse(File file) throws FileNotFoundException {
 		model = new MiniBrassAST();
+		refManager = new ReferenceManager();
 		
 		worklist = new HashSet<File>();
 		worklist.add(file);
@@ -62,6 +66,10 @@ public class MiniBrassParser {
 				visited.add(next);
 			}
 			
+			// now do a first consistency check of pending references 
+			refManager.updateReferences();
+		
+			System.out.println("I should optimize: "+model.getSolveInstance().literal);
 		} catch(MiniBrassParseException ex){
 			
 			System.err.println("Error at line "+lexer.getLineNo()+" ("+lexer.getColPtr()+"): " + ex.getMessage());
@@ -102,13 +110,16 @@ public class MiniBrassParser {
 			}
 			getNextSy();
 			String solveInstance = solveItem();
-			model.setSolveInstance(solveInstance); 
+			NamedRef<AbstractPVSInstance> namedRef = new NamedRef<AbstractPVSInstance>(solveInstance);
+			refManager.scheduleUpdate(namedRef, model.getPvsReferences());
+			
+			model.setSolveInstance(namedRef ); 
 		} else if(currSy == MiniBrassSymbol.PvsSy) { 
 			getNextSy();
-			pvsInstItem();
+			pvsInstItem(model);
 		}
 		else {
-			throw new MiniBrassParseException("Unexpected symbol when looking for item: "+currSy);
+			throw new MiniBrassParseException("Unexpected symbol when looking for item: "+currSy + " (last ident -> " +lexer.getLastIdent() +")");
 		}
 	}
 
@@ -118,35 +129,148 @@ public class MiniBrassParser {
 	 * PVS: cr = new ConstraintRelationships(2, [| 1, 2 |]);
 	 * PVS: hierarchy = cr lex fuzzyInstance
 	 *    
-	 * PVSItem -> "PVS" ":" ident "=" PVSInst
-	 * PVSInst -> "new" ident "(" int ("," MZNLiteral)* ")" ";"
-	 *          |  ident
-	 *          |  PVSInst "lex" PVSInst
-	 *          |  PVSAtom "*" PVSAtom
-	 *          
+	 * PVSItem   -> "PVS" ":" ident "=" PVSInst ";"
+	 * PVSInst   ->  PVSDiProd ( "lex" PVSDiProd )*
+	 * PVSDiProd ->  PVSAtom ("*" PVSAtom)*
+	 * PVSAtom   -> "new" ident "(" stringlit "," int ("," MZNLiteral)* ")" ";"         
+	 *            |  ident
+	 *            
 	 * pvs1, pvs2, pvs3
 	 * pvs1 lex pvs2 * pvs3 (should be read as pvs1 lex (pvs2 * pvs3) 
 	 * pvs1 * pvs2 lex pvs3 
+	 * @param model2 
 	 * @throws MiniBrassParseException
 	 */
-	private void pvsInstItem() throws MiniBrassParseException {
+	private void pvsInstItem(MiniBrassAST model) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.ColonSy) { // tolerated, but not required
 			getNextSy();
 		}
 		expectSymbol(MiniBrassSymbol.IdentSy);
-		String newPvsIdent = lexer.getLastIdent();
+		String newPvsRef = lexer.getLastIdent();
 		getNextSy();
-		
-		if(currSy == MiniBrassSymbol.NewSy) {
-			
-		} else if (currSy == MiniBrassSymbol.IdentSy) {
-			
-			
-		} // maybe else if (function sym) 
-		
+
 		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
-		if(currSy == MiniBrassSymbol.NewSy) { // tolerated, but not required
+		
+		AbstractPVSInstance pvsInstance = PVSInst(model);
+		
+		System.out.println("Got instance: ");
+		System.out.println(pvsInstance);
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+		
+		if(model.getPvsReferences().containsKey(newPvsRef)) {
+			throw new MiniBrassParseException("PVS reference "+newPvsRef + " already defined ("+model.getPvsReferences().get(newPvsRef));
+		} else {
+			model.getPvsReferences().put(newPvsRef, pvsInstance);
+		}
+ 	}	
+
+	/**
+	 * PVSInst   ->  PVSDiProd ( "lex" PVSDiProd )
+	 * @param model2 *
+	 * @return
+	 * @throws MiniBrassParseException
+	 */
+	private AbstractPVSInstance PVSInst(MiniBrassAST model) throws MiniBrassParseException {
+
+		AbstractPVSInstance first =  PVSDiProd(model);
+		
+		while(currSy == MiniBrassSymbol.LexSy){
 			getNextSy();
+			
+			AbstractPVSInstance next = PVSDiProd(model);
+			
+			CompositePVSInstance composite = new CompositePVSInstance();
+			composite.setLeftHandSide(first);
+			composite.setProductType(ProductType.LEXICOGRAPHIC);
+			composite.setRightHandSide(next);
+			
+			first = composite;
+		}
+		return first;
+	}
+
+	/**
+	 * PVSDiProd ->  PVSAtom ("*" PVSAtom)
+	 * @return *
+	 */
+	private AbstractPVSInstance PVSDiProd(MiniBrassAST model) throws MiniBrassParseException {
+	
+		AbstractPVSInstance first = PVSAtom(model);
+		while(currSy == MiniBrassSymbol.AsteriskSy) {
+			getNextSy();
+			
+			AbstractPVSInstance next = PVSAtom(model);
+			
+			CompositePVSInstance composite = new CompositePVSInstance();
+			composite.setLeftHandSide(first);
+			composite.setProductType(ProductType.DIRECT);
+			composite.setRightHandSide(next);
+			
+			first = composite;
+		}
+		return first;
+	}
+
+	/**
+	 * PVSAtom   -> "new" ident "(" stringlit "," intlit ("," MZNLiteral)* ")"          
+	 *            |  ident
+	 *            | "(" PVSInst ")"
+	 * @throws MiniBrassParseException 
+	 * 
+	 */
+	private AbstractPVSInstance PVSAtom(MiniBrassAST model) throws MiniBrassParseException {
+		if(currSy == MiniBrassSymbol.NewSy) {
+			getNextSy();
+			expectSymbol(MiniBrassSymbol.IdentSy);
+			String typeId = lexer.getLastIdent();
+			NamedRef<PVSType> typeRef = new NamedRef<>(typeId);
+			refManager.scheduleUpdate(typeRef, model.getPvsTypes());
+			
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+			expectSymbol(MiniBrassSymbol.StringLitSy);
+			String name = lexer.getLastIdent();
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.CommaSy);
+			expectSymbol(MiniBrassSymbol.IntLitSy);
+			int nScs = lexer.getLastInt();
+			
+			PVSInstance instance = new PVSInstance();
+			
+			instance.setName(name);
+			instance.setType(typeRef);
+			instance.setNumberSoftConstraints(nScs);
+			
+			getNextSy();
+			if(currSy == MiniBrassSymbol.CommaSy) {
+				String parameters = lexer.readVerbatimUntil(')');
+				String[] splitted = parameters.split(",");
+				for(String s : splitted) {
+					instance.getParameterValues().add(s.trim());
+				}
+				getNextSy();
+			}
+			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			
+			// register the newly created instance
+			model.getPvsInstances().put(instance.getName(), instance);
+			return instance;
+		} else if (currSy == MiniBrassSymbol.IdentSy) {
+			String reference = lexer.getLastIdent();
+			ReferencedPVSInstance referencedPVSInstance = new ReferencedPVSInstance();
+			referencedPVSInstance.setReference(reference);
+			referencedPVSInstance.setName("RefTo-"+reference);
+			
+			getNextSy();
+			return referencedPVSInstance;
+		} else if(currSy == MiniBrassSymbol.LeftParenSy) {
+			getNextSy();
+			AbstractPVSInstance inst = PVSInst(model);
+			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			
+			return inst;
+		} else {
+			throw new MiniBrassParseException("Expected 'new' or identifier as atomic PVS");
 		}
 	}
 
@@ -340,8 +464,8 @@ public class MiniBrassParser {
 			getNextSy();
 			expectSymbol(MiniBrassSymbol.ArrowSy);
 			if(readIdent.equals("top") || readIdent.equals("bot")) {
-				String verbatimExpr = readVerbatimUntil(';');
-				System.out.println("Read verbatim: "+verbatimExpr);
+				targetFunction = readVerbatimUntil(';');
+				System.out.println("Read verbatim: "+targetFunction);
 				getNextSy();
 				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			} else {
@@ -355,6 +479,12 @@ public class MiniBrassParser {
 			switch(readIdent) {
 			case "times":
 				newType.setCombination(targetFunction);
+				break;
+			case "is_worse":
+				newType.setOrder(targetFunction);
+				break;
+			case "top":
+				newType.setTop(targetFunction);
 				break;
 			}
 			// map.put(readIdent, targetExpression)

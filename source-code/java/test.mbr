@@ -56,8 +56,14 @@ type ConstraintRelationships = PVSType<bool, set of 1..nScs> =
 morph ConstraintRelationships -> WeightedCsp: ToWeighted = weight_cr;
    
 
-PVS: fuzzyInstance = new FuzzyCsp(3); 
+PVS: fuzzyInstance = new FuzzyCsp("fuzzy1", 3); 
+PVS: weightedInstance = new WeightedCsp("w1", 3, 8, [2,1,2]);
 
+PVS: cr = new ConstraintRelationships("cr1", 2, [| 1, 2 |]);
+
+PVS: combi = fuzzyInstance * weightedInstance lex fuzzyInstance;
+
+solve combi;
 /*
 This should look something like that:
 
@@ -67,20 +73,4 @@ if useSPD then
 else
   is_worse_tpd(violated1, violated2, crEdges
 endif;
-
-
-    
-fuzzyInstance = new FuzzyCsp(3); /* these functions need to be tied to the specific instance */
-% for example function 0.0 .. 1.0 fuzzyInstance_sc1() = ...
-% array[1..nScs_fuzzyInstance] of var 0.0 .. 1.0: fuzzyInstance_degrees;
-
-weightedInstance = new WeightedCsp(3, 8, [2,1,2]);
-cr = new ConstraintRelationships(2, [| 1, 2 |]);
-
-weightedCr = ToWeighted(cr);
-
-lexProd = fuzzyInstance lex weightedInstance;
-dirProd = fuzzyInstance * weightedInstance;
-
-solve weightedCr;
 */
