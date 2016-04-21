@@ -22,6 +22,7 @@ public enum MiniBrassSymbol {
 	StringLitSy,        // any string literal enclosed by ' or "
 	IdentSy, 
 	IncludeSy,          // include
+	SolveSy,            // solve
 	TypeSy,             // type
 	PvsSy,              // pvs
 	PVSTypeSy,              // PVSType (for types)
@@ -38,7 +39,8 @@ public enum MiniBrassSymbol {
 	InSy,               // "in"
 	InstantiatesSy,     // "instantiates"
 	WithSy,             // "with"
-	MorphismSy,         // "morphism"
+	MorphismSy,         // "morph"
+	NewSy, 				// "new"
 	NoSy,
 	EofSy                 
 }

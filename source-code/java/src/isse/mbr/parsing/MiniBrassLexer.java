@@ -141,9 +141,11 @@ public class MiniBrassLexer {
 				switch (s) {
 				case "include":
 					return MiniBrassSymbol.IncludeSy;
+				case "solve":
+					return MiniBrassSymbol.SolveSy;
 				case "type":
 					return MiniBrassSymbol.TypeSy;
-				case "pvs":
+				case "PVS":
 					return MiniBrassSymbol.PvsSy;
 				case "PVSType":
 					return MiniBrassSymbol.PVSTypeSy;
@@ -151,8 +153,10 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.ParamsSy;
 				case "instantiates":
 					return MiniBrassSymbol.InstantiatesSy;
-				case "morphism":
+				case "morph":
 					return MiniBrassSymbol.MorphismSy;
+				case "new":
+					return MiniBrassSymbol.NewSy;
 				case "in":
 					return MiniBrassSymbol.InSy;
 				case "with":

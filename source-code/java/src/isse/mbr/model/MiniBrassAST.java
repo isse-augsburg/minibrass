@@ -16,6 +16,7 @@ import isse.mbr.model.types.PVSType;
 public class MiniBrassAST {
 
 	private Map<String, PVSType> pvsTypes;
+	private String solveInstance;
 	
 	public MiniBrassAST() {
 		pvsTypes = new HashMap<String, PVSType>();
@@ -24,6 +25,14 @@ public class MiniBrassAST {
 	public void registerPVSType(String reference, PVSType type) {
 		System.out.println("Registering PVS type ... "+ type);
 		pvsTypes.put(reference, type);
+	}
+
+	public String getSolveInstance() {
+		return solveInstance;
+	}
+
+	public void setSolveInstance(String solveInstance) {
+		this.solveInstance = solveInstance;
 	}
 }
 
