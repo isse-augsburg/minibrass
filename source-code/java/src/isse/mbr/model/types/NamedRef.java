@@ -2,25 +2,25 @@ package isse.mbr.model.types;
 
 public class NamedRef<T> {
 	public String name;
-	public T literal;
+	public T instance;
 		
 	@SuppressWarnings("unchecked")
 	public NamedRef(Object value) {
 		if(value instanceof String){
 			this.name = (String) value;
-			this.literal = null;
+			this.instance = null;
 		} else {
 			this.name = null;
-			this.literal = (T) value;
+			this.instance = (T) value;
 		}	
 	}
 	
 	@Override
 	public String toString() {
-		if(name == null) return literal.toString(); else return name;
+		if(instance != null) return "[lit] "+ instance.toString(); else return name;
 	}
 
 	public void update(Object object) {
-		literal = (T) object;
+		instance = (T) object;
 	}
 }

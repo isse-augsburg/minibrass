@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -18,8 +20,10 @@ import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
 import isse.mbr.model.types.IntType;
+import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NamedRef;
+import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PVSParameter;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
@@ -39,11 +43,11 @@ public class MiniBrassParser {
 	private Set<File> visited;
 	private Set<File> worklist;
 	private MiniBrassAST model; 
-	private ReferenceManager refManager;
+	private SemanticChecker semChecker;
 	
-	public MiniBrassAST parse(File file) throws FileNotFoundException {
+	public MiniBrassAST parse(File file) throws FileNotFoundException, MiniBrassParseException {
 		model = new MiniBrassAST();
-		refManager = new ReferenceManager();
+		semChecker = new SemanticChecker();
 		
 		worklist = new HashSet<File>();
 		worklist.add(file);
@@ -54,25 +58,33 @@ public class MiniBrassParser {
 				File next = worklist.iterator().next();
 				worklist.remove(next);
 				
-				scanner = new Scanner(next);
-				lexer = new MiniBrassLexer();
-				lexer.setScanner(scanner);
-				lexer.readNextChar(); // to initialize
-				
-				// top level non-terminal, initialize before
-				getNextSy();
-				miniBrassFile(model);
-				
+				if(!visited.contains(next)) {
+					scanner = new Scanner(next);
+					lexer = new MiniBrassLexer();
+					lexer.setScanner(scanner);
+					lexer.readNextChar(); // to initialize
+					
+					// top level non-terminal, initialize before
+					getNextSy();
+					miniBrassFile(model);
+				}
 				visited.add(next);
+				
 			}
 			
 			// now do a first consistency check of pending references 
-			refManager.updateReferences();
-		
-			System.out.println("I should optimize: "+model.getSolveInstance().literal);
+			semChecker.updateReferences();
+			semChecker.executeArrayJobs();
+			semChecker.checkPvsInstances(model);
+			
+			System.out.println("I should optimize: "+model.getSolveInstance().instance);
+			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
+				System.out.println("Got instance: " + entry.getValue().toString());
+			}
 		} catch(MiniBrassParseException ex){
 			
 			System.err.println("Error at line "+lexer.getLineNo()+" ("+lexer.getColPtr()+"): " + ex.getMessage());
+			throw ex;
 		}
 		finally {
 			if(scanner != null)
@@ -111,7 +123,7 @@ public class MiniBrassParser {
 			getNextSy();
 			String solveInstance = solveItem();
 			NamedRef<AbstractPVSInstance> namedRef = new NamedRef<AbstractPVSInstance>(solveInstance);
-			refManager.scheduleUpdate(namedRef, model.getPvsReferences());
+			semChecker.scheduleUpdate(namedRef, model.getPvsReferences());
 			
 			model.setSolveInstance(namedRef ); 
 		} else if(currSy == MiniBrassSymbol.PvsSy) { 
@@ -224,7 +236,7 @@ public class MiniBrassParser {
 			expectSymbol(MiniBrassSymbol.IdentSy);
 			String typeId = lexer.getLastIdent();
 			NamedRef<PVSType> typeRef = new NamedRef<>(typeId);
-			refManager.scheduleUpdate(typeRef, model.getPvsTypes());
+			semChecker.scheduleUpdate(typeRef, model.getPvsTypes());
 			
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
@@ -242,13 +254,10 @@ public class MiniBrassParser {
 			instance.setNumberSoftConstraints(nScs);
 			
 			getNextSy();
-			if(currSy == MiniBrassSymbol.CommaSy) {
-				String parameters = lexer.readVerbatimUntil(')');
-				String[] splitted = parameters.split(",");
-				for(String s : splitted) {
-					instance.getParameterValues().add(s.trim());
-				}
+			while(currSy == MiniBrassSymbol.CommaSy) {
 				getNextSy();
+				String mznLiteral = MznLiteral(model);
+				instance.getParameterValues().add(mznLiteral.trim());
 			}
 			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
 			
@@ -272,6 +281,40 @@ public class MiniBrassParser {
 		} else {
 			throw new MiniBrassParseException("Expected 'new' or identifier as atomic PVS");
 		}
+	}
+
+	/**
+	 * "[" digit ("," digit)+ "]" | "[|" digit ("," (digit|"|") )+ "|]" | ident | "{}"
+	 * @param model
+	 * @return
+	 * @throws MiniBrassParseException 
+	 */
+	private String MznLiteral(MiniBrassAST model) throws MiniBrassParseException {
+		// TODO Auto-generated method stub
+		if(currSy == MiniBrassSymbol.LeftBracketSy) { // [ 1, 2, 4] [| 12 | 12 | |]
+			String remainder = lexer.readVerbatimUntil(']');
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
+			return '['+remainder+']';
+		} else if (currSy == MiniBrassSymbol.LeftCurlSy) {
+			String remainder = lexer.readVerbatimUntil('}');
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
+			return '{'+remainder+'}';
+		} else if (currSy == MiniBrassSymbol.IntLitSy) {
+			String val = Integer.toString(lexer.lastInt);
+			getNextSy();
+			return val;
+		} else if (currSy == MiniBrassSymbol.FloatLitSy) {
+			String val = Double.toString(lexer.lastFloat);
+			getNextSy();
+			return val;
+		} else if (currSy == MiniBrassSymbol.IdentSy) {
+			String id = lexer.getLastIdent();
+			getNextSy();
+			return id;
+		}
+		throw new MiniBrassParseException("Unexpected symbol: "+currSy + " in MiniZinc literal.");
 	}
 
 	/**
@@ -324,6 +367,11 @@ public class MiniBrassParser {
 		System.out.println("In type item");
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		newType.setName(lexer.getLastIdent());
+		
+		if(model.getPvsTypes().containsKey(newType.getName())) {
+			throw new MiniBrassParseException("Type "+newType.getName() + " already defined!");
+		}
+		
 		System.out.println("Working on type ... "+newType.getName());
 		getNextSy();
 		
@@ -332,14 +380,14 @@ public class MiniBrassParser {
 				
 		expectSymbolAndNext(MiniBrassSymbol.LeftAngleSy);		
 		
-		MiniZincVarType specType = MiniZincVarType();
+		MiniZincVarType specType = MiniZincVarType(newType);
 		MiniZincVarType elementType = specType;
 		
 		System.out.println("Specification type: "+elementType);
 		if(currSy == MiniBrassSymbol.CommaSy) {
 			// Read the element type as well
 			getNextSy();
-			elementType = MiniZincVarType();
+			elementType = MiniZincVarType(newType);
 		}
 		
 		newType.setElementType(elementType);
@@ -353,8 +401,9 @@ public class MiniBrassParser {
 			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 			
 			while(currSy != MiniBrassSymbol.RightCurlSy) {
-				PVSParameter par = parameterDecl();
-				newType.getPvsParameters().add(par);
+				PVSParameter par = parameterDecl(newType);
+				
+				newType.addPvsParameter(par);
 			}
 			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
 			System.out.println("Standing here, which symbol? " + currSy + " ; " + lexer.getLastIdent());
@@ -384,12 +433,14 @@ public class MiniBrassParser {
 	/**
 	 * Things like
 	 *    int: k; 
+	 *    1..k: top;
    	 *    array[1..nScs] of 1..k: weights;
    	 *    array[int, 1..2] of 1..nScs: crEdges;
+	 * @param newType 
 	 * @return 
 	 * @throws MiniBrassParseException 
 	 */
-	private PVSParameter parameterDecl() throws MiniBrassParseException {
+	private PVSParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
 		PVSParameter returnParameter;
 		if(currSy == MiniBrassSymbol.ArraySy) {
 			getNextSy();
@@ -397,32 +448,24 @@ public class MiniBrassParser {
 			
 			ArrayType arrayType = new ArrayType();
 					
-			MiniZincVarType indexType = MiniZincVarType();
-			IntType asIntType = null;
-			if (!(indexType instanceof IntType)) {
-				throw new MiniBrassParseException("Index type has to be an integer range! " + indexType);
-			}  else {
-				asIntType = (IntType) indexType;
-			}
+			MiniZincVarType indexType = MiniZincVarType(scopeType);
 			
-			arrayType.getIndexSets().add(asIntType);
+			List<MiniZincVarType> pendingIndexTypes = new LinkedList<>();
+			pendingIndexTypes.add(indexType);
 			
 			System.out.println("Main index: "+indexType);
 			while(currSy != MiniBrassSymbol.RightBracketSy) { 
 				expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 				
-				indexType = MiniZincVarType();
+				indexType = MiniZincVarType(scopeType);
 				System.out.println("  Next index: "+indexType);
-				if (!(indexType instanceof IntType)) {
-					throw new MiniBrassParseException("Index type has to be an integer range! " + indexType);
-				} else {
-					asIntType = (IntType) indexType;
-				}
-				arrayType.getIndexSets().add(asIntType);				
+				pendingIndexTypes.add(indexType);				
 			}
+			
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.OfSy);
-			MiniZincVarType varType = MiniZincVarType();
+			MiniZincVarType varType = MiniZincVarType(scopeType);
+			
 			arrayType.setType(varType);
 			
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
@@ -430,10 +473,18 @@ public class MiniBrassParser {
 			String name = lexer.getLastIdent();
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+
+			semChecker.scheduleArrayTypeCheck(arrayType, pendingIndexTypes, name);
+			
+			// dependency checks 
+			semChecker.scheduleTypeDependencyCheck(scopeType, name, varType);
+			for(MiniZincVarType pendingVarType : pendingIndexTypes) {
+				semChecker.scheduleTypeDependencyCheck(scopeType, name, pendingVarType);
+			}
 			
 			returnParameter = new PVSParameter(name, arrayType);
 		} else {
-			MiniZincVarType varType = MiniZincVarType(); // could be int
+			MiniZincVarType varType = MiniZincVarType(scopeType); // could be int
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
 			expectSymbol(MiniBrassSymbol.IdentSy);
 			String ident = lexer.getLastIdent();
@@ -442,6 +493,7 @@ public class MiniBrassParser {
 		
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			semChecker.scheduleTypeDependencyCheck(scopeType, ident, varType);
 			returnParameter = new PVSParameter(ident, varType);
 		}
 		return returnParameter;
@@ -506,19 +558,19 @@ public class MiniBrassParser {
 	 * set of PRIMTYPE | PRIMTYPE
 	 * @throws MiniBrassParseException 
 	 */
-	private MiniZincVarType MiniZincVarType() throws MiniBrassParseException {
+	private MiniZincVarType MiniZincVarType(PVSType scopeType) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.SetSy) {
 			getNextSy();
 			expectSymbol(MiniBrassSymbol.OfSy);
 			getNextSy();
-			PrimitiveType pt = primType();
+			PrimitiveType pt = primType(scopeType);
 			return new SetType(pt);
 		} else {
-			return primType();
+			return primType(scopeType);
 		}
 	}
 
-	private PrimitiveType primType() throws MiniBrassParseException {
+	private PrimitiveType primType(PVSType scopeType) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.FloatSy || currSy == MiniBrassSymbol.BoolSy || currSy == MiniBrassSymbol.IntSy) {
 			switch(currSy) {
 			case FloatSy:
@@ -534,7 +586,7 @@ public class MiniBrassParser {
 				throw new MiniBrassParseException("This should not happen");
 			}
 		} else {
-			return intervalType();
+			return intervalType(scopeType);
 		}
 		
 	}
@@ -544,37 +596,29 @@ public class MiniBrassParser {
 	 * @return
 	 * @throws MiniBrassParseException
 	 */
-	private PrimitiveType intervalType() throws MiniBrassParseException {
-		Object lower = getNumericExpr();
+	private PrimitiveType intervalType(PVSType scopeType) throws MiniBrassParseException {
+		NumericValue lower = getNumericExpr(scopeType);
 		expectSymbolAndNext(MiniBrassSymbol.DotsSy);
-		Object upper = getNumericExpr();
+		NumericValue upper = getNumericExpr(scopeType);
 		
-		if(lower instanceof Double || upper instanceof Double) {
-			// treat as floatType
-			NamedRef<Double> lRef = new NamedRef<Double>(lower);
-			NamedRef<Double> uRef = new NamedRef<Double>(upper);
-			return new FloatType(lRef, uRef);
-		} else {
-			// treat as int
-			NamedRef<Integer> lRef = new NamedRef<Integer>(lower);
-			NamedRef<Integer> uRef = new NamedRef<Integer>(upper);
-			return new IntType(lRef, uRef);
-		}
+		return new IntervalType(lower, upper);
 	}
 
-	private Object getNumericExpr() throws MiniBrassParseException {
+	private NumericValue getNumericExpr(PVSType scopeType) throws MiniBrassParseException {
 		if (currSy == MiniBrassSymbol.IntLitSy) {
 			Integer value = lexer.getLastInt();
 			getNextSy();
-			return value;
+			return new NumericValue(value);
 		} else if (currSy == MiniBrassSymbol.FloatLitSy) {
 			Double value = lexer.getLastFloat();
 			getNextSy();
-			return value;
+			return new NumericValue(value);
 		} else if (currSy == MiniBrassSymbol.IdentSy) {
 			String value = lexer.getLastIdent();
 			getNextSy();
-			return value;
+			NumericValue ref = new NumericValue(value);
+			semChecker.scheduleParameterReference(ref.getReferencedParameter(), scopeType);
+			return ref;
 		}
 		throw new MiniBrassParseException("Expected IntLitSy or FloatLitSy or Ident");
 	}

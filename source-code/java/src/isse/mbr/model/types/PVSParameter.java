@@ -28,4 +28,9 @@ public class PVSParameter {
 	public void setType(MiniZincParType type) {
 		this.type = type;
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 }
