@@ -1,11 +1,11 @@
 package isse.mbr.model.types;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import isse.mbr.parsing.MiniBrassParseException;
 
 /**
  * Holds all information that is necessary to instantiate 
@@ -22,16 +22,21 @@ public class PVSType {
 	private String combination;
 	private String order;
 	private String top;
-	private Collection<PVSParameter> pvsParameters;
+	private List<PVSParameter> pvsParameters;
+	private Map<String, PVSParameter> paramMap;
 	private String implementationFile; 
 	private boolean isBounded; 
-	private Set<String> hyperparameters;
+	
+	public final static String N_SCS_LIT = "nScs";
 
 	// empty constructor to be filled by parser
 	public PVSType() {
 		this.pvsParameters = new LinkedList<PVSParameter>();
-		this.hyperparameters = new HashSet<>(); // only those that exist
-		this.hyperparameters.add("nScs");
+		this.paramMap = new HashMap<>();
+
+		PVSParameter nScsParam = new PVSParameter(N_SCS_LIT, new IntType());
+		this.pvsParameters.add(nScsParam);		
+		paramMap.put(N_SCS_LIT, nScsParam);
 	}
 	
 	@Override
@@ -87,11 +92,11 @@ public class PVSType {
 		this.specType = specType;
 	}
 
-	public Collection<PVSParameter> getPvsParameters() {
+	public List<PVSParameter> getPvsParameters() {
 		return pvsParameters;
 	}
 
-	public void setPvsParameters(Collection<PVSParameter> pvsParameters) {
+	public void setPvsParameters(List<PVSParameter> pvsParameters) {
 		this.pvsParameters = pvsParameters;
 	}
 
@@ -111,5 +116,20 @@ public class PVSType {
 		this.isBounded = isBounded;
 	}
 
+	public Map<String, PVSParameter> getParamMap() {
+		return paramMap;
+	}
 
+	public void setParamMap(Map<String, PVSParameter> paramMap) {
+		this.paramMap = paramMap;
+	}
+
+	public void addPvsParameter(PVSParameter par) throws MiniBrassParseException {
+		if(paramMap.containsKey(par.getName()) )
+			throw new MiniBrassParseException("Type "+name + " already contains a parameter: "+par.getName());
+		else {
+			pvsParameters.add(par);
+			paramMap.put(par.getName(), par);
+		}
+	}
 }

@@ -1,0 +1,32 @@
+include "defs.mbr" ;
+ 
+% defines weighted CSP as type
+type WeightedCsp = PVSType<bool, int> = 
+  params {
+    1..a: b; 
+    1..c: a; % change to 1..b for cyclic definition
+    int: c;
+    array[1..k] of 1..k: d;
+    
+    %1..a: k; 
+  } in  
+  instantiates with "weighteds_type.mzn" {
+    times -> sum;
+    is_worse -> is_worse_weighted;
+    top -> 0;
+    % bot -> k+1;
+  };
+
+PVS: weightedInstance = new WeightedCsp("w1", 3, 8, [2,1,2]);
+
+solve weightedInstance;
+/*
+This should look something like that:
+
+predicate is_worse_cr(var set of 1..nScs: violated1, var set of 1..nScs: violated2, crEdges, useSPD) =
+if useSPD then
+  is_worse_spd(violated1, violated2, crEdges)
+else
+  is_worse_tpd(violated1, violated2, crEdges
+endif;
+*/

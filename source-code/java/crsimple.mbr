@@ -1,0 +1,17 @@
+include "defs.mbr" ;
+
+type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges;
+    bool: useSPD;
+  } in 
+  instantiates with "mbr_types/cr_type.mzn" {
+    times -> link_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+    % bot -> 1..nScs;
+  };
+    
+PVS: cr = new ConstraintRelationships("cr1", 2, [| 1, 2 |], true);
+
+solve cr;

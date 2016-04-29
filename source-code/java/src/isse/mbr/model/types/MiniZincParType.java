@@ -1,5 +1,7 @@
 package isse.mbr.model.types;
 
+import isse.mbr.model.parsetree.PVSInstance;
+
 /**
  * MiniZinc types than can be used as parameters
  * 
@@ -9,5 +11,5 @@ package isse.mbr.model.types;
  *
  */
 public interface MiniZincParType {
-
+	String toMzn(PVSInstance instance);
 }
