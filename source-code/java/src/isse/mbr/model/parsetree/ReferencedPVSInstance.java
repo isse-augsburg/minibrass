@@ -1,8 +1,10 @@
 package isse.mbr.model.parsetree;
 
+import isse.mbr.model.types.NamedRef;
+
 public class ReferencedPVSInstance extends AbstractPVSInstance {
 	private String reference;
-	private AbstractPVSInstance referencedInstance;
+	private NamedRef<AbstractPVSInstance> referencedInstance;
 	
 	public String getReference() {
 		return reference;
@@ -10,10 +12,10 @@ public class ReferencedPVSInstance extends AbstractPVSInstance {
 	public void setReference(String reference) {
 		this.reference = reference;
 	}
-	public AbstractPVSInstance getReferencedInstance() {
+	public NamedRef<AbstractPVSInstance> getReferencedInstance() {
 		return referencedInstance;
 	}
-	public void setReferencedInstance(AbstractPVSInstance referencedInstance) {
+	public void setReferencedInstance(NamedRef<AbstractPVSInstance> referencedInstance) {
 		this.referencedInstance = referencedInstance;
 	}
 	

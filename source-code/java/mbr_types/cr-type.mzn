@@ -28,5 +28,5 @@ predicate is_worse_cr(var set of 1..nScs: violated1, var set of 1..nScs: violate
 if useSPD then
   spd_worse(violated1, violated2, crEdges)
 else
-  tpd_worse(violated1, violated2, crEdges
+  tpd_worse(violated1, violated2, crEdges)
 endif;

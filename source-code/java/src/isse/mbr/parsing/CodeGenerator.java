@@ -8,6 +8,8 @@ import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
 import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.ProductType;
+import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.NumericValue;
@@ -23,6 +25,8 @@ import isse.mbr.model.types.PVSType;
  */
 public class CodeGenerator {
 	
+	private static final String OVERALL_KEY = "overall";
+
 	public void generateCode(MiniBrassAST model) {
 		// for now, just fill a string builder and print the console 
 		System.out.println("\n\nSTARTING CODE GENERATION\n\n");
@@ -54,7 +58,7 @@ public class CodeGenerator {
 
 	private void addPvsInstances(StringBuilder sb, MiniBrassAST model) {
 		// start with solve item then continue only its referenced instances (that can play an active role)
-		AbstractPVSInstance topLevelInstance = model.getSolveInstance().instance;
+		AbstractPVSInstance topLevelInstance = deref(model.getSolveInstance());
 		
 		sb.append("\n% ---------------------------------------------------");
 		sb.append("\n% Overall exported predicate : \n");
@@ -63,14 +67,34 @@ public class CodeGenerator {
 		String pvsPred = encodeString("getBetter", topLevelInstance);
 		sb.append(String.format("predicate getBetter() = %s();\n",pvsPred));
 
-		addPvs(topLevelInstance, sb, model);
+		addPvs(deref(topLevelInstance), sb, model);
 	}
 
 	private void addPvs(AbstractPVSInstance pvsInstance, StringBuilder sb, MiniBrassAST model) {
 		if(pvsInstance instanceof CompositePVSInstance) {
 			CompositePVSInstance comp = (CompositePVSInstance) pvsInstance;
-			addPvs(comp.getLeftHandSide(), sb, model);
-			addPvs(comp.getRightHandSide(), sb, model);
+			AbstractPVSInstance left = deref(comp.getLeftHandSide());
+			AbstractPVSInstance right = deref(comp.getRightHandSide());
+			
+			addPvs(left, sb, model);
+			addPvs(right, sb, model);
+			
+			if(comp.getProductType() == ProductType.DIRECT) {
+				String pvsPred = encodeString("getBetter",  comp);
+				String leftBetter = encodeString("getBetter",  left);
+				String rightBetter = encodeString("getBetter",  right);
+				sb.append(String.format("predicate %s() = (%s()) /\\ (%s());\n", pvsPred, leftBetter, rightBetter));
+					
+			} else { // lexicographic
+				String pvsPred = encodeString("getBetter",  comp);
+				String leftBetter = encodeString("getBetter",  left);
+				String rightBetter = encodeString("getBetter",  right);
+				
+				// get left objective variable 
+				String leftOverall = getOverallValuation(left);
+				
+				sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
+			}
 		} else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
 			String name = inst.getName();
@@ -102,7 +126,7 @@ public class CodeGenerator {
 			
 			sb.append("\n% Decision variables: \n");
 			
-			String overallIdent = encodeString("overall", inst);
+			String overallIdent = getOverallValuation(inst); 
 			sb.append(String.format("var %s: %s;\n",encode(pvsType.getElementType(), inst), overallIdent));
 			PVSParameter nScs = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
 			IntervalType sCSet = new IntervalType(new NumericValue(1), new NumericValue(nScs));
@@ -122,6 +146,18 @@ public class CodeGenerator {
 			sb.append(String.format("predicate %s() = %s(sol(%s), %s);\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent));
 		}
 		
+	}
+
+	private String getOverallValuation(AbstractPVSInstance inst) {
+		return encodeString(OVERALL_KEY, inst);
+	}
+
+	private AbstractPVSInstance deref(AbstractPVSInstance pvsInstance) {
+		if (pvsInstance instanceof ReferencedPVSInstance) {
+			ReferencedPVSInstance refPvs = (ReferencedPVSInstance) pvsInstance;
+			return deref(refPvs.getReferencedInstance().instance);
+		} else 
+			return pvsInstance;
 	}
 
 	private static String encodeString(String string, AbstractPVSInstance inst) {
