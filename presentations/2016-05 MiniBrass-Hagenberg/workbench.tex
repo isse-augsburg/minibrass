@@ -1,0 +1,162 @@
+%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+\usepackage{isse}
+
+
+\usepackage{apalike}
+\usepackage[utf8]{inputenc}
+\usepackage{pdfpages}
+%\usepackage{ngerman}
+\usepackage{stmaryrd,amsmath,amssymb}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage[makeroom]{cancel}
+\usepackage{mdframed}
+\usepackage{xskak}
+\usepackage{marvosym}
+\setchessboard{
+showmover=false}
+\usepackage[noend]{algpseudocode}   % package for algorithms
+\usepackage{algorithm}
+\usepackage{tikz}
+
+\usepackage[absolute,overlay]{textpos}
+
+\usetikzlibrary{trees,calc,shapes,arrows,matrix,shadows,decorations.markings}
+\usetikzlibrary{decorations.pathreplacing}
+
+\mdfdefinestyle{theoremstyle}{
+linecolor=red,linewidth=2pt,
+frametitlerule=true,
+frametitlebackgroundcolor=gray!20,
+innertopmargin=\topskip,
+}
+\definecolor{LRed}{rgb}{1,.8,.8}
+\definecolor{MRed}{rgb}{1,.6,.6}
+\definecolor{HRed}{rgb}{1,.2,.2}
+
+\usepackage{listings}
+\lstdefinelanguage{mzn}
+{
+	morekeywords={var,int,solve,not,search,satisfy,endif,maximize,minimize,float,constraint,sum,forall,exists,array,of,include,predicate,then,commit,post,set,function,if,else,repeat,next,ann,break},
+	sensitive=false,
+	morecomment=[l]{\%},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]",
+}
+
+\definecolor{lightlightgray}{gray}{0.95}
+\definecolor{forestgreen}{HTML}{009B55}
+\definecolor{thermicred}{rgb}{0.82, 0.1, 0.26}
+\lstset
+{
+	basicstyle=\ttfamily\small,
+	commentstyle=\ttfamily\color{thermicred},
+	stringstyle=\ttfamily\color{isseorange},
+	keywordstyle=\ttfamily\color{blue},
+	tabsize=2,
+	showstringspaces=false,
+	flexiblecolumns=true,
+	captionpos=b,	
+	backgroundcolor=\color{lightlightgray},
+	frame=single,
+	 xleftmargin=\parindent,
+}
+
+\lstset{language=mzn}
+\interfootnotelinepenalty=10000
+
+% ====== custom commands
+
+\newcommand{\prosumer}[1]{\ensuremath{\mathtt{#1}}}
+% Soft Constraint Example
+\newcommand{\constraintName}[1]{\ensuremath{\mathtt{#1}}}
+% Biogas Constraints
+\newcommand{\biogas}{biogas}
+\newcommand{\biogasShort}{bio}
+\newcommand{\gasFull}{\ensuremath{\constraintName{gasFull}_\mathtt{\biogasShort}}}
+\newcommand{\ecoSweet}{\ensuremath{\constraintName{ecoSweet}_\mathtt{\biogasShort}}}
+\newcommand{\onOff}{\ensuremath{\constraintName{onOff}_\mathtt{\biogasShort}}}
+% Thermal Plant Constraints
+\newcommand{\thermal}{thermal}
+\newcommand{\thermalShort}{therm}
+\newcommand{\ecoOpt}{\ensuremath{\constraintName{ecoOpt}_\mathtt{\thermalShort}}}
+\newcommand{\inertia}{\ensuremath{\constraintName{inertia}_\mathtt{\thermalShort}}}
+\newcommand{\ecoGood}{\ensuremath{\constraintName{ecoGood}_\mathtt{\thermalShort}}}
+\newcommand{\hLevelThermal}[1]{$H_#1^\mathtt{\thermalShort}$}
+% Electric Vehicle
+\newcommand{\ev}{EV}
+\newcommand{\limitBatteryUsage}{\ensuremath{\constraintName{limitBU}_\mathtt{\ev}}}
+\newcommand{\prefBatteryLevel}{\ensuremath{\constraintName{prefBL}_\mathtt{\ev}}}
+\newcommand{\earlyBird}{\ensuremath{\constraintName{earlyBird}_\mathtt{\ev}}}
+% Organization
+\newcommand{\org}{org}
+\newcommand{\minMaxViolation}{\ensuremath{\constraintName{violation}_\mathtt{\org}}}
+\newcommand{\hLevelOrg}[1]{$H_#1^\mathtt{\org}$}
+
+\newcommand{\Variable}{X}
+\newcommand{\LocalVariable}{\widehat{\Variable}}
+\newcommand{\Domain}{D}
+\newcommand{\Constraint}{C}
+\newcommand{\ConstraintRelationship}{\mathcal{R}}
+
+\newcommand{\valuation}{v}
+\newcommand{\constraint}[1]{\mathrm{#1}}
+
+\newcommand{\plantconstraint}[3]{  
+\ifx#1b \constraint{best}[#3]
+\else \ifx#1g \constraint{good}[#3]
+\else \ifx#1a \constraint{acc}[#3]
+\else \ifx#1d \constraint{diff}
+\else \ifx#1l \constraint{low}[#3]
+\else \ifx#1h \constraint{high}[#3]
+\else \ifx#1o \constraint{org}[#3]
+   \else
+   \constraint{#1}_{#2}^{#3} 
+   
+   
+\fi \fi \fi \fi \fi \fi \fi}
+\input{notespreamble}
+
+\renewcommand{\submseteq}{%
+\mathrel{\mathchoice%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{0.0pt}{\fontsize{7.5pt}{7.5pt}\selectfont\rotatebox{90}{$-$}\hspace{1.6pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{0.0pt}{\fontsize{7.5pt}{7.5pt}\selectfont\rotatebox{90}{$-$}\hspace{1.6pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{-0.3pt}{\fontsize{7pt}{7pt}\selectfont\rotatebox{90}{$-$}\hspace{1pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{-0.3pt}{\fontsize{7pt}{7pt}\selectfont\rotatebox{90}{$-$}\hspace{1pt}}}}}%
+}}
+
+
+\tikzset{
+   main node/.style={circle,fill=black!15,draw,font=\sffamily},
+   constraint node/.style={main node, circle, inner sep=2pt,font=\sffamily\small},   
+   treestyle/.style={rectangle,fill=black!15,draw,font=\sffamily}
+}
+
+
+\mdtheorem[style=theoremstyle]{definition}{Definition}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\tupleOf}[1]{\langle #1 \rangle}
+\newcommand{\cemph}[1]{\alert{#1}}
+\input{common}
+
+\title{Constraint-based Scheduling \& Packing}
+\author{including MiniBrass}
+
+\date{\today}
+
+\begin{document}
+
+
+
+
+\begin{frame}[allowframebreaks]
+        \frametitle{References}
+        \bibliographystyle{apalike}
+        \bibliography{../common.bib}
+\end{frame}
+
+
+\end{document}
+

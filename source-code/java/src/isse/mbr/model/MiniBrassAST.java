@@ -22,7 +22,7 @@ public class MiniBrassAST {
 	private Map<String, AbstractPVSInstance> pvsReferences; // here by reference
 	
 
-	private NamedRef<AbstractPVSInstance> solveInstance;
+	private AbstractPVSInstance solveInstance;
 	
 	public MiniBrassAST() {
 		pvsTypes = new HashMap<String, PVSType>();
@@ -35,11 +35,11 @@ public class MiniBrassAST {
 		pvsTypes.put(reference, type);
 	}
 
-	public NamedRef<AbstractPVSInstance> getSolveInstance() {
+	public AbstractPVSInstance getSolveInstance() {
 		return solveInstance;
 	}
 
-	public void setSolveInstance(NamedRef<AbstractPVSInstance> solveInstance) {
+	public void setSolveInstance(AbstractPVSInstance solveInstance) {
 		this.solveInstance = solveInstance;
 	}
 

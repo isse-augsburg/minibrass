@@ -44,6 +44,8 @@ public class MiniBrassParser {
 	private Set<File> worklist;
 	private MiniBrassAST model; 
 	private SemanticChecker semChecker;
+	private int lexCounter;
+	private int dirCounter;
 	
 	public MiniBrassAST parse(File file) throws FileNotFoundException, MiniBrassParseException {
 		model = new MiniBrassAST();
@@ -53,6 +55,7 @@ public class MiniBrassParser {
 		worklist.add(file);
 		visited = new HashSet<>();
 		
+		lexCounter = dirCounter = 0;
 		try{
 			while(!worklist.isEmpty()) {
 				File next = worklist.iterator().next();
@@ -77,7 +80,7 @@ public class MiniBrassParser {
 			semChecker.executeArrayJobs();
 			semChecker.checkPvsInstances(model);
 			
-			System.out.println("I should optimize: "+model.getSolveInstance().instance);
+			System.out.println("I should optimize: "+model.getSolveInstance());
 			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
 				System.out.println("Got instance: " + entry.getValue().toString());
 			}
@@ -121,11 +124,9 @@ public class MiniBrassParser {
 				throw new MiniBrassParseException("More than one solve item specified !");
 			}
 			getNextSy();
-			String solveInstance = solveItem();
-			NamedRef<AbstractPVSInstance> namedRef = new NamedRef<AbstractPVSInstance>(solveInstance);
-			semChecker.scheduleUpdate(namedRef, model.getPvsReferences());
+			AbstractPVSInstance solveInstance = solveItem();
 			
-			model.setSolveInstance(namedRef ); 
+			model.setSolveInstance(solveInstance); 
 		} else if(currSy == MiniBrassSymbol.PvsSy) { 
 			getNextSy();
 			pvsInstItem(model);
@@ -165,6 +166,11 @@ public class MiniBrassParser {
 		
 		AbstractPVSInstance pvsInstance = PVSInst(model);
 		
+		// in case we have a composite pvs, we can use the reference identifier as name, otherwise just use anonymous name 
+		if(pvsInstance instanceof CompositePVSInstance) {
+			pvsInstance.setName(newPvsRef);
+		}
+		
 		System.out.println("Got instance: ");
 		System.out.println(pvsInstance);
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
@@ -195,7 +201,8 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.LEXICOGRAPHIC);
 			composite.setRightHandSide(next);
-			
+			composite.setName("MBR_LEX_"+(++lexCounter));
+						
 			first = composite;
 		}
 		return first;
@@ -217,6 +224,7 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.DIRECT);
 			composite.setRightHandSide(next);
+			composite.setName("MBR_DIR_"+(++lexCounter));
 			
 			first = composite;
 		}
@@ -269,7 +277,8 @@ public class MiniBrassParser {
 			ReferencedPVSInstance referencedPVSInstance = new ReferencedPVSInstance();
 			referencedPVSInstance.setReference(reference);
 			referencedPVSInstance.setName("RefTo-"+reference);
-			
+			referencedPVSInstance.setReferencedInstance(new NamedRef<AbstractPVSInstance>(reference));
+			semChecker.scheduleUpdate(referencedPVSInstance.getReferencedInstance(), model.getPvsReferences());
 			getNextSy();
 			return referencedPVSInstance;
 		} else if(currSy == MiniBrassSymbol.LeftParenSy) {
@@ -290,7 +299,6 @@ public class MiniBrassParser {
 	 * @throws MiniBrassParseException 
 	 */
 	private String MznLiteral(MiniBrassAST model) throws MiniBrassParseException {
-		// TODO Auto-generated method stub
 		if(currSy == MiniBrassSymbol.LeftBracketSy) { // [ 1, 2, 4] [| 12 | 12 | |]
 			String remainder = lexer.readVerbatimUntil(']');
 			getNextSy();
@@ -321,12 +329,11 @@ public class MiniBrassParser {
 	 * solve ident ;
 	 * @throws MiniBrassParseException 
 	 */
-	private String solveItem() throws MiniBrassParseException {
-		expectSymbol(MiniBrassSymbol.IdentSy);
-		String identifier = lexer.getLastIdent();
-		getNextSy();
+	private AbstractPVSInstance solveItem() throws MiniBrassParseException {
+		
+		AbstractPVSInstance instToSolve = PVSInst(model);
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
-		return identifier;
+		return instToSolve;
 	}
 
 	/**
