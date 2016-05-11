@@ -1,0 +1,77 @@
+\begin{frame}{Suche am Beispiel Map Coloring}
+\begin{center}
+\def\svgwidth{.55\columnwidth}
+\input{img/australia-large-exp.pdf_tex}
+\end{center}
+
+$X = \{ \mathsf{WA}, \mathsf{NT}, \ldots \mathsf{V} \}$, $D_x = \{\mathsf{r}, \mathsf{g}, \mathsf{b} \}$, $C = \{
+\mathsf{WA} \neq \mathsf{NT}, \mathsf{NT} \neq \mathsf{SA}, \ldots  \}$
+
+
+\end{frame}
+
+\input{img/sys-search}
+
+\begin{frame}{Tricks (Heuristiken)}
+Wähle Länder (Variablen) und Farben (Werte) in \alert{geschickter} Reihenfolge aus
+
+
+\begin{itemize}
+\item \emph{Minimum-Remaining-Values} (MRV): Wähle das Land mit der kleinsten verbleibenden Domäne 
+\item \emph{Most-constrained} (MC): Wähle das Land mit den meisten angrenzenden Ländern
+\item \emph{Minimum reduction} (MR): Wähle eine Farbe, die andere Länder minimal einschränkt
+\end{itemize}
+
+Dadurch frühe Sackgassenerkennung und sinnvolle Wahl, um Suchbaum zu begrenzen.
+\end{frame}
+
+\begin{frame}{Variablenordnung}
+Beispiel für MRV+MC (MC bricht Unentschieden nach MRV):
+
+\input{img/variablen}
+\end{frame}
+
+\begin{frame}{Wertordnung}
+Wähle die Belegung, die
+die wenigsten Domäneneinschränkungen zur Folge haben.
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=2.6cm,inner sep=0pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node (1) at (0, 0)                   {
+\def\svgwidth{.15\columnwidth}
+\input{img/blue-red.pdf_tex}
+};
+
+\node[below left of=1] (2) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-red-green.pdf_tex}
+
+{\huge
+\alert{\Lightning}
+}
+};  
+
+\node[below right of=1] (3) {
+\def\svgwidth{.15\columnwidth}
+\input{img/wa-red-blue.pdf_tex}
+};  
+
+
+\node[below left of=2] (l2) {
+Es bleibt \alert{kein} Wert für SA.
+};
+
+\node[below right of=3] (l3) {
+Es bleibt ein Wert für SA.
+};
+
+
+\path[every node/.style={font=\sffamily\tiny}]
+  (1) edge (2)
+  (1) edge (3)
+ ;
+\end{tikzpicture}
+\end{center}
+\end{frame}

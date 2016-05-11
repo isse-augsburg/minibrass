@@ -1,0 +1,452 @@
+\begin{frame}
+\frametitle{Soft Constraint Solving}
+
+\vspace*{1ex}
+
+In der Praxis: \cemph{überbestimmte} Probleme
+
+\vspace*{2ex}
+
+$x, y, z \in \{1,2,3\}$ mit 
+\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
+\begin{align*}
+  \mathrm{c}_1 &: x + 1 = y
+\\[-.4ex]
+  \mathrm{c}_2 &: z = y + 2
+\\[-.4ex]
+  \mathrm{c}_3 &: x + y \leq 3
+\end{align*}
+\egroup
+
+\begin{itemize}
+  \item Nicht alle Constraints können gleichzeitig erfüllt werden
+\begin{itemize} \pause
+  \item e.\,g., $\mathrm{c}_2$ erzwingt $z = 3$ und $y = 1$, im Konflikt mit $\mathrm{c}_1$
+\end{itemize}
+
+  \item Wir \cemph{wählen} zwischen Zuweisungen, die $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ oder $\{ \mathrm{c}_2, \mathrm{c}_3 \}$ erfüllen.
+\end{itemize}
+
+\vspace*{2ex}
+
+Welche Zuweisungen $v \in [X \to D]$ sollen \alert{bevorzugt} werden?
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Constraint Relationships}
+
+Ansatz~\cite{Schiendorfer13}
+\begin{itemize}
+  \item Definiere Relation $R$ über Constraints $C$ um anzugeben, welche Constraints wichtiger sind als andere, e.\,g.
+\begin{itemize}
+  \item $\mathrm{c}_1$ wichtiger als $\mathrm{c}_2$
+
+  \item $\mathrm{c}_1$ wichtiger als $\mathrm{c}_3$
+\end{itemize}
+\end{itemize}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-1.5cm,\textheight-2.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
+
+%\vspace*{2ex}
+%\begin{small}
+%A.~Schiendorfer, J.-Ph.~Steghöfer, A.~Knapp, F.~Nafz, W.~Reif (2013)
+%\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{MiniBrass}
+
+\begin{center}
+
+\includegraphics[width=.5\textwidth]{img/minibrass.png}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/constraint-relationships/}
+
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Single-Predecessor-Dominance (SPD)}
+
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
+%
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \SPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c \} \SPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $c \rightarrow_R c'$}
+%\end{gather*}
+%\egroup
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=1cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\begin{scope}
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=green] (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=red]   (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\begin{scope}[xshift=6cm]
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=red]   (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=green] (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};  
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\node (R) at (3.05, -1.4) {$\SPDrel{R}$};
+\end{tikzpicture}
+\end{center}
+%
+%\cemph{Ordnungs}relation über Zuweisungen 
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Transitive-Predecessors-Dominance (TPD)}
+
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
+%
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \TPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c_1, \ldots, c_k \} \TPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $\forall c \in \{ c_1, \ldots, c_k \} \,.\, c \rightarrow_{R}^{+} c'$}
+%\end{gather*}
+%\egroup
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=1cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\begin{scope}
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=green] (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=red]   (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=red] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\begin{scope}[xshift=6cm]
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=red]   (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=green] (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};  
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\node (R) at (3.05, -1.4) {$\TPDrel{R}$};
+\end{tikzpicture}
+\end{center}
+
+%\cemph{Ordnungs}relation über Zuweisungen
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \TPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\TPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
+
+\end{frame}
+
+% block styles
+\tikzstyle{sensor}=[draw, fill=blue!20, text width=5em, 
+    text centered, minimum height=2.5em,drop shadow]    
+    
+\tikzstyle{alg} = [sensor, text width=5em, fill=isseorange!20, 
+    minimum height=13em, rounded corners, drop shadow]
+\tikzstyle{constraint}=[draw, circle, fill=issegrey!20, text width=1.2em, 
+    text centered, minimum height=1.5em,drop shadow]
+\tikzstyle{domainstore} = [alg, text width=5em, fill=isseorange!40, 
+    minimum height=4em, rounded corners]
+\tikzstyle{goodc} = [ForestGreen, font=\bfseries]
+\tikzstyle{badc} = [Red, font=\bfseries]
+\tikzstyle{okayc} = [LimeGreen, font=\bfseries]
+        
+\tikzset{
+vecArrow/.style={
+  thick
+  }
+}
+
+\tikzset{
+    mn/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30,
+                   very thick, inner sep=\myinnersep*1em, minimum size=3em, text centered, outer sep=0, align=center},
+    innernode/.style={mn, text width=3cm,  minimum height=1.5cm,
+                      top color=issegrey!20, bottom color=issegrey!60},
+    emphnode/.style={innernode, top color=isseorange!30, bottom color=isseorange!70}
+}
+
+% Define distances for bordering
+\def\blockdist{2.3}
+\def\edgedist{2.5}
+
+  \tikzset{
+    invisible/.style={opacity=0},
+    visible on/.style={alt={#1{}{invisible}}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+  }
+  
+\begin{frame}{Traditional Constraint Solving}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search \phantom{$x = 5$} };
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$x\gets5$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [above,goodc,visible on=<4->] {$\top$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,goodc] {$\top$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<0>{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own 
+\begin{itemize}
+\item Eine Menge von Erfüllungsgraden, $\mathbb{B} = \{ \bot, \top \}$
+\item Eine Kombinationsoperation $\wedge$
+\item Ein neutrales Element $\top$
+\item Eine partielle Ordnung $(\mathbb{B}, \leq_\mathbb{B})$ mit $\top <_\mathbb{B} \bot$ 
+\end{itemize}
+\end{column}
+     \begin{column}[c]{4.5cm} 
+     \end{column} 
+\end{columns}
+}
+
+\end{frame}
+
+\begin{frame}{Klassisches Constraint-Solving}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search $x = 5$};
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,badc,visible on=<4->] {$\bot$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,badc] {$\bot$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<5->{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own 
+\begin{itemize}
+\item Eine Menge von Erfüllungsgraden, $\mathbb{B} = \{ \bot, \top \}$
+\item Eine Kombinationsoperation $\wedge$
+\item Ein neutrales Element $\top$
+\item Eine partielle Ordnung $(\mathbb{B}, \leq_\mathbb{B})$ mit $\top <_\mathbb{B} \bot$ 
+\end{itemize}
+   \end{column} 
+     \begin{column}[c]{4.5cm} 
+     \end{column} 
+\end{columns}
+}
+\end{frame}
+
+\begin{frame}{Soft-Constraint-Solving}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search $x = 5$};
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,okayc,visible on=<4->] {$4$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,okayc] {$4$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$0$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$0$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$0$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<5->{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own environment
+    \begin{itemize}
+\item Eine Menge von Erfüllungsgraden, e.g., $\{ 0, \ldots, k \}$
+\item Eine Kombinationsoperation $+$
+\item Ein neutrales Element $0$
+\item Eine partielle Ordnung $(\mathbb{N}, \geq)$ mit $0$ als Top 
+\end{itemize}
+   \end{column} \pause
+     \begin{column}[c]{4.5cm} 
+    %    Eine \cemph{valuation structure}~\cite{Schiex1995valued}, wenn die Ordnung total ist, sonst eine  \cemph{partial valuation structure}~\cite{Gadducci2013} (PVS).
+     \end{column}
+\end{columns}
+    
+}
+\end{frame}
+
+\begin{frame}{Partial Valuation Structures}
+Zugrundeliegende \alert{algebraische Struktur}:
+Partial valuation structure \emph{(= partiell geordnetes, kommutatives Monoid)}
+\begin{itemize}
+\item $(M, \cdot_M, \varepsilon_M, \leq_M)$ 
+\item $m \cdot_m \varepsilon_M = m$
+\item $m \leq_M \varepsilon_M$
+\item $m \leq_M n \rightarrow m \cdot_M o \leq_M n \cdot_M o$
+\end{itemize}
+
+\vspace*{2ex}
+
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.7\textwidth}
+          
+    \hSecond{Abstrakt}
+    
+    \begin{itemize}
+    \item $M$ \ldots Elemente
+    \item $\cdot_M$ \ldots Kombination von Bewertungen
+    \item $\varepsilon_M$ \ldots neutrales, ``bestes'' Element
+    \item $\leq_M$ \ldots Ordnung, links ``schlechter''
+    \end{itemize}
+    \end{column}
+    
+    \begin{column}{.3\textwidth}
+  	\hFirst{Konkret}  
+  	 \begin{itemize}
+    \item $\{0, \ldots, k \}$ 
+    \item $+_k$
+    \item $0$ 
+    \item $\geq$
+    \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace*{2ex}
+  
+  \hfill \emph{\cite{Gadducci2013,SchiendorferPvs2015}}
+\end{frame}
+
+\begin{frame}[fragile]{SoftConstraints in MiniZinc}
+\begin{lstlisting}
+% X: {x,y,z} D_i = {1,2,3}, i in X
+%    * c1: x + 1 = y   * c2: z = y + 2 * c3: x + y <= 3
+% (c) ISSE
+% isse.uni-augsburg.de/en/software/constraint-relationships/
+include "soft_constraints/minizinc_bundle.mzn";
+
+var 1..3: x; var 1..3: y; var 1..3: z;
+
+% read as "soft constraint c1 is satisfied iff x + 1 = y"
+constraint x + 1 = y <-> satisfied[1];
+constraint z = y + 2 <-> satisfied[2];
+constraint x + y <= 3 <-> satisfied[3];
+
+% soft constraint specific for this model
+nScs = 3; nCrEdges = 2;
+crEdges = [| 2, 1 | 3, 1 |]; % read c2 is less important than c1
+
+solve minimize penSum; % minimize the sum of penalties
+\end{lstlisting}
+
+\end{frame}

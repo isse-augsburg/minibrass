@@ -1,0 +1,1916 @@
+
+\begin{frame}
+    \frametitle{Agenda}
+ \alert{Grundlagen:}
+    \begin{itemize}
+    \item Constraint Satisfaction (Optimisation) Problems
+    \item Funktionsweise von Constraint-Lösern und Sprachen (MiniZinc)
+    \item Einsatz im Scheduling
+    \end{itemize}
+
+    \vspace*{3ex}
+    
+\alert{ISSE-Entwicklungen:}
+    \begin{itemize} 
+    \item Constraint Relationships für Soft Constraints
+    \item Entwickelte Fallstudien
+    \item Sprachunterstützung / Features
+     \end{itemize}
+\end{frame}
+\graphicspath{{img/}}
+
+\begin{frame}{Constraint Programming: Einordnung}	
+\begin{itemize}
+\item Generischer Ansatz zur Lösung von \alert{Erfüllbarkeitsproblemen} 
+\item Ausnützen von \textbf{Struktur} von logischen Bedingungen~\cite{tsang1993foundations}
+\item Konzentration auf \emph{endliche} Wertebereiche und Erfüllbarkeit~\cite[Kap.~5]{russell2010artificial} \pause
+\begin{itemize}
+\item Im Gegensatz z.B. zu \emph{linearer Programmierung}, \emph{konvexe Optimierung}
+\item Verallgemeinert Boolesche Erfüllbarkeitsprobleme (SAT)
+\item \textbf{Scheduling-Probleme}
+\item Reorganisationen
+\item Zuweisungsprobleme (z.B. Frequenzen an Sender, Energie and Produzenten, \ldots)
+\end{itemize} \pause
+\item Deklarativ, aber Constraints sind an Algorithmen geknüpft~\cite{Rossi2006}! 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Ein prototypisches CSP}
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/map_europe.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Und noch eins}
+\begin{center}
+\chessboard[clearboard,setpieces={Qf8, Qc7, Qe6, Qh5, Qa4, Qd3, Qb2, Qg1}]
+\end{center}
+\end{frame}
+
+\begin{frame}{Basics}
+\begin{definition}[Constraint-Problem]
+Ein \alert{Constraint-Problem} $(X, D, C)$ ist beschrieben durch
+\begin{itemize}
+  \item \emph{Variablen} $X$,
+\emph{Domänen} $D = (D_x)_{x \in X}$ (endlich),
+\emph{Constraints} $C$ 
+\end{itemize} 
+
+\end{definition}
+\pause
+
+Domänen typischerweise: \texttt{int}, \texttt{bool}, (\texttt{float})
+\vspace*{2ex}
+
+Was ist ein \textbf{Constraint}? Ein \emph{boolesches} Prädikat über einer Belegung von $X$:
+
+$X = \{x, y, z \}$
+\begin{itemize}
+\item $x < y$
+\item $x + 5 = z - y$
+\item $\texttt{alldifferent}([x,y,z])$
+\item $\forall$ und $\exists$ nur über endlichen Wertebereichen 
+\end{itemize}
+\end{frame} 
+%
+%\begin{frame}{Das eigentliche Erfüllbarkeitsproblem}
+%Eine (partielle) Zuweisung ist eine (partielle) Abbildung $\theta : X \to D$ mit Scope $\mathrm{sc}$ als definierter Wertebereich.
+%
+%\begin{definition}[Lösung] 
+%Eine Lösung für ein Constraint-Problem $(X, D, C)$
+%ist eine Zuweisung $\theta$ mit $\mathrm{sc}(\theta) = X$, sodass $\theta$ alle Constraints $c \in C$ erfüllt, also
+%$\forall c \in C : c(\theta) = \mathsf{tt}$.
+%\end{definition}
+%
+%\vspace*{2ex}
+%
+%Ein Constraint-Satisfaction-Problem (CSP) besteht darin, eine Lösung $\theta$ aus dem Suchraum $[X \to D]$ zu finden~\cite{Rossi2006}.
+%
+%\end{frame}
+
+
+\begin{frame}[fragile]{Beispiel}
+\begin{columns}[onlytextwidth]
+    \begin{column}{.48\textwidth}
+     \hFirst{Problem}
+
+CSP ($X$, $D$, $C$) mit 
+\begin{itemize}
+\item $X = \{x, y, z\}$
+\item $D_x = D_y = \{0,1,2\}$, $D_z = \{0,1\}$
+\item $C $
+\begin{itemize}
+\item $c_1 : x \neq y$, $y \neq z$, $x \neq z$
+\item $c_2 : x + 1 = y$
+\end{itemize}
+\end{itemize}
+
+    \pause 
+    \end{column}
+    \pause
+    \begin{column}{.48\textwidth}
+	\begin{lstlisting}
+var 0..2: x;
+var 0..2: y;
+var 0..1: z;
+
+% c1
+constraint x != y /\ y != z /\ x != z;
+% c2
+constraint x + 1 = y;
+
+solve satisfy;
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  
+  \vspace*{3ex}
+    \alert{Welche Zuweisung ist eine Lösung dieses Problems?}
+
+\begin{itemize}
+\item $\Theta = \{ (x \to 1, y \to 2, z \to ?), (x \to 0, y \to 1, z \to ?) \}$ erfüllen $c_2$; \pause
+\item $(x \to 0, y \to 1, z \to ?)$ lässt sich aber zu keiner Lösung erweitern, da $z$ entweder 0 oder 1 sein muss und somit garantiert
+$c_1$ verletzt \pause
+\item Also ist die einzige Lösung $(x \to 1, y \to 2, z \to 0)$
+\end{itemize}
+\end{frame}
+%\begin{frame}{Constraint-Algorithmen}
+%Wesentliche Kernrichtungen für Algorithmen:
+%
+%\vspace*{2ex}
+%
+%\begin{itemize}
+%\item \alert{Systematische} (vollständige) Suche (``\alert{Try}'')
+%\begin{itemize}
+%\item[-] Backtracking
+%\item[-] Branch \& Bound
+%\end{itemize} \pause
+%
+%\vspace*{1ex}
+%
+%\item Constraint-\alert{Propagation}, Inferenz
+%\begin{itemize}
+%\item[-] Einfache, lokale Konsistenzchecks (\emph{Logische Schlüsse})
+%\item[-] \alert{Reduktion} der \emph{Domänen}
+%\end{itemize} \pause
+%
+%\vspace*{1ex}
+%
+%\item \alert{Relaxierung}
+%\begin{itemize}
+%\item[-] Löse einfachere Teilprobleme
+%\item[-] Nehme Ergebnis als \emph{Schranken}
+%\end{itemize} \pause
+%
+%\vspace*{1ex}
+%
+%\item \alert{Lokale} (\emph{heuristische}) Suche
+%\begin{itemize}
+%\item[-] \emph{Min-Conflicts}-Heuristik
+%\item[-] Large-neighborhood Search
+%\item[-] Tabu-Suche / Simulated Annealing
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{Systematische Suche}
+%Partielle Zuweisungen schrittweise um ein Variablen-Wert-Paar erweitert.
+%
+%\vspace*{2ex}
+%
+%Ausnützen der Konjunktivität: Wenn eine partielle Zuweisung bereits \alert{einen} Constraint verletzt, wird die
+%letzte Zuweisung \alert{rückgängig} gemacht (\emph{backtracking}) und neuer Wert versucht.
+%
+%\vspace*{2ex}
+%
+%Im schlimmsten Fall exponentielle Exploration aller vollständigen Zuweisungen $O(|D|^{|X|})$.
+%
+%\vspace*{1ex}
+%
+%$\rightarrow$ in der Praxis: 
+%
+%\begin{itemize}
+%\item \textbf{Einschränkung der Lösungsraums durch \alert{Propagation}}
+%\item Frühzeitiges Abschneiden von ``\alert{Sackgassen}''
+%\item Frühzeitiges Probieren von \alert{vielversprechenden} Kandidaten
+%\end{itemize}
+%\end{frame}
+
+\tikzstyle{sensor}=[draw, fill=blue!20, text width=5em, 
+    text centered, minimum height=2.5em,drop shadow]    
+    
+\tikzstyle{alg} = [sensor, text width=5em, fill=isseorange!20, 
+    minimum height=13em, rounded corners, drop shadow]
+\tikzstyle{constraint}=[draw, circle, fill=issegrey!20, text width=1.2em, 
+    text centered, minimum height=1.5em,drop shadow]
+\tikzstyle{domainstore} = [alg, text width=5em, fill=isseorange!40, 
+    minimum height=4em, rounded corners]
+\tikzstyle{goodc} = [ForestGreen, font=\bfseries]
+\tikzstyle{badc} = [Red, font=\bfseries]
+\tikzstyle{okayc} = [LimeGreen, font=\bfseries]
+        
+\tikzset{
+vecArrow/.style={
+  thick
+  }
+}
+
+\tikzset{
+    mynode/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30,
+                   very thick, inner sep=\myinnersep*1em, minimum size=3em, text centered, outer sep=0, align=center},
+    innernode/.style={mynode, text width=3cm,  minimum height=1.5cm,
+                      top color=issegrey!20, bottom color=issegrey!60},
+    emphnode/.style={innernode, top color=isseorange!30, bottom color=isseorange!70}
+}
+
+% Define distances for bordering
+\def\blockdist{2.3}
+\def\edgedist{2.5}
+
+  \tikzset{
+    invisible/.style={opacity=0},
+    visible on/.style={alt={#1{}{invisible}}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+  }
+  
+\begin{frame}{Architektur von Constraint-Lösern}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search \phantom{$x = 5$} };
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$x\gets5$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [above,goodc,visible on=<4->] {$\top$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,goodc] {$\top$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Architektur von Constraint-Lösern}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search $x = 5$};
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,badc,visible on=<4->] {$\bot$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,badc] {$\bot$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\end{frame}
+%
+%\begin{frame}{Constraint-Propagation}
+%\begin{itemize}
+%\item Nutze Constraints, um Suchraum einzugrenzen
+%\item Idee: Entferne alle Werte aus Domänen, die in keiner
+%Lösung vorkommen können (\emph{Domain Store}) \pause
+%\item $|x_1 - x_2| > 5$ für $x_1, x_2 \in X$ und $D_{x_i} = \{1,\ldots, 10\}$
+%\item \alert{Welche Werte sind nicht möglich?} \alert
+%\item jeweils 5 und 6 \pause
+%\item Propagierungsschritte beeinflussen einander
+%\begin{itemize}
+%\item ``Kettenreaktion''
+%\item Fixpunktalgorithmus $\rightarrow$ Keine Propagierung möglich
+%\item Wenn Domäne nur mehr einen Wert enthält, \emph{muss} dieser
+%zugewiesen werden.
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}{Constraint-Propagation: Beispiel}
+\begin{center}
+\includegraphics[width=\textwidth]{img/constprop.png}
+\end{center}
+Entfernen von Werten, die zu keiner Lösung führen können. 
+\end{frame}
+
+
+\begin{frame}{Globale Constraints}
+\begin{itemize}
+\item Betrachten wir folgendes einfaches Problem
+\begin{itemize}
+\item $X = \{x_1, x_2, x_3 \}$
+\item $(D_x)_{x \in X} = \{1,2\}$
+\item $C$ : $x_1 \neq x_2$, $x_2 \neq x_3$, $x_1 \neq x_3$
+\end{itemize}
+\item Ist dieses Problem nach Constraint-Propagation mit binären Constraints \alert{lösbar}? \pause
+\item Ja, für jedes $d \in D_x$ gibt es einen Partner \pause 
+\item Insgesamt allerdings nicht, da mindestens 3 unterschiedliche Werte nötig
+\item $\rightarrow$ daher globale Constraints, die eine größere Menge von Variablen im Auge betrachten können
+\item Und \emph{spezialisierte} Propagationsalgorithmen haben!
+\item $\mathtt{alldifferent(x_1, x_2, x_3)}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Task-Zuweisung in Practice}
+\begin{itemize}
+\item Taskzuweisungsproblem (\emph{task allocation problem})
+
+\begin{itemize}
+\item [-] $n$ Roboter
+\item [-] $m$ Tasks
+\item [-] Gebe jedem Roboter einen \emph{unterschiedlichen} Task, um den Gewinn zu maximieren (Unterschied zu Kompensation und Strafe)
+\end{itemize}
+\item Beispielproblem:
+\begin{itemize}
+\item[-] $n = 4$, $m = 5$
+\end{itemize}
+\end{itemize}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+ & t1 & t2 & t3 & t4 & t5 \\ 
+\hline 
+r1 & 7 & 1 & 3 & 4 & 6 \\ 
+\hline 
+r2 & 8 & 2 & 5 & 1 & 4 \\ 
+\hline 
+r3 & 4 & 3 & 7 & 2 & 5 \\ 
+\hline 
+r4 & 3 & 1 & 6 & 3 & 6 \\ 
+\hline 
+\end{tabular} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Task-Zuweisung: Modell}
+\begin{lstlisting}
+% problem data 
+int: n; set of int: ROBOTS = 1..n;
+int: m; set of int: TASKS = 1..m;
+array[ROBOTS,TASKS] of int: profit;
+
+% decisions
+array[ROBOTS] of var TASKS: allocation;
+
+% goal
+solve maximize sum(r in ROBOTS) (profit[r, allocation[r]] );
+
+% have robots work on different tasks
+constraint alldifferent(allocation);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{AllDifferent -- Machbarkeit}
+\begin{itemize}
+\item Erster bekannter Propagator
+\item Basiert auf Matching in bipartiten Graphen
+\item Laufzeit ist polynomiell!
+\end{itemize}
+
+\begin{lstlisting}
+var {1,2,3}: x;       var {2,3}: y;      var {2,3}: z;
+var {1,2,3,4,5}: t; var {3,4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\vspace*{-15ex}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+text width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, circle](x){$x$}; \& \node[draw, circle](y){$y$};  \& \node[draw, circle](z){$z$};  \& \node[draw, circle](t){$t$};  \& \node[draw, circle](u){$u$};  \\
+ \& \\
+\& \\
+\& \\
+\node[draw, circle](1){$1$};  \& \node[draw, circle](2){$2$};  \& \node[draw, circle](3){$3$};  \& \node[draw, circle](4){$4$};  \& \node[draw, circle](5){$5$};  \& \node[draw, circle](6){$6$};  \\
+};
+
+\draw[onslide={<2>{highlight}}] (x) -- (1);
+\draw[] (x) -- (2);
+\draw[] (x) -- (3);
+
+\draw[onslide={<2>{highlight}}] (y) -- (3);
+\draw[] (y) -- (2);
+
+\draw[onslide={<2>{highlight}}] (z) -- (2);
+\draw[] (z) -- (3);
+
+\draw[onslide={<2>{highlight}}] (t) -- (5);
+\draw[] (t) -- (1);
+\draw[] (t) -- (2);
+\draw[] (t) -- (3);
+\draw[] (t) -- (4);
+\draw[onslide={<2>{highlight}}] (u) -- (4);
+\draw[] (u) -- (3);
+\draw[] (u) -- (5);
+\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{AllDifferent -- Propagierung}
+
+\begin{lstlisting}
+var {1,2,3}: x;       var {2,3}: y;      var {2,3}: z;
+var {1,2,3,4,5}: t; var {3,4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\vspace*{-15ex}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{impo}=[dashed]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+text width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, circle](x){$x$}; \& \node[draw, circle](y){$y$};  \& \node[draw, circle](z){$z$};  \& \node[draw, circle](t){$t$};  \& \node[draw, circle](u){$u$};  \\
+ \& \\
+\& \\
+\& \\
+\node[draw, circle](1){$1$};  \& \node[draw, circle](2){$2$};  \& \node[draw, circle](3){$3$};  \& \node[draw, circle](4){$4$};  \& \node[draw, circle](5){$5$};  \& \node[draw, circle](6){$6$};  \\
+};
+
+\draw[onslide={<2>{highlight}}] (x) -- (1);
+\draw[onslide={<2>{impo}}] (x) -- (2);
+\draw[onslide={<2>{impo}}] (x) -- (3);
+
+\draw[onslide={<2>{highlight}}] (y) -- (3);
+\draw[] (y) -- (2);
+
+\draw[onslide={<2>{highlight}}] (z) -- (2);
+\draw[] (z) -- (3);
+
+\draw[onslide={<2>{highlight}}] (t) -- (5);
+\draw[onslide={<2>{impo}}] (t) -- (1);
+\draw[onslide={<2>{impo}}] (t) -- (2);
+\draw[onslide={<2>{impo}}] (t) -- (3);
+\draw[] (t) -- (4);
+\draw[onslide={<2>{highlight}}] (u) -- (4);
+\draw[onslide={<2>{impo}}] (u) -- (3);
+\draw[] (u) -- (5);
+\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+\vspace*{-15ex}
+\begin{lstlisting}
+var {1}: x;       var {2,3}: y;      var {2,3}: z;
+var {4,5}: t;      var {4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{AllDifferent -- Algorithmus}
+
+\begin{lstlisting}
+var {1,2,3}: x;       var {2,3}: y;      var {2,3}: z;
+var {1,2,3,4,5}: t; var {3,4,5,6}: u;
+constraint alldifferent([x,y,z,t,u]);
+\end{lstlisting}
+\vspace*{-15ex}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{impo}=[dashed]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+text width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, circle](x){$x$}; \& \node[draw,onslide={<2->{highlight}}, circle](y){$y$};  \& \node[draw, onslide={<2->{highlight}}, circle](z){$z$};  \& \node[draw, onslide={<2->{highlight}}, circle](t){$t$};  \& \node[draw, circle](u){$u$};  \\
+ \& \\
+\& \\
+\& \\
+\node[draw, circle](1){$1$};  \& \node[draw, onslide={<2->{highlight}}, circle](2){$2$};  \& \node[draw, onslide={<2->{highlight}}, circle](3){$3$};  \& \node[draw, circle](4){$4$};  \& \node[draw, onslide={<2->{highlight}},circle](5){$5$};  \& \node[draw, circle](6){$6$};  \\
+};
+
+\draw[onslide={<1->{highlight}}] (x) -- (1);
+\draw[] (x) -- (2);
+\draw[] (x) -- (3);
+
+\draw[onslide={<3>{highlight}}] (y) -- (3);
+\draw[] (y) -- (2);
+
+\draw[onslide={<1-2>{highlight}}] (z) -- (3);
+\draw[onslide={<3>{highlight}}] (z) -- (2);
+
+\draw[onslide={<1-2>{highlight}}] (t) -- (2);
+\draw[] (t) -- (1);
+\draw[onslide={<3>{highlight}}] (t) -- (5);
+\draw[] (t) -- (3);
+\draw[] (t) -- (4);
+\draw[onslide={<1>{highlight}}] (u) -- (4);
+\draw[] (u) -- (3);
+\draw[] (u) -- (5);
+\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+\vspace*{-15ex}
+Augmentierender Pfad:
+
+$y \to 3 \to z \to 2 \to t \to 5$
+\end{frame}
+
+\begin{frame}{Let that sink in}
+
+\begin{parchment}[Take away message]
+\large
+\alert{Global constraints} are the \alert{essence} of constraint programming!
+\end{parchment}
+\end{frame}
+
+\tikzset{
+    process/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30},
+    file/.style={rectangle,draw=black}
+}
+
+\begin{frame}{How can we actually use all that?}
+\alert{Architecture}
+
+\begin{center}
+\vspace*{-25ex}
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+minimum width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.3cm,column sep=0.5cm]
+{
+\node[draw, file,isseorange,thick](cr){\texttt{cr.dzn}};  \\
+\node[draw, file](f1){\texttt{f1.dzn}}; \& \& \node[draw, process](mzn2fzn){\texttt{mzn2fzn}}; \& \& \node[draw, file](output){\emph{output}};  \\
+\node[draw, file](f2){\texttt{f2.dzn}};   \&  \&  \node(inv){}; \& \node[draw, rectangle, rounded corners](globals){solver-specific globals};  \\
+\node[draw, file](mod){\texttt{model.mzn}}; \& \&  \\
+\& \& \node[draw, file](fzn){\texttt{compiled.fzn}}; \& \& \node[draw, process](solve){\texttt{solve}};  \\
+\& \\
+};
+
+\draw[dashed,->] (f1) -- (mzn2fzn);
+\draw[dashed,->] (f2) -- (mzn2fzn);
+\draw[dashed,->] (cr) -- (mzn2fzn);
+\draw[dashed,->] (mod) -- (mzn2fzn);
+\draw[dashed,->] (fzn) -- (solve);
+\draw[->] (mzn2fzn) -- (fzn);
+\draw[->] (solve) -- (output);
+\draw[dashed] (globals) -- (inv);
+\end{tikzpicture}
+\end{center}
+\vspace*{-25ex}
+
+\end{frame}
+
+\begin{frame}{Why MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{One modeling language -- many solvers} 
+\end{parchment}
+\begin{textblock*}{2.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=\textwidth]{img/MiniZn_logo.jpg} 
+
+\end{textblock*}
+Supported Solvers
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item Choco (CP)
+\item G12 (CP/LP/MIP)
+\end{itemize}
+
+\end{frame}
+
+%\begin{frame}[fragile]{Globale Constraints: Beispiele}
+%Häufig auftretende Constraints samt Propagierungsalgorithmen. Gesammelt im \emph{Global Constraints Catalogue}\footnote{\url{http://www.emn.fr/z-info/sdemasse/gccat/sec5.html}}
+%
+%\vspace*{2ex}
+%
+%\begin{description}
+%\item[{\tt \textbf{alldifferent(VARIABLES)}}] Erfordert, dass alle Variablen \alert{unterschiedliche} Werte haben, z.B: $[1,2,3]$ \pause
+%
+%\item[{\tt \textbf{allequal(VARIABLES)}}] Erfordert, dass alle Variablen den \alert{gleichen} Wert haben, z.B: $[5,5,5]$ \pause
+%
+%\item[{\tt \textbf{nvalue(VARIABLES, N)}}] Erfordert, dass genau $N$ verschiedene Werte vorkommen, z.B: $([1,2,1],2)$ \pause
+%
+%\item[{\tt \textbf{at\_most(N, VARIABLES, V)}}] Erfordert, dass höchstens $N$ Variablen den Wert $V$ annehmen z.B: $(2,[2,2,4],2)$
+%
+%
+%\end{description}
+%\end{frame}
+
+\begin{frame}{Scheduling \& Packing}
+\begin{itemize}
+\item A very important application for CP
+\item Strong support (global constraints) in MiniZinc
+\begin{itemize}
+\item[-] Involved propagators -- fortunately encapsulated by solvers!
+\end{itemize}
+\vspace*{1ex}
+
+\item Planning and scheduling are coming together and constraint
+satisfaction may serve as a bridge between them
+\item Many applications in practice (production style problems)
+
+\vspace*{1ex}
+\item Overview papers:
+\begin{itemize}
+\item Bartak'03~\cite{Bartak03constraintbasedscheduling}
+\item Bartak'10~\cite{bartak2010constraint}
+\item Baptiste'06~\cite{baptiste2006constraint}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Intro to Scheduling}
+\include{img/scheduling}
+\end{frame}
+\input{img/disjunctive}
+\input{img/scheduling-example.tex}
+ 
+\input{img/cumulative}
+
+\begin{frame}{Packing}
+Another popular type of problem, supported by global constraints:
+
+\begin{center}
+\includegraphics[width=.4\textwidth]{img/cookie_cutting.jpg}
+\hfill
+\includegraphics[width=.35\textwidth]{img/cfk.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}{Square Packing}
+Simple \alert{benchmark} variant:
+\begin{itemize}
+\item Parameter $n \in \mathbb{N}$
+\item Find the minimal area to place the squares from $1$ to $n$ without overlap
+\end{itemize}
+
+\tikzset{
+    task/.style={rounded corners, minimum height=3.8ex,rectangle,anchor=south west},
+    task1/.style={task,draw=black, top color=isseorange!5, bottom color=isseorange!30},    
+    task2/.style={task,draw=black, top color=issegrey!5, bottom color=issegrey!30},
+    task3/.style={task,draw=black, top color=BrickRed!5, bottom color=BrickRed!30},
+}
+ 
+%\vspace*{-6ex}
+\begin{figure}
+\begin{tikzpicture}[scale=1.0,x=.5cm,y=.5cm]
+    % Draw axes
+    
+     \node[draw, fill=issegrey!20,anchor=south west, text width=2.73cm,text height=3.73cm] at (0,0) { };  
+     
+    \draw [<->,thick] (0,8) node (yaxis) [above] {\texttt{height}}
+        |- (6,0) node (xaxis) [right] {\texttt{width}};    
+
+% first slide
+
+     \node[task1,text width=.5cm,text height=.5cm] at (4.45,1) { 1 };       
+     \node[task1,text width=1cm,text height=1cm] at (3.45,5.45) { 2  };   
+     \node[task1,text width=2cm,text height=2cm] at (0,0) { 4  };  
+     \node[task1,text width=1.5cm,text height=1.5cm] at (0,4.45) { 3 };  
+     
+% 
+%    \node[task1,text width=1.8cm,text height=2cm] at (0,0) {  };        
+%    \node[task1,text width=2.3cm,text height=.5cm] at (0,2.25) { };         
+%    \node[task1,text width=2.5cm,text height=.2cm] at (2.05,0) {  }; 
+%    \node[task1,text width=1.cm,text height=.2cm] at (2.05,0.6) {  };         
+   
+	
+\end{tikzpicture}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Results}
+\begin{center}
+\includegraphics[width=.9\textwidth]{img/results.pdf}
+\end{center}
+
+\end{frame}
+\begin{frame}{Geost}
+Almost counts as a special type of ``solver'':
+
+\begin{center}
+\includegraphics[width=.5\textwidth]{img/geost1.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Port Scheduling}
+Combines many scheduling and packing constraints:
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/portscheduling.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Scheduling: Outlook}
+There's clearly much more to scheduling (that could be useful for us)
+\begin{itemize}
+\item Optional tasks $\rightarrow$ brings us to \alert{planning} problems
+\item State-based models: Captures transitions of finite state machines~(FSM)
+\item Sequence-dependent Scheduling
+\begin{itemize}
+\item Times for cooling down
+\item Color changes 
+\end{itemize} 
+\end{itemize}
+
+\begin{parchment}[Take away]
+Rather easy to capture since we're dealing only with \alert{constraint models}!
+\end{parchment}
+\end{frame}
+
+
+\begin{frame}{Soft-Constraints}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Präferenzen im Constraint Solving}
+
+Constraint-Problem $(X, D, C)$ 
+\begin{itemize}
+  \item \cemph{Variablen} $X$,
+\cemph{Domänen} $D = (D_x)_{x \in X}$,
+\cemph{Constraints} $C$
+\end{itemize}
+
+\vspace*{1ex}
+
+In der Praxis: \cemph{überbestimmte} Probleme
+
+\vspace*{2ex}
+
+$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
+\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
+\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
+\mathrm{c}_2, \mathrm{c}_3 \})$ mit 
+\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
+\begin{align*}
+  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
+\\[-.4ex]
+  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
+\\[-.4ex]
+  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
+\end{align*}
+\egroup
+
+\begin{itemize}
+  \item Nicht alle Constraints können gleichzeitig erfüllt werden
+\begin{itemize} \pause
+  \item e.\,g., $\mathrm{c}_2$ erzwingt $\mathrm{z} = 3$ und $\mathrm{y} = 1$, im Konflikt mit $\mathrm{c}_1$
+\end{itemize}
+
+  \item Ein Agent \cemph{wählt} zwischen Zuweisungen, die $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ oder $\{ \mathrm{c}_2, \mathrm{c}_3 \}$ erfüllen.
+\end{itemize}
+
+\vspace*{2ex}
+
+Welche Zuweisungen $v \in [X \to D]$ sollen \alert{bevorzugt} werden von einem Agenten (oder sogar einer Menge von Agenten)?
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Constraint Relationships}
+
+Ansatz~\cite{Schiendorfer13}
+\begin{itemize}
+  \item Definiere Relation $R$ über Constraints $C$ um anzugeben, welche Constraints wichtiger sind als andere, e.\,g.
+\begin{itemize}
+  \item $\mathrm{c}_1$ wichtiger als $\mathrm{c}_2$
+
+  \item $\mathrm{c}_1$ wichtiger als $\mathrm{c}_3$
+\end{itemize}
+\end{itemize}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-1.5cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+\end{tikzpicture}
+\end{textblock*}
+
+\vspace*{5.6ex}
+
+Benefits
+\begin{itemize}
+  \item \cemph{Qualitativer} Formalismus --- einfach zu spezifizieren
+\begin{itemize}
+ \item Hebe diese Relation auf Verletzungsmengen
+  \item \cemph{Dominanzeigenschaften} regulieren den Tradeoff ``Hierarchie vs. Egalitär''
+  \item Single-Predecessors-Dominance (SPD) vs. Transitive-Predecessors-Dominance (TPD)
+\end{itemize}
+
+\end{itemize}
+
+%\vspace*{2ex}
+%\begin{small}
+%A.~Schiendorfer, J.-Ph.~Steghöfer, A.~Knapp, F.~Nafz, W.~Reif (2013)
+%\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{MiniBrass}
+
+\begin{center}
+
+\includegraphics[width=.5\textwidth]{img/minibrass.png}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/constraint-relationships/}
+
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Single-Predecessor-Dominance (SPD) Lifting}
+
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
+%
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \SPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c \} \SPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $c \rightarrow_R c'$}
+%\end{gather*}
+%\egroup
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=1cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\begin{scope}
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=green] (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=red]   (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\begin{scope}[xshift=6cm]
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=red]   (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=green] (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};  
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\node (R) at (3.05, -1.4) {$\SPDrel{R}$};
+\end{tikzpicture}
+\end{center}
+%
+%\cemph{Ordnungs}relation über Zuweisungen 
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Transitive-Predecessors-Dominance (TPD) Lifting}
+
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints
+%
+%\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+%\begin{gather*}
+%  V \TPDrel{R} V \uplus \{ c \} 
+%\\
+%  V \uplus \{ c_1, \ldots, c_k \} \TPDrel{R} V \uplus \{ c' \}
+%\quad\text{if $\forall c \in \{ c_1, \ldots, c_k \} \,.\, c \rightarrow_{R}^{+} c'$}
+%\end{gather*}
+%\egroup
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=1cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\begin{scope}
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=green] (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=red]   (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=red] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\begin{scope}[xshift=6cm]
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=red]   (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=green] (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};  
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\node (R) at (3.05, -1.4) {$\TPDrel{R}$};
+\end{tikzpicture}
+\end{center}
+
+%\cemph{Ordnungs}relation über Zuweisungen
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \TPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\TPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
+
+\end{frame}
+
+% block styles
+\tikzstyle{sensor}=[draw, fill=blue!20, text width=5em, 
+    text centered, minimum height=2.5em,drop shadow]    
+    
+\tikzstyle{alg} = [sensor, text width=5em, fill=isseorange!20, 
+    minimum height=13em, rounded corners, drop shadow]
+\tikzstyle{constraint}=[draw, circle, fill=issegrey!20, text width=1.2em, 
+    text centered, minimum height=1.5em,drop shadow]
+\tikzstyle{domainstore} = [alg, text width=5em, fill=isseorange!40, 
+    minimum height=4em, rounded corners]
+\tikzstyle{goodc} = [ForestGreen, font=\bfseries]
+\tikzstyle{badc} = [Red, font=\bfseries]
+\tikzstyle{okayc} = [LimeGreen, font=\bfseries]
+        
+\tikzset{
+vecArrow/.style={
+  thick
+  }
+}
+
+\tikzset{
+    mn/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30,
+                   very thick, inner sep=\myinnersep*1em, minimum size=3em, text centered, outer sep=0, align=center},
+    innernode/.style={mn, text width=3cm,  minimum height=1.5cm,
+                      top color=issegrey!20, bottom color=issegrey!60},
+    emphnode/.style={innernode, top color=isseorange!30, bottom color=isseorange!70}
+}
+
+% Define distances for bordering
+\def\blockdist{2.3}
+\def\edgedist{2.5}
+
+  \tikzset{
+    invisible/.style={opacity=0},
+    visible on/.style={alt={#1{}{invisible}}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+  }
+  
+\begin{frame}{Traditional Constraint Solving}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search \phantom{$x = 5$} };
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$x\gets5$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [above,goodc,visible on=<4->] {$\top$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,goodc] {$\top$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<0>{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own 
+\begin{itemize}
+\item Eine Menge von Erfüllungsgraden, $\mathbb{B} = \{ \bot, \top \}$
+\item Eine Kombinationsoperation $\wedge$
+\item Ein neutrales Element $\top$
+\item Eine partielle Ordnung $(\mathbb{B}, \leq_\mathbb{B})$ mit $\top <_\mathbb{B} \bot$ 
+\end{itemize}
+\end{column}
+     \begin{column}[c]{4.5cm} 
+     \end{column} 
+\end{columns}
+}
+
+\end{frame}
+
+\begin{frame}{Klassisches Constraint-Solving}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search $x = 5$};
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,badc,visible on=<4->] {$\bot$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,badc] {$\bot$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<5->{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own 
+\begin{itemize}
+\item Eine Menge von Erfüllungsgraden, $\mathbb{B} = \{ \bot, \top \}$
+\item Eine Kombinationsoperation $\wedge$
+\item Ein neutrales Element $\top$
+\item Eine partielle Ordnung $(\mathbb{B}, \leq_\mathbb{B})$ mit $\top <_\mathbb{B} \bot$ 
+\end{itemize}
+   \end{column} 
+     \begin{column}[c]{4.5cm} 
+     \end{column} 
+\end{columns}
+}
+\end{frame}
+
+\begin{frame}{Soft-Constraint-Solving}
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search $x = 5$};
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,okayc,visible on=<4->] {$4$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,okayc] {$4$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$0$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$0$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$0$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<5->{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own environment
+    \begin{itemize}
+\item Eine Menge von Erfüllungsgraden, e.g., $\{ 0, \ldots, k \}$
+\item Eine Kombinationsoperation $+$
+\item Ein neutrales Element $0$
+\item Eine partielle Ordnung $(\mathbb{N}, \geq)$ mit $0$ als Top 
+\end{itemize}
+   \end{column} \pause
+     \begin{column}[c]{4.5cm} 
+    %    Eine \cemph{valuation structure}~\cite{Schiex1995valued}, wenn die Ordnung total ist, sonst eine  \cemph{partial valuation structure}~\cite{Gadducci2013} (PVS).
+     \end{column}
+\end{columns}
+    
+}
+\end{frame}
+
+\begin{frame}[fragile]{SoftConstraints in MiniZinc}
+\begin{lstlisting}
+% X: {x,y,z} D_i = {1,2,3}, i in X
+%    * c1: x + 1 = y   * c2: z = y + 2 * c3: x + y <= 3
+% (c) ISSE
+% isse.uni-augsburg.de/en/software/constraint-relationships/
+include "soft_constraints/minizinc_bundle.mzn";
+
+var 1..3: x; var 1..3: y; var 1..3: z;
+
+% read as "soft constraint c1 is satisfied iff x + 1 = y"
+constraint x + 1 = y <-> satisfied[1];
+constraint z = y + 2 <-> satisfied[2];
+constraint x + y <= 3 <-> satisfied[3];
+
+% soft constraint specific for this model
+nScs = 3; nCrEdges = 2;
+crEdges = [| 2, 1 | 3, 1 |]; % read c2 is less important than c1
+
+solve minimize penSum; % minimize the sum of penalties
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Search types}
+The whole valuation space (partially ordered)
+
+\begin{figure}[!t]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {$\bot = \{c_1, c_2, c_3 \}$};
+\node (c1c2) at (-2,1) {$\{c_1, c_2\}$};
+\node (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {$\{c_1\}$};
+\node (c2) at (-2,4) {$\{c_2\}$};
+\node (c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge (c3)
+(c1c2) edge (c1)
+(c1c2) edge (c2)
+(c1) edge (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+%(a) edge (b)
+%(b) edge (top)
+%(bot) edge (c)
+%(c) edge (top)
+;
+
+\end{tikzpicture}
+\end{center}
+\label{fig:nosuprema}
+\end{figure}
+%\onslide<0>{
+\begin{lstlisting}
+%
+% Typical Optimization Routine (Branch and Bound):
+%
+%  1. Look for the first feasible solution
+%  2. Impose restrictions on the next feasible solution
+%  3. Repeat
+\end{lstlisting}
+%}
+\end{frame}
+
+
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{highlight2}=[CornflowerBlue,ultra thick]
+
+\begin{frame}[fragile]{Search types: Strictly better}
+The whole valuation space (partially ordered)
+
+
+
+\begin{figure}[!t]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {\alert<2->{$\{c_1, c_2\}$}};
+\node (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {\alert<3->{$\{c_1\}$}};
+\node (c2) at (-2,4) {\alert<4->{$\{c_2\}$}};
+\node (c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[onslide={<2->{highlight}}] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge (c3)
+(c1c2) edge[onslide={<3->{highlight}}] (c1)
+(c1c2) edge (c2)
+(c1) edge[onslide={<4->{highlight}}] (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+%(a) edge (b)
+%(b) edge (top)
+%(bot) edge (c)
+%(c) edge (top)
+;
+
+\end{tikzpicture}
+\end{center}
+\label{fig:nosuprema}
+\end{figure}
+\begin{lstlisting}
+function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: vScs) 
+      = repeat(
+           if next() then 
+             commit() /\ 
+             post(isWorse(sol(vScs), vScs))
+           else break endif       );
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Search types: Only not dominated}
+The whole valuation space (partially ordered)
+
+\begin{figure}[!t]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {\alert<2->{$\{c_1, c_2\}$}};
+\node[onslide={<4->{highlight2}}] (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {\alert<3->{$\{c_1\}$}};
+\node (c2) at (-2,4) {\alert<5->{$\{c_2\}$}};
+\node [onslide={<6->{highlight2}}](c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[onslide={<2->{highlight}}] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge[onslide={<4->{highlight2}}] (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge[onslide={<6->{highlight2}}] (c3)
+(c1c2) edge[onslide={<3->{highlight}}] (c1)
+(c1c2) edge (c2)
+(c1) edge[onslide={<5->{highlight}}] (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+
+\end{tikzpicture}
+\end{center}
+\label{fig:nosuprema}
+\end{figure}
+\begin{lstlisting}
+function ann: strictlyBetterBAB(var set of SOFTCONSTRAINTS: vScs) 
+      = repeat(
+           if next() then 
+             commit() /\ 
+             post((isWorse(vScs, sol(vScs)) \/ vScs = sol(vScs)))
+           else break endif       );
+\end{lstlisting}
+\end{frame}
+
+
+
+
+\begin{frame}{Case Studies}
+Applied to domains where 
+\begin{itemize}
+\item Certain properties should really capture \alert{preferences}, not constraints
+\item at design time, it is \alert{unclear} whether an instance is actually solvable
+\item Solution space is \emph{combinatorial}
+\begin{itemize}
+\item[-] Discrete choices
+\item[-] Additional hard constraints
+\end{itemize}
+\end{itemize}
+
+\vspace*{2ex}
+
+Illustrative case studies (found in \texttt{example-problems})
+\begin{itemize}
+\item Mentor Matching
+\item Exam Scheduling
+\item Power Plant Scheduling
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Mentor Matching}
+
+\textbf{Goal}: Assign mentees (e.g. students) to mentors (e.g. companies) such that 
+\begin{itemize}
+\item Students are most satisfied with their mentors 
+\item Companies are satisfied with their mentees
+\item Two-sided preferences
+\end{itemize}
+
+\vspace*{2ex}
+
+So far, sounds like a typical \emph{stable matching} problem, but:
+
+\begin{itemize}
+\item We do not have a 1:1 mapping (companies advise several students)
+\item Additional constraints are present
+\begin{itemize}
+\item[-] Each company has to advise at least $l$, at most $u$ students
+\item[-] The number of advised students \emph{should} be roughly equal per company (fairness)
+\item[-] Students actually despising a company should not be forced to go there (\emph{hard exclusion} of solutions)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Mentor Matching: Example}
+\begin{center}
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{highlight2}=[CornflowerBlue,ultra thick,rounded corners]
+\tikzstyle{defaultStyle}=[white,ultra thick,rounded corners]
+
+\tikzstyle{impo}=[dashed]
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+%text depth=.5ex,
+%text height=2ex,
+%minimum height=2ex,
+align=center,
+rectangle,
+text width=2em
+}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.4cm,column sep=1.5cm]
+{
+\node[draw,defaultStyle, onslide={<3->{highlight2}}](s1){\includegraphics[width=\textwidth]{img/businessman.png}}; \& \& \& \node[text width=4em, defaultStyle, draw, onslide={<3->{highlight2}}](c1) {\includegraphics[width=\textwidth]{img/airplane.png}}; \\
+\node(s2){\includegraphics[width=\textwidth]{img/woman.png}};       \& \& \& \node(c2) {\includegraphics[width=2\textwidth]{img/logistics.png}}; \\
+\node(s3){\includegraphics[width=\textwidth]{img/man.png}};         \& \& \& \node(c3) {\includegraphics[width=2\textwidth]{img/enrgy.png}}; \\
+\node[defaultStyle, draw, onslide={<3->{highlight2}}](s4){\includegraphics[width=\textwidth]{img/woman2.png}};      \& \\
+};
+
+\draw[onslide={<2->{highlight}}] (s1) -- (c1);
+\draw[] (s1) -- (c2);
+
+\draw[onslide={<2->{highlight}}] (s2) -- (c1);
+\draw[] (s2) -- (c3);
+
+\draw[onslide={<2->{highlight}}] (s3) -- (c2);
+
+\draw[onslide={<2->{highlight}}] (s4) -- (c3);
+\draw[] (s4) -- (c2);
+%
+%\draw[onslide={<1-2>{highlight}}] (z) -- (3);
+%\draw[onslide={<3>{highlight}}] (z) -- (2);
+%
+%\draw[onslide={<1-2>{highlight}}] (t) -- (2);
+%\draw[] (t) -- (1);
+%\draw[onslide={<3>{highlight}}] (t) -- (5);
+%\draw[] (t) -- (3);
+%\draw[] (t) -- (4);
+%\draw[onslide={<1>{highlight}}] (u) -- (4);
+%\draw[] (u) -- (3);
+%\draw[] (u) -- (5);
+%\draw[] (u) -- (6);
+\end{tikzpicture}
+\end{center}
+\onslide<2->{This \alert{assignment} respects the students' preferences (edges) \onslide<3->{but ignores the {\color{CornflowerBlue} companies' preferences}.}}
+\onslide<4->{\tiny ok, it's not really a \emph{matching} since companies supervise more than one student \ldots }
+\end{frame}
+
+\begin{frame}[fragile]{Mentor Matching: Model}
+\begin{lstlisting}
+int: n; set of int: STUDENT = 1..n;
+int: m; set of int: COMPANY = 1..m;
+
+% assign students to companies
+array[STUDENT] of var COMPANY: worksAt;
+
+% insert relationships of students and companies here
+
+int: minPerCompany = 2; int: maxPerCompany = 3;
+constraint global_cardinality_low_up ( 
+           worksAt, [c | c in COMPANY], 
+           [minPerCompany | c in COMPANY], 
+           [maxPerCompany | c in COMPANY]); 
+           
+solve 
+:: int_search([ satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS], 
+  input_order, indomain_max, complete)
+minimize penSum;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Mentor Matching: Preferences}
+\begin{lstlisting}
+n = 3; m = 3;
+int: brenner = 1;
+int: teufel = 2;
+int: fennek  = 3;
+
+int: cupgainini = 1;
+int: gsm = 2;
+int: junedied = 3;
+
+% specify soft constraints, order by relationship
+constraint worksAt[teufel] = junedied <-> satisfied[teufJune];
+constraint worksAt[teufel] = cupgainini <-> satisfied[teufCap];
+constraint worksAt[teufel] = gsm <-> satisfied[teufGsm];
+
+constraint worksAt[fennek ] in {cupgainini, gsm}  <-> satisfied[fenFavs];
+constraint worksAt[fennek ] in {junedied} <-> satisfied[fenOK];
+
+crEdges = [| teufGsm, teufCap | teufGsm, teufJune 
+            | fenOK, fenFavs |];
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Mentor Matching: Refinements}
+Split company and student preferences:
+\begin{lstlisting}
+% first, our students' preferences
+var int: penStud = sum(sc in 1..lastStudentPref) 
+     (bool2int(not satisfied[sc]) * penalties[sc]);
+% now companies' preferences
+var int: penComp = sum(sc in lastStudentPref+1..nScs)
+     (bool2int(not satisfied[sc]) * penalties[sc]);
+\end{lstlisting}
+
+\vspace*{3ex}
+
+Optimize lexicographically
+
+\begin{lstlisting}
+solve 
+:: int_search([ satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS],%... 
+%search minimize_lex([penStud, penComp]) /\ if % ...
+search minimize_lex([penComp, penStud]) /\ if % ...
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Mentor Matching: Priority Example}
+Taken from example: \texttt{student-company-matching.mzn}
+\begin{lstlisting}
+solve 
+:: int_search([ satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS],%... 
+search minimize_lex([penStud, penComp]) /\ if %...
+\end{lstlisting}
+
+\small
+\begin{verbatim}
+worksAt = [1, 3, 2, 3], penalty Students: 8, penalty Companies: 6
+----------
+==========
+\end{verbatim}
+
+\begin{lstlisting}
+solve 
+:: int_search([ satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS],%... 
+search minimize_lex([penStud, penComp]) /\ if %...
+\end{lstlisting}
+
+\small
+\begin{verbatim}
+worksAt = [1, 3, 1, 2], penalty Students: 10, penalty Companies: 4
+----------
+==========
+\end{verbatim}
+Here, company 1 (cupgainini) wanted to have student 3, and company 2 (APS) did not have any preferences whatsoever (so accepted student 4 instead of 3). Student 4 would have liked company 3 (junedied) better, though.
+\end{frame}
+
+\begin{frame}[fragile]{Mentor Matching: Real Instance}
+\begin{itemize}
+\item Collected data from winter term
+
+\begin{parchment}
+\begin{verbatim}
+"the favorites":
+1. JuneDied-Lynx- HumanIT
+2. Cupgainini
+ 
+"I could live with that":
+3. Seamless-German
+4. gsm systems
+5. Yiehlke
+ 
+"I think, we won't be happy":
+6. APS
+7. Delphi Databases
+\end{verbatim} 
+\end{parchment}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Mentor Matching: Real Instance}
+\begin{itemize}
+\item Gave precedence to \alert{students}
+\begin{itemize}
+\item[-] After all, what should companies do with unhappy students?
+\end{itemize}
+\item Search space: 7 companies for 16 students $\rightarrow 7^{16} = 3.3233 \cdot 10^{13}$
+\vspace*{2ex}
+\item Led to a constraint problem with 
+\begin{itemize}
+\item[-] 77 student preferences (soft constraints) from 16 students
+\item[-] of a total of 114 soft constraints (37 company preferences) 
+\end{itemize}
+
+\vspace*{2ex}
+
+\item \emph{Proved} optimal solution 
+\begin{itemize}
+\item[-] 4 minutes compilation 
+\item[-] another 2m 12s solving time
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Exam Scheduling}
+
+\textbf{Goal}: Assign exam dates to students such that 
+\begin{itemize}
+\item Each student likes their appoints (\emph{approves of it})
+\item The number of distinct dates is minimized (to reduce time investment of teachers)
+\end{itemize}
+
+%\vspace*{2ex}
+%\begin{parchment}
+\begin{center}
+\includegraphics[width=.15\textwidth]{img/voting.png}
+\hspace*{4ex}
+\includegraphics[width=.5\textwidth]{img/Voting.pdf}
+\end{center}
+%\end{parchment}
+
+\begin{itemize}
+\item No preference of any student should be weighted higher than another one's
+\item Solution (exam schedule) is a shared decision
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Scheduling: Core Model}
+See \texttt{exam-scheduling-approval.mzn}:
+\begin{lstlisting}
+% Exam scheduling example with just a set of 
+% approved dates and *impossible* ones
+include "globals.mzn";
+include "soft_constraints/soft_constraints.mzn";
+
+int: n; set of int: STUDENT = 1..n; 
+int: m; set of int: DATE = 1..m;
+array[STUDENT] of set of DATE: possibles;
+array[STUDENT] of set of DATE: impossibles;
+
+% the actual decisions
+array[STUDENT] of var DATE: scheduled;
+
+int: minPerSlot = 0; int: maxPerSlot = 4;
+constraint global_cardinality_low_up(scheduled % minPerSlot, maxPerSlot
+constraint forall(s in STUDENT) (not (scheduled[s] in impossibles[s])); 
+ 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Scheduling: Preferences}
+See \texttt{exam-scheduling-approval.mzn}:
+\begin{lstlisting}
+% have a soft constraint for every student
+nScs = n;
+penalties = [ 1 | n in STUDENT]; % equally important in this case 
+
+constraint forall(s in STUDENT) ( 
+     (scheduled[s] in possibles[s]) <-> satisfied[s] ) ;
+var DATE: scheduledDates;
+% constrains that "scheduledDates" different 
+% values (appointments) appear in "scheduled"
+constraint  nvalue(scheduledDates, scheduled);
+
+% search variants 
+solve 
+:: int_search(satisfied, input_order, indomain_max, complete)
+search minimize_lex([scheduledDates, violateds]);   % pro teachers
+%search minimize_lex([violateds, scheduledDates]); % pro students
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Exam Scheduling: Real Instance}
+
+\begin{itemize}
+\item Collected preferences of 33 students
+\item over 12 possible dates (6 days, morning and afternoon)
+\begin{itemize}
+\item[-] \emph{Approval} set 
+\item[-] \emph{Impossible} set 
+\end{itemize}
+
+\vspace*{2ex}
+
+\item Aggregated via \alert{approval voting} (has nice voting-theoretical properties!)
+\item At most 4 per appointment
+
+\item Immediately (61 msec) found an optimal solution that
+\begin{itemize}
+\item[-] Is approved by \emph{every} student
+\item[-] Is achieved with the minimal number of 9 dates 
+\end{itemize}
+\item Used Strategy:
+\end{itemize}
+\begin{lstlisting}
+search minimize_lex([violateds, scheduledDates]); % pro students
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Power Plant Scheduling}
+\textbf{Goal}: Schedule plants such that they meet the \alert{demand}; See \texttt{unitCommitment.mzn}
+
+\input{img/problem}
+\end{frame}
+
+\begin{frame}[fragile]{Power Plant Scheduling: Core Model}
+\begin{lstlisting}
+include "soft_constraints/soft_constraints_noset.mzn";
+include "soft_constraints/cr_types.mzn";
+include "soft_constraints/cr_weighting.mzn";
+% ground penalties using the appropriate weighting
+penalties = [weighting(s, SOFTCONSTRAINTS, crEdges, true) 
+                 | s in SOFTCONSTRAINTS];
+
+int: T = 5; set of int: WINDOW = 1..T;
+array[WINDOW] of float: demand = [10.0, 11.3, 15.2, 20.7, 19.2];
+
+int: P = 3; set of int: PLANTS = 1..P;
+array[PLANTS] of float: pMin  = [12.0, 5.0, 7.3];
+array[PLANTS] of float: pMax  = [15.0, 11.3, 9.7];
+
+array[WINDOW, PLANTS] of var 0.0..15.0: supply; 
+var float: obj;
+
+constraint obj = sum(w in WINDOW) ( abs( sum(p in PLANTS) 
+           (supply[w, p]) - demand[w] ) );
+
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Power Plant Scheduling: Soft Constraints}
+\begin{lstlisting}
+% ground penalties using the appropriate weighting
+penalties = [weighting(s, SOFTCONSTRAINTS, crEdges, true) 
+                 | s in SOFTCONSTRAINTS];
+[...]
+
+% some soft constraints
+constraint supply[1, 2] >= 6.0 <-> satisfied[1]; 
+constraint supply[2, 2] >= 6.0 <-> satisfied[2]; 
+
+
+% constraint time step 1 seems more urgent
+nCrEdges = 1;
+crEdges = [| 2, 1 |];
+
+% could do something more sophisticated here
+solve minimize obj + penSum;
+\end{lstlisting}
+$\rightarrow$ Library works with MIP (\emph{Mixed Integer Programming}) as well!
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Switching PVS Type}
+Concrete PVS are instantiated by importing the appropriate \texttt{pvs\_x.mzn} file.
+\lstinputlisting{models/m1.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks}
+Vital, when designing constraint relationships: \alert{avoid cycles!}
+
+\texttt{model-inconsistent.mzn}
+\lstinputlisting{models/model-inconsistent.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks}
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/errorMz.png}
+\end{center}
+Better: Add model checks to detect cyclic relationships!
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks: Assertions}
+\texttt{model-inconsistent-safe.mzn}
+\lstinputlisting{models/model-inconsistent-safe.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Consistency Checks: Assertions}
+\texttt{minisearch model-inconsistent-safe.mzn}
+
+\vspace*{2ex}
+
+\begin{verbatim}
+minizinc/std/soft_constraints/cr_consistency.mzn:46:
+  in call 'assert'
+  Assertion failed: Relationship is cyclic!
+
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Transitive Closure}
+\vspace*{2ex}
+
+For larger constraint relationships, it can be more convenient 
+to just specify a directed acyclic graph and have the closure (all transitive edges)
+be calculated automatically.
+
+\centering
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (1, 0) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 2, 0) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (2)
+  (3) edge[dashed,bend right] (1)
+  ;
+\end{tikzpicture}
+\lstinputlisting{models/cr_trans_example.mzn}
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering}
+Recall that \texttt{soft\_constraints.mzn} defines a variable ordering with 
+weights in descending order:
+
+\vspace*{1ex}
+
+\begin{lstlisting}
+% find the sorted permutation of soft constraint instances
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: sortPermScs = 
+    arg_sort(penalties);
+% invert, since arg_sort use <= and we need decreasing order
+array[SOFTCONSTRAINTS] of SOFTCONSTRAINTS: mostImpFirst = 
+    [ sortPermScs[nScs-s+1] | s in SOFTCONSTRAINTS]; 
+
+\end{lstlisting}
+
+\vspace*{1ex}
+
+We can use this ordering to try out important constraints early on in search.
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering: Demo}
+\texttt{smallexample.mzn}:
+
+\lstinputlisting{models/smallexample.mzn}
+\small 
+\begin{verbatim}
+Obj: 4 by x=1, y=1,z=1
+----------
+Obj: 3 by x=1, y=1,z=3
+----------
+Obj: 1 by x=1, y=2,z=1
+----------
+==========
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Variable Ordering: Demo}
+\texttt{smallexample-mif.mzn}:
+
+\lstinputlisting{models/smallexample-mif.mzn}
+\small 
+\begin{verbatim}
+Obj: 1 by x=1, y=2,z=1
+----------
+==========
+\end{verbatim}
+(finds the optimal solution at first try)
+\end{frame}
