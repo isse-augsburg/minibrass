@@ -443,10 +443,10 @@ y = 2;
 
 \begin{frame}[fragile]{Exam Scheduling}
 
-\textbf{Goal}: Assign exam dates to students such that 
+\textbf{Ziel}: Weise Prüfungsslots an Studenten zu sodass:
 \begin{itemize}
-\item Each student likes their appoints (\emph{approves of it})
-\item The number of distinct dates is minimized (to reduce time investment of teachers)
+\item Jeder Student ist zufrieden mit seinem Datum (\emph{stimmt zumindest zu})
+\item Die Anzahl von Prüfungs\emph{tagen} ist minimiert (um das Zeitbudget der Prüfer zu schonen)
 \end{itemize}
 
 %\vspace*{2ex}
@@ -459,8 +459,8 @@ y = 2;
 %\end{parchment}
 
 \begin{itemize}
-\item No preference of any student should be weighted higher than another one's
-\item Solution (exam schedule) is a shared decision
+\item Präferenzen von Studenten sollten nicht unterschiedlich hoch gewichtet werden
+\item Lösung (Prüfplan) ist eine geteilte Entscheidung
 
 \end{itemize}
 \end{frame}
@@ -511,11 +511,11 @@ search minimize_lex([scheduledDates, violateds]);   % pro teachers
 \end{frame}
 
 
-\begin{frame}[fragile]{Exam Scheduling: Real Instance}
+\begin{frame}[fragile]{Exam Scheduling: Realversuch}
 
 \begin{itemize}
-\item Collected preferences of 33 students
-\item over 12 possible dates (6 days, morning and afternoon)
+\item Gesammelte Präferenzen von 33 Studenten
+\item verteilt über 12 mögliche Termine (6 Tage, Vormittag und Nachmittag)
 \begin{itemize}
 \item[-] \emph{Approval} set 
 \item[-] \emph{Impossible} set 
@@ -523,15 +523,15 @@ search minimize_lex([scheduledDates, violateds]);   % pro teachers
 
 \vspace*{2ex}
 
-\item Aggregated via \alert{approval voting} (has nice voting-theoretical properties!)
-\item At most 4 per appointment
+\item Kombiniert mittels \alert{Approval Voting} (schöne wahltheoretische Eigenschaften!)
+\item Höchstens 4 pro Termin
 
-\item Immediately (61 msec) found an optimal solution that
+\item Findet optimale Lösung sofort (61 msec) 
 \begin{itemize}
-\item[-] Is approved by \emph{every} student
-\item[-] Is achieved with the minimal number of 9 dates 
+\item[-] \emph{Jeder} Student stimmt Termin zu
+\item[-] Wird mit der minimalen Anzahl von 9 Terminen erreicht
 \end{itemize}
-\item Used Strategy:
+\item Eingesetzte Strategie:
 \end{itemize}
 \begin{lstlisting}
 search minimize_lex([violateds, scheduledDates]); % pro students
@@ -550,5 +550,5 @@ search minimize_lex([violateds, scheduledDates]); % pro students
 \end{enumerate}
 \end{parchment}
 
-\hfill Try it in your own projects!
+\url{schiendorfer@isse.de} \hfill Try it in your own projects!
 \end{frame}
