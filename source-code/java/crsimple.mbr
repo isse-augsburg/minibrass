@@ -19,7 +19,7 @@ PVS: cr1 = new ConstraintRelationships("cr1") {
    soft-constraint c1: x < 500;
    soft-constraint c2: x > 500;
    
-   crEdges : |- [| c1, c2  | c3, c2 |] -|;
+   crEdges : |- [| c1, c2 |] -|;
    useSPD: false ;
 }; 
 
