@@ -1,23 +1,16 @@
 package isse.mbr.model.types;
 
-public class IntType implements PrimitiveType {
-	int lower;
-	int upper;
-	boolean bounded;
-	
-	public IntType() {
-		bounded = false;
-	}
+import isse.mbr.model.parsetree.PVSInstance;
 
-	public IntType(int lower, int upper) {
-		super();
-		this.lower = lower;
-		this.upper = upper;
-		bounded = true;
-	}
+public class IntType implements PrimitiveType {
 	
 	@Override
-	public String toString() {
-		return "int" + (bounded ? "("+lower+" .. "+upper + ")" : "" );
+	public boolean isFloat() {
+		return false;
+	}
+
+	@Override
+	public String toMzn(PVSInstance instance) {
+		return "int";
 	}
 }

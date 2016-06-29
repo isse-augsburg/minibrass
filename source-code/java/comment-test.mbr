@@ -1,0 +1,50 @@
+include "defs.mbr" ;
+
+
+type FuzzyCsp = PVSType<0.0..1.0> = 
+  instantiates with "fuzzy_type.mzn" {
+    times -> min;
+    is_worse -> is_worse_fuzzy;
+    top -> 1.0;
+    % bot -> 0.0;
+  }; 
+
+
+type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges;
+    bool: useSPD;
+  } in 
+  instantiates with "cr_type.mzn" {
+    times -> link_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+    % bot -> 1..nScs;
+  };
+    
+/*
+This should look something like that:
+
+predicate is_worse_cr(var set of 1..nScs: violated1, var set of 1..nScs: violated2, crEdges, useSPD) =
+if useSPD then
+  is_worse_spd(violated1, violated2, crEdges)
+else
+  is_worse_tpd(violated1, violated2, crEdges
+endif;
+
+
+    
+fuzzyInstance = new FuzzyCsp(3); /* these functions need to be tied to the specific instance */
+% for example function 0.0 .. 1.0 fuzzyInstance_sc1() = ...
+% array[1..nScs_fuzzyInstance] of var 0.0 .. 1.0: fuzzyInstance_degrees;
+
+weightedInstance = new WeightedCsp(3, 8, [2,1,2]);
+cr = new ConstraintRelationships(2, [| 1, 2 |]);
+
+weightedCr = ToWeighted(cr);
+
+lexProd = fuzzyInstance lex weightedInstance;
+dirProd = fuzzyInstance * weightedInstance;
+
+solve weightedCr;
+*/
