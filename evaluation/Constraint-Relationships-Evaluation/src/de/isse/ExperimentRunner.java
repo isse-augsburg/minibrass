@@ -280,6 +280,17 @@ public class ExperimentRunner {
 					
 			} 
 		}
+		ProcessBuilder killBuilder = new ProcessBuilder("./killscript.sh");
+		killBuilder.redirectErrorStream(true);
+		try {
+			Process killProcess = killBuilder.start();
+			killProcess.waitFor();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-l", "-c", underlyingCommand);
 
 		System.out.println("About to start: " + pb.command());
@@ -308,7 +319,7 @@ public class ExperimentRunner {
 				@Override
 				public void run() {
 					System.out.println("Destroyed by timeout ... ");
-					p.destroy();
+					p.destroyForcibly();
 				}
 			}, Math.round(timeoutInMillisecs * 1.05));
 
@@ -321,7 +332,7 @@ public class ExperimentRunner {
 			assert p.getInputStream().read() == -1;
 
 			// compile results object
-			processResult(result, log, t);
+			processResult(result, log, t,p);
 			
 			if(!result.valid) {
 				File errorCopy = new File(errorDir, evalJob.toFileName()+".log");
@@ -335,6 +346,17 @@ public class ExperimentRunner {
 		}
 		System.out.println("Completed job; Result: " + result);
 
+		killBuilder = new ProcessBuilder("./killscript.sh");
+		killBuilder.redirectErrorStream(true);
+		try {
+			Process killProcess = killBuilder.start();
+			killProcess.waitFor();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		// zip model file for debug purposes TODO for now only copy directory, not really zipping
 		if (EXPORT_MODELS_ZIP) {
 			exportZippedModel(evalJob, pb);
@@ -381,7 +403,7 @@ public class ExperimentRunner {
 	 * @param log
 	 * @param t
 	 */
-	private void processResult(MiniBrassResult result, File log, BookkeepingTimer t) {
+	private void processResult(MiniBrassResult result, File log, BookkeepingTimer t, Process job) {
 		Scanner sc = null;
 		final String optimalitySep = "==========";
 		final String solutionSep = "----------";
@@ -423,6 +445,8 @@ public class ExperimentRunner {
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.valid = false;
+			// make sure in these cases that the process really was killed!
+			job.destroyForcibly();
 		} finally {
 			if (sc != null)
 				sc.close();
