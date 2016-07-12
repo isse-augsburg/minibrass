@@ -15,12 +15,14 @@ public class MiniBrassLexer {
 	private char currentChar;
 	private String line;
 	private int colPtr;
+	
 
 	// to be accessed from ATGs
 	String lastIdent;
 	int lastInt;
 	double lastFloat;
 	private boolean hasNext;
+	private char lastStringLitChar;
 
 	// for better error messages 
 	int lineNo;
@@ -71,7 +73,7 @@ public class MiniBrassLexer {
 					else {
 						eatWhiteSpace();
 						// could be MinusSy if needed
-						return MiniBrassSymbol.NoSy;
+						return MiniBrassSymbol.MinusSy;
 					}
 			} 
 
@@ -126,7 +128,7 @@ public class MiniBrassLexer {
 				}
 				
 				lastIdent = sb.toString();
-			
+				lastStringLitChar = initChar;
 				return mv(MiniBrassSymbol.StringLitSy);
 			}
 			else if (Character.isLetter(currentChar)) { // either an ident or
@@ -200,7 +202,7 @@ public class MiniBrassLexer {
 	}
 
 	private boolean validIdent(char currentChar) {
-		return Character.isUnicodeIdentifierPart(currentChar);
+		return Character.isUnicodeIdentifierPart(currentChar) || currentChar == '-' || currentChar == '_';
 	}
 
 	private void eatWhiteSpace() {
@@ -324,6 +326,14 @@ public class MiniBrassLexer {
 				break;
 		}
 		return sb.toString();
+	}
+
+	public char getLastStringLitChar() {
+		return lastStringLitChar;
+	}
+
+	public void setLastStringLitChar(char lastStringLitChar) {
+		this.lastStringLitChar = lastStringLitChar;
 	}
 
 }

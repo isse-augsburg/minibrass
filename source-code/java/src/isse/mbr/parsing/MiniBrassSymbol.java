@@ -9,6 +9,7 @@ public enum MiniBrassSymbol {
 	CommaSy,            // , 
 	SemicolonSy,        // ;
 	ColonSy,            // :
+	MinusSy,            // - 
 	LeftParenSy,        // (
 	RightParenSy,       // )
 	LeftBracketSy,      // [

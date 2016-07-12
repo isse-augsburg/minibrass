@@ -319,7 +319,7 @@ public class ExperimentRunner {
 				@Override
 				public void run() {
 					System.out.println("Destroyed by timeout ... ");
-					p.destroyForcibly();
+					p.destroy();
 				}
 			}, Math.round(timeoutInMillisecs * 1.05));
 
@@ -446,7 +446,7 @@ public class ExperimentRunner {
 			e.printStackTrace();
 			result.valid = false;
 			// make sure in these cases that the process really was killed!
-			job.destroyForcibly();
+			job.destroy();
 		} finally {
 			if (sc != null)
 				sc.close();
