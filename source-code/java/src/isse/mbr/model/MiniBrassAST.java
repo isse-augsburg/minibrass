@@ -2,6 +2,7 @@ package isse.mbr.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.types.NamedRef;
@@ -17,6 +18,8 @@ import isse.mbr.model.types.PVSType;
  */
 public class MiniBrassAST {
 
+	private final static Logger LOGGER = Logger.getGlobal();
+	
 	private Map<String, PVSType> pvsTypes;
 	private Map<String, AbstractPVSInstance> pvsInstances; // here by identifier
 	private Map<String, AbstractPVSInstance> pvsReferences; // here by reference
@@ -31,7 +34,7 @@ public class MiniBrassAST {
 	}
 	
 	public void registerPVSType(String reference, PVSType type) {
-		System.out.println("Registering PVS type ... "+ type);
+		LOGGER.fine("Registering PVS type ... "+ type);
 		pvsTypes.put(reference, type);
 	}
 

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -38,6 +39,10 @@ import isse.mbr.model.types.SetType;
  *
  */
 public class MiniBrassParser {
+
+	private final static Logger LOGGER = Logger.getGlobal();
+	
+	
 	private Scanner scanner;
 	private MiniBrassSymbol currSy;
 	private MiniBrassLexer lexer;
@@ -46,9 +51,12 @@ public class MiniBrassParser {
 	private MiniBrassAST model; 
 	private SemanticChecker semChecker;
 	private int lexCounter;
-	private int dirCounter;
+	
+	public MiniBrassParser() {
+	}
 	
 	public MiniBrassAST parse(File file) throws FileNotFoundException, MiniBrassParseException {
+		
 		model = new MiniBrassAST();
 		semChecker = new SemanticChecker();
 		
@@ -56,7 +64,7 @@ public class MiniBrassParser {
 		worklist.add(file);
 		visited = new HashSet<>();
 		
-		lexCounter = dirCounter = 0;
+		lexCounter = 0;
 		try{
 			while(!worklist.isEmpty()) {
 				File next = worklist.iterator().next();
@@ -81,13 +89,13 @@ public class MiniBrassParser {
 			semChecker.executeArrayJobs();
 			semChecker.checkPvsInstances(model);
 			
-			System.out.println("I should optimize: "+model.getSolveInstance());
+			LOGGER.finer("I should optimize: "+model.getSolveInstance());
 			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
-				System.out.println("Got instance: " + entry.getValue().toString());
+				LOGGER.fine("Got instance: " + entry.getValue().toString());
 			}
 		} catch(MiniBrassParseException ex){
 			
-			System.err.println("Error at line "+lexer.getLineNo()+" ("+lexer.getColPtr()+"): " + ex.getMessage());
+			LOGGER.severe("Error at line "+lexer.getLineNo()+" ("+lexer.getColPtr()+"): " + ex.getMessage());
 			throw ex;
 		}
 		finally {
@@ -172,8 +180,8 @@ public class MiniBrassParser {
 			pvsInstance.setName(newPvsRef);
 		}
 		
-		System.out.println("Got instance: ");
-		System.out.println(pvsInstance);
+		LOGGER.fine("Got instance: ");
+		LOGGER.fine(pvsInstance.toString());
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		
 		if(model.getPvsReferences().containsKey(newPvsRef)) {
@@ -365,7 +373,7 @@ public class MiniBrassParser {
 		getNextSy();
 
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
-		System.out.println("Morphism "+morphName+" mapping "+morphFrom + " to "+morphTo + " with mzn function "+mznFunctionName);
+		LOGGER.fine("Morphism "+morphName+" mapping "+morphFrom + " to "+morphTo + " with mzn function "+mznFunctionName);
 	}
 
 	/**
@@ -376,7 +384,7 @@ public class MiniBrassParser {
 		
 		PVSType newType = new PVSType();
 		
-		System.out.println("In type item");
+		LOGGER.fine("In type item");
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		newType.setName(lexer.getLastIdent());
 		
@@ -384,7 +392,7 @@ public class MiniBrassParser {
 			throw new MiniBrassParseException("Type "+newType.getName() + " already defined!");
 		}
 		
-		System.out.println("Working on type ... "+newType.getName());
+		LOGGER.fine("Working on type ... "+newType.getName());
 		getNextSy();
 		
 		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
@@ -395,7 +403,7 @@ public class MiniBrassParser {
 		MiniZincVarType specType = MiniZincVarType(newType);
 		MiniZincVarType elementType = specType;
 		
-		System.out.println("Specification type: "+elementType);
+		LOGGER.fine("Specification type: "+elementType);
 		if(currSy == MiniBrassSymbol.CommaSy) {
 			// Read the element type as well
 			getNextSy();
@@ -418,7 +426,6 @@ public class MiniBrassParser {
 				newType.addPvsParameter(par);
 			}
 			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
-			System.out.println("Standing here, which symbol? " + currSy + " ; " + lexer.getLastIdent());
 			expectSymbolAndNext(MiniBrassSymbol.InSy);
 		} 
 		
@@ -427,7 +434,6 @@ public class MiniBrassParser {
 		expectSymbol(MiniBrassSymbol.StringLitSy);
 		
 		String fileName = lexer.getLastIdent();
-		System.out.println("Look for in file : "+ fileName);
 		newType.setImplementationFile(fileName);
 		
 		getNextSy();
@@ -465,12 +471,11 @@ public class MiniBrassParser {
 			List<MiniZincVarType> pendingIndexTypes = new LinkedList<>();
 			pendingIndexTypes.add(indexType);
 			
-			System.out.println("Main index: "+indexType);
 			while(currSy != MiniBrassSymbol.RightBracketSy) { 
 				expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 				
 				indexType = MiniZincVarType(scopeType);
-				System.out.println("  Next index: "+indexType);
+				LOGGER.fine("Next index: "+indexType);
 				pendingIndexTypes.add(indexType);				
 			}
 			
@@ -501,7 +506,7 @@ public class MiniBrassParser {
 			expectSymbol(MiniBrassSymbol.IdentSy);
 			String ident = lexer.getLastIdent();
 			
-			System.out.println("Registering parameter "+varType + ": "+ident);
+			LOGGER.fine("Registering parameter "+varType + ": "+ident);
 		
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
@@ -529,14 +534,14 @@ public class MiniBrassParser {
 			expectSymbol(MiniBrassSymbol.ArrowSy);
 			if(readIdent.equals("top") || readIdent.equals("bot")) {
 				targetFunction = readVerbatimUntil(';');
-				System.out.println("Read verbatim: "+targetFunction);
+				LOGGER.fine("Read verbatim: "+targetFunction);
 				getNextSy();
 				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			} else {
 				getNextSy();
 				expectSymbol(MiniBrassSymbol.IdentSy);
 				targetFunction = lexer.getLastIdent();
-				System.out.println("Read function: "+targetFunction);
+				LOGGER.fine("Read function: "+targetFunction);
 				getNextSy();
 				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			}
