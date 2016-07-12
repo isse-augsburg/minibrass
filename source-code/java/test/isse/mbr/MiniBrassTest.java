@@ -12,9 +12,10 @@ public class MiniBrassTest {
 
 	public static void main(String[] args) throws FileNotFoundException, MiniBrassParseException {
 		MiniBrassParser parser = new MiniBrassParser(); 
-		MiniBrassAST model = parser.parse(new File("crsimple.mbr"));
+		MiniBrassAST model = parser.parse(new File("classic.mbr"));
 		CodeGenerator codegen = new CodeGenerator();
-		codegen.generateCode(model);
+		String code = codegen.generateCode(model);
+		System.out.println(code);
 	}
 
 }

@@ -176,32 +176,31 @@ public class SemanticChecker {
 				List<String> actualParameters = new ArrayList<>(pvsInst.getParameterValues().size()+1);
 				// number of soft constraints as one built-in parameter of type int
 				actualParameters.add(Integer.toString(pvsInst.getNumberSoftConstraints()));
-				actualParameters.addAll(pvsInst.getParameterValues());
+				//actualParameters.addAll(pvsInst.getParameterValues());
 				
 				List<PVSParameter> formalParameters =  pvsType.getPvsParameters();
-
-				System.out.println("Actual: ("+actualParameters.size() + ") "+Arrays.toString(actualParameters.toArray()));
-				System.out.println("Formal: ("+formalParameters.size() + ") "+Arrays.toString(formalParameters.toArray()));
-				
-				if(formalParameters.size() != actualParameters.size()) {
-					String message = String.format("Mismatch of parameters in instance %s of type %s; Expecting %d but got %d parameters.", pvsInst.getName(), pvsType.getName(), formalParameters.size()-1, actualParameters.size()-1);
-					throw new MiniBrassParseException(message);
+				HashMap<String, PVSParameter> lookupMap = new HashMap<>(formalParameters.size());
+				for(PVSParameter formalPar : formalParameters){
+					lookupMap.put(formalPar.getName(), formalPar);
 				}
-				
-				Iterator<PVSParameter> formParIt = formalParameters.iterator();
 				Map<String, PVSParamInst> parInst = new HashMap<>(formalParameters.size());
 				
-				for(String actParam : actualParameters) {
+				for(Entry<String, String> parameterValuePair : pvsInst.getParameterValues().entrySet()) {
 					PVSParamInst pi = new PVSParamInst();
-					PVSParameter formalParameter = formParIt.next();
+					PVSParameter formalParameter = lookupMap.get(parameterValuePair.getKey());
+					if (formalParameter == null) {
+						throw new MiniBrassParseException("Undefined parameter initialisation "+parameterValuePair.getKey());
+					} 
+					
 					pi.parameter = formalParameter;
-					pi.expression = actParam;
+					pi.expression = parameterValuePair.getValue();
 					
 					parInst.put(formalParameter.getName(), pi);
 				}
 				
 				// inject this back into instance:
-				pvsInst.setParametersLinked(parInst);				
+				pvsInst.setParametersLinked(parInst);	
+								
 			}
 		}
 		

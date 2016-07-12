@@ -16,6 +16,7 @@ import isse.mbr.model.parsetree.CompositePVSInstance;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
+import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
@@ -251,25 +252,62 @@ public class MiniBrassParser {
 			expectSymbol(MiniBrassSymbol.StringLitSy);
 			String name = lexer.getLastIdent();
 			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.CommaSy);
-			expectSymbol(MiniBrassSymbol.IntLitSy);
-			int nScs = lexer.getLastInt();
+
+			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 			
+			// register the newly created instance
 			PVSInstance instance = new PVSInstance();
-			
+						
+			int nScs = 0;
+			while(currSy != MiniBrassSymbol.RightCurlSy) {
+				// expect items (either soft constraint item or parameter value)
+				// surely has to be an ident; Idents do not have hyphens so unfortunately my parser has to deal with that
+				expectSymbol(MiniBrassSymbol.IdentSy);
+				String ident = lexer.getLastIdent();
+				if("soft-constraint".equalsIgnoreCase(ident)) {
+					++nScs;
+					getNextSy();
+					expectSymbol(MiniBrassSymbol.IdentSy);
+					String constraintId = lexer.getLastIdent();
+
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.ColonSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					String mznExpression = lexer.getLastIdent();
+					
+					if(lexer.getLastStringLitChar() != '\'') {
+						throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
+					}
+					getNextSy();
+					// here we need optional annotations 
+					expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+					SoftConstraint sc = new SoftConstraint(nScs, constraintId, mznExpression);
+					
+					instance.getSoftConstraints().put(constraintId, sc);
+				} else {
+					String paramName = lexer.getLastIdent();
+					getNextSy();	
+					expectSymbolAndNext(MiniBrassSymbol.ColonSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					String mznExpression = lexer.getLastIdent();
+					
+					if(lexer.getLastStringLitChar() != '\'') {
+						throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
+					}
+					
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+					instance.getParameterValues().put(paramName, mznExpression);					
+				}				
+			}
+			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
+						
 			instance.setName(name);
 			instance.setType(typeRef);
 			instance.setNumberSoftConstraints(nScs);
 			
-			getNextSy();
-			while(currSy == MiniBrassSymbol.CommaSy) {
-				getNextSy();
-				String mznLiteral = MznLiteral(model);
-				instance.getParameterValues().add(mznLiteral.trim());
-			}
-			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
-			
-			// register the newly created instance
+			instance.getParameterValues().put(PVSType.N_SCS_LIT, Integer.toString(nScs));
 			model.getPvsInstances().put(instance.getName(), instance);
 			return instance;
 		} else if (currSy == MiniBrassSymbol.IdentSy) {
@@ -290,39 +328,6 @@ public class MiniBrassParser {
 		} else {
 			throw new MiniBrassParseException("Expected 'new' or identifier as atomic PVS");
 		}
-	}
-
-	/**
-	 * "[" digit ("," digit)+ "]" | "[|" digit ("," (digit|"|") )+ "|]" | ident | "{}"
-	 * @param model
-	 * @return
-	 * @throws MiniBrassParseException 
-	 */
-	private String MznLiteral(MiniBrassAST model) throws MiniBrassParseException {
-		if(currSy == MiniBrassSymbol.LeftBracketSy) { // [ 1, 2, 4] [| 12 | 12 | |]
-			String remainder = lexer.readVerbatimUntil(']');
-			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
-			return '['+remainder+']';
-		} else if (currSy == MiniBrassSymbol.LeftCurlSy) {
-			String remainder = lexer.readVerbatimUntil('}');
-			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
-			return '{'+remainder+'}';
-		} else if (currSy == MiniBrassSymbol.IntLitSy) {
-			String val = Integer.toString(lexer.lastInt);
-			getNextSy();
-			return val;
-		} else if (currSy == MiniBrassSymbol.FloatLitSy) {
-			String val = Double.toString(lexer.lastFloat);
-			getNextSy();
-			return val;
-		} else if (currSy == MiniBrassSymbol.IdentSy) {
-			String id = lexer.getLastIdent();
-			getNextSy();
-			return id;
-		}
-		throw new MiniBrassParseException("Unexpected symbol: "+currSy + " in MiniZinc literal.");
 	}
 
 	/**

@@ -1,7 +1,11 @@
 package isse.mbr.parsing;
 
 import java.util.Map.Entry;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import isse.mbr.model.MiniBrassAST;
@@ -10,6 +14,7 @@ import isse.mbr.model.parsetree.CompositePVSInstance;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
+import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.NumericValue;
@@ -26,10 +31,11 @@ import isse.mbr.model.types.PVSType;
 public class CodeGenerator {
 	
 	private static final String OVERALL_KEY = "overall";
-
-	public void generateCode(MiniBrassAST model) {
+	private static final String MBR_PREFIX = "mbr.";
+	private List<String> leafValuations;
+	
+	public String generateCode(MiniBrassAST model) {
 		// for now, just fill a string builder and print the console 
-		System.out.println("\n\nSTARTING CODE GENERATION\n\n");
 		StringBuilder sb = new StringBuilder("% ===============================================\n");
 		sb.append("% Generated code from MiniBrass, do not modify!\n");
 
@@ -39,8 +45,7 @@ public class CodeGenerator {
 		
 		// only final output here
 		String fileContents = sb.toString();
-		System.out.println();
-		System.out.println(fileContents);
+		return fileContents;
 		
 	}
 
@@ -64,10 +69,18 @@ public class CodeGenerator {
 		sb.append("\n% Overall exported predicate : \n");
 		sb.append("\n% ---------------------------------------------------\n");
 		
-		String pvsPred = encodeString("getBetter", topLevelInstance);
-		sb.append(String.format("predicate getBetter() = %s();\n",pvsPred));
+		String pvsPred = encodeString("postBetter", topLevelInstance);
+		sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
 
+		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
+		// add output line for valuation-carrying variables 
+		sb.append("\n% Add this line to your output to make use of minisearch\n");
+		sb.append("% [ \"\\nValuations:  ");
+		for(String val : leafValuations) {
+			sb.append(String.format("%s = \\(%s)", val,val));
+		}
+		sb.append("\\n\"]\n");
 	}
 
 	private void addPvs(AbstractPVSInstance pvsInstance, StringBuilder sb, MiniBrassAST model) {
@@ -117,21 +130,26 @@ public class CodeGenerator {
 			PVSType pvsType = inst.getType().instance;
 			sb.append("% Parameters: \n");
 			
+			// prepare possible substitutions
+			Map<String, String> subs = prepareSubstitutions(inst);
+			
 			for(Entry<String, PVSParamInst> entry : inst.getParametersLinked().entrySet()) {
 				// first one should be nScs 
 				PVSParamInst pi = entry.getValue();
-				String def = String.format("%s : %s = %s; \n", encode(pi.parameter.getType(), inst),CodeGenerator.encodeIdent(pi.parameter, inst) , pi.expression);
+				String def = String.format("%s : %s = %s; \n", encode(pi.parameter.getType(), inst),CodeGenerator.encodeIdent(pi.parameter, inst) , CodeGenerator.processSubstitutions(pi.expression, subs));
 				sb.append(def);
-			}
+			} 
 			
 			sb.append("\n% Decision variables: \n");
 			
 			String overallIdent = getOverallValuation(inst); 
+			leafValuations.add(overallIdent);
 			sb.append(String.format("var %s: %s;\n",encode(pvsType.getElementType(), inst), overallIdent));
 			PVSParameter nScs = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
 			IntervalType sCSet = new IntervalType(new NumericValue(1), new NumericValue(nScs));
 			
 			String valuationsArray = CodeGenerator.encodeString("valuations", inst);
+			
 			
 			sb.append(String.format("array[%s] of var %s: %s;\n", sCSet.toMzn(inst), encode(pvsType.getSpecType(), inst), valuationsArray));
 			sb.append(String.format("constraint %s = %s (%s);\n", overallIdent, pvsType.getCombination() , valuationsArray));
@@ -142,10 +160,52 @@ public class CodeGenerator {
 			sb.append("\n% MiniSearch predicates: \n");
 			// predicate getBetter() = x < sol(x) /\ y < sol(y);
 			// predicate getBetter() = isWorse(sol(lb), violatedScs)
-			String pvsPred = encodeString("getBetter", inst);
-			sb.append(String.format("predicate %s() = %s(sol(%s), %s);\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent));
+			String pvsPred = encodeString("postBetter", inst);
+			
+			StringBuilder instanceArguments = new StringBuilder();
+			boolean first = true;
+			for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
+				if(!first)
+					instanceArguments.append(", ");
+				else 
+					first = false;
+				String parIdent = CodeGenerator.encodeIdent(pvsParam, inst);
+				instanceArguments.append(parIdent);
+			}
+
+			sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
+			
+			sb.append("\n% Soft constraints: \n");
+			for(SoftConstraint sc : inst.getSoftConstraints().values()) {
+				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(),sc.getMznLiteral()));
+			}
 		}
 		
+	}
+
+	private Map<String, String> prepareSubstitutions(PVSInstance inst) {
+		HashMap<String, String> substitutions = new HashMap<>();
+
+		// all soft constraints map to their id
+		for(SoftConstraint sc:  inst.getSoftConstraints().values()) {
+			substitutions.put(MBR_PREFIX + sc.getName(), Integer.toString(sc.getId()));
+		}
+		
+		// all parameters to their encoded id
+		for(PVSParamInst pi : inst.getParametersLinked().values()) {
+			String encodedIdent = CodeGenerator.encodeIdent(pi.parameter, inst);
+			substitutions.put(MBR_PREFIX+pi.parameter.getName(), encodedIdent);
+		}
+		return substitutions;
+	}
+
+	private static String processSubstitutions(String expression, Map<String, String> subs) {
+		for(Entry<String, String> entry : subs.entrySet()) {
+			if(expression.contains(entry.getKey())){
+				expression = expression.replaceAll(entry.getKey(), entry.getValue());
+			}
+		}
+		return expression;
 	}
 
 	private String getOverallValuation(AbstractPVSInstance inst) {

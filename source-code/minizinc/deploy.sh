@@ -22,6 +22,7 @@ mkdir "$EXP_LIB"
 # enter all files of the utility library here 
 
 cp pvs_search.mzn "$EXP_LIB"
+cp pvs_gen_search.mzn "$EXP_LIB"
 cp cr_consistency.mzn "$EXP_LIB"
 cp cr_types.mzn "$EXP_LIB"
 cp cr_weighting.mzn "$EXP_LIB"
