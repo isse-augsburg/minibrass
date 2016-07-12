@@ -1,6 +1,7 @@
 package isse.mbr.parsing;
 
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 
 /**
@@ -11,6 +12,8 @@ import java.util.Scanner;
  */
 public class MiniBrassLexer {
 
+	private final static Logger LOGGER = Logger.getGlobal();
+	
 	private Scanner scanner;
 	private char currentChar;
 	private String line;
@@ -104,7 +107,7 @@ public class MiniBrassLexer {
 						lastFloat = Double.parseDouble(numberStr);
 						return MiniBrassSymbol.FloatLitSy;
 					} catch (Exception e) {
-						System.err.println(
+						LOGGER.severe(
 								"Could not parse floating point literal: " + numberStr + " (" + e.getMessage() + ")");
 						return MiniBrassSymbol.NoSy;
 					}
@@ -113,7 +116,7 @@ public class MiniBrassLexer {
 						lastInt = Integer.parseInt(numberStr);
 						return MiniBrassSymbol.IntLitSy;
 					} catch (Exception e) {
-						System.err.println(
+						LOGGER.severe(
 								"Could not parse integer literal: " + numberStr + " (" + e.getMessage() + ")");
 						return MiniBrassSymbol.NoSy;
 					}

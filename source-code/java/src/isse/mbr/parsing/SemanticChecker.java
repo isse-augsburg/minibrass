@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.Queue;
 
 import org.jgrapht.DirectedGraph;
@@ -35,6 +36,9 @@ import isse.mbr.model.types.PrimitiveType;
  *
  */
 public class SemanticChecker {
+
+	private final static Logger LOGGER = Logger.getGlobal();
+	
 	private Queue<ReferenceJob> referenceJobs;
 	private Queue<ArrayJob> arrayJobs;
 	private Map<String, DirectedGraph<String, DefaultEdge>> parameterDependencies;
@@ -168,6 +172,7 @@ public class SemanticChecker {
 	}
 
 	public void checkPvsInstances(MiniBrassAST model) throws MiniBrassParseException {
+		LOGGER.fine("Checking PVS instances");
 		for( Entry<String, AbstractPVSInstance> entry : model.getPvsInstances().entrySet()) {
 			if(entry.getValue() instanceof PVSInstance) {
 				PVSInstance pvsInst = (PVSInstance) entry.getValue();

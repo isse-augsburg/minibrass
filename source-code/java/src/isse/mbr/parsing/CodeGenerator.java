@@ -1,6 +1,7 @@
 package isse.mbr.parsing;
 
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,12 +30,15 @@ import isse.mbr.model.types.PVSType;
  *
  */
 public class CodeGenerator {
+
+	private final static Logger LOGGER = Logger.getGlobal();
 	
 	private static final String OVERALL_KEY = "overall";
 	private static final String MBR_PREFIX = "mbr.";
 	private List<String> leafValuations;
 	
 	public String generateCode(MiniBrassAST model) {
+		 LOGGER.fine("Starting code generation");
 		// for now, just fill a string builder and print the console 
 		StringBuilder sb = new StringBuilder("% ===============================================\n");
 		sb.append("% Generated code from MiniBrass, do not modify!\n");
