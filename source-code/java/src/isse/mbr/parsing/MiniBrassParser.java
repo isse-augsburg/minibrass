@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
+import java.util.logging.Logger; 
 import java.util.Scanner;
 import java.util.Set;
 
@@ -48,6 +48,7 @@ public class MiniBrassParser {
 	private MiniBrassLexer lexer;
 	private Set<File> visited;
 	private Set<File> worklist;
+	private File currDir;
 	private MiniBrassAST model; 
 	private SemanticChecker semChecker;
 	private int lexCounter;
@@ -69,6 +70,7 @@ public class MiniBrassParser {
 			while(!worklist.isEmpty()) {
 				File next = worklist.iterator().next();
 				worklist.remove(next);
+				currDir = next.getParentFile();
 				
 				if(!visited.contains(next)) {
 					scanner = new Scanner(next);
@@ -651,7 +653,7 @@ public class MiniBrassParser {
 		
 		getNextSy();
 		
-		File referred = new File(fileName);
+		File referred = new File(currDir,fileName);
 		if(!visited.contains(referred)) {
 			worklist.add(referred);
 		}

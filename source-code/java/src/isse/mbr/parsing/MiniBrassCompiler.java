@@ -73,7 +73,19 @@ public class MiniBrassCompiler {
 		new MiniBrassCompiler().doMain(args);
 	}
 
-	private void doMain(String[] args) {
+	public void compile(File input, File output) throws IOException, MiniBrassParseException {
+		MiniBrassParser parser = new MiniBrassParser();
+		MiniBrassAST model = parser.parse(input);
+		CodeGenerator codegen = new CodeGenerator();
+		String generatedCode = codegen.generateCode(model);
+
+		// write code to file
+		FileWriter fw = new FileWriter(output);
+		fw.write(generatedCode);
+		fw.close();
+	}
+	
+	public void doMain(String[] args) {
 		CmdLineParser cmdLineParser = new CmdLineParser(this);
 		try {
 			cmdLineParser.parseArgument(args);
@@ -87,15 +99,7 @@ public class MiniBrassCompiler {
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
 
-			MiniBrassParser parser = new MiniBrassParser();
-			MiniBrassAST model = parser.parse(mbrFile);
-			CodeGenerator codegen = new CodeGenerator();
-			String generatedCode = codegen.generateCode(model);
-
-			// write code to file
-			FileWriter fw = new FileWriter(out);
-			fw.write(generatedCode);
-			fw.close();
+			compile(mbrFile, out);		
 		} catch (CmdLineException e) {
 			// if there's a problem in the command line,
 			// you'll get this exception. this will report
