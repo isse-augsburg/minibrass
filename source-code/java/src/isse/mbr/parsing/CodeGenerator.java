@@ -35,6 +35,8 @@ public class CodeGenerator {
 	
 	private static final String OVERALL_KEY = "overall";
 	private static final String MBR_PREFIX = "mbr.";
+	public static final String VALUATTIONS_PREFIX = "Valuations:";
+	
 	private List<String> leafValuations;
 	
 	public String generateCode(MiniBrassAST model) {
@@ -80,8 +82,13 @@ public class CodeGenerator {
 		addPvs(deref(topLevelInstance), sb, model);
 		// add output line for valuation-carrying variables 
 		sb.append("\n% Add this line to your output to make use of minisearch\n");
-		sb.append("% [ \"\\nValuations:  ");
+		sb.append("% [ \"\\n"+VALUATTIONS_PREFIX+" ");
+		boolean first = true;
 		for(String val : leafValuations) {
+			if(!first)
+				sb.append("; ");
+			else 
+				first = false;
 			sb.append(String.format("%s = \\(%s)", val,val));
 		}
 		sb.append("\\n\"]\n");
@@ -223,9 +230,13 @@ public class CodeGenerator {
 		} else 
 			return pvsInstance;
 	}
-
-	private static String encodeString(String string, AbstractPVSInstance inst) {
-		return "mbr_"+string+"_"+inst.getName();
+	
+	public static String encodeString(String string, String instName) {
+		return "mbr_"+string+"_"+instName;
+	}
+	
+	public static String encodeString(String string, AbstractPVSInstance inst) {
+		return encodeString(string,inst.getName());
 	}
 
 	private String encode(MiniZincParType type, PVSInstance concreteInstance) {
