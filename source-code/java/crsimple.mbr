@@ -1,0 +1,43 @@
+include "defs.mbr" ;
+
+
+% PVS: cr1 = new ConstraintRelationships("cr1", 2, [| 1, 2 |], true);
+PVS: cr1 = new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'x < 500';
+   soft-constraint c2: 'x > 500';
+   
+   crEdges : '[| mbr.c1, mbr.c2 |]';
+   useSPD: 'false' ;
+}; 
+
+PVS: cr2 = new ConstraintRelationships("cr2") {
+   soft-constraint c1: 'x < 700';
+   soft-constraint c2: 'x > 700';
+   
+   crEdges : '[| mbr.c1, mbr.c2 |]';
+   useSPD: 'true' ;
+}; 
+/* 
+ParamInst = MZNLiteral | int | float | boolean
+PVS: cr1 = new ConstraintRelationships("cr1") {
+   soft-constraint c1: x < 500;
+   soft-constraint c2: x > 500;
+   
+   crEdges : '[| mbr.c1, mbr.c2 |]';
+   useSPD: 'false' ;
+}; 
+
+PVS: wcs = new WeightedCSP("wcsp1") {
+   soft-constraint c1:  'x < 500'  :: weights(6);
+   soft-constraint c2:  'x > 500'  :: weights(3);
+   
+   k: '7';
+}; 
+
+*/
+% constraint mbr_valuations_cr1[1] = true <-> x < 500;
+
+PVS: obj = cr1 * cr2;
+solve cr1 * cr2;
+% solve obj;
+% solve cr1 lex (cr2 * cr3 * (w1 lex w2 lex w3));

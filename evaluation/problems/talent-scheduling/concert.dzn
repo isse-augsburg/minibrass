@@ -1,0 +1,38 @@
+numScenes = 9;
+numActors = 5;
+% optimal cost: 111
+slackedCost = 120;
+ia = [|
+1,1,0,1,0,1,1,0,1|
+1,1,0,1,1,1,0,1,0|
+1,1,0,0,0,0,1,1,0|
+1,0,0,0,1,1,0,0,1|
+0,0,1,0,1,1,1,1,0|];
+c = [1,1,1,1,1];
+d = [2,4,1,3,3,2,5,7,7];
+
+% --------------------------------- 
+earliestPrefs = 3;
+actorEarl = [1,2,4];
+durEarl =   [7,5,2];
+scEarl =    [3,4,5];
+
+latestPrefs = 3;
+actorLate = [2,3,5];
+durLate =   [9,5,10];
+scLate =    [6,7,8];
+
+adversarials = 3;
+actorAdv =     [1, 1, 2];
+adversaryAdv = [2, 4, 3];
+scAdv =        [9,10,11];
+
+nScs = 11; 
+crTempEdges = [| 
+  2, 1  | % 1 and 2 are reserved canonically 
+  4, 6  | % actor two wants to leave earlier more than starting late
+  3, 9  | % actor one prefers not meeting his adversary to starting late
+  9, 10 | % actor one prefers not meeting 4 to not meeting 2
+  5, 1  | 6, 1 | 7, 1 | 8, 1 | 10, 1 | 11, 1 |
+  5, 2  | 6, 2 | 7, 2 | 8, 2 | 10, 2 | 11, 2
+|]; % earliest is more important 

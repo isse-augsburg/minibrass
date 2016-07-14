@@ -1,4 +1,5 @@
 % instantiating isWorse-predicate with weighted csp cases
+include "soft_constraints/pvs_set_based.mzn";
 
 % an aggregator function for violations has to be defined (e.g., sum,max,min)
 function var int: weightedAggregator(var set of int: leftViolatedScs); 

@@ -1,0 +1,16 @@
+concert.dzn
+  OR_TOOLS,      0.120871034
+  GECODE         0.123323852
+  G12,           0.129350846
+  JACOP,         0.275439315
+  CHOCO,         0.523964684
+  NUMBERJACK,   15.124319792
+  
+small.dzn
+  OR_TOOLS,      0.051231105
+  GECODE,        0.058164671
+  G12,           0.065000256
+  JACOP,         0.201840061
+  CHOCO,         0.378441143
+  NUMBERJACK,    2.306776212
+ 

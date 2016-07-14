@@ -8,16 +8,30 @@ package isse.mbr.parsing;
 public enum MiniBrassSymbol {
 	CommaSy,            // , 
 	SemicolonSy,        // ;
+	ColonSy,            // :
+	DoubleColonSy,      // ::
+	MinusSy,            // - 
 	LeftParenSy,        // (
 	RightParenSy,       // )
+	LeftBracketSy,      // [
+	RightBracketSy,     // ]
+	LeftAngleSy,        // <
+	RightAngleSy,       // >
+	ArrowSy,            // ->
+	LeftCurlSy,         // {
+	RightCurlSy,        // }
+	AsteriskSy,         // *
+	LexSy,              // lex
 	EqualsSy,           // =
 	StringLitSy,        // any string literal enclosed by ' or "
 	IdentSy, 
 	IncludeSy,          // include
+	SolveSy,            // solve
 	TypeSy,             // type
 	PvsSy,              // pvs
-	PVSSy,              // PVS (for types)
+	PVSTypeSy,              // PVSType (for types)
 	SetSy,              // set 
+	ArraySy,            // array
 	OfSy,               // of
 	IntSy,              // int
 	BoolSy,             // bool
@@ -25,6 +39,12 @@ public enum MiniBrassSymbol {
 	IntLitSy,           // any integer
 	FloatLitSy,         // any float
 	DotsSy,             // .. 
+	ParamsSy,           // "params"
+	InSy,               // "in"
+	InstantiatesSy,     // "instantiates"
+	WithSy,             // "with"
+	MorphismSy,         // "morph"
+	NewSy, 				// "new"
 	NoSy,
-	EofSy                 
+	EofSy     
 }

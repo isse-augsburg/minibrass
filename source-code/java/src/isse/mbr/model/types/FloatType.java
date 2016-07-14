@@ -1,23 +1,21 @@
 package isse.mbr.model.types;
 
-public class FloatType implements PrimitiveType {
-	double lower;
-	double upper;
-	boolean bounded;
-	
-	public FloatType() {
-		bounded = false;
-	}
+import isse.mbr.model.parsetree.PVSInstance;
 
-	public FloatType(double lower, double upper) {
-		super();
-		this.lower = lower;
-		this.upper = upper;
-		bounded = true;
+public class FloatType implements PrimitiveType {
+
+	@Override
+	public String toString() {
+		return "float";
 	}
 	
 	@Override
-	public String toString() {
-		return "float" + (bounded ? "("+lower+" .. "+upper + ")" : "" );
+	public boolean isFloat() {
+		return true;
+	}
+
+	@Override
+	public String toMzn(PVSInstance instance) {
+		return "float";
 	}
 }

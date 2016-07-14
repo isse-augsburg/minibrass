@@ -18,7 +18,7 @@ array[STUDENT] of var DATE: scheduled;
 int: minPerSlot; int: maxPerSlot;
 
 % some default values for now
-minPerSlot = 0; maxPerSlot = 4;
+minPerSlot = 0; maxPerSlot = 3;
 
 constraint global_cardinality_low_up ( scheduled, [d | d in DATE], [minPerSlot | d in DATE], [maxPerSlot | d in DATE]); 
 
