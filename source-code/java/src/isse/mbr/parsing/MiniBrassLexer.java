@@ -50,6 +50,10 @@ public class MiniBrassLexer {
 			case ';':
 				return mv(MiniBrassSymbol.SemicolonSy);
 			case ':':
+				if( peekNextChar() == ':') {
+					readNextChar();
+					return mv(MiniBrassSymbol.DoubleColonSy);
+				} else 
 				return mv(MiniBrassSymbol.ColonSy);
 			case '(':
 				return mv(MiniBrassSymbol.LeftParenSy);

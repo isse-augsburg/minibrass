@@ -14,7 +14,8 @@ include "link_set_to_booleans.mzn";
 include "soft_constraints/tpd_worse.mzn";
 include "soft_constraints/spd_worse.mzn";
 
-function var set of int: link_invert_booleans(array[int] of var bool: b) =
+function var set of int: link_invert_booleans(array[int] of var bool: b, 
+  par int: nScs, array[int, 1..2] of par int: crEdges, par bool: useSPD) =
 let {
   var set of index_set(b): violatedSet;
   constraint link_set_to_booleans(violatedSet, [ not b[i]  | i in index_set(b) ]); 
