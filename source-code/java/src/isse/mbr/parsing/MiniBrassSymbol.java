@@ -9,6 +9,7 @@ public enum MiniBrassSymbol {
 	CommaSy,            // , 
 	SemicolonSy,        // ;
 	ColonSy,            // :
+	DoubleColonSy,      // ::
 	MinusSy,            // - 
 	LeftParenSy,        // (
 	RightParenSy,       // )
@@ -45,5 +46,5 @@ public enum MiniBrassSymbol {
 	MorphismSy,         // "morph"
 	NewSy, 				// "new"
 	NoSy,
-	EofSy                 
+	EofSy     
 }

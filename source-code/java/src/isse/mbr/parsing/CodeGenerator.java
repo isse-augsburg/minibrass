@@ -163,7 +163,6 @@ public class CodeGenerator {
 			
 			
 			sb.append(String.format("array[%s] of var %s: %s;\n", sCSet.toMzn(inst), encode(pvsType.getSpecType(), inst), valuationsArray));
-			sb.append(String.format("constraint %s = %s (%s);\n", overallIdent, pvsType.getCombination() , valuationsArray));
 		
 			String topIdent = CodeGenerator.encodeString("top", inst);
 			sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
@@ -186,6 +185,8 @@ public class CodeGenerator {
 
 			sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
 			
+			sb.append(String.format("constraint %s = %s (%s,%s);\n", overallIdent, pvsType.getCombination() , valuationsArray,instanceArguments.toString()));
+				
 			sb.append("\n% Soft constraints: \n");
 			for(SoftConstraint sc : inst.getSoftConstraints().values()) {
 				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(),sc.getMznLiteral()));

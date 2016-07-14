@@ -291,6 +291,22 @@ public class MiniBrassParser {
 					}
 					getNextSy();
 					// here we need optional annotations 
+					if(currSy == MiniBrassSymbol.DoubleColonSy) {
+						getNextSy();
+						expectSymbol(MiniBrassSymbol.IdentSy); 
+						String parameteName = lexer.getLastIdent();
+						getNextSy();
+						expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+						expectSymbol(MiniBrassSymbol.StringLitSy);
+						if(lexer.getLastStringLitChar() != '\'') {
+							throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
+						}
+						String content = lexer.getLastIdent();
+						
+						getNextSy();
+						expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+						
+					} 					
 					expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 					SoftConstraint sc = new SoftConstraint(nScs, constraintId, mznExpression);
 					
