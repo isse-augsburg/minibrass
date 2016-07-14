@@ -10,11 +10,11 @@
 include "globals.mzn";
 
 include "minisearch.mzn"; % include the search minisearch lite
-include "soft-constraints/soft_constraints.mzn"; % model additions for soft constraint business
-include "soft-constraints/spd_worse.mzn"; % the actual isBetter predicate
-include "soft-constraints/tpd_worse.mzn"; % the actual isBetter predicate
-include "soft-constraints/constraint_relationship_search.mzn"; % search strategies for SPD better
-include "soft-constraints/pvs-tpd.mzn";
+include "soft_constraints/soft_constraints.mzn"; % model additions for soft constraint business
+include "soft_constraints/spd_worse.mzn"; % the actual isBetter predicate
+include "soft_constraints/tpd_worse.mzn"; % the actual isBetter predicate
+include "soft_constraints/pvs_search.mzn"; % search strategies for SPD better
+include "soft_constraints/pvs_tpd.mzn";
 
 int: n;
 array[1..n] of var 1..n: queens;

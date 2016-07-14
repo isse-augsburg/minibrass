@@ -1,0 +1,2 @@
+solve :: custSearch
+    minimize penSum;

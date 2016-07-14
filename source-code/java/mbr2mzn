@@ -1,0 +1,2 @@
+#!/bin/sh
+java -jar mbr2mzn.jar "$@"

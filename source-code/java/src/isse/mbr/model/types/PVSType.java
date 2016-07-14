@@ -1,5 +1,12 @@
 package isse.mbr.model.types;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import isse.mbr.parsing.MiniBrassParseException;
+
 /**
  * Holds all information that is necessary to instantiate 
  * a particular PVS; Examples are constraint relationships,
@@ -9,21 +16,29 @@ package isse.mbr.model.types;
  *
  */
 public class PVSType {
+	private MiniZincVarType specType;
 	private MiniZincVarType elementType;
 	private String name;
 	private String combination;
 	private String order;
 	private String top;
+	private List<PVSParameter> pvsParameters;
+	private Map<String, PVSParameter> paramMap;
+	private String implementationFile; 
+	private boolean isBounded; 
 	
-	public PVSType(MiniZincVarType elementType, String name, String combination, String order, String top) {
-		super();
-		this.elementType = elementType;
-		this.name = name;
-		this.combination = combination;
-		this.order = order;
-		this.top = top;
-	}
+	public final static String N_SCS_LIT = "nScs";
 
+	// empty constructor to be filled by parser
+	public PVSType() {
+		this.pvsParameters = new LinkedList<PVSParameter>();
+		this.paramMap = new HashMap<>();
+
+		PVSParameter nScsParam = new PVSParameter(N_SCS_LIT, new IntType());
+		this.pvsParameters.add(nScsParam);		
+		paramMap.put(N_SCS_LIT, nScsParam);
+	}
+	
 	@Override
 	public String toString() {
 		return "PVS-Type: "+name + " <" + elementType.toString() +"("+combination+", "+order+", "+top+ ")"+">";
@@ -67,5 +82,54 @@ public class PVSType {
 
 	public void setTop(String top) {
 		this.top = top;
+	}
+
+	public MiniZincVarType getSpecType() {
+		return specType;
+	}
+
+	public void setSpecType(MiniZincVarType specType) {
+		this.specType = specType;
+	}
+
+	public List<PVSParameter> getPvsParameters() {
+		return pvsParameters;
+	}
+
+	public void setPvsParameters(List<PVSParameter> pvsParameters) {
+		this.pvsParameters = pvsParameters;
+	}
+
+	public String getImplementationFile() {
+		return implementationFile;
+	}
+
+	public void setImplementationFile(String implementationFile) {
+		this.implementationFile = implementationFile;
+	}
+
+	public boolean isBounded() {
+		return isBounded;
+	}
+
+	public void setBounded(boolean isBounded) {
+		this.isBounded = isBounded;
+	}
+
+	public Map<String, PVSParameter> getParamMap() {
+		return paramMap;
+	}
+
+	public void setParamMap(Map<String, PVSParameter> paramMap) {
+		this.paramMap = paramMap;
+	}
+
+	public void addPvsParameter(PVSParameter par) throws MiniBrassParseException {
+		if(paramMap.containsKey(par.getName()) )
+			throw new MiniBrassParseException("Type "+name + " already contains a parameter: "+par.getName());
+		else {
+			pvsParameters.add(par);
+			paramMap.put(par.getName(), par);
+		}
 	}
 }
