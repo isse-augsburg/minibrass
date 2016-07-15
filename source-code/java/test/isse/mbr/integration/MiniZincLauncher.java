@@ -118,6 +118,7 @@ public class MiniZincLauncher {
 				if (line.contains(optimalitySep)) {
 					// System.out.println("Solved optimally!");
 					for(MiniZincResultListener listener : listeners) {
+						listener.notifySolved();
 						listener.notifyOptimality();
 					}
 					broadcast = false;
