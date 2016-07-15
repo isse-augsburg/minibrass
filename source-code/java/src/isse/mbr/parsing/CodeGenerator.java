@@ -112,14 +112,14 @@ public class CodeGenerator {
 				comp.setGeneratedBetterPredicate(String.format("( (%s) /\\ (%s) )", leftBetter, rightBetter));
 					
 			} else { // lexicographic
-				String pvsPred = encodeString("getBetter",  comp);
 				String leftBetter = left.getGeneratedBetterPredicate();
 				String rightBetter = right.getGeneratedBetterPredicate();
 				
 				// get left objective variable 
 				String leftOverall = getOverallValuation(left);
+				comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ (sol(%s) = %s /\\ %s) )", leftBetter, leftOverall, leftOverall, rightBetter));
 				
-				sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
+				// sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
 			}
 		} else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
@@ -235,7 +235,7 @@ public class CodeGenerator {
 				
 			sb.append("\n% Soft constraints: \n");
 			for(SoftConstraint sc : inst.getSoftConstraints().values()) {
-				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(),sc.getMznLiteral()));
+				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(), CodeGenerator.processSubstitutions(sc.getMznLiteral(), subs) ));
 			}
 		}
 		

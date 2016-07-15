@@ -1,0 +1,24 @@
+type CostFunctionNetwork = PVSType<0..k> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "../mbr_types/cfn_type.mzn" {
+    times -> sum;
+    is_worse -> is_worse_weighted; 
+    top -> 0;
+ };
+  
+
+PVS: cr1 = new CostFunctionNetwork("cr1") {
+   soft-constraint c1: 'x' ;
+   soft-constraint c2: '3 - y' ;
+   k : '20';
+}; 
+
+PVS: cr2 = new CostFunctionNetwork("cr2") {
+   soft-constraint c1: 'y' ;
+   soft-constraint c2: '3 - x' ;
+   k : '20';
+}; 
+
+solve cr2 lex cr1 ;
