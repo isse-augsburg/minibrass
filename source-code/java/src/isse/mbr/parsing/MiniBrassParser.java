@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Logger; 
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
@@ -41,7 +41,6 @@ import isse.mbr.model.types.SetType;
 public class MiniBrassParser {
 
 	private final static Logger LOGGER = Logger.getGlobal();
-	
 	
 	private Scanner scanner;
 	private MiniBrassSymbol currSy;
@@ -268,7 +267,7 @@ public class MiniBrassParser {
 			
 			// register the newly created instance
 			PVSInstance instance = new PVSInstance();
-						
+						 
 			int nScs = 0;
 			while(currSy != MiniBrassSymbol.RightCurlSy) {
 				// expect items (either soft constraint item or parameter value)
@@ -290,11 +289,13 @@ public class MiniBrassParser {
 						throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
 					}
 					getNextSy();
+					SoftConstraint sc = new SoftConstraint(nScs, constraintId, mznExpression);
+					
 					// here we need optional annotations 
 					if(currSy == MiniBrassSymbol.DoubleColonSy) {
 						getNextSy();
 						expectSymbol(MiniBrassSymbol.IdentSy); 
-						String parameteName = lexer.getLastIdent();
+						String parameterName = lexer.getLastIdent();
 						getNextSy();
 						expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
 						expectSymbol(MiniBrassSymbol.StringLitSy);
@@ -302,13 +303,14 @@ public class MiniBrassParser {
 							throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
 						}
 						String content = lexer.getLastIdent();
+						// store in annotations linked to soft constraint
+						sc.getAnnotations().put(parameterName, content);
 						
 						getNextSy();
 						expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
 						
 					} 					
 					expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
-					SoftConstraint sc = new SoftConstraint(nScs, constraintId, mznExpression);
 					
 					instance.getSoftConstraints().put(constraintId, sc);
 				} else {
@@ -478,6 +480,8 @@ public class MiniBrassParser {
 	 */
 	private PVSParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
 		PVSParameter returnParameter;
+		String defaultVal = null;
+		
 		if(currSy == MiniBrassSymbol.ArraySy) {
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
@@ -507,6 +511,17 @@ public class MiniBrassParser {
 			expectSymbol(MiniBrassSymbol.IdentSy);
 			String name = lexer.getLastIdent();
 			getNextSy();
+			
+			// optional default value 
+			if(currSy == MiniBrassSymbol.DoubleColonSy) {
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.DefaultSy);
+				expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+				expectSymbol(MiniBrassSymbol.StringLitSy);
+				defaultVal = lexer.getLastIdent();
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 
 			semChecker.scheduleArrayTypeCheck(arrayType, pendingIndexTypes, name);
@@ -518,6 +533,7 @@ public class MiniBrassParser {
 			}
 			
 			returnParameter = new PVSParameter(name, arrayType);
+			
 		} else {
 			MiniZincVarType varType = MiniZincVarType(scopeType); // could be int
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
@@ -527,9 +543,23 @@ public class MiniBrassParser {
 			LOGGER.fine("Registering parameter "+varType + ": "+ident);
 		
 			getNextSy();
+			
+			// optional default value 
+			if(currSy == MiniBrassSymbol.DoubleColonSy) {
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.DefaultSy);
+				expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+				expectSymbol(MiniBrassSymbol.StringLitSy);
+				defaultVal = lexer.getLastIdent();
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			semChecker.scheduleTypeDependencyCheck(scopeType, ident, varType);
 			returnParameter = new PVSParameter(ident, varType);
+		}
+		if(defaultVal != null) {
+			returnParameter.setDefaultValue(defaultVal);
 		}
 		return returnParameter;
 	}

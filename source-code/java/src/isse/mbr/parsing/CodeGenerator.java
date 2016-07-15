@@ -1,13 +1,13 @@
 package isse.mbr.parsing;
 
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
@@ -16,6 +16,7 @@ import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
+import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.NumericValue;
@@ -144,13 +145,56 @@ public class CodeGenerator {
 			// prepare possible substitutions
 			Map<String, String> subs = prepareSubstitutions(inst);
 			
+			// I actually want to go through every PVSParam and look for the proper inst
+			
+			for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
+				PVSParamInst pi = inst.getParametersLinked().get(pvsParam.getName());
+				// is it an array type (important for annotations) or not?
+				String paramExpression = null; 
+				String defaultValue = pvsParam.getDefaultValue();
+				
+				if(pvsParam.getType() instanceof ArrayType) {
+					if(pi == null) { // we need to collect the values from the individual soft constraints
+						StringBuilder exprBuilder = new StringBuilder("[");
+						boolean first = true;
+
+						for(SoftConstraint sc : inst.getSoftConstraints().values()) {
+							String annotValue = sc.getAnnotations().get(pvsParam.getName());
+							if(annotValue == null)
+								annotValue = defaultValue;
+							if(first)
+								first = false;
+							else 
+								exprBuilder.append(", ");
+							exprBuilder.append(annotValue);
+						}
+						exprBuilder.append("]");
+						paramExpression = exprBuilder.toString();
+					} else {
+						paramExpression = pi.expression;
+					}
+				} else {
+					if(pi != null)
+						paramExpression = pi.expression;
+					else 
+						paramExpression = defaultValue;
+					// TODO this has to go in the semantic check
+					/* if(pi == null)
+						throw new MiniBrassParseException("Undefined parameter "+pvsParam.getName() + " in inst: "+inst.getName());
+					*/
+				}
+				String def = String.format("%s : %s = %s; \n", encode(pvsParam.getType(), inst),CodeGenerator.encodeIdent(pvsParam, inst) , CodeGenerator.processSubstitutions(paramExpression, subs));
+				sb.append(def);
+			}
+			
+			/*
 			for(Entry<String, PVSParamInst> entry : inst.getParametersLinked().entrySet()) {
 				// first one should be nScs 
 				PVSParamInst pi = entry.getValue();
 				String def = String.format("%s : %s = %s; \n", encode(pi.parameter.getType(), inst),CodeGenerator.encodeIdent(pi.parameter, inst) , CodeGenerator.processSubstitutions(pi.expression, subs));
 				sb.append(def);
 			} 
-			
+			*/
 			sb.append("\n% Decision variables: \n");
 			
 			String overallIdent = getOverallValuation(inst); 

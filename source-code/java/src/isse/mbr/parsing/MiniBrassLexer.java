@@ -164,6 +164,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.ParamsSy;
 				case "instantiates":
 					return MiniBrassSymbol.InstantiatesSy;
+				case "default":
+					return MiniBrassSymbol.DefaultSy;
 				case "lex":
 					return MiniBrassSymbol.LexSy;
 				case "morph":
