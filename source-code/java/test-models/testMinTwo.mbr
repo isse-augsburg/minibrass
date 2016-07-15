@@ -1,0 +1,24 @@
+type WeightedCsp = PVSType<bool, int> = 
+  params {
+    int: k :: default('1000'); 
+    array[1..nScs] of 1..k: weights :: default('1');
+  } in  
+  instantiates with "../mbr_types/weighted_type.mzn" {
+    times -> weighted_sum;
+    is_worse -> is_worse_weighted; 
+    top -> 0;
+    % bot -> k+1;
+ };
+  
+
+PVS: cr1 = new WeightedCsp("cr1") {
+   soft-constraint c1: 'y = false' ;
+   k : '20';
+}; 
+
+PVS: cr2 = new WeightedCsp("cr2") {
+   soft-constraint c1: 'x = false' ;
+   k : '20';
+}; 
+
+solve cr1 * cr2;
