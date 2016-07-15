@@ -29,7 +29,8 @@ public enum MiniBrassSymbol {
 	SolveSy,            // solve
 	TypeSy,             // type
 	PvsSy,              // pvs
-	PVSTypeSy,              // PVSType (for types)
+	PVSTypeSy,          // PVSType (for types)
+	DefaultSy,
 	SetSy,              // set 
 	ArraySy,            // array
 	OfSy,               // of

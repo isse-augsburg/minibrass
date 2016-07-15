@@ -10,7 +10,6 @@ var DOM: y;
 var DOM: z;
 
 solve 
-%minimize x;
 :: int_search([x,y,z], input_order, indomain_min, complete)
 search pvs_BAB();
 

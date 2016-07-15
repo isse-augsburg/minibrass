@@ -35,6 +35,7 @@ public class BasicTestListener implements MiniZincResultListener {
 	public void notifyLine(String line) {
 		boolean solutionLine = line.startsWith("Intermediate solution:" );
 		boolean objLine = line.startsWith(CodeGenerator.VALUATTIONS_PREFIX);
+
 		if(solutionLine || objLine) {
 			String valuations = line.substring(line.lastIndexOf(':')+1, line.length());
 
@@ -46,6 +47,7 @@ public class BasicTestListener implements MiniZincResultListener {
 				String id = sc.next();
 				sc.next(); // "="
 				String val = sc.next();
+				
 				if(solutionLine)
 					lastSolution.put(id, val);
 				else
