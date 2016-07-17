@@ -1,6 +1,8 @@
 package isse.mbr.model.parsetree;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import isse.mbr.model.parsetree.Morphism.ParamMapping;
@@ -20,6 +22,7 @@ public class MorphedPVSInstance extends PVSInstance {
 	private AbstractPVSInstance input;
 	private NamedRef<Morphism> morphism;
 	private PVSInstance concreteInstance;
+	private List<PVSParameter> joinedPars;
 	
 	public void deref() {
 		AbstractPVSInstance inst = input;
@@ -53,21 +56,8 @@ public class MorphedPVSInstance extends PVSInstance {
 	}
 	
 	@Override
-	public Map<String, PVSParamInst> getParametersLinked() {
-		Map<String, PVSParamInst> parInst = new LinkedHashMap<>();
-		parInst.putAll(concreteInstance.getParametersLinked());
-		
-		// now put instantiations for all the morphed result parameters (those of type "to")
-		PVSType toType = morphism.instance.getTo().instance;
-		
-		for(ParamMapping parMapping : morphism.instance.getParamMappings().values()) {
-			PVSParameter par = toType.getParamMap().get(parMapping.getParam());
-			PVSParamInst pi = new PVSParamInst();
-			pi.parameter = par; 
-			pi.expression = parMapping.getMznExpression();
-			parInst.put(par.getName(), pi);
-		}
-		return parInst;
+	public Map<String, PVSParamInst> getParametersInstantiated() {
+		return this.parametersInstantiated;
 	}
 	
 	public AbstractPVSInstance getInput() {
@@ -88,5 +78,49 @@ public class MorphedPVSInstance extends PVSInstance {
 
 	public PVSInstance getConcreteInstance() {
 		return concreteInstance;
+	}
+
+	/**
+	 * For a morphed PVS instance, this includes the "from" and "to" parameters!
+	 */
+	@Override
+	public List<PVSParameter> getInstanceParameters() {
+		return joinedPars;
+	}
+	
+	/**
+	 * @param fromArguments
+	 */
+	public void update(StringBuilder fromArguments) {
+		Map<String, PVSParamInst> parInst = new LinkedHashMap<>();
+		parInst.putAll(concreteInstance.getParametersInstantiated());
+		
+		// now put instantiations for all the morphed result parameters (those of type "to")
+		PVSType toType = morphism.instance.getTo().instance;
+		
+		for(ParamMapping parMapping : morphism.instance.getParamMappings().values()) {
+			PVSParameter par = toType.getParamMap().get(parMapping.getParam());
+			PVSParamInst pi = new PVSParamInst();
+			pi.parameter = par; 
+			if(parMapping.getMznExpression()!=null){
+				pi.expression = parMapping.getMznExpression();
+			} else {
+				pi.expression = parMapping.getMznFunction()+"("+fromArguments.toString()+")";
+			}
+			parInst.put(par.getName(), pi);
+		}
+		this.parametersInstantiated = parInst;
+		
+
+		List<PVSParameter> fromPars = morphism.instance.getFrom().instance.getPvsParameters();
+		List<PVSParameter> toPars = morphism.instance.getTo().instance.getPvsParameters();
+		
+		joinedPars = new ArrayList<>(fromPars.size()+toPars.size());
+		joinedPars.addAll(fromPars);
+		for(PVSParameter toPar : toPars) {
+			if(! toPar.getName().equals(PVSType.N_SCS_LIT)) {
+				joinedPars.add(toPar);
+			}
+		}
 	}
 }

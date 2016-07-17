@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.MorphedPVSInstance;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
@@ -122,14 +123,13 @@ public class CodeGenerator {
 				// sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
 			}
 		} 
-	/*	else if (pvsInstance instanceof MorphedPVSInstance){
-			MorphedPVSInstance minst = (MorphedPVSInstance) pvsInstance;
-			addPvs(deref(minst.getInput()), sb,model);
-			pvsInstance.setGeneratedBetterPredicate(deref(minst.getInput()).getGeneratedBetterPredicate());
-		} */
 		else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
-			inst.update();
+			if(inst instanceof MorphedPVSInstance) {
+				MorphedPVSInstance minst = (MorphedPVSInstance) inst;
+				StringBuilder fromArguments = getInstanceArguments(minst.getMorphism().instance.getFrom().instance, inst);
+				minst.update(fromArguments);
+			}
 			String name = inst.getName();
 			
 			sb.append("\n% ---------------------------------------------------");
@@ -145,8 +145,8 @@ public class CodeGenerator {
 			
 			// I actually want to go through every PVSParam and look for the proper inst
 			
-			for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
-				PVSParamInst pi = inst.getParametersLinked().get(pvsParam.getName());
+			for(PVSParameter pvsParam : inst.getInstanceParameters()) {
+				PVSParamInst pi = inst.getParametersInstantiated().get(pvsParam.getName());
 				// is it an array type (important for annotations) or not?
 				String paramExpression = null; 
 				String defaultValue = pvsParam.getDefaultValue();
@@ -181,6 +181,9 @@ public class CodeGenerator {
 				sb.append(def);
 			}
 			
+			StringBuilder instanceArguments = getInstanceArguments(pvsType, inst);
+			
+			// ------------------------------------------------------------- 
 			sb.append("\n% Decision variables: \n");
 			
 			String overallIdent = getOverallValuation(inst); 
@@ -197,22 +200,9 @@ public class CodeGenerator {
 			String topIdent = CodeGenerator.encodeString("top", inst);
 			sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
 			
+			// ------------------------------------------------------------- 
+			
 			sb.append("\n% MiniSearch predicates: \n");
-			// predicate getBetter() = x < sol(x) /\ y < sol(y);
-			// predicate getBetter() = isWorse(sol(lb), violatedScs)
-			
-			StringBuilder instanceArguments = new StringBuilder();
-			boolean first = true;
-			
-			for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
-				if(!first)
-					instanceArguments.append(", ");
-				else 
-					first = false;
-				String parIdent = CodeGenerator.encodeIdent(pvsParam, inst);
-				instanceArguments.append(parIdent);
-			}
-
 			String getBetterString = String.format("%s(sol(%s), %s, %s)", pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString());
 			inst.setGeneratedBetterPredicate(getBetterString);
 			// sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
@@ -227,6 +217,21 @@ public class CodeGenerator {
 		
 	}
 
+	private StringBuilder getInstanceArguments(PVSType pvsType, PVSInstance inst) {
+		StringBuilder instanceArguments = new StringBuilder();
+		boolean first = true;
+		
+		for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
+			if(!first)
+				instanceArguments.append(", ");
+			else 
+				first = false;
+			String parIdent = CodeGenerator.encodeIdent(pvsParam, inst);
+			instanceArguments.append(parIdent);
+		}
+		return instanceArguments;
+	}
+
 	private Map<String, String> prepareSubstitutions(PVSInstance inst) {
 		HashMap<String, String> substitutions = new HashMap<>();
 
@@ -236,7 +241,7 @@ public class CodeGenerator {
 		}
 		
 		// all parameters to their encoded id
-		for(PVSParamInst parInst : inst.getParametersLinked().values()) {
+		for(PVSParamInst parInst : inst.getParametersInstantiated().values()) {
 			PVSParameter parameter = parInst.parameter;
 			String encodedIdent = CodeGenerator.encodeIdent(parameter, inst);
 			substitutions.put(MBR_PREFIX+parameter.getName(), encodedIdent);

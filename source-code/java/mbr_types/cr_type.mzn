@@ -11,9 +11,6 @@ Best element                       ... {}
 */ 
 
 include "link_set_to_booleans.mzn";
-include "soft_constraints/tpd_worse.mzn";
-include "soft_constraints/spd_worse.mzn";
-
 function var set of int: link_invert_booleans(array[int] of var bool: b, 
   par int: nScs, array[int, 1..2] of par int: crEdges, par bool: useSPD) =
 let {
@@ -36,3 +33,12 @@ let {
       tpd_worse(violated1, violated2, softConstraints, crEdges)
     endif
 );
+
+% also a morphism for weightings:
+include "soft_constraints/cr_weighting.mzn";
+
+function array[int] of int : calculate_cr_weights(par int: nScs, array[int, 1..2] of par int: crEdges, par bool: useSPD) = 
+let {
+  % ground penalties using the appropriate weighting
+  array[int] of int: penalties = [weighting(s, 1..nScs, crEdges, useSPD) | s in 1..nScs];
+} in  penalties;
