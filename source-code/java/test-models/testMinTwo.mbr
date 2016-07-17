@@ -21,4 +21,4 @@ PVS: cr2 = new WeightedCsp("cr2") {
    k : '20';
 }; 
 
-solve cr1 * cr2;
+solve cr1 pareto cr2;

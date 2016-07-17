@@ -66,4 +66,11 @@ public class PVSInstance extends AbstractPVSInstance {
 		return parameterArrayValues;
 	}
 
+	/**
+	 * This is essentially a template method for, e.g., performing updates on par-insts when using a morphisms
+	 */
+	public void update() {
+		// do nothing here
+	}
+
 }

@@ -168,6 +168,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.DefaultSy;
 				case "lex":
 					return MiniBrassSymbol.LexSy;
+				case "pareto":
+					return MiniBrassSymbol.ParetoSy;
 				case "morph":
 					return MiniBrassSymbol.MorphismSy;
 				case "new":

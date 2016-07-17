@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import isse.mbr.model.parsetree.AbstractPVSInstance;
-import isse.mbr.model.types.NamedRef;
+import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.types.PVSType;
 
 /**
@@ -21,6 +21,7 @@ public class MiniBrassAST {
 	private final static Logger LOGGER = Logger.getGlobal();
 	
 	private Map<String, PVSType> pvsTypes;
+	private Map<String, Morphism> morphisms;
 	private Map<String, AbstractPVSInstance> pvsInstances; // here by identifier
 	private Map<String, AbstractPVSInstance> pvsReferences; // here by reference
 	
@@ -31,6 +32,7 @@ public class MiniBrassAST {
 		pvsTypes = new HashMap<String, PVSType>();
 		pvsInstances = new HashMap<>();
 		pvsReferences =  new HashMap<>();
+		morphisms = new HashMap<>();
 	}
 	
 	public void registerPVSType(String reference, PVSType type) {
@@ -68,6 +70,14 @@ public class MiniBrassAST {
 
 	public void setPvsTypes(Map<String, PVSType> pvsTypes) {
 		this.pvsTypes = pvsTypes;
+	}
+
+	public void registerMorphism(String name, Morphism m) {
+		this.morphisms.put(name, m);
+	}
+
+	public Map<String, Morphism> getMorphisms() {
+		return morphisms;
 	}
 }
 

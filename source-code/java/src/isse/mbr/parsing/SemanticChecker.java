@@ -15,6 +15,8 @@ import org.jgrapht.graph.DefaultEdge;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.parsetree.MorphedPVSInstance;
+import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.types.ArrayType;
@@ -173,7 +175,20 @@ public class SemanticChecker {
 	public void checkPvsInstances(MiniBrassAST model) throws MiniBrassParseException {
 		LOGGER.fine("Checking PVS instances");
 		for( Entry<String, AbstractPVSInstance> entry : model.getPvsInstances().entrySet()) {
-			if(entry.getValue() instanceof PVSInstance) {
+			if (entry.getValue() instanceof MorphedPVSInstance) {
+				MorphedPVSInstance mi = (MorphedPVSInstance) entry.getValue();
+				mi.deref();
+				Morphism m = mi.getMorphism().instance;
+				if(! (mi.getConcreteInstance() instanceof PVSInstance)) {
+					throw new MiniBrassParseException("Invalid argument for morphism "+m.getName() + "(" +mi.getConcreteInstance()+ ") must be a concrete instance of type "+m.getFrom().instance);
+				} else {
+					PVSInstance decoratedPi = mi.getConcreteInstance();
+					if ( ! decoratedPi.getType().instance.getName().equals(m.getFrom().instance.getName())) {
+						throw new MiniBrassParseException("Invalid argument for morphism "+m.getName() + "(" +mi.getConcreteInstance() + ") must be a concrete instance of type "+m.getFrom().instance);						
+					}
+				}
+				
+			} else if(entry.getValue() instanceof PVSInstance) {
 				PVSInstance pvsInst = (PVSInstance) entry.getValue();
 				PVSType pvsType = pvsInst.getType().instance;
 				
@@ -230,7 +245,8 @@ public class SemanticChecker {
 				// inject this back into instance:
 				pvsInst.setParametersLinked(parInst);	
 								
-			}
+			} 
+		
 		}
 		
 	}
