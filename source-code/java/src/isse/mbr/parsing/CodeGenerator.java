@@ -121,20 +121,17 @@ public class CodeGenerator {
 				
 				// sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
 			}
-		} else {
+		} 
+	/*	else if (pvsInstance instanceof MorphedPVSInstance){
+			MorphedPVSInstance minst = (MorphedPVSInstance) pvsInstance;
+			addPvs(deref(minst.getInput()), sb,model);
+			pvsInstance.setGeneratedBetterPredicate(deref(minst.getInput()).getGeneratedBetterPredicate());
+		} */
+		else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
+			inst.update();
 			String name = inst.getName();
-			/* 
-			What we generate for a PVSType<E, S>(n, times o mu : S^n -> E, leq : E x E, top : E)
-
-			array[1..n] of var S: softConstraintResults; % the applications of the individual soft constraints into the specification type
-			var E: overall; 
-			constraint overall = times(softConstraintResults); 
-			constraint forall(i in 1..n) (is_worse(softConstraintResults[i], top) ); % maybe not even necessary, useful
-			for minisearch: propagate "post( is_worse(sol(overall), overall) )" to BaB 
-			for combined PVS (e.g. PVS_1 x PVS_2): post (is_worse(sol(overall_1), sol(overall_2), overall1, overall2 )
-			generate string list of outputs of all overall values so minisearch can access them 
-			*/
+			
 			sb.append("\n% ---------------------------------------------------");
 			sb.append("\n%   PVS "+name);
 			sb.append("\n% ---------------------------------------------------\n");
@@ -179,23 +176,11 @@ public class CodeGenerator {
 						paramExpression = pi.expression;
 					else 
 						paramExpression = defaultValue;
-					// TODO this has to go in the semantic check
-					/* if(pi == null)
-						throw new MiniBrassParseException("Undefined parameter "+pvsParam.getName() + " in inst: "+inst.getName());
-					*/
 				}
 				String def = String.format("%s : %s = %s; \n", encode(pvsParam.getType(), inst),CodeGenerator.encodeIdent(pvsParam, inst) , CodeGenerator.processSubstitutions(paramExpression, subs));
 				sb.append(def);
 			}
 			
-			/*
-			for(Entry<String, PVSParamInst> entry : inst.getParametersLinked().entrySet()) {
-				// first one should be nScs 
-				PVSParamInst pi = entry.getValue();
-				String def = String.format("%s : %s = %s; \n", encode(pi.parameter.getType(), inst),CodeGenerator.encodeIdent(pi.parameter, inst) , CodeGenerator.processSubstitutions(pi.expression, subs));
-				sb.append(def);
-			} 
-			*/
 			sb.append("\n% Decision variables: \n");
 			
 			String overallIdent = getOverallValuation(inst); 
@@ -218,6 +203,7 @@ public class CodeGenerator {
 			
 			StringBuilder instanceArguments = new StringBuilder();
 			boolean first = true;
+			
 			for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
 				if(!first)
 					instanceArguments.append(", ");
@@ -250,9 +236,10 @@ public class CodeGenerator {
 		}
 		
 		// all parameters to their encoded id
-		for(PVSParamInst pi : inst.getParametersLinked().values()) {
-			String encodedIdent = CodeGenerator.encodeIdent(pi.parameter, inst);
-			substitutions.put(MBR_PREFIX+pi.parameter.getName(), encodedIdent);
+		for(PVSParamInst parInst : inst.getParametersLinked().values()) {
+			PVSParameter parameter = parInst.parameter;
+			String encodedIdent = CodeGenerator.encodeIdent(parameter, inst);
+			substitutions.put(MBR_PREFIX+parameter.getName(), encodedIdent);
 		}
 		return substitutions;
 	}

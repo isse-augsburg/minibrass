@@ -14,6 +14,9 @@ import java.util.logging.Logger;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.MorphedPVSInstance;
+import isse.mbr.model.parsetree.Morphism;
+import isse.mbr.model.parsetree.Morphism.ParamMapping;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
@@ -128,7 +131,9 @@ public class MiniBrassParser {
 			model.registerPVSType(pvsType.getName(), pvsType);
 		} else if (currSy == MiniBrassSymbol.MorphismSy) {
 			getNextSy();
-			morphismItem();
+			Morphism m = morphismItem();
+			model.registerMorphism(m.getName(), m);
+			
 		} else if (currSy == MiniBrassSymbol.SolveSy) {
 			if(model.getSolveInstance() != null) {
 				throw new MiniBrassParseException("More than one solve item specified !");
@@ -225,7 +230,7 @@ public class MiniBrassParser {
 	private AbstractPVSInstance PVSDiProd(MiniBrassAST model) throws MiniBrassParseException {
 	
 		AbstractPVSInstance first = PVSAtom(model);
-		while(currSy == MiniBrassSymbol.AsteriskSy) {
+		while(currSy == MiniBrassSymbol.ParetoSy) {
 			getNextSy();
 			
 			AbstractPVSInstance next = PVSAtom(model);
@@ -242,8 +247,9 @@ public class MiniBrassParser {
 	}
 
 	/**
-	 * PVSAtom   -> "new" ident "(" stringlit "," intlit ("," MZNLiteral)* ")"          
+	 * PVSAtom   -> "new" ident "(" stringlit "," intlit ("," MZNLiteral)* ")"           
 	 *            |  ident
+	 *            |  ident "(" PVSAtom ")"
 	 *            | "(" PVSInst ")"
 	 * @throws MiniBrassParseException 
 	 * 
@@ -340,13 +346,29 @@ public class MiniBrassParser {
 			return instance;
 		} else if (currSy == MiniBrassSymbol.IdentSy) {
 			String reference = lexer.getLastIdent();
-			ReferencedPVSInstance referencedPVSInstance = new ReferencedPVSInstance();
-			referencedPVSInstance.setReference(reference);
-			referencedPVSInstance.setName("RefTo-"+reference);
-			referencedPVSInstance.setReferencedInstance(new NamedRef<AbstractPVSInstance>(reference));
-			semChecker.scheduleUpdate(referencedPVSInstance.getReferencedInstance(), model.getPvsReferences());
+
 			getNextSy();
-			return referencedPVSInstance;
+			if(currSy == MiniBrassSymbol.LeftParenSy) {
+				getNextSy();
+				AbstractPVSInstance pvs = PVSAtom(model);
+				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				MorphedPVSInstance morphedInst = new MorphedPVSInstance();
+				morphedInst.setInput(pvs);
+				morphedInst.setMorphism(new NamedRef<Morphism>(reference));
+				semChecker.scheduleUpdate(morphedInst.getMorphism(), model.getMorphisms());
+				morphedInst.setName(reference+"_"+pvs.getName()+"_");
+				model.getPvsInstances().put(morphedInst.getName(), morphedInst);
+		
+				return morphedInst;
+			} else {
+				ReferencedPVSInstance referencedPVSInstance = new ReferencedPVSInstance();
+				referencedPVSInstance.setReference(reference);
+				referencedPVSInstance.setName("RefTo_"+reference);
+				referencedPVSInstance.setReferencedInstance(new NamedRef<AbstractPVSInstance>(reference));
+				semChecker.scheduleUpdate(referencedPVSInstance.getReferencedInstance(), model.getPvsReferences());
+				
+				return referencedPVSInstance;
+			}
 		} else if(currSy == MiniBrassSymbol.LeftParenSy) {
 			getNextSy();
 			AbstractPVSInstance inst = PVSInst(model);
@@ -371,8 +393,9 @@ public class MiniBrassParser {
 
 	/**
 	 * 	morphism ConstraintRelationships -> WeightedCsp: ToWeighted = weight_cr;
+	 * @return 
 	 */
-	private void morphismItem() throws MiniBrassParseException {
+	private Morphism morphismItem() throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		String morphFrom = lexer.getLastIdent();
 		getNextSy();
@@ -388,12 +411,53 @@ public class MiniBrassParser {
 		getNextSy();
 		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
 
+		Morphism m = new Morphism();
+		m.setFrom(new NamedRef<PVSType>(morphFrom));
+		m.setTo(new NamedRef<PVSType>(morphTo));
+		m.setName(morphName);
+		
+		// can have params 
+		if(currSy == MiniBrassSymbol.ParamsSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
+			// now a param item until we see RightCurlSy
+			while(currSy != MiniBrassSymbol.RightCurlSy) {
+				expectSymbol(MiniBrassSymbol.IdentSy);
+				String targetParamName = lexer.getLastIdent();
+				ParamMapping pm = new ParamMapping();
+				pm.setParam(targetParamName);
+				
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
+				
+				// now either we have a stringlit sy for a minizinc literal expression
+				if(currSy == MiniBrassSymbol.StringLitSy) {
+					pm.setMznExpression(lexer.getLastIdent());
+					getNextSy();
+				} else {
+					// or we have an ident for a function 
+					expectSymbol(MiniBrassSymbol.IdentSy);
+					pm.setMznFunction(lexer.getLastIdent());
+					getNextSy();
+				}
+				m.getParamMappings().put(pm.getParam(), pm);
+				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			}
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.InSy);
+		}
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		String mznFunctionName = lexer.getLastIdent();
 		getNextSy();
 
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		LOGGER.fine("Morphism "+morphName+" mapping "+morphFrom + " to "+morphTo + " with mzn function "+mznFunctionName);
+		m.setMznFunction(mznFunctionName);
+		
+		semChecker.scheduleUpdate(m.getFrom(), model.getPvsTypes());
+		semChecker.scheduleUpdate(m.getTo(), model.getPvsTypes());
+
+		return m;
 	}
 
 	/**
