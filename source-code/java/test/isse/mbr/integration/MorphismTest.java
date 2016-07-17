@@ -15,7 +15,7 @@ public class MorphismTest {
 
 	String minibrassModel = "test-models/classicMorphed.mbr";
 	String minibrassCompiled = "test-models/classic_o.mzn";
-	String minizincModel = "test-models/classic.mzn";
+	String minizincModel = "test-models/classicMorphed.mzn";
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
 	
@@ -48,7 +48,7 @@ public class MorphismTest {
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
-		String obj = CodeGenerator.encodeString("overall","cr1");
+		String obj = CodeGenerator.encodeString("overall","ToWeighted_RefTo_cr1_");
 		// we expect a violation (in weights) of 1
 		Assert.assertEquals("1", listener.getObjectives().get(obj));
 	}

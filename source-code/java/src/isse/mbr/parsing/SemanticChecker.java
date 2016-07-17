@@ -243,7 +243,7 @@ public class SemanticChecker {
 				}
 				
 				// inject this back into instance:
-				pvsInst.setParametersLinked(parInst);	
+				pvsInst.setParametersInstantiated(parInst);	
 								
 			} 
 		
