@@ -285,6 +285,8 @@ public class MiniBrassParser {
 					getNextSy();
 					expectSymbol(MiniBrassSymbol.IdentSy);
 					String constraintId = lexer.getLastIdent();
+					if(instance.getSoftConstraints().containsKey(constraintId))
+						throw new MiniBrassParseException("Double definition of constraint '"+constraintId+"' (id "+nScs+").");
 
 					getNextSy();
 					expectSymbolAndNext(MiniBrassSymbol.ColonSy);
