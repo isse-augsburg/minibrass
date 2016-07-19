@@ -1,0 +1,787 @@
+%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+\usepackage{isse}
+
+
+\usepackage{apalike}
+\usepackage[utf8]{inputenc}
+\usepackage{pdfpages}
+%\usepackage{ngerman}
+\usepackage{stmaryrd,amsmath,amssymb}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage[makeroom]{cancel}
+\usepackage{mdframed}
+\usepackage{xskak}
+\usepackage{fancyvrb}
+\usepackage{marvosym}
+\setchessboard{
+showmover=false}
+\usepackage[noend]{algpseudocode}   % package for algorithms
+\usepackage{algorithm}
+\usepackage{tikz}
+
+\usepackage[absolute,overlay]{textpos}
+
+\usetikzlibrary{trees,calc,shapes,arrows,matrix,shadows,decorations.markings}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{calc,shapes.callouts,shapes.arrows}
+\usetikzlibrary{decorations.text}
+\newcommand{\CustomCite}[1]{\color{issegrey} \textbf{#1}}
+\tikzset{
+   hierNode/.style={main node,text width=1.1em,text centered,inner sep=1pt},
+   bStyle/.style={fill=forestgreen!35},
+   cStyle/.style={fill=black!35},
+   dStyle/.style={fill=thermicred!25},
+   optboundaries/.style={
+           state,
+           rectangle,
+           rounded corners,
+           draw=black, thick,
+           minimum height=4em,
+           minimum width=7em,
+           inner sep=2pt,
+           text centered,
+           dashed
+           },
+  trajectory/.style={issegrey,-},
+  emph/.style={isseorange},
+  trajectorynode/.style={fill=issegrey},
+  hystate/.style={
+           state,
+           rectangle,
+           rounded corners,
+           draw=black, very thick,
+           minimum height=1em,
+           minimum width=2em,
+           inner sep=1pt,
+           text centered,
+           },
+ hystatel/.style={
+ 		   hystate, 
+ 		   inner sep=3pt
+ }
+}
+
+
+\mdfdefinestyle{theoremstyle}{
+linecolor=red,linewidth=2pt,
+frametitlerule=true,
+frametitlebackgroundcolor=gray!20,
+innertopmargin=\topskip,
+}
+\definecolor{LRed}{rgb}{1,.8,.8}
+\definecolor{MRed}{rgb}{1,.6,.6}
+\definecolor{HRed}{rgb}{1,.2,.2}
+
+\usepackage{listings}
+\lstdefinelanguage{mzn}
+{
+	morekeywords={var,int,solve,not,search,satisfy,new,endif,maximize,params,instantiates,with,bool,in,type,PVS,PVSType,minimize,float,constraint,soft,sum,forall,exists,array,of,include,predicate,then,commit,post,set,function,if,else,repeat,next,ann,break},
+	sensitive=false,
+	morecomment=[l]{\%},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]",
+}
+
+
+\definecolor{lightlightgray}{gray}{0.95}
+\definecolor{forestgreen}{HTML}{009B55}
+\definecolor{thermicred}{rgb}{0.82, 0.1, 0.26}
+\lstset
+{
+	basicstyle=\ttfamily\small,
+	commentstyle=\ttfamily\color{thermicred},
+	stringstyle=\ttfamily\color{isseorange},
+	keywordstyle=\ttfamily\color{blue},
+	tabsize=2,
+	showstringspaces=false,
+	flexiblecolumns=true,
+	captionpos=b,	
+	backgroundcolor=\color{lightlightgray},
+	frame=single,
+	 xleftmargin=\parindent,
+}
+
+\lstset{language=mzn}
+\interfootnotelinepenalty=10000
+
+% ====== custom commands
+
+\newcommand{\prosumer}[1]{\ensuremath{\mathtt{#1}}}
+% Soft Constraint Example
+\newcommand{\constraintName}[1]{\ensuremath{\mathtt{#1}}}
+% Biogas Constraints
+\newcommand{\biogas}{biogas}
+\newcommand{\biogasShort}{bio}
+\newcommand{\gasFull}{\ensuremath{\constraintName{gasFull}_\mathtt{\biogasShort}}}
+\newcommand{\ecoSweet}{\ensuremath{\constraintName{ecoSweet}_\mathtt{\biogasShort}}}
+\newcommand{\onOff}{\ensuremath{\constraintName{onOff}_\mathtt{\biogasShort}}}
+% Thermal Plant Constraints
+\newcommand{\thermal}{thermal}
+\newcommand{\thermalShort}{therm}
+\newcommand{\ecoOpt}{\ensuremath{\constraintName{ecoOpt}_\mathtt{\thermalShort}}}
+\newcommand{\inertia}{\ensuremath{\constraintName{inertia}_\mathtt{\thermalShort}}}
+\newcommand{\ecoGood}{\ensuremath{\constraintName{ecoGood}_\mathtt{\thermalShort}}}
+\newcommand{\hLevelThermal}[1]{$H_#1^\mathtt{\thermalShort}$}
+% Electric Vehicle
+\newcommand{\ev}{EV}
+\newcommand{\limitBatteryUsage}{\ensuremath{\constraintName{limitBU}_\mathtt{\ev}}}
+\newcommand{\prefBatteryLevel}{\ensuremath{\constraintName{prefBL}_\mathtt{\ev}}}
+\newcommand{\earlyBird}{\ensuremath{\constraintName{earlyBird}_\mathtt{\ev}}}
+% Organization
+\newcommand{\org}{org}
+\newcommand{\minMaxViolation}{\ensuremath{\constraintName{violation}_\mathtt{\org}}}
+\newcommand{\hLevelOrg}[1]{$H_#1^\mathtt{\org}$}
+
+\newcommand{\Variable}{X}
+\newcommand{\LocalVariable}{\widehat{\Variable}}
+\newcommand{\Domain}{D}
+\newcommand{\Constraint}{C}
+\newcommand{\ConstraintRelationship}{\mathcal{R}}
+
+\newcommand{\valuation}{v}
+\newcommand{\constraint}[1]{\mathrm{#1}}
+
+\newcommand{\plantconstraint}[3]{  
+\ifx#1b \constraint{best}[#3]
+\else \ifx#1g \constraint{good}[#3]
+\else \ifx#1a \constraint{acc}[#3]
+\else \ifx#1d \constraint{diff}
+\else \ifx#1l \constraint{low}[#3]
+\else \ifx#1h \constraint{high}[#3]
+\else \ifx#1o \constraint{org}[#3]
+   \else
+   \constraint{#1}_{#2}^{#3} 
+   
+   
+\fi \fi \fi \fi \fi \fi \fi}
+\input{notespreamble}
+
+\renewcommand{\submseteq}{%
+\mathrel{\mathchoice%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{0.0pt}{\fontsize{7.5pt}{7.5pt}\selectfont\rotatebox{90}{$-$}\hspace{1.6pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{0.0pt}{\fontsize{7.5pt}{7.5pt}\selectfont\rotatebox{90}{$-$}\hspace{1.6pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{-0.3pt}{\fontsize{7pt}{7pt}\selectfont\rotatebox{90}{$-$}\hspace{1pt}}}}}%
+{\mathnormal{\subseteq}\llap{\text{\raisebox{-0.3pt}{\fontsize{7pt}{7pt}\selectfont\rotatebox{90}{$-$}\hspace{1pt}}}}}%
+}}
+
+
+\tikzset{
+   main node/.style={circle,fill=black!15,draw,font=\sffamily},
+   constraint node/.style={main node, circle, inner sep=2pt,font=\sffamily\small},   
+   treestyle/.style={rectangle,fill=black!15,draw,font=\sffamily}
+}
+
+
+\mdtheorem[style=theoremstyle]{definition}{Definition}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\tupleOf}[1]{\langle #1 \rangle}
+\newcommand{\cemph}[1]{\alert{#1}}
+\input{common}
+
+\title{MiniBrass: Soft Constraint Programming}
+\author{Alexander Schiendorfer et al.}
+
+\date{\today}
+
+\begin{document}
+\titleframe
+
+\begin{frame}{Einordnung}
+Wo wir letztes Jahr waren \ldots 
+\end{frame}
+
+
+{
+
+\addtobeamertemplate{background canvas}{\transfade[duration=0.001]}{}
+%gets rid of bottom navigation bars
+\setbeamertemplate{footline}[frame number]{}
+
+%gets rid of bottom navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+%gets rid of footer
+%will override 'frame number' instruction above
+%comment out to revert to previous/default definitions
+\setbeamertemplate{footline}{}
+
+\begin{frame}{Fahrplanerstellungsproblem}
+\textbf{Ziel}: Plane Kraftwerke so ein, dass sie die \alert{Last} gemeinsam erfüllen
+\input{img/problem}
+\end{frame}
+}
+
+
+\begin{frame}{Hierarchisches Energiemanagement}
+
+\begin{figure}
+\centering
+\input{overview}
+\label{fig:hierarchical-decomposition}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Constraint Relationships}
+\begin{figure}
+\centering
+\input{soft-constraint-intro}
+\end{figure}
+\vspace*{-2.4ex}
+\onslide<5->{\textbf{Ziel:} Integration von Individualpräferenzen.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Präferenzen im Constraint-Solving}
+
+Constraint-Problem $((X, D), C)$
+\begin{itemize}
+  \item \cemph{Variablen} $X$,
+\cemph{Domänen} $D = (D_x)_{x \in X}$,
+\cemph{Constraints} $C$
+\end{itemize}
+
+\vspace*{1ex}
+
+In der Praxis: \cemph{unerfüllbare} Probleme
+
+\vspace*{2ex}
+
+$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
+\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
+\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
+\mathrm{c}_2, \mathrm{c}_3 \})$ mit
+\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
+\begin{align*}
+  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
+\\[-.4ex]
+  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
+\\[-.4ex]
+  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
+\end{align*}
+\egroup
+
+\begin{itemize}
+  \item Nicht alle Constraints können gleichzeitig erfüllt werden
+\begin{itemize}
+  \item z.\,B., $\mathrm{c}_2$ erzwingt $\mathrm{z} = 3$ und $\mathrm{y} = 1$, im Konflikt zu $\mathrm{c}_1$
+\end{itemize}
+
+  \item Ein Agent wählt also zwischen Belegungen, die $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ oder $\{ \mathrm{c}_2, \mathrm{c}_3 \}$ erfüllen.
+\end{itemize}
+
+\vspace*{2ex}
+
+Welche Belegungen $v \in [X \to D]$ sollen \cemph{bevorzugt} werden?
+
+\end{frame}
+
+
+\begin{frame}{(Soft) Constraints in der Energie}
+
+\alert{Harte} Constraints aus Supply Automata:
+\begin{equation}
+\mathsf{hardBounds}: \forall t \in T, a \in A : m[a][t] = \mathsf{on} \rightarrow P_{\mathrm{min}} \leq S[a][t] \leq P_{\mathrm{max}} \nonumber
+\end{equation}
+
+\pause
+\vspace*{2ex}
+\alert{Weiche} Constraints anlagenspezifisch (z.B. Präferenz für 350 bis 390 KW):
+\begin{equation}
+\mathsf{ecoSweet}_{\mathsf{bio}}: \forall t \in T : m[\mathsf{biogas}][t] = \mathsf{on} \rightarrow 350 \leq S[\mathsf{biogas}][t] \leq 390 \nonumber
+\end{equation}
+
+\pause
+\vspace*{2ex}
+oder Änderungsgeschwindigkeit
+\begin{equation}
+\mathsf{inertia}_{\mathsf{therm}}: \forall t \in T : |S[\mathsf{biogas}][t] - S[\mathsf{biogas}][t+1] | \leq 10 \nonumber
+\end{equation}
+\end{frame}
+
+\input{soft-constraint-block}
+
+\begin{frame}{Partial Valuation Structures}
+Zugrundeliegende \alert{algebraische Struktur}: Partielle Bewertungsstruktur (\emph{partial valuation structure, partiell geordnetes, kommutatives Monoid)}
+\begin{itemize}
+\item $(M, \cdot_M, \varepsilon_M, \leq_M)$ 
+\item $m \cdot_m \varepsilon_M = m$
+\item $m \leq_M \varepsilon_M$
+\item $m \leq_M n \rightarrow m \cdot_M o \leq_M n \cdot_M o$
+\end{itemize}
+\vspace*{2ex}
+
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.7\textwidth}
+          
+    \hSecond{Abstrakt}
+    
+    \begin{itemize}
+    \item $M$ \ldots Elemente
+    \item $\cdot_M$ \ldots Kombination von Bewertungen
+    \item $\varepsilon_M$ \ldots neutrales, ``bestes'' Element
+    \item $\leq_M$ \ldots Ordnung, links ``schlechter''
+    \end{itemize}
+    \end{column}
+    
+    \begin{column}{.3\textwidth}
+  	\hFirst{Konkret}  
+  	 \begin{itemize}
+    \item $\{0, \ldots, k \}$ 
+    \item $+_k$
+    \item $0$ 
+    \item $\geq$
+    \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace*{2ex}
+  
+  \hfill \emph{\cite{Gadducci2013,SchiendorferPvs2015}}
+\end{frame}
+
+
+\begin{frame}[fragile]{PVS--Idee}
+\begin{center}
+\begin{tabular}{l|c|c|c|c}
+\textbf{Konkrete PVS} & $M$ & $\oplus_M$ & $\leq_M$ & $\varepsilon_M$ \\ 
+\hline 
+Weighted CSP (WCSP)& $\mathbb{N}$ & $+$ & $\geq$ & $0$ \\ 
+Fuzzy CSP & $[0,1]$ & $\min$ & $\leq$  & 1 \\ 
+Inclusion Max CSP & $2^{C_s}$ & $\cup$ & $\supseteq$  & $\emptyset$ \\ 
+Constraint Relationships\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\cup$ & $\supseteq_{\mathsf{SPD}}$ & $\emptyset$ \\ 
+\end{tabular} 
+\end{center}
+
+\begin{parchment}[Hauptidee]
+Implementiere Lösungsverfahren für Constraint-Probleme, die durch Bewertungsstrukturen geordnet sind. Instantiiere für konkrete Probleme.
+\end{parchment}
+\end{frame}
+
+
+\begin{frame}{Kombinationen~\cite{SchiendorferPvs2015}}
+\fontsize{8pt}{7.2}\selectfont
+\input{img/synth-graph-2}
+Die Präferenzstruktur dieses Problems:
+\vspace*{2ex}
+
+\qquad $
+  V_{\mathtt{org}_1} \ltimes (P_{\prosumer{\biogas}} \times P_{\prosumer{\ev}} \times (P_{\prosumer{\thermal}}^1 \ltimes P_{\prosumer{\thermal}}^2))
+$
+%
+\end{frame}
+
+
+\begin{frame}{Praxis I}
+Third International CSP Competition (CPAI’08)
+\begin{center}
+\includegraphics[width=.8\textwidth]{img/cpai08.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Praxis II}
+Im Constraint Programming:
+\begin{itemize}
+\item Fokus auf \emph{klassischen} Constraint-Lösern
+\item Erweiterung auf einfache Optimierung (Branch \& Bound)
+\item Zielfunktion kann skalare Variable (\texttt{int} oder \texttt{float}) sein
+\item { \color{isseorange} \texttt{toulbar2} ist der einzige dedizierte Weighted-CSP-Solver}
+\end{itemize}
+
+\vspace*{2ex}
+
+In der mathematischen Programmierung:
+
+\begin{itemize}
+\item Probleme müssen gewisse Struktur aufweisen (lineare Constraints, quadratische Constraints, etc.)
+\item Schlecht geeignet für beliebige Ordnungen nach denen optimiert werden soll
+\end{itemize}
+
+\vspace*{1ex} \pause 
+Wir wollen aber heterogene PVS $\rightarrow$ \alert{MiniZinc}
+\end{frame}
+
+
+\begin{frame}{Warum MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{Eine Modellierungssprache -- viele Solver} 
+\end{parchment}
+
+\begin{textblock*}{2.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=\textwidth]{img/MiniZn_logo.jpg} 
+
+\end{textblock*}
+\emph{Reduziere Soft-Constraint-Probleme auf konventionelle Constraint-Probleme}
+
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item CPLEX (CP/LP/MIP)
+\item G12 (CP/LP/MIP)
+\item \ldots
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{MiniBrass}
+
+\begin{center}
+
+\includegraphics[width=.5\textwidth]{img/minibrass.png}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/minibrass/}
+
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{MiniBrass: HelloWorld}
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.40\textwidth}
+          
+    \hSecond{Basismodell (MiniZinc)}
+    \begin{lstlisting}
+include "hello_o.mzn"; 
+include "soft_constraints/
+   pvs_gen_search.mzn"; 
+% the basic, "classic" CSP 
+set of int: DOM = 1..3;
+
+var DOM: x; var DOM: y; 
+var DOM: z;
+% add. *hard* constraints
+% e.g. constraint x < y;
+
+solve search pvs_BAB();
+\end{lstlisting}
+    \end{column}
+    
+    \begin{column}{.55\textwidth}
+  	\hFirst{Präferenzmodell (MiniBrass)} 
+  	\begin{lstlisting}
+PVS: cr1 = 
+  new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | 
+                  mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+solve cr1;
+\end{lstlisting}
+
+    \end{column}
+  \end{columns}
+  \pause
+  \begin{verbatim}
+Solution:  x = 1; y = 2; z = 1
+Valuations:  mbr_overall_cr1 = 2..2
+----------
+==========
+  \end{verbatim}
+\end{frame}
+
+
+\begin{frame} \small
+\frametitle{Single-Predecessor-Dominance (SPD) Lifting}
+
+\cemph{isWorseThan}-Relation für Mengen verletzter Constraints~\cite{Schiendorfer13}
+%
+\bgroup\abovedisplayskip=4pt\belowdisplayskip=12pt
+\begin{gather*}
+  V \uplus \{ c \}  \supset_{\mathsf{SPD}}  V 
+\\
+  V \uplus \{ c_{\mathrm{imp}} \}  \supset_{\mathsf{SPD}}  V \uplus \{ c_{\neg \mathrm{imp}} \}
+\quad\text{if $c_{\neg \mathrm{imp}} \rightarrow c_{\mathrm{imp}}$}
+\end{gather*}
+\egroup
+
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=1cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\begin{scope}
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=red] (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=green]   (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\begin{scope}[xshift=6cm]
+\node[constraint,fill=green] (1) at (0, 0)                   {$\mathrm{c}_7$};
+\node[constraint,fill=green]   (2) at ($ (1) + (-1.2, -0.8) $) {$\mathrm{c}_4$};  
+\node[constraint,fill=red] (3) at ($ (2) + (0.0, -0.9) $) {$\mathrm{c}_5$};  
+\node[constraint,fill=green] (4) at ($ (3) + ( 0.0, -1.0) $) {$\mathrm{c}_6$};  
+\node[constraint,fill=green] (7) at ($ (1) + ( 1.2, -0.8) $) {$\mathrm{c}_1$};  
+\node[constraint,fill=red]   (8) at ($ (7) + (-0.6, -0.9) $) {$\mathrm{c}_2$};  
+\node[constraint,fill=red]   (9) at ($ (7) + ( 0.6, -0.9) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (7) edge (1)
+  (3) edge (2)
+  (4) edge (3)
+  (8) edge (7)
+  (9) edge (7)
+  ;
+\end{scope}
+%
+\node (R) at (3.05, -1.4) {$ \supset_{\mathsf{SPD}}$};
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+\item Bekannt als \emph{Smyth-Ordnung} (Powerdomains) \hfill \cite[Ch.~9]{amadio-curien:1998}
+\item Entsteht aus \emph{freier Konstruktion} über Constraint-Relationship.\hfill \cite{knapp-schiendorfer2014ictai}
+\end{itemize}
+
+%
+%\cemph{Ordnungs}relation über Zuweisungen 
+%\bgroup\abovedisplayskip4pt
+%\begin{equation*}
+%  w \SPDord{R} v \iff \{ c \in C \mid v \not\models c \} \mathrel{({\SPDrel{R}})^{+}} \{ c \in C \mid w \not\models c \}
+%\end{equation*}
+%\egroup
+
+\end{frame}
+
+\tikzset{onslide/.code args={<#1>#2}{%
+  \only<#1>{\pgfkeysalso{#2}}
+}}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{highlight2}=[CornflowerBlue,ultra thick]
+\begin{frame}[fragile]{Constraint-Optimierung mit PVS}
+Der partiell geordnete Bewertungsraum
+
+
+
+\begin{figure}[!t]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {\alert<2->{$\{c_1, c_2\}$}};
+\node (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {\alert<3->{$\{c_1\}$}};
+\node (c2) at (-2,4) {\alert<4->{$\{c_2\}$}};
+\node (c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+\node[text width=2cm] (verb) at (4,0) {     };
+\path[-]
+(bot) edge[onslide={<2->{highlight}}] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge (c3)
+(c1c2) edge[onslide={<3->{highlight}}] (c1)
+(c1c2) edge (c2)
+(c1) edge[onslide={<4->{highlight}}] (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+%(a) edge (b)
+%(b) edge (top)
+%(bot) edge (c)
+%(c) edge (top)
+;
+
+\end{tikzpicture}
+\end{center}
+\label{fig:nosuprema}
+\end{figure}
+\begin{lstlisting}
+function ann: pvs_BAB() =
+       repeat(
+           if next() then 
+                 print("Intermediate solution:") /\ print() /\
+                 commit() /\ postGetBetter()
+           else break endif       );
+\end{lstlisting}
+\begin{textblock*}{2.5cm}[1,1](\textwidth-8.8cm,\textheight-4.03cm)
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint node] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint node] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+  
+
+\end{tikzpicture}
+\begin{Verbatim}[fontsize=\small]
+c1: 'x + 1 = y';
+c2: 'z = y + 2';
+c3: 'x + y <= 3';   
+\end{Verbatim}
+\end{textblock*}
+
+\begin{textblock*}{4cm}[1,1](\textwidth+0.5cm,\textheight-3.03cm)
+
+\onslide<2->{
+
+{ \tt  \small
+x = 1; y = 1; z = 1 \newline
+Valuation = 1..2
+}
+}
+
+\onslide<3->{
+{ \tt  \small
+----------
+
+x = 1; y = 1; z = 3 \newline
+Valuation = 1..1
+}
+}
+
+
+\onslide<4->{
+{ \tt  \small
+----------
+
+x = 1; y = 2; z = 1 \newline
+Valuations = 2..2
+
+----------
+
+==========
+
+}
+}
+\end{textblock*}
+\end{frame}
+
+\tikzset{
+    process/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30},
+    file/.style={rectangle,draw=black}
+}
+
+\begin{frame}{MiniBrass: Workflow}
+
+\vspace*{-10ex}
+\alert{Architektur}
+
+\begin{center}
+\vspace*{-10ex}
+\begin{tikzpicture}[every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+minimum width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.5cm,column sep=0.5cm]
+{
+\node[draw, file,isseorange,thick](mbr){\texttt{prefs.mbr}};  \& \& \node[draw, isseorange,thick,process](mbr2mzn){\texttt{mbr2mzn}}; \\
+\node[draw, file,isseorange,thick](mbrlibs){\texttt{mbrlibs.mzn}}; \& \& \node[draw, file,isseorange,thick](compiledMzn){\emph{prefs\_o.mbr}}; \\
+%    \&  \&  \node(inv){}; \&  \\
+\node[draw, file](f1){\texttt{model.mzn}}; \& \& \node[draw, process](mzn2fzn){\texttt{mzn2fzn}}; \& \& \node[draw, file](output){\emph{output}};  \\
+%    \&  \&  \node(inv){}; \&  \\
+\node[draw, file](mod){\texttt{data.dzn}}; \& \&  \\
+\& \& \node[draw, file](fzn){\texttt{compiled.fzn}}; \& \& \node[draw, process](solve){\texttt{solve}};  \\
+\& \\
+};
+
+\draw[dashed,->] (f1) -- (mzn2fzn);
+\draw[dashed,->] (mbr) -- (mbr2mzn);
+\draw[dashed,->] (mod) -- (mzn2fzn);
+\draw[dashed,->] (mbrlibs) -- (mzn2fzn);
+\draw[dashed] (mbrlibs) -- (mbr);
+\draw[dashed,->] (compiledMzn) -- (mzn2fzn);
+\draw[dashed,->] (fzn) -- (solve);
+\draw[->] (mbr2mzn) -- (compiledMzn);
+
+\draw[->] (mzn2fzn) -- (fzn);
+\draw[->] (solve) -- (output);
+%\draw[dashed] (globals) -- (inv);
+\end{tikzpicture}
+\end{center}
+\vspace*{-25ex}
+
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}{Evaluationsergebnisse}
+
+\end{frame}
+
+\begin{frame}{Kooperationen}
+\begin{itemize}
+\item[] \alert{Konzepte, Sprachdesign MiniBrass}
+\begin{itemize}
+\item[-] AS, Alexander Knapp, Gerrit Anders, Oliver Kosak
+\end{itemize}
+\item[] \alert{Anwendungen, Multiagenten-Einsatz}
+\begin{itemize}
+\item[-] Alexander Schubert (MSc-Thesis: Einsatz von Voting-Verfahren), Markus Tolls (MSc-Thesis: Formalisierung von Task-Allocation-Problemen)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Outreach}
+\begin{itemize}
+\item Vortrag Helmholtz-Zentrum München
+\item Vortrag FH Hagenberg
+\item Tutorial @ SASO 2016
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[allowframebreaks]
+        \frametitle{References}
+        \bibliographystyle{apalike}
+        \bibliography{../common}
+\end{frame}
+
+
+\end{document}
+

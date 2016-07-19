@@ -1,0 +1,68 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.3cm,
+  thick,main node/.style={circle,fill=black!15,draw,font=\sffamily}]
+
+ \node[hierNode, double, label=north:\only<1->{500}] (tl) {a};
+ \node[hierNode, double,label=west:\only<4->{\alert<4>{300}}] (i) [xshift=-.2cm, yshift=-.3cm,below left of=tl] {\alert<3-4>{i}}; 
+ \node[hierNode, double,label=east:\only<4->{\alert<4>{200}}] (j) [below right of=tl,yshift=-.3cm,xshift=.9cm] {\alert<3-4>{j}};
+
+
+ \node[hierNode, cStyle, label=south:\only<8->{60}] (c) [below of=i] {\alert<5-7>{c}}; 
+ 
+ \node[hierNode,bStyle, label=south:\only<8->{140}] (b) [left of=c] {\alert<5-7>{b}}; 
+ \node[hierNode, dStyle, label=south:\only<8->{100}] (d) [right of=c] {\alert<5-7>{d}}; 
+ \node[hierNode, bStyle, label=south:\only<8->{160}] (e) [right of=d] {\alert<5-7>{e}}; 
+ \node[hierNode, dStyle, label=south:\only<8->{40}] (f) [right of=e] {\alert<5-7>{f}}; 
+  
+ 
+  \path[every node/.style={font=\sffamily\tiny}]
+    (tl) edge node [right] {} (i)
+   	     edge node [right] {} (j) 
+   	(i) edge node [right] {} (b)
+   	     edge node [right] {} (c)
+   	     edge node [right] {} (d) 
+   	(j) edge node [right] {} (e)
+   	     edge node [right] {} (f)      ;   	     
+  
+\onslide<2-4>{ \node[optboundaries, text width=13.5em, text height = 6.4em] (tlOpt) at (.4,-.4) { };}  
+ 
+\onslide<5->{\node[optboundaries, text width=8.7em, text height = 6.8em] (iOpt) at (-1.2,-2.0) {}; }
+ 
+\onslide<5->{\node[optboundaries, text width=6.3em, text height = 6.8em] (jOpt) at (2.2,-2.0) {};}  
+ 
+
+\onslide<3-4,9->{  
+\node[overlay,align=left,rectangle callout,%
+      callout absolute pointer=(tl.west),fill=isseorange!50] at (-3.8,-0.3) {Was sollen $i$ und $j$\\ beisteuern?};} 
+     
+\onslide<4,9->{     
+\node[overlay,rectangle callout,%
+      callout absolute pointer=(j.north),fill=isseorange!50] at (3.0,1.4) {Wie kann ich $e$ und $f$ repräsentieren?}; } 
+
+\onslide<6->{
+\node[overlay,align=left,rectangle callout,%
+      callout absolute pointer=(b.west),fill=isseorange!50] at (-3.8,-4.3) {Wie vermeide ich \\ meinen Speicher \\über 90\% zu füllen?}; } 
+      
+\onslide<7-> { \node[overlay,align=left,rectangle callout,%
+      callout absolute pointer=(f.east),fill=isseorange!50] at (4.3,-4.4) {Wie beschreibe ich \\meine Abläufe?}; }
+      
+\onslide<10-> { \node[overlay,align=left, fill=issegrey!20] at (0.3,-4.4) {\footnotesize Constraint Relationships / PVS \\
+\footnotesize \CustomCite{SGAI'13}, \CustomCite{ICTAI'14} \\
+\footnotesize \CustomCite{Wirsing'15}, \alert{\CustomCite{Constraints'16}}
+}; }      
+
+\onslide<11-> { \node[overlay,align=left, fill=issegrey!20] at (-3.2,1.4) {\footnotesize Regio-zentrale Fahrpläne\\
+\footnotesize \CustomCite{ICAART'14}, \CustomCite{SAOS'14} \\
+\footnotesize Marktbasiert \\
+\footnotesize \CustomCite{TAAS'15}
+}; }      
+
+\onslide<12-> { \node[overlay,align=left, fill=issegrey!20] at (4.7,0.2) {\footnotesize Abstraktion\\
+\footnotesize \CustomCite{ICAART'14}, \CustomCite{TCCI'15} \\
+\footnotesize \CustomCite{SASO'15}
+}; }  
+
+\onslide<13-> { \node[overlay,align=left, fill=issegrey!20] at (5.3,-2.0) {\footnotesize Supply Automata \\
+\footnotesize \CustomCite{SEN-MAS'14} \\
+\footnotesize \CustomCite{TCCI'15}
+}; }  
+\end{tikzpicture}
