@@ -13,6 +13,7 @@ type ConstraintRelationships = PVSType<bool, set of 1..nScs> =
 type CostFunctionNetwork = PVSType<0..k> = 
   params {
     int: k :: default('1000'); 
+    bool: isWorstCase :: default('false');
   } in  
   instantiates with "soft_constraints/mbr_types/cfn_type.mzn" {
     times -> sum;

@@ -20,7 +20,7 @@ rm -r "$EXP_LIB"
 mkdir "$EXP_LIB"
 
 # enter all files of the utility library here 
-
+cp -r mbr_types "$EXP_LIB"
 cp pvs_search.mzn "$EXP_LIB"
 cp pvs_gen_search.mzn "$EXP_LIB"
 cp cr_consistency.mzn "$EXP_LIB"

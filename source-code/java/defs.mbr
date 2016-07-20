@@ -3,10 +3,41 @@ type ConstraintRelationships = PVSType<bool, set of 1..nScs> =
     array[int, 1..2] of 1..nScs: crEdges;
     bool: useSPD;
   } in 
-  instantiates with "mbr_types/cr_type.mzn" {
+  instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
     times -> link_invert_booleans;
     is_worse -> is_worse_cr;
     top -> {};
     % bot -> 1..nScs;
   };
     
+type CostFunctionNetwork = PVSType<0..k> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "soft_constraints/mbr_types/cfn_type.mzn" {
+    times -> sum;
+    is_worse -> is_worse_weighted; 
+    top -> 0;
+ };
+  
+  
+type WeightedCsp = PVSType<bool, int> = 
+  params {
+    int: k :: default('1000'); 
+    array[1..nScs] of int: weights :: default('1');
+  } in  
+  instantiates with "soft_constraints/mbr_types/weighted_type.mzn" {
+    times -> weighted_sum;
+    is_worse -> is_worse_weighted;
+    top -> 0;
+    % bot -> k+1;
+ };
+  
+    
+
+morph ConstraintRelationships -> WeightedCsp: ToWeighted = 
+  params {
+    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    weights = calculate_cr_weights;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+   

@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar mbr2mzn.jar "$@"
+java -jar /home/alexander/Documents/Projects/git-new/Minizinc/minizinc-soft-constraints/source-code/java/mbr2mzn.jar "$@"
