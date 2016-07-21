@@ -34,6 +34,6 @@ PVS: therm2 = new CostFunctionNetwork("therm2") {
   soft-constraint ecoGood: 'sum(w in WINDOW) ( abs(supply[w,3] - 9) )';
 };
 
-PVS: overall = orga lex ( (biogas pareto ev) pareto  (therm1 lex therm2) );
+PVS: overall = orga lex ( biogas pareto ev pareto  (therm1 lex therm2) );
 
 solve overall;

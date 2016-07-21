@@ -1,0 +1,192 @@
+
+
+{
+
+\addtobeamertemplate{background canvas}{\transfade[duration=0.001]}{}
+%gets rid of bottom navigation bars
+\setbeamertemplate{footline}[frame number]{}
+
+%gets rid of bottom navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+%gets rid of footer
+%will override 'frame number' instruction above
+%comment out to revert to previous/default definitions
+\setbeamertemplate{footline}{}
+
+\begin{frame}{Fahrplanerstellungsproblem}
+\textbf{Ziel}: Plane Kraftwerke so ein, dass sie die \alert{Last} gemeinsam erfüllen
+\input{img/problem}
+\end{frame}
+}
+
+
+\begin{frame}{Hierarchisches Energiemanagement}
+
+\begin{figure}
+\centering
+\input{overview}
+\label{fig:hierarchical-decomposition}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Constraint Relationships}
+\begin{figure}
+\centering
+\input{soft-constraint-intro}
+\end{figure}
+\vspace*{-2.4ex}
+\onslide<5->{\textbf{Ziel:} Integration von Individualpräferenzen.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Präferenzen im Constraint-Solving}
+
+Constraint-Problem $((X, D), C)$
+\begin{itemize}
+  \item \cemph{Variablen} $X$,
+\cemph{Domänen} $D = (D_x)_{x \in X}$,
+\cemph{Constraints} $C$
+\end{itemize}
+
+\vspace*{1ex}
+
+In der Praxis: \cemph{unerfüllbare} Probleme
+
+\vspace*{2ex}
+
+$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
+\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
+\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
+\mathrm{c}_2, \mathrm{c}_3 \})$ mit
+\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
+\begin{align*}
+  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
+\\[-.4ex]
+  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
+\\[-.4ex]
+  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
+\end{align*}
+\egroup
+
+\begin{itemize}
+  \item Nicht alle Constraints können gleichzeitig erfüllt werden
+\begin{itemize}
+  \item z.\,B., $\mathrm{c}_2$ erzwingt $\mathrm{z} = 3$ und $\mathrm{y} = 1$, im Konflikt zu $\mathrm{c}_1$
+\end{itemize}
+
+  \item Ein Agent wählt also zwischen Belegungen, die $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ oder $\{ \mathrm{c}_2, \mathrm{c}_3 \}$ erfüllen.
+\end{itemize}
+
+\vspace*{2ex}
+
+Welche Belegungen $v \in [X \to D]$ sollen \cemph{bevorzugt} werden?
+
+\end{frame}
+
+
+\begin{frame}{(Soft) Constraints in der Energie}
+
+\alert{Harte} Constraints aus Supply Automata:
+\begin{equation}
+\mathsf{hardBounds}: \forall t \in T, a \in A : m[a][t] = \mathsf{on} \rightarrow P_{\mathrm{min}} \leq S[a][t] \leq P_{\mathrm{max}} \nonumber
+\end{equation}
+
+\pause
+\vspace*{2ex}
+\alert{Weiche} Constraints anlagenspezifisch (z.B. Präferenz für 350 bis 390 KW):
+\begin{equation}
+\mathsf{ecoSweet}_{\mathsf{bio}}: \forall t \in T : m[\mathsf{biogas}][t] = \mathsf{on} \rightarrow 350 \leq S[\mathsf{biogas}][t] \leq 390 \nonumber
+\end{equation}
+
+\pause
+\vspace*{2ex}
+oder Änderungsgeschwindigkeit
+\begin{equation}
+\mathsf{inertia}_{\mathsf{therm}}: \forall t \in T : |S[\mathsf{biogas}][t] - S[\mathsf{biogas}][t+1] | \leq 10 \nonumber
+\end{equation}
+\end{frame}
+
+\input{soft-constraint-block}
+
+\begin{frame}{Partial Valuation Structures}
+Zugrundeliegende \alert{algebraische Struktur}: Partielle Bewertungsstruktur (\emph{partial valuation structure, partiell geordnetes, kommutatives Monoid)}
+\begin{itemize}
+\item $(M, \cdot_M, \varepsilon_M, \leq_M)$ 
+\item $m \cdot_m \varepsilon_M = m$
+\item $m \leq_M \varepsilon_M$
+\item $m \leq_M n \rightarrow m \cdot_M o \leq_M n \cdot_M o$
+\end{itemize}
+\vspace*{2ex}
+
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.7\textwidth}
+          
+    \hSecond{Abstrakt}
+    
+    \begin{itemize}
+    \item $M$ \ldots Elemente
+    \item $\cdot_M$ \ldots Kombination von Bewertungen
+    \item $\varepsilon_M$ \ldots neutrales, ``bestes'' Element
+    \item $\leq_M$ \ldots Ordnung, links ``schlechter''
+    \end{itemize}
+    \end{column}
+    
+    \begin{column}{.3\textwidth}
+  	\hFirst{Konkret}  
+  	 \begin{itemize}
+    \item $\{0, \ldots, k \}$ 
+    \item $+_k$
+    \item $0$ 
+    \item $\geq$
+    \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace*{2ex}
+  
+  \hfill \emph{\cite{Gadducci2013,SchiendorferPvs2015}}
+\end{frame}
+
+
+\begin{frame}[fragile]{PVS--Idee}
+\begin{center}
+\begin{tabular}{l|c|c|c|c}
+\textbf{Konkrete PVS} & $M$ & $\oplus_M$ & $\leq_M$ & $\varepsilon_M$ \\ 
+\hline 
+Weighted CSP (WCSP)& $\mathbb{N}$ & $+$ & $\geq$ & $0$ \\ 
+Fuzzy CSP & $[0,1]$ & $\min$ & $\leq$  & 1 \\ 
+Inclusion Max CSP & $2^{C_s}$ & $\cup$ & $\supseteq$  & $\emptyset$ \\ 
+Constraint Relationships\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\mcup$ & $\supseteq_{\mathsf{SPD}}$ & $\lbag \rbag$ \\ 
+\end{tabular} 
+\end{center}
+
+\begin{parchment}[Hauptidee]
+Implementiere Lösungsverfahren für Constraint-Probleme, die durch Bewertungsstrukturen geordnet sind. Instantiiere für konkrete Probleme.
+\end{parchment}
+\end{frame}
+
+
+\begin{frame}{Kombinationen~\cite{SchiendorferPvs2015}}
+\fontsize{8pt}{7.2}\selectfont
+\input{img/synth-graph-2}
+Die Präferenzstruktur dieses Problems:
+\vspace*{2ex}
+
+\qquad $
+  V_{\mathtt{org}_1} \ltimes (P_{\prosumer{\biogas}} \times P_{\prosumer{\ev}} \times (P_{\prosumer{\thermal}}^1 \ltimes P_{\prosumer{\thermal}}^2))
+$
+%
+\begin{textblock*}{7.5cm}[1,1](\textwidth+3.8cm,\textheight-0.13cm)
+\begin{itemize}
+\item[] \textsc{SPD} \ldots Single-Pred.-Dom.
+\item[] \textsc{TPD} \ldots Single-Pred.-Dom.
+\item[] \textsc{SUM} \ldots Sum of Errors
+\item[] \textsc{WC} \ldots Worst-Case Error
+
+
+\end{itemize}
+ \end{textblock*}
+\end{frame}
