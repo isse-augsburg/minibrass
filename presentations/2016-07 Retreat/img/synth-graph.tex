@@ -1,0 +1,44 @@
+\begin{figure}
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.45cm,inner sep=1.5pt,outer sep = 0.0pt, thick] 
+
+\tikzstyle{every node}=[font=\small]
+
+\begin{scope}[xshift=-12cm,yshift=0.0cm]
+\node[constraint node, xshift=0.6cm, label=west:{\small 4/13}] (1) {$\mathrm{c_7}$};
+\node[constraint node, xshift=1cm, label=east:{\small 2/3}] (3)  [below right of=1] {$\mathrm{c_1}$};
+\node[constraint node, label=0:{\small 1/1}] (4) [below left of=3] {$\mathrm{c_2}$};
+\node[constraint node, label=0:{\small 1/1}] (8) [below right of=3] {$\mathrm{c_3}$};
+\node[constraint node, label=0:{\small 3/4}] (5) [below left of=1, xshift=-.5cm] {$\mathrm{c_4}$};
+\node[constraint node, node distance=0.85cm, label=0:{\small 2/2}] (6) [below of=5] {$\mathrm{c_5}$};  
+\node[constraint node, node distance=0.85cm,label=0:{\small 1/1}] (7) [below of=6] {$\mathrm{c_6}$};  
+
+\path[every node/.style={font=\sffamily\tiny}]
+  (3) edge node [right] {} (1)
+  (5) edge node [right] {} (1)
+  (4) edge node [right] {} (3)
+  (8) edge node [right] {} (3) 	
+  (6) edge node [right] {} (5)
+  (7) edge node [right] {} (6)    
+  ;
+        
+%\draw [rounded corners, black!45,dashed] (-2.0,-0.5) rectangle (0.3,-3.8);
+%\node[yshift=-.75cm] (ag1) at (7){ Agent 1};
+    
+%\draw [rounded corners, black!45,dashed] (0.6,-0.5) rectangle (4.5,-3.8);
+%\node[yshift=-2.45cm] (ag2) at (3) { Agent 2};
+\end{scope}
+
+\end{tikzpicture}
+\caption{Beispiel mit errechneten Gewichten}
+\label{fig:combRelGraph}
+\end{figure}
+
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% mode: TeX-PDF
+%%% mode: TeX-source-correlate
+%%% TeX-master: "../quality-quantity-soft-constraints.tex"
+%%% End:
+
