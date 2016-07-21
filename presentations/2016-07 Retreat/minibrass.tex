@@ -179,6 +179,15 @@ innertopmargin=\topskip,
 \renewcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\tupleOf}[1]{\langle #1 \rangle}
 \newcommand{\cemph}[1]{\alert{#1}}
+%% Alex: booktabs packages
+\usepackage{longtable}
+\usepackage{dcolumn}
+\usepackage{tabularx}% http://ctan.org/pkg/tabularx
+\usepackage{booktabs}% http://ctan.org/pkg/booktabs
+% tabularx already includes the array package
+%\usepackage{array}% http://ctan.org/pkg/array
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
 \input{common}
 
 \title{MiniBrass: Soft Constraint Programming}
@@ -193,13 +202,13 @@ innertopmargin=\topskip,
 
 %\input{rationale}
 
-\input{minibrass-lang}
+%\input{minibrass-lang}
 
 %\input{search-space}
 
 %\input{case-studies}
 
-%\input{evaluation}
+\input{evaluation}
 
 %\input{conclusion}
 

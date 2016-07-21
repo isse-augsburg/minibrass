@@ -3,4 +3,10 @@ JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID
 where Timeout &gt; 10000 and 
 SearchType = 3 
 and instance = 'concert.dzn'
--- group by instance, SPD, Objective</sql><current_tab id="0"/></tab_sql></sqlb_project>
+-- group by instance, SPD, Objective</sql><sql name="query.sql">SELECT problem, instance, SolverName, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+-- group by instance, SPD, Objective
+where searchtype = 3 and problem =&quot;soft-queens&quot; and instance = &quot;soft-queens-30.dzn&quot;
+and SPD = 1 and MIF = 0 and timeout &gt; 10000
+order by problem, instance, elapsedSecs, solverId </sql><current_tab id="1"/></tab_sql></sqlb_project>

@@ -1,4 +1,132 @@
 
-\begin{frame}{Evaluationsergebnisse}
+\begin{frame}{Evaluation}
+\begin{itemize}
+\item Direkter Vergleich schwierig
+\item Kein anderes System implementiert PVS (oder c-Semiringe)
+\item $\rightarrow$ Dafür unterstützt \texttt{toulbar2} Weighted CSP und \emph{Cost Function Networks}
+\item[] (der einzig frei verfügbare \emph{Soft-Constraint-Solver})
+\end{itemize}
+
+\vspace*{2ex} \pause 
+
+\begin{itemize}
+\item Daher Beschränkung auf \emph{Weighted CSP} für die Evaluierung
+\item Abbildung aus Constraint-Relationships
+\item Probleme sind Variationen von 5 Problemen aus den MiniZinc-Benchmarks\footnote{\url{https://github.com/MiniZinc/minizinc-benchmarks}} (erweitert um Soft Constraints in PVS)
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}{Rahmenbedingungen}
+\begin{itemize}
+\item Eingesetzte Solver
+\begin{itemize}
+\item[-] JaCoP
+\item[-] Gecode
+\item[-] Google OR-Tools
+\item[-] G12
+\item[-] Choco
+\item[-] \texttt{toulbar2}
+\end{itemize}
+
+\vspace*{2ex}
+
+\item Eingesetzte Probleme (insgesamt 15 Instanzen)
+\begin{itemize}
+\item[-] Soft-Queens
+\item[-] Photo-Platzierung
+\item[-] Talent-Scheduling
+\item[-] On-Call-Rostering
+\item[-] Multi-Skilled Project Scheduling Problem
+\end{itemize}
+
+\vspace*{2ex}
+\item Timeout: 10 Minuten
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Resultate: Kleine Probleme} \small
+\textbf{Photo-Platzierung und Soft-Queens} 
+
+\begin{table}[t]
+%\vspace*{1.3ex}% Fill page
+\caption{\normalfont Werte in Klammern geben die beste gefundene Lösung nach Timeout an; Da Weighted CSP $\rightarrow$ Minimierung. Zeiten in Sekunden.}
+%
+%\newcolumntype{C}{>{\centering\arraybackslash}X}
+\begin{tabularx}{\columnwidth}{lcccccc}
+  \toprule
+  & OR-Tools & Gecode & Choco & JaCoP & G12 & \texttt{toulbar2} \\
+  \midrule 
+  Photo \\
+  \midrule
+  photo1 & \textbf{0.18} & 0.19 & 0.41 & 0.54 & 3.38 & \hFirst{0.4}\\
+  photo2 & 1.06 & 2.98 & \textbf{0.52} & 2.92 & 35.3 & \hFirst{0.55} \\
+  \midrule 
+  Soft-Queens \\
+  \midrule 
+  $n = 8$ & \textbf{0.03} & 0.03 & 0.46 & 0.18 & 0.03 & \hFirst{0.27} \\
+  $n = 16$ & \textbf{0.03} & 0.04 & 0.5 & 0.22 & 0.05 & \hFirst{0.28} \\ 
+  $n = 30$ & \textbf{0.04} (0) & 600 (4) & 0.55 (0) & 187.86 (0) & 600 (4)  & \hFirst{0.58 (0)} \\ 
+  \bottomrule                             
+\end{tabularx}
+\label{tab:closing}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Resultate: Mittlere Probleme} \small
+\textbf{Talent-Scheduling und On-Call Rostering} 
+
+\begin{table}[t]
+%\vspace*{1.3ex}% Fill page
+\caption{\normalfont Werte in Klammern geben die beste gefundene Lösung nach Timeout an; Da Weighted CSP $\rightarrow$ Minimierung. Zeiten in Sekunden.}
+%
+%\newcolumntype{C}{>{\centering\arraybackslash}X}
+\begin{tabularx}{\columnwidth}{lcccccc}
+  \toprule
+  & OR-Tools & Gecode & Choco & JaCoP & G12 & \texttt{toulbar2} \\
+  \midrule 
+  Talents \\
+  \midrule
+  small & \textbf{0.03} & 0.03 & 0.35 & 0.16 & 0.04 & \hFirst{2.28}\\
+  concert & \textbf{0.05} & 0.05 & 0.47 & 0.24 & 0.07 & \hFirst{16.98} \\
+  film103 & \textbf{2.23} & 67.69 & 7.48 & 3.01 & 9.3 & -- \\
+  \midrule 
+  Rostering \\
+  \midrule 
+  4s-10d\footnote{s bezeichnet ``staff'', d ``days''} & \textbf{0.14} & 0.17 & 1.53 & 0.64 & 0.22 & \hFirst{0.81} \\
+  4s-23d & \textbf{2.59} & 2.92 & 5.68 & 4.06 & 4.49 & \hFirst{3.98} \\ 
+  10s-50d & 600 (6) & 600 (6) & 600 (14) & 600 (10) & 600 (10) & \hFirst{\textbf{87.18} (1)} \\ 
+  \bottomrule                             
+\end{tabularx}
+\label{tab:closing}
+\end{table}
+
+\end{frame}
+
+
+\begin{frame}{Resultate: Große Probleme} \small
+\textbf{Multi-Skilled Project Scheduling Problem} 
+
+\begin{table}[t]
+%\vspace*{1.3ex}% Fill page
+\caption{\normalfont Werte in Klammern geben die beste gefundene Lösung nach Timeout an; Da Weighted CSP $\rightarrow$ Minimierung. Zeiten in Sekunden.}
+%
+%\newcolumntype{C}{>{\centering\arraybackslash}X}
+\begin{tabularx}{\columnwidth}{lcccccc}
+  \toprule
+  & OR-Tools & Gecode & Choco & JaCoP & G12 & \texttt{toulbar2} \\
+  \midrule 
+  MSPSP \\
+  \midrule
+  easy\_01 & \textbf{0.2} & 0.32 & 1.26 & 0.94 & 0.27 & --\\
+  medium\_01 & \textbf{0.19} & 0.22 & 1.35 & 0.67 & 0.21 & --\\
+  hard\_02 & 0.37 & \textbf{0.33} & 1.59 & 1.01 & 0.37 & 600 (--)\\
+  hard\_04 & 0.27 & \textbf{0.25} & 1.62 & 0.86 & 0.28 & --\\
+     \bottomrule                             
+\end{tabularx}
+\label{tab:closing}
+\end{table}
 
 \end{frame}
