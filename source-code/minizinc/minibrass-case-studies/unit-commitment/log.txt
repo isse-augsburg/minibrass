@@ -1,48 +1,48 @@
-2016-07-20 17:39:35 INFO isse.mbr.parsing.MiniBrassCompiler doMain Processing unit-commitment.mbr to file unit-commitment_o.mzn
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Orga: CostFunctionNetwork, nScs: 3, params: [nScs=3, isWorstCase=true]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem biogas: ConstraintRelationships, nScs: 3, params: [crEdges=[| mbr.ecoSweet, mbr.gasFull | mbr.onOff, mbr.gasFull |], nScs=3, useSPD=true]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem ev: ConstraintRelationships, nScs: 3, params: [crEdges=[| mbr.limitBU, mbr.prefBL |  mbr.limitBU, mbr.earlyBird |], nScs=3, useSPD=false]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem therm1: CostFunctionNetwork, nScs: 2, params: [nScs=2]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem therm2: CostFunctionNetwork, nScs: 1, params: [nScs=1]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem ( (ref) -> orga lex ( ( (ref) -> biogas * (ref) -> ev ) * ( (ref) -> therm1 lex (ref) -> therm2 ) ) )
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... ConstraintRelationships
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Next index: int(1 .. 2)
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter bool: useSPD
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: link_invert_booleans
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_cr
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: {}
-2016-07-20 17:39:35 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: ConstraintRelationships <set of int(1 .. nScs)(link_invert_booleans, is_worse_cr, {})>
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... CostFunctionNetwork
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: int(0 .. k)
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter isse.mbr.model.types.IntType@3695de1a: k
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter bool: isWorstCase
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: sum
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_weighted
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: 0
-2016-07-20 17:39:35 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: CostFunctionNetwork <int(0 .. k)(sum, is_worse_weighted, 0)>
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... WeightedCsp
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter isse.mbr.model.types.IntType@292898f5: k
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: weighted_sum
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_weighted
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: 0
-2016-07-20 17:39:35 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: WeightedCsp <int(0 .. k)(weighted_sum, is_worse_weighted, 0)>
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser morphismItem Morphism ToWeighted mapping ConstraintRelationships to WeightedCsp with mzn function id
-2016-07-20 17:39:35 FINE isse.mbr.parsing.SemanticChecker checkPvsInstances Checking PVS instances
-2016-07-20 17:39:35 FINER isse.mbr.parsing.MiniBrassParser parse I should optimize: (ref) -> overall
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: Orga: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 3, params: [nScs=3, isWorstCase=true]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: ev: [lit] PVS-Type: ConstraintRelationships <set of int(1 .. [lit] nScs)(link_invert_booleans, is_worse_cr, {})>, nScs: 3, params: [crEdges=[| mbr.limitBU, mbr.prefBL |  mbr.limitBU, mbr.earlyBird |], nScs=3, useSPD=false]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: therm1: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 2, params: [nScs=2]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: therm2: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 1, params: [nScs=1]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: biogas: [lit] PVS-Type: ConstraintRelationships <set of int(1 .. [lit] nScs)(link_invert_booleans, is_worse_cr, {})>, nScs: 3, params: [crEdges=[| mbr.ecoSweet, mbr.gasFull | mbr.onOff, mbr.gasFull |], nScs=3, useSPD=true]
-2016-07-20 17:39:35 FINE isse.mbr.parsing.CodeGenerator generateCode Starting code generation
+2016-07-20 18:25:55 INFO isse.mbr.parsing.MiniBrassCompiler doMain Processing unit-commitment.mbr to file unit-commitment_o.mzn
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Orga: CostFunctionNetwork, nScs: 3, params: [nScs=3, isWorstCase=true]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem biogas: ConstraintRelationships, nScs: 3, params: [crEdges=[| mbr.ecoSweet, mbr.gasFull | mbr.onOff, mbr.gasFull |], nScs=3, useSPD=true]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem ev: ConstraintRelationships, nScs: 3, params: [crEdges=[| mbr.limitBU, mbr.prefBL |  mbr.limitBU, mbr.earlyBird |], nScs=3, useSPD=false]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem therm1: CostFunctionNetwork, nScs: 2, params: [nScs=2]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem therm2: CostFunctionNetwork, nScs: 1, params: [nScs=1]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem ( (ref) -> orga lex ( ( (ref) -> biogas * (ref) -> ev ) * ( (ref) -> therm1 lex (ref) -> therm2 ) ) )
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... ConstraintRelationships
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Next index: int(1 .. 2)
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter bool: useSPD
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: link_invert_booleans
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_cr
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: {}
+2016-07-20 18:25:55 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: ConstraintRelationships <set of int(1 .. nScs)(link_invert_booleans, is_worse_cr, {})>
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... CostFunctionNetwork
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: int(0 .. k)
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter isse.mbr.model.types.IntType@3695de1a: k
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter bool: isWorstCase
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: sum
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_weighted
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: 0
+2016-07-20 18:25:55 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: CostFunctionNetwork <int(0 .. k)(sum, is_worse_weighted, 0)>
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... WeightedCsp
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter isse.mbr.model.types.IntType@292898f5: k
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: weighted_sum
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_weighted
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: 0
+2016-07-20 18:25:55 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: WeightedCsp <int(0 .. k)(weighted_sum, is_worse_weighted, 0)>
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser morphismItem Morphism ToWeighted mapping ConstraintRelationships to WeightedCsp with mzn function id
+2016-07-20 18:25:55 FINE isse.mbr.parsing.SemanticChecker checkPvsInstances Checking PVS instances
+2016-07-20 18:25:55 FINER isse.mbr.parsing.MiniBrassParser parse I should optimize: (ref) -> overall
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: Orga: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 3, params: [nScs=3, isWorstCase=true]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: ev: [lit] PVS-Type: ConstraintRelationships <set of int(1 .. [lit] nScs)(link_invert_booleans, is_worse_cr, {})>, nScs: 3, params: [crEdges=[| mbr.limitBU, mbr.prefBL |  mbr.limitBU, mbr.earlyBird |], nScs=3, useSPD=false]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: therm1: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 2, params: [nScs=2]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: therm2: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 1, params: [nScs=1]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: biogas: [lit] PVS-Type: ConstraintRelationships <set of int(1 .. [lit] nScs)(link_invert_booleans, is_worse_cr, {})>, nScs: 3, params: [crEdges=[| mbr.ecoSweet, mbr.gasFull | mbr.onOff, mbr.gasFull |], nScs=3, useSPD=true]
+2016-07-20 18:25:55 FINE isse.mbr.parsing.CodeGenerator generateCode Starting code generation
