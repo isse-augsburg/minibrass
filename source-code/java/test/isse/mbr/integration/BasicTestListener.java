@@ -16,6 +16,7 @@ public class BasicTestListener implements MiniZincResultListener {
 
 	private boolean solved;
 	private boolean optimally;
+	private String customString;
 	private Map<String, String> objectives;
 	private Map<String, String> lastSolution;
 	
@@ -35,7 +36,8 @@ public class BasicTestListener implements MiniZincResultListener {
 	public void notifyLine(String line) {
 		boolean solutionLine = line.startsWith("Intermediate solution:" );
 		boolean objLine = line.startsWith(CodeGenerator.VALUATTIONS_PREFIX);
-
+		boolean customLine = line.startsWith("Custom:");
+		
 		if(solutionLine || objLine) {
 			String valuations = line.substring(line.lastIndexOf(':')+1, line.length());
 
@@ -55,7 +57,11 @@ public class BasicTestListener implements MiniZincResultListener {
 				
 				sc.close();
 			}
-		} 
+		}
+		
+		if(customLine) {
+			customString = line.substring(line.lastIndexOf(':')+1, line.length());
+		}
 	}
 
 	@Override
@@ -77,5 +83,9 @@ public class BasicTestListener implements MiniZincResultListener {
 
 	public Map<String, String> getLastSolution() {
 		return lastSolution;
+	}
+
+	public String getCustomString() {
+		return customString;
 	}
 }

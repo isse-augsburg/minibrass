@@ -177,6 +177,9 @@ public class CodeGenerator {
 					else 
 						paramExpression = defaultValue;
 				}
+				if(pvsParam.getWrappedBy() != null) {
+					paramExpression = String.format("%s(%s)", pvsParam.getWrappedBy(), paramExpression);
+				}
 				String def = String.format("%s : %s = %s; \n", encode(pvsParam.getType(), inst),CodeGenerator.encodeIdent(pvsParam, inst) , CodeGenerator.processSubstitutions(paramExpression, subs));
 				sb.append(def);
 			}

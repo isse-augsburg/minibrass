@@ -63,24 +63,24 @@
 
        \tikzstyle{every state}=[circle,fill=black!25,minimum size=17pt,inner sep=.2pt]
 \onslide<3->{      
-\draw [black!85,fill=white] (5.0,-1.5) rectangle (9.0,-3.8);
-\node[main node, style={font=\sffamily\footnotesize}] (5) at (7.05,-2.2) {\gasFull};
+\draw [black!85,fill=white] (5.0,0.5) rectangle (9.0,-1.8);
+\node[main node, style={font=\sffamily\footnotesize}] (5) at (7.05,-0.2) {\gasFull};
 \node[main node, style={font=\sffamily\footnotesize}] (6) [below left of=5,xshift=-1.4] {\ecoSweet};
 \node[main node, style={font=\sffamily\footnotesize}] (7) [below right of=5,xshift=2.1] {\onOff};
 %\node[main node, style={font=\sffamily\footnotesize},double] (hardConstraint) [below left of=7,xshift=-3.1,yshift=7] {$\mathsf{maxProd}$};
 
-\node[text width=2cm, anchor=west, left] at (7.2, -1.8) { \textsc{TPD} };
+%\node[text width=2cm, anchor=west, left] at (7.2, -1.8) { \textsc{TPD} };
 
 \path[every node/.style={font=\sffamily\tiny}]
   (6) edge node [right] {} (5)
   (7) edge node [right] {} (5)
 ;
 }
-
-\node[overlay] at (6.5, 0.0) {
-\only<4->{      
- \includegraphics[width=.4\textwidth]{img/pvs.png} } };
- 
+%
+%\node[overlay] at (6.5, 0.0) {
+%\only<4->{      
+% \includegraphics[width=.4\textwidth]{img/pvs.png} } };
+% 
     \end{pgfonlayer}
 
 \end{tikzpicture}

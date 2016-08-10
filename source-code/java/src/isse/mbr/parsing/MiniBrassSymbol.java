@@ -31,7 +31,8 @@ public enum MiniBrassSymbol {
 	TypeSy,             // type
 	PvsSy,              // pvs
 	PVSTypeSy,          // PVSType (for types)
-	DefaultSy,
+	DefaultSy,          // default
+	WrappedBySy,        // wrappedBy
 	SetSy,              // set 
 	ArraySy,            // array
 	OfSy,               // of

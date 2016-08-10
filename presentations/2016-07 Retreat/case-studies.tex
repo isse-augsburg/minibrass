@@ -10,6 +10,7 @@ MiniBrass wurde für verschiedene Anwendungen eingesetzt:
 \item \alert<2->{Energiefallstudie}
 \item Multi-User-Multi-Display
 \item Rekonfigurierbare Roboterteams
+\item (Rollenallokation im ODP, dzt. nur harte Constraints) 
 \end{itemize}
 \end{frame}
 
@@ -362,7 +363,7 @@ solve students lex teachers;% pro students
 \item Steuerungsvorlieben (ökonomische Leistungsbereiche, \ldots) eingehalten werden
 \end{itemize}
 \fontsize{8pt}{7.2}\selectfont
-%\input{img/synth-graph-2}
+\input{img/synth-graph-2}
 \end{frame}
 
 
@@ -430,5 +431,5 @@ PVS: therm2 = new CostFunctionNetwork("therm2") {
 
 solve orga lex ( biogas pareto ev pareto  (therm1 lex therm2) );
 \end{lstlisting}
-$V_{\mathtt{org}_1} \ltimes (P_{\prosumer{\biogas}} \times P_{\prosumer{\ev}} \times (P_{\prosumer{\thermal}}^1 \ltimes P_{\prosumer{\thermal}}^2))$
+$P_{\mathtt{org}_1} \ltimes (P_{\prosumer{\biogas}} \times P_{\prosumer{\ev}} \times (P_{\prosumer{\thermal}}^1 \ltimes P_{\prosumer{\thermal}}^2))$
 \end{frame}

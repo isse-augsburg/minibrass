@@ -14,8 +14,6 @@
 \item Abbildung aus Constraint-Relationships
 \item Probleme sind Variationen von 5 Problemen aus den MiniZinc-Benchmarks\footnote{\url{https://github.com/MiniZinc/minizinc-benchmarks}} (erweitert um Soft Constraints in PVS)
 \end{itemize}
-
-
 \end{frame}
 
 \begin{frame}{Rahmenbedingungen}
@@ -45,6 +43,43 @@
 \item Timeout: 10 Minuten
 \end{itemize}
 \end{frame}
+
+
+\begin{frame}[fragile]{State of the Art: \texttt{toulbar2}}
+Eingabeformat: \texttt{wcsp}
+
+\vspace*{2ex}
+
+\begin{verbatim}
+SAMPLE-PROB 3 3 3 4
+3 3 3
+2 0 1 2 2
+0 1 0 
+1 2 0
+2 1 2 1 1
+0 2 0
+2 0 1 1 6
+0 0 0
+0 1 0
+0 2 0 
+1 0 0 
+1 1 0
+2 0 0
+\end{verbatim}
+
+
+\begin{textblock*}{6.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+\onslide<2->{
+\includegraphics[width=.7\textwidth]{img/nj.png}
+\hfill
+\includegraphics[width=\textwidth]{img/pullreq.png} 
+
+%\includegraphics[width=1\textwidth]{img/nictaorg.png}
+}
+\end{textblock*}
+
+\end{frame}
+
 
 \begin{frame}{Resultate: Kleine Probleme} \small
 \textbf{Photo-Platzierung und Soft-Queens} 
@@ -128,5 +163,27 @@
 \end{tabularx}
 \label{tab:closing}
 \end{table}
-
 \end{frame}
+
+%\begin{frame}[fragile]{Resultate: Most Important First} \small
+%Kanonische Suchheuristik~(MIF): Versuche \alert{wichtigste} Constraints zuerst zu erfüllen
+%\begin{lstlisting}
+%array[SCS] of SCS: sortPermScs = arg_sort(penalties);
+%% invert, since arg_sort use <= and we need decreasing order
+%array[SCS] of SCS: mostImpFirst = [ sortPermScs[nScs-s+1] | s in SCS]; 
+%\end{lstlisting}
+%\begin{table}[t]
+%%\vspace*{1.3ex}% Fill page
+%\caption{\normalfont Daten über alle 86 gemessenen Problem/Solverkonfigurationen.}
+%%
+%%\newcolumntype{C}{>{\centering\arraybackslash}X}
+%\begin{tabularx}{\columnwidth}{lcccc}
+%  \toprule
+%  $\varnothing$ Zeitersparnis & \% Verbesserung & \% Opt. MIF & \% Opt. $\neg$ MIF  \\
+%  \midrule 
+%  -18.61 & 36 \% & 86 \% & 91\% \\
+% \bottomrule                             
+%\end{tabularx}
+%\label{tab:closing}
+%\end{table}
+%\end{frame}

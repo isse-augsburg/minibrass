@@ -21,7 +21,7 @@
 }
 
 
-\begin{frame}{Hierarchisches Energiemanagement}
+\begin{frame}{Hierarchisches Energiemanagement} \large
 
 \begin{figure}
 \centering
@@ -31,7 +31,7 @@
 \end{frame}
 
 
-\begin{frame}{Constraint Relationships}
+\begin{frame}{Soft Constraints} \large
 \begin{figure}
 \centering
 \input{soft-constraint-intro}
@@ -115,7 +115,7 @@ Zugrundeliegende \alert{algebraische Struktur}: Partielle Bewertungsstruktur (\e
 \begin{itemize}
 \item $(M, \cdot_M, \varepsilon_M, \leq_M)$ 
 \item $m \cdot_m \varepsilon_M = m$
-\item $m \leq_M \varepsilon_M$
+\item $m \leq_M \varepsilon_M$ ($\varepsilon_M = \top_M$)
 \item $m \leq_M n \rightarrow m \cdot_M o \leq_M n \cdot_M o$
 \end{itemize}
 \vspace*{2ex}
@@ -154,12 +154,13 @@ Zugrundeliegende \alert{algebraische Struktur}: Partielle Bewertungsstruktur (\e
 \begin{frame}[fragile]{PVS--Idee}
 \begin{center}
 \begin{tabular}{l|c|c|c|c}
-\textbf{Konkrete PVS} & $M$ & $\oplus_M$ & $\leq_M$ & $\varepsilon_M$ \\ 
+\textbf{Konkrete PVS-Typen} & $M$ & $\cdot_M$ & $\leq_M$ & $\varepsilon_M$ \\ 
 \hline 
 Weighted CSP (WCSP)& $\mathbb{N}$ & $+$ & $\geq$ & $0$ \\ 
+Cost Function Network (CFN)& $\{0,\ldots,k\}$ & $+$/$\max$ & $\geq$ & $0$ \\ 
 Fuzzy CSP & $[0,1]$ & $\min$ & $\leq$  & 1 \\ 
 Inclusion Max CSP & $2^{C_s}$ & $\cup$ & $\supseteq$  & $\emptyset$ \\ 
-Constraint Relationships\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\mcup$ & $\supseteq_{\mathsf{SPD}}$ & $\lbag \rbag$ \\ 
+Constraint Relationships (CR)\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\mcup$ & $\supseteq_{\mathsf{SPD}}$ & $\lbag \rbag$ \\ 
 \end{tabular} 
 \end{center}
 
@@ -168,25 +169,35 @@ Implementiere Lösungsverfahren für Constraint-Probleme, die durch Bewertungsst
 \end{parchment}
 \end{frame}
 
+\begin{frame}{Soft Constraints} \large
+\begin{figure}
+\centering
+\input{soft-constraint-intro}
+\end{figure}
+\vspace*{-2.4ex}
+\onslide<5->{\textbf{Ziel:} Integration von Individualpräferenzen.}
+\end{frame}
 
 \begin{frame}{Kombinationen~\cite{SchiendorferPvs2015}}
 \fontsize{8pt}{7.2}\selectfont
 \input{img/synth-graph-2}
-Die Präferenzstruktur dieses Problems:
+\onslide<2->{
+Die Bewertungsstruktur dieses Problems:
 \vspace*{2ex}
 
 \qquad $
-  V_{\mathtt{org}_1} \ltimes (P_{\prosumer{\biogas}} \times P_{\prosumer{\ev}} \times (P_{\prosumer{\thermal}}^1 \ltimes P_{\prosumer{\thermal}}^2))
+  P_{\mathtt{org}_1} \ltimes (P_{\prosumer{\biogas}} \times P_{\prosumer{\ev}} \times (P_{\prosumer{\thermal}}^1 \ltimes P_{\prosumer{\thermal}}^2))
 $
+}
 %
-\begin{textblock*}{7.5cm}[1,1](\textwidth+3.8cm,\textheight-0.13cm)
-\begin{itemize}
-\item[] \textsc{SPD} \ldots Single-Pred.-Dom.
-\item[] \textsc{TPD} \ldots Single-Pred.-Dom.
-\item[] \textsc{SUM} \ldots Sum of Errors
-\item[] \textsc{WC} \ldots Worst-Case Error
-
-
-\end{itemize}
- \end{textblock*}
+%\begin{textblock*}{7.5cm}[1,1](\textwidth+3.8cm,\textheight-0.13cm)
+%\begin{itemize}
+%%\item[] \textsc{SPD} \ldots Single-Pred.-Dom.
+%%\item[] \textsc{TPD} \ldots Single-Pred.-Dom.
+%\item[] \textsc{SUM} \ldots Sum of Errors
+%\item[] \textsc{WC} \ldots Worst-Case Error
+%
+%
+%\end{itemize}
+% \end{textblock*}
 \end{frame}
