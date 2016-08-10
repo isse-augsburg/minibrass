@@ -17,12 +17,14 @@ public class BasicTestListener implements MiniZincResultListener {
 	private boolean solved;
 	private boolean optimally;
 	private String customString;
+	private boolean cyclic;
 	private Map<String, String> objectives;
 	private Map<String, String> lastSolution;
 	
 	public BasicTestListener() {
 		this.solved = false;
 		this.optimally = false;
+		this.cyclic = false;
 		this.objectives = new HashMap<>();
 		this.lastSolution = new HashMap<>();
 	}
@@ -37,6 +39,8 @@ public class BasicTestListener implements MiniZincResultListener {
 		boolean solutionLine = line.startsWith("Intermediate solution:" );
 		boolean objLine = line.startsWith(CodeGenerator.VALUATTIONS_PREFIX);
 		boolean customLine = line.startsWith("Custom:");
+		
+		cyclic = cyclic || line.contains("cycl");
 		
 		if(solutionLine || objLine) {
 			String valuations = line.substring(line.lastIndexOf(':')+1, line.length());
@@ -87,5 +91,9 @@ public class BasicTestListener implements MiniZincResultListener {
 
 	public String getCustomString() {
 		return customString;
+	}
+
+	public boolean isCyclic() {
+		return cyclic;
 	}
 }
