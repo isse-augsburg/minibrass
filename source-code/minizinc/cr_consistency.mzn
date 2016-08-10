@@ -102,6 +102,19 @@ in (
   convertBoolToEdges(tc, nEdges, softConstraints, edges)
 );
 
+% Allows to enter a pure array representing adjacency
+% and returns the transitive closure
+function array[int, int] of int: 
+               transClosureWrap(array[int, int] of int: edges) =
+                  % parameter range check is *not* done as of now by MZ
+let {
+  set of int: softConstraints = { edges[r,c] | r in index_set_1of2(edges), c in index_set_2of2(edges) };
+} 
+in (
+  transClosure(softConstraints, edges)
+);
+
+
 function array[int, int] of int: 
                convertBoolToEdges(array[int, int] of bool: tc, int: nEdges,
                             set of int: sc,

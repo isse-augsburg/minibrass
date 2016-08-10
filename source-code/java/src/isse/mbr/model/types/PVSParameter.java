@@ -13,6 +13,7 @@ public class PVSParameter {
 	String name;
 	MiniZincParType type;
 	String defaultValue;
+	String wrappedBy;
 	
 	public PVSParameter(String name, MiniZincParType type) {
 		super();
@@ -61,5 +62,13 @@ public class PVSParameter {
 
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
+	}
+
+	public String getWrappedBy() {
+		return wrappedBy;
+	}
+
+	public void setWrappedBy(String wrappedBy) {
+		this.wrappedBy = wrappedBy;
 	}
 }

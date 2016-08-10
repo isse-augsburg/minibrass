@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/alexander/Documents/Projects/git-new/Minizinc/minizinc-soft-constraints/evaluation/db/results.db"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="898"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="Config"/><default_encoding codec=""/><browsetable_info data="AAAAAQAAAAwAQwBvAG4AZgBpAGcAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////"/></tab_browse><tab_sql><sql name="SQL 1">SELECT * FROM 
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/alexander/Documents/Projects/git-new/Minizinc/minizinc-soft-constraints/evaluation/db/results.db"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1006"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="JobResult"/><default_encoding codec=""/><browsetable_info data="AAAAAgAAABIASgBvAGIAUgBlAHMAdQBsAHQAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAADABDAG8AbgBmAGkAZwAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8="/></tab_browse><tab_sql><sql name="SQL 1">SELECT * FROM 
 JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
 where Timeout &gt; 10000 and 
 SearchType = 3 
@@ -9,4 +9,38 @@ INNER JOIN Solver sv ON jr.SolverId = sv.ID
 -- group by instance, SPD, Objective
 where searchtype = 3 and problem =&quot;soft-queens&quot; and instance = &quot;soft-queens-30.dzn&quot;
 and SPD = 1 and MIF = 0 and timeout &gt; 10000
-order by problem, instance, elapsedSecs, solverId </sql><current_tab id="1"/></tab_sql></sqlb_project>
+order by problem, instance, elapsedSecs, solverId </sql><sql name="query-mif-comp.sql"> Drop View MifData; Drop View NoMifData;
+
+Create View If not Exists MiFData as 
+SELECT problem, instance, SolverName, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+where SPD = 1 and MIF = 1 and timeout &gt; 10000 and PropRed = 0 
+order by problem, instance, elapsedSecs, solverId ;
+
+Create View If not Exists NoMiFData as 
+SELECT problem, instance, SolverName, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+where SPD = 1 and MIF = 0 and timeout &gt; 10000 and PropRed = 0 
+order by problem, instance, elapsedSecs, solverId ;
+
+Select AVG(diff), AVG(Impr), COUNT(*), AVG(MdOpt), AVG(NmdOpt) From
+( 
+Select md.elapsedSecs - nmd.elapsedSecs as diff, md.elapsedSecs - nmd.elapsedSecs &lt; 0 as Impr, md.Optimally as MdOpt, nmd.Optimally as NmdOpt  
+From MifData as md, NoMifData as nmd
+Where md.problem = nmd.problem and md.instance = nmd.instance and md.SolverName = nmd.SolverName
+);
+</sql><sql name="SQL 5">SELECT * -- problem, instance, SolverName, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally FROM 
+From 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+-- group by instance, SPD, Objective
+where SPD = 1 and MIF = 0 and PropRed = 0 and timeout &gt; 10000
+order by problem, instance, elapsedSecs, solverId </sql><sql name="query-mif-comparison.sql">Select AVG(diff), AVG(Impr), COUNT(*), AVG(MdOpt), AVG(NmdOpt) From
+( 
+Select md.elapsedSecs - nmd.elapsedSecs as diff, md.elapsedSecs - nmd.elapsedSecs &lt; 0 as Impr, md.Optimally as MdOpt, nmd.Optimally as NmdOpt  
+From MifData as md, NoMifData as nmd
+Where md.problem = nmd.problem and md.instance = nmd.instance and md.SolverName = nmd.SolverName
+);
+</sql><current_tab id="2"/></tab_sql></sqlb_project>

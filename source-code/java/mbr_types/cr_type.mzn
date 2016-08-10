@@ -36,6 +36,7 @@ let {
 
 % also a morphism for weightings:
 include "soft_constraints/cr_weighting.mzn";
+include "soft_constraints/cr_consistency.mzn";
 
 function array[int] of int : calculate_cr_weights(par int: nScs, array[int, 1..2] of par int: crEdges, par bool: useSPD) = 
 let {

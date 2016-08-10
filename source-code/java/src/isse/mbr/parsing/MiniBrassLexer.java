@@ -166,6 +166,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.InstantiatesSy;
 				case "default":
 					return MiniBrassSymbol.DefaultSy;
+				case "wrappedBy":
+					return MiniBrassSymbol.WrappedBySy;
 				case "lex":
 					return MiniBrassSymbol.LexSy;
 				case "pareto":

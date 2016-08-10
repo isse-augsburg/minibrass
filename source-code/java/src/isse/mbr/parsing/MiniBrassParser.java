@@ -547,6 +547,7 @@ public class MiniBrassParser {
 	private PVSParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
 		PVSParameter returnParameter;
 		String defaultVal = null;
+		String wrapFunction = null;
 		
 		if(currSy == MiniBrassSymbol.ArraySy) {
 			getNextSy();
@@ -581,12 +582,21 @@ public class MiniBrassParser {
 			// optional default value 
 			if(currSy == MiniBrassSymbol.DoubleColonSy) {
 				getNextSy();
-				expectSymbolAndNext(MiniBrassSymbol.DefaultSy);
-				expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
-				expectSymbol(MiniBrassSymbol.StringLitSy);
-				defaultVal = lexer.getLastIdent();
-				getNextSy();
-				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				if(currSy == MiniBrassSymbol.DefaultSy) {
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					defaultVal = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				} else {
+					expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					wrapFunction = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				}
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 
@@ -613,12 +623,21 @@ public class MiniBrassParser {
 			// optional default value 
 			if(currSy == MiniBrassSymbol.DoubleColonSy) {
 				getNextSy();
-				expectSymbolAndNext(MiniBrassSymbol.DefaultSy);
-				expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
-				expectSymbol(MiniBrassSymbol.StringLitSy);
-				defaultVal = lexer.getLastIdent();
-				getNextSy();
-				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				if(currSy == MiniBrassSymbol.DefaultSy) {
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					defaultVal = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				} else {
+					expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					wrapFunction = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				}
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			semChecker.scheduleTypeDependencyCheck(scopeType, ident, varType);
@@ -626,6 +645,10 @@ public class MiniBrassParser {
 		}
 		if(defaultVal != null) {
 			returnParameter.setDefaultValue(defaultVal);
+		}
+		
+		if(wrapFunction != null) {
+			returnParameter.setWrappedBy(wrapFunction);
 		}
 		return returnParameter;
 	}

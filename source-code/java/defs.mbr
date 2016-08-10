@@ -1,6 +1,6 @@
 type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
   params { 
-    array[int, 1..2] of 1..nScs: crEdges;
+    array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('transClosureWrap');
     bool: useSPD;
   } in 
   instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
