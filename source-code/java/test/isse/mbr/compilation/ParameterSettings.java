@@ -88,7 +88,7 @@ public class ParameterSettings {
 	@After
 	public void tearDown() {
 		tempFile.delete();
-		//tempOutput.delete();
+		tempOutput.delete();
 	}
 
 	@Test 
@@ -116,10 +116,39 @@ public class ParameterSettings {
 		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
 		
 		Assert.assertTrue(listener.isSolved());
+		Assert.assertFalse(listener.isCyclic());
 		
 		// 3. inspect result
 		String customString = listener.getCustomString();
 		Assert.assertEquals("[2, 1, 3, 1, 3, 2]", customString);
+	}
+	
+	@Test
+	public void testWrappedCyclic() throws IOException, MiniBrassParseException {
+		String instantiation = "PVS: cr1 = new ConstraintRelationships(\"cr1\") {"
+				+ "   soft-constraint c1: 'x + 1 = y' ;"
+				+ "   soft-constraint c2: 'z = y + 2' ;"
+				+ "   soft-constraint c3: 'x + y <= 3' ;"
+				+ "   crEdges : '[| mbr.c3, mbr.c2 | mbr.c2, mbr.c3 |]';"
+				+ "}; "
+				+ "solve cr1;";
+		
+		String combined = typeWithWrap + instantiation;
+		writeSilent(tempFile, combined);
+		
+		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		compiler.compile(tempFile, tempOutput);
+ 
+		Assert.assertTrue(tempOutput.exists());
+		
+		// 2. execute minisearch
+		
+		BasicTestListener listener = new BasicTestListener();
+		launcher.addMiniZincResultListener(listener);
+		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
+		
+		Assert.assertFalse(listener.isSolved());
+		Assert.assertTrue(listener.isCyclic());
 	}
 	
 	@Test (expected=MiniBrassParseException.class)

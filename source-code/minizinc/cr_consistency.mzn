@@ -4,6 +4,8 @@
 % to validate constraint relationships
 % including a check for cycles
 % -------------------------------
+function bool: preassert(bool: expr, string: message) = 
+assert(expr, message, expr);
 
 % just checks naively from each soft constraint if there is a cycle
 function bool: isCyclic(set of int: softConstraints, 
@@ -108,10 +110,14 @@ function array[int, int] of int:
                transClosureWrap(array[int, int] of int: edges) =
                   % parameter range check is *not* done as of now by MZ
 let {
-  set of int: softConstraints = { edges[r,c] | r in index_set_1of2(edges), c in index_set_2of2(edges) };
+  set of int: softConstraints =  1..max({ edges[r,c] | r in index_set_1of2(edges), c in index_set_2of2(edges) });
+  bool: isConsistent = consistentCR(softConstraints, edges);
 } 
 in (
-  transClosure(softConstraints, edges)
+  if preassert(isConsistent, "Supplied constraint relationship is inconsistent") then 
+    transClosure(softConstraints, edges)
+  else  [| |]
+  endif
 );
 
 

@@ -104,7 +104,7 @@ public class MiniZincLauncher {
 		Scanner sc = null;
 		final String optimalitySep = "==========";
 		final String solutionSep = "----------";
-
+		boolean error = false;
 		try {
 			sc = new Scanner(log);
 
@@ -134,7 +134,7 @@ public class MiniZincLauncher {
 				
 				if(line.toLowerCase().contains("error") ) {
 					broadcast = false; // not really necessary, but I like it for clarity
-					throw new Exception("Apparently, an error happened.");
+					error = true;
 				}
 				
 				if(broadcast) {
@@ -152,6 +152,8 @@ public class MiniZincLauncher {
 			if (sc != null)
 				sc.close();
 		}
+		if(error) 
+			System.err.println("Apparently, an error happened.");
 	}
 	
 	public static void main(String[] args) {
