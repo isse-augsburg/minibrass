@@ -43,6 +43,8 @@ public enum MiniBrassSymbol {
 	FloatLitSy,         // any float
 	DotsSy,             // .. 
 	ParamsSy,           // "params"
+	OffersSy,           // "offers"
+	HeuristicsSy,       // "heuristics"
 	InSy,               // "in"
 	InstantiatesSy,     // "instantiates"
 	WithSy,             // "with"

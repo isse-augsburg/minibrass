@@ -44,14 +44,15 @@ let {
   array[int] of int: penalties = [weighting(s, 1..nScs, crEdges, useSPD) | s in 1..nScs];
 } in  penalties;
 
+
 % and a variable ordering heuristic
-function ann: getSearchHeuristicCR(set of int: softConstraints, array[int] of var bool: degs, var int: overall, 
+function ann: getSearchHeuristicCR (array[int] of var bool: degs, var set of int: overall, par int: nSoftConstraints,
                                    array[int, 1..2] of int: crEdges, bool: useSPD) = 
 let {
+  set of int: softConstraints = 1..nSoftConstraints;
   % calculate weights
   array[softConstraints] of int: weights = [weighting(s, softConstraints, crEdges, useSPD) | s in softConstraints];
 
-  int: nSoftConstraints = max(softConstraints);
   % find the sorted permutation of soft constraint instances
   array[softConstraints] of softConstraints: sortPermScs = arg_sort(weights);
 

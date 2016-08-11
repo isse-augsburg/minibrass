@@ -38,7 +38,7 @@ public class CodeGenerator {
 	private static final String OVERALL_KEY = "overall";
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
-	
+	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
 	private List<String> leafValuations;
 	
 	public String generateCode(MiniBrassAST model) {
@@ -80,6 +80,8 @@ public class CodeGenerator {
 		String pvsPred = encodeString("postBetter", topLevelInstance);
 		sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
 
+		sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
+		
 		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
 		sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsPred, topLevelInstance.getGeneratedBetterPredicate()));
@@ -122,6 +124,14 @@ public class CodeGenerator {
 				
 				// sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
 			}
+			
+			// search heuristics as well  
+			sb.append("\n% Composite search Heuristics to be used in a model: \n");
+			
+			String leftHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, left);
+			String rightHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, right);
+			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, pvsInstance) + String.format(" = seq_search( [%s, %s]);",leftHeur,rightHeur);
+			sb.append(annDecl); sb.append('\n');
 		} 
 		else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
@@ -215,6 +225,21 @@ public class CodeGenerator {
 			sb.append("\n% Soft constraints: \n");
 			for(SoftConstraint sc : inst.getSoftConstraints().values()) {
 				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(), CodeGenerator.processSubstitutions(sc.getMznLiteral(), subs) ));
+			}
+			
+			// ------------------------------------------------------------- 
+			sb.append("\n% Search Heuristics to be used in a model: \n");
+			String heuristicFunc = inst.getType().instance.getOrderingHeuristic();
+			
+			
+			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, inst);
+			sb.append(annDecl);
+			if( heuristicFunc != null) {
+				sb.append(" = ");
+				sb.append(String.format("%s(%s, %s, %s);\n", heuristicFunc, valuationsArray, overallIdent, instanceArguments.toString()));
+			} else {
+				
+				sb.append(";\n");
 			}
 		}
 		

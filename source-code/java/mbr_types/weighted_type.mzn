@@ -9,11 +9,11 @@ function var int: weighted_sum(array[int] of var bool: b,
   sum(i in index_set(b)) ( (1 - bool2int(b[i])) * weights[i]);
 
 
-function ann: getSearchHeuristicWeighted(set of int: softConstraints, array[int] of var bool: degs, var int: overall, 
+function ann: getSearchHeuristicWeighted(array[int] of var bool: degs, var int: overall,  par int: nSoftConstraints,
                                          int: k, array[int] of int: weights) = 
 let {
-  int: nSoftConstraints = max(softConstraints);
-
+  set of int: softConstraints = 1..nSoftConstraints;
+  
   % find the sorted permutation of soft constraint instances
   array[softConstraints] of softConstraints: sortPermScs = arg_sort(weights);
 
