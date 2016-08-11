@@ -528,8 +528,26 @@ public class MiniBrassParser {
 			mapping(newType);
 		}
 		getNextSy();
-		if(currSy == MiniBrassSymbol.SemicolonSy) 
-			getNextSy(); // this should be EOF if only comments follow ...
+		
+		// we can have an optional "offers" block here
+		if(currSy == MiniBrassSymbol.OffersSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
+			
+			// currently only for heuristics
+			expectSymbolAndNext(MiniBrassSymbol.HeuristicsSy);
+			expectSymbolAndNext(MiniBrassSymbol.ArrowSy);
+			expectSymbol(MiniBrassSymbol.IdentSy);
+			String heuristicFunction = lexer.getLastIdent();
+			newType.setOrderingHeuristic(heuristicFunction);
+			
+			getNextSy();
+
+			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
+			
+		} 
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		
 		return newType;
 	}

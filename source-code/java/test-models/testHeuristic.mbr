@@ -1,0 +1,24 @@
+type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('transClosureWrap');
+    bool: useSPD :: default('true');
+  } in 
+  instantiates with "../mbr_types/cr_type.mzn" {
+    times -> link_invert_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+  }
+  offers {
+    heuristics -> getSearchHeuristicCR;
+  };
+ 
+
+PVS: cr1 = new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'x = 3' ;
+   soft-constraint c2: 'y = 3' ;
+   soft-constraint c3: 'z = 3' ;
+   
+   crEdges: '[| mbr.c3, mbr.c1 | mbr.c3, mbr.c2 |]';
+}; 
+
+solve cr1;

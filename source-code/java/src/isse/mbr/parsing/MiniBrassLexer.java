@@ -168,6 +168,10 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.DefaultSy;
 				case "wrappedBy":
 					return MiniBrassSymbol.WrappedBySy;
+				case "offers":
+					return MiniBrassSymbol.OffersSy;
+				case "heuristics":
+					return MiniBrassSymbol.HeuristicsSy;
 				case "lex":
 					return MiniBrassSymbol.LexSy;
 				case "pareto":
