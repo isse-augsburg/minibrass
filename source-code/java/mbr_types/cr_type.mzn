@@ -43,3 +43,21 @@ let {
   % ground penalties using the appropriate weighting
   array[int] of int: penalties = [weighting(s, 1..nScs, crEdges, useSPD) | s in 1..nScs];
 } in  penalties;
+
+% and a variable ordering heuristic
+function ann: getSearchHeuristicCR(set of int: softConstraints, array[int] of var int: degs, var int: overall, 
+                                   array[int, 1..2] of 1..nScs: crEdges, bool: useSPD) = 
+let {
+  % calculate weights
+  array[softConstraints] of int: weights = [weighting(s, softConstraints, crEdges, useSPD) | s in softConstraints];
+
+  int: nSoftConstraints = max(softConstraints);
+  % find the sorted permutation of soft constraint instances
+  array[softConstraints] of softConstraints: sortPermScs = arg_sort(weights);
+
+  % invert, since arg_sort use <= and we need decreasing order
+  array[softConstraints] of softConstraints: mostImpFirst = [ sortPermScs[nSoftConstraints-s+1] | s in softConstraints]; 
+  array[softConstraints] of var 1..3: mifSatisfied = [ degs[mostImpFirst[s]] | s in SOFTCONSTRAINTS]; 
+
+} in 
+int_search(mifSatisfied, input_order, indomain_max, complete);
