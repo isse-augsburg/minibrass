@@ -36,9 +36,29 @@ let {
 
 % also a morphism for weightings:
 include "soft_constraints/cr_weighting.mzn";
+include "soft_constraints/cr_consistency.mzn";
 
 function array[int] of int : calculate_cr_weights(par int: nScs, array[int, 1..2] of par int: crEdges, par bool: useSPD) = 
 let {
   % ground penalties using the appropriate weighting
   array[int] of int: penalties = [weighting(s, 1..nScs, crEdges, useSPD) | s in 1..nScs];
 } in  penalties;
+
+
+% and a variable ordering heuristic
+function ann: getSearchHeuristicCR (array[int] of var bool: degs, var set of int: overall, par int: nSoftConstraints,
+                                   array[int, 1..2] of int: crEdges, bool: useSPD) = 
+let {
+  set of int: softConstraints = 1..nSoftConstraints;
+  % calculate weights
+  array[softConstraints] of int: weights = [weighting(s, softConstraints, crEdges, useSPD) | s in softConstraints];
+
+  % find the sorted permutation of soft constraint instances
+  array[softConstraints] of softConstraints: sortPermScs = arg_sort(weights);
+
+  % invert, since arg_sort use <= and we need decreasing order
+  array[softConstraints] of softConstraints: mostImpFirst = [ sortPermScs[nSoftConstraints-s+1] | s in softConstraints]; 
+  array[softConstraints] of var bool: mifSatisfied = [ degs[mostImpFirst[s]] | s in softConstraints]; 
+
+} in 
+int_search(mifSatisfied, input_order, indomain_max, complete);

@@ -67,6 +67,10 @@ public class CodeGenerator {
 			}
 		}
 		
+		// additional minizinc files specified in minibrass file
+		for(String addMinizincFile : model.getAdditionalMinizincIncludes()) {
+			sb.append(String.format("include \"%s\";\n", addMinizincFile));
+		}
 	}
 
 	private void addPvsInstances(StringBuilder sb, MiniBrassAST model) {

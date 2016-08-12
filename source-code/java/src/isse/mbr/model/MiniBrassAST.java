@@ -1,6 +1,8 @@
 package isse.mbr.model;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -24,7 +26,7 @@ public class MiniBrassAST {
 	private Map<String, Morphism> morphisms;
 	private Map<String, AbstractPVSInstance> pvsInstances; // here by identifier
 	private Map<String, AbstractPVSInstance> pvsReferences; // here by reference
-	
+	private Collection<String> additionalMinizincIncludes;
 
 	private AbstractPVSInstance solveInstance;
 	
@@ -33,6 +35,7 @@ public class MiniBrassAST {
 		pvsInstances = new HashMap<>();
 		pvsReferences =  new HashMap<>();
 		morphisms = new HashMap<>();
+		additionalMinizincIncludes = new LinkedList<>();
 	}
 	
 	public void registerPVSType(String reference, PVSType type) {
@@ -78,6 +81,10 @@ public class MiniBrassAST {
 
 	public Map<String, Morphism> getMorphisms() {
 		return morphisms;
+	}
+
+	public Collection<String> getAdditionalMinizincIncludes() {
+		return additionalMinizincIncludes;
 	}
 }
 
