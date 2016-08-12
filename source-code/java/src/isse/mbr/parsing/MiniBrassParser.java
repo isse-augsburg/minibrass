@@ -124,7 +124,7 @@ public class MiniBrassParser {
 	private void item(MiniBrassAST model) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.IncludeSy) {
 			getNextSy();
-			includeItem();
+			includeItem(model);
 		} else if(currSy == MiniBrassSymbol.TypeSy) {
 			getNextSy();
 			PVSType pvsType = typeItem();
@@ -797,21 +797,25 @@ public class MiniBrassParser {
 
 	/**
 	 * "include" ident ";" (just read ident, when entering
+	 * @param model2 
 	 * @throws MiniBrassParseException 
 	 */
-	private void includeItem() throws MiniBrassParseException {
+	private void includeItem(MiniBrassAST model) throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.StringLitSy);
 		// add this file to our work list
 		String fileName = lexer.getLastIdent();
-		
-		getNextSy();
-		
-		File referred = new File(currDir,fileName);
-		if(!visited.contains(referred)) {
-			worklist.add(referred);
+
+		if(fileName.endsWith(".mzn")) {
+			model.getAdditionalMinizincIncludes().add(fileName);
+		} else {
+			File referred = new File(currDir,fileName);
+			
+			if(!visited.contains(referred)) {
+				worklist.add(referred);
+			}
 		}
-		expectSymbol(MiniBrassSymbol.SemicolonSy);
 		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 	}
 
 	private void expectSymbol(MiniBrassSymbol expectedSy) throws MiniBrassParseException {
