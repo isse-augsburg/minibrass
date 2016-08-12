@@ -1,0 +1,17 @@
+% A fuzzy CSP example from the paper: "Preferences in Constraint Satisfaction and Optimization", Francesca Rossi, K. Brent Venable, and Toby Walsh, AI Magazine, 2008
+
+type FuzzyConstraints = PVSType<0.0 .. 1.0> = 
+  instantiates with "../mbr_types/fuzzy_type.mzn" {
+    times -> min;
+    is_worse -> is_worse_fuzzy;
+    top -> 1.0;
+  };
+    
+
+PVS: fz1 = new FuzzyConstraints("fz1") {
+   soft-constraint c1: 'fbinary_fuzzy([1.0, 0.8, 0.3, 0.7], mainCourse, wine)';
+   soft-constraint c2: 'fbinary_fuzzy([1.0, 0.8, 0.8, 1.0], mainCourse, lunch)';
+   soft-constraint c3: 'fbinary_fuzzy([1.0, 1.0, 1.0, 0.0], mainCourse, lunch)'; 
+}; 
+
+solve fz1;
