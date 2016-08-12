@@ -1,0 +1,18 @@
+% A fuzzy CSP example from the paper: "Preferences in Constraint Satisfaction and Optimization", Francesca Rossi, K. Brent Venable, and Toby Walsh, AI Magazine, 2008
+% This model uses the "rational" workaround, we denote satisfaction degrees as ints between 0 and 100 and do the conversion internally 
+
+type FuzzyConstraints = PVSType<0.0 .. 1.0> = 
+  instantiates with "../mbr_types/fuzzy_type.mzn" {
+    times -> min;
+    is_worse -> is_worse_fuzzy;
+    top -> 1.0;
+  };
+    
+
+PVS: fz1 = new FuzzyConstraints("fz1") {
+   soft-constraint c1: 'fbinary_fuzzy_rational([100, 80, 30, 70], 100, mainCourse, wine)';
+   soft-constraint c2: 'fbinary_fuzzy_rational([100, 80, 80, 100], 100, mainCourse, lunch)';
+   soft-constraint c3: 'fbinary_fuzzy_rational([100, 100, 100, 0], 100, mainCourse, lunch)'; 
+}; 
+
+solve fz1;

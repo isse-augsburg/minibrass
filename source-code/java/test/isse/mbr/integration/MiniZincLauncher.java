@@ -19,6 +19,9 @@ import java.util.logging.Logger;
 public class MiniZincLauncher {
 	Collection<MiniZincResultListener> listeners;
 
+	private String flatzincExecutable = "fzn-gecode";
+	private String minizincGlobals = "gecode";  
+
 	private final static Logger LOGGER = Logger.getGlobal();
 	
 	public MiniZincLauncher() {
@@ -31,8 +34,6 @@ public class MiniZincLauncher {
 	
 	public void runMiniSearchModel(File model, File data, int timeout) {
 		// for now, just use Gecode
-		String flatzincExecutable = "fzn-gecode";
-		String minizincGlobals = "gecode";  
 		
 		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
 	
@@ -163,6 +164,22 @@ public class MiniZincLauncher {
 		
 		mznLauncher.runMiniSearchModel(model, data, 5);
 
+	}
+
+	public String getFlatzincExecutable() {
+		return flatzincExecutable;
+	}
+
+	public void setFlatzincExecutable(String flatzincExecutable) {
+		this.flatzincExecutable = flatzincExecutable;
+	}
+
+	public String getMinizincGlobals() {
+		return minizincGlobals;
+	}
+
+	public void setMinizincGlobals(String minizincGlobals) {
+		this.minizincGlobals = minizincGlobals;
 	}
 
 }

@@ -8,6 +8,12 @@
 
 include "table.mzn";
 
+function var float: fbinary_fuzzy_rational(array[int] of int: values, int: denominator, var int: x, var int: y ) = 
+let {
+  var float: value; 
+  constraint binary_fuzzy_rational(values, denominator, x, y, value);
+} in ( value );
+
 predicate binary_fuzzy_rational(array[int] of int: values, int: denominator, var int: x, var int: y, var float: value ) = 
 let {
   int: vals = card(dom(x)) * card(dom(y));
@@ -18,6 +24,12 @@ let {
 (
   encode_cost_function_binary(x,y,idMap, chosenRow) /\ values[chosenRow]/denominator = value
 );
+
+function var float: fbinary_fuzzy(array[int] of float: values, var int: x, var int: y ) = 
+let {
+  var float: value; 
+  constraint binary_fuzzy(values, x, y, value);
+} in ( value );
 
 predicate binary_fuzzy(array[int] of float: values, var int: x, var int: y, var float: value ) = 
 let {
