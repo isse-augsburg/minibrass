@@ -1,1 +1,1 @@
-include "soft_constraints/pvs_tpd.mzn";
+include "soft_constraints/pvs_tpd_red.mzn";
