@@ -438,7 +438,7 @@ public class ExperimentRunner {
 				}
 				
 				if(line.toLowerCase().contains("error") ) {
-					throw new Exception("Apparently, an error happened.");
+					System.err.println("Apparently, an error happened.");
 				}
 			}
 			result.noSolutions = noSolutions;
