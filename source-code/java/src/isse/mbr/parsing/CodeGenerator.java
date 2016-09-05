@@ -20,6 +20,7 @@ import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincParType;
+import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PVSParamInst;
 import isse.mbr.model.types.PVSParameter;
@@ -39,7 +40,9 @@ public class CodeGenerator {
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
+	public static final String TOP_LEVEL_OBJECTIVE = "topLevelObjective";
 	private List<String> leafValuations;
+	private boolean onlyMiniZinc;
 	
 	public String generateCode(MiniBrassAST model) {
 		 LOGGER.fine("Starting code generation");
@@ -78,17 +81,27 @@ public class CodeGenerator {
 		AbstractPVSInstance topLevelInstance = deref(model.getSolveInstance());
 		
 		sb.append("\n% ---------------------------------------------------");
-		sb.append("\n% Overall exported predicate : \n");
+		sb.append("\n% Overall exported predicate (and objective in case of atomic top-level PVS) : \n");
 		sb.append("\n% ---------------------------------------------------\n");
 		
 		String pvsPred = encodeString("postBetter", topLevelInstance);
-		sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
+		if(!onlyMiniZinc)
+			sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
 
+		if( !(topLevelInstance instanceof CompositePVSInstance)) {
+			String topLevelOverall = getOverallValuation(topLevelInstance);
+			PVSInstance pvsInst = (PVSInstance) topLevelInstance; 
+			MiniZincVarType elementType = pvsInst.getType().instance.getElementType();
+			String encodedType = encode(elementType, pvsInst); 
+			sb.append(String.format("var %s: %s; \nconstraint %s = %s;\n",encodedType, TOP_LEVEL_OBJECTIVE, TOP_LEVEL_OBJECTIVE, topLevelOverall));
+		}
+		
 		sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
 		
 		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
-		sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsPred, topLevelInstance.getGeneratedBetterPredicate()));
+		if(!onlyMiniZinc)
+			sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsPred, topLevelInstance.getGeneratedBetterPredicate()));
 		
 		// add output line for valuation-carrying variables 
 		sb.append("\n% Add this line to your output to make use of minisearch\n");
@@ -316,5 +329,13 @@ public class CodeGenerator {
 	
 	public static String encodeIdent(PVSParameter par, PVSInstance instance) {
 		return encodeString(par.getName(), instance);
+	}
+
+	public boolean isOnlyMiniZinc() {
+		return onlyMiniZinc;
+	}
+
+	public void setOnlyMiniZinc(boolean onlyMiniZinc) {
+		this.onlyMiniZinc = onlyMiniZinc;
 	}
 }

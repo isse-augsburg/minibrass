@@ -1,0 +1,19 @@
+include "count.mzn";
+
+type CostFunctionNetwork = PVSType<0..k> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "soft_constraints/mbr_types/cfn_type.mzn" {
+    times -> sum;
+    is_worse -> is_worse_weighted; 
+    top -> 0;
+ };
+  
+
+PVS: cfn1 = new CostFunctionNetwork("cfn1") {
+   soft-constraint c1: 'soft_alldifferent(x, true)';
+   soft-constraint c2: 'count(x,1)';
+}; 
+
+solve cfn1;

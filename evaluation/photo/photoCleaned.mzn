@@ -56,7 +56,7 @@ constraint
   pos[1] < pos[2];
 
 solve :: int_search(pos, first_fail, indomain, complete) 
-    maximize satisfies;
+    maximize satisfies; % maybe try to modify with minimization, see photoMin.mzn
 
 output [
     "pos = ", show(pos), "\n",

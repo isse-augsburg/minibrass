@@ -32,6 +32,21 @@ public class MiniZincLauncher {
 		listeners.add(listener);
 	}
 	
+
+	public void runMiniZincModel(File model, File data, int timeout) {
+		// for now, just use Gecode
+		
+		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
+	
+		String dataPath = data != null ? data.getPath() : "";
+		ProcessBuilder pb = new ProcessBuilder("minizinc", "-a","-f",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+		if(data != null)
+			pb.command().add(dataPath);
+		
+		runProcess(pb, timeoutInMillisecs);
+		cleanup();
+	}
+	
 	public void runMiniSearchModel(File model, File data, int timeout) {
 		// for now, just use Gecode
 		
