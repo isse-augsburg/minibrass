@@ -1,0 +1,99 @@
+\begin{frame}[fragile]{Basic MiniZinc: Parameters and Variables}
+\textbf{Parameters}: input data for the problem, constants 
+\begin{lstlisting}
+int: n; 
+n = 3; 
+% equivalent to: 
+int: n = 3; 
+par int: n = 3; 
+% or with bounded domains
+0..10: m; % a fixed value (input by a user) between 0 and 10
+% set types 
+set of int: AGENTS = 1..n; % {1, ..., n}
+\end{lstlisting}
+\pause 
+
+\vspace*{2ex}
+
+\textbf{Decision Variables}: variables to be assigned by a solver
+\begin{lstlisting}
+var int: n; 
+var 0..10: x;
+% immediate declaration (useful for dependent expressions)
+var int: y = 2*x; 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Basic MiniZinc: Arrays and Sets}
+\textbf{Arrays}: for parameters/variables of different sizes 
+\begin{lstlisting}
+int: n;
+array[1..n] of int: height; % height[i] denotes the height of truck i
+% also for decisions 
+array[1..n] of var bool: x; % x[i] holds if we select item i 
+% typical usage 
+set of int: ITEMS = 1..n;
+array[ITEMS] of var bool: x;
+\end{lstlisting}
+\pause 
+
+\vspace*{2ex}
+
+\textbf{Sets}: set type for parameters and decisions (only set of int/subtype int)
+\begin{lstlisting}
+set of int: AGENTS = 1..n;
+set of int: CAP = 1..m; 
+array[AGENTS] of set of CAP: offers; % [{1}, {2], {1,2}]
+
+var set of AGENT: selectedTeam;
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Basic MiniZinc: Types}
+Allowed primitive types for variables/parameters are
+\begin{itemize}
+\item Integer \texttt{int} or subtypes:
+\begin{itemize}
+\item range \texttt{1..n}
+\item explicit set \texttt{\{1,5,7\}}
+\end{itemize}  
+\item Floating point number \texttt{float} or subtypes:
+\begin{itemize}
+\item range \texttt{0.0 .. 1.0}
+\item explicit set \texttt{\{1.0, 2.5, 3.7\}}
+\end{itemize}
+\item Boolean \texttt{bool}  
+\item Arrays, Sets
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Constraints, Objective and Output}
+\textbf{Constraints}: to restrict assignments 
+\begin{lstlisting}
+var 0..10: x; var 0..10: y; var 0..10: z;
+constraint x + y = z;
+constraint x mod 2 = 0;
+% 'forall' concept for arrays
+par int: n; array[1..n] of var 0..10: t; 
+% each t[i] should be even:
+constraint forall(i in 1..n) (t[i] mod 2 = 0);
+\end{lstlisting}
+\pause 
+
+\vspace*{1ex}
+
+\textbf{Solve Item}: provides the objective (one per model)
+\begin{lstlisting}
+solve satisfy; % for a satisfaction problem
+solve maximize sum(i in 1..n) (t[i]);
+solve minimize x + y;
+\end{lstlisting}
+\pause 
+\vspace*{1ex}
+
+\textbf{String Output}: one output item per model
+\begin{lstlisting}
+var 0..10: x;
+output ["The value of x is: \(x)"]
+\end{lstlisting}
+\end{frame}

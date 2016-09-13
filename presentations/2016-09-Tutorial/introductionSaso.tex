@@ -1,0 +1,365 @@
+\begin{frame}[fragile]{Decision Problems}
+
+\begin{center}
+
+\begin{tikzpicture}
+\matrix (m) [matrix of nodes,row sep=0.2em,column sep=0.2em,minimum width=2em]
+  {
+       \begin{minipage}[t]{.45\textwidth}
+       \begin{center}
+     \includegraphics[width=.7\textwidth]{img/muffins.jpg} \\
+     ``How many muffins of each kind?''
+     \end{center}
+     \end{minipage} 
+       & 
+     \begin{minipage}[t]{.5\textwidth}     
+     \begin{center}
+     \includegraphics[width=.45\textwidth]{img/levis.png} \\
+     ``When does which lecture take place?''     
+       \end{center}
+     \end{minipage}  \\
+     \begin{minipage}[t]{.45\textwidth}     
+     \begin{center}
+     \includegraphics[width=.7\textwidth]{img/putzplan.jpg} \\
+     ``Who performs which tasks?''
+       \end{center}
+     \end{minipage}  & 
+     
+     \begin{minipage}[t]{.45\textwidth}
+     \begin{center}
+           \includegraphics[width=.7\textwidth]{img/resti.jpg} \\
+           ``What's up on the weekend?'' 
+       \end{center}
+     \end{minipage}
+\\};
+     
+%  \path[-stealth]
+%    (m-1-1) edge node [left] {$\mathcal{B}_X$} (m-2-1)
+%            edge [double] node [below] {$\mathcal{B}_t$} (m-1-2)
+%    (m-2-1.east|-m-2-2) edge node [below] {$\mathcal{B}_T$}
+%            node [above] {$\exists$} (m-2-2)
+%    (m-1-2) edge node [right] {$\mathcal{B}_T$} (m-2-2)
+%            edge [dashed,-] (m-2-1);
+\end{tikzpicture}
+
+\end{center}
+\end{frame}
+
+\begin{frame}{What do these problems have in common?}
+\hFirst{Decisions} \onslide<2->{\emph{(variables)}}
+\begin{itemize}
+\item The number of chocolate or banana muffins
+\item The lectures in the curriculum
+\item Friday and saturday activity
+\end{itemize}
+\pause
+
+\vspace*{2ex}
+
+\hFirst{Possibilities} \onslide<3->{\emph{(domains)}}
+\begin{itemize}
+\item Chocolate muffins: $\{0, \ldots, 20\}$
+\item Lecture ``Algorithms 101'': $\{\mathrm{LH1}, \mathrm{LH2}, \mathrm{LH3}, \ldots \}$
+\end{itemize}
+
+\pause
+
+\vspace*{2ex}
+
+\hFirst{Dependencies} \onslide<4->{\emph{(constraints)}}
+\begin{itemize}
+\item The required flour for $x$ chocolate and $y$ banana muffins may not exceed 250g.
+\item There can only be one class per room (at a time).
+\item There can only be one all-you-can-eat buffet per weekend.
+\end{itemize} \pause 
+\end{frame}
+
+\begin{frame}{What do these problems have in common?}
+\hFirst{Preferences} \onslide<2->{\emph{(soft constraints)}}
+\begin{itemize}
+\item There \emph{should} be no algorithm lab on Friday, 8am
+\item Bernd would like to have steaks, Ada prefers sushi $\rightarrow$ Ada's preference is \emph{more important}
+\item I'd rather not clean nor vacuum. But if I have to do either, cleaning is \emph{worse}
+\end{itemize}
+\pause
+
+\vspace*{2ex}
+and/or
+\vspace*{2ex}
+
+\hFirst{Goals} \onslide<3->{\emph{(utility functions)}}
+\begin{itemize}
+\item Maximize the revenue of our chocolate/banana mix
+\item Maximize the number of lecture-free days 
+\end{itemize}
+
+\vspace*{2ex}
+\hfill a \alert{constraint satisfaction (optimization) problem} (CSP/COP), 
+
+\hfill discrete if some decisions are over integers 
+\end{frame}
+
+
+\begin{frame}{Discrete Optimization Problems in FAS* (1)}
+
+\begin{center}
+Adaptive production cells
+
+\includegraphics[width=.42\textwidth]{img/automobilindustrie.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}{Discrete Optimization Problems in FAS* (1)}
+\textbf{Goal}: Assign tasks to robots such that a correct \alert{resource flow} emerges
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/produktionszelle.pdf}
+\end{center}
+
+\hfill \cite{seebach2010software}, SASO
+
+\end{frame}
+
+
+\begin{frame}{Discrete Optimization Problems in FAS* (2)}
+\begin{center}
+Decentralized energy management
+\includegraphics[width=.7\textwidth]{img/power_plants.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Discrete Optimization Problems in FAS* (2)}
+\textbf{Goal}: Schedule power plants such that they meet the demand 
+\input{img/problem}
+\hfill \cite{anders2013trust}, SASO
+\end{frame}
+
+
+
+\begin{frame}{Discrete Optimization Problems in FAS*}
+ESDS Deployment Problem (\emph{eventually serializable data services})
+
+\begin{center}
+
+\includegraphics[width=.7\textwidth]{img/esds.png}
+\end{center}
+\hfill \cite{michel2008optimal}, CPAIOR
+\end{frame}
+
+\begin{frame}{Why is it useful to you?}
+
+\alert{As a tool \ldots }
+
+\begin{itemize}
+\item If you identify discrete optimization problems in your (self-organizing, autonomic, cloud) application,
+you can solve them with reliable tools.
+\item Modeling languages provide \emph{easy} access to powerful solvers
+\item $\rightarrow$ \emph{independent} of the concrete technology (SAT, CSP, Mathematical Programming)
+\end{itemize}
+
+\vspace*{2ex} \pause 
+\alert{As a research opportunity \ldots }
+\begin{itemize}
+\item Studying interactions of complex networks of optimizing agents offers interesting problems (\emph{global systems science})
+\item Integration of optimization problems into architectures for decision-making
+\item Solving large-scale problems by decomposition through self-organization
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+    \frametitle{Soft Constraint Programming in MiniBrass}
+ \alert{Constraint programming} (first half of the tutorial)
+    \begin{itemize}
+    \item Declarative programming (similar to SQL, Prolog)
+    \item Separation of \textbf{model} and \emph{algorithm}
+    \item Suitable for combinatorial problems with hard constraints (e.g. physics!)
+    \item Modeling language \hFirst{MiniZinc}
+    \end{itemize}
+
+    \vspace*{3ex}
+    
+\alert{Soft constraint programming} (second half of the tutorial)
+    \begin{itemize} 
+    \item Modeling of \textbf{user preferences}
+    \item Find solutions that are \emph{as good as possible} 
+    \item What does ``good`` mean?
+    \item Modeling language \hFirst{MiniBrass}
+     \end{itemize}
+\end{frame}
+
+\begin{frame}{Artificial Intelligence: Categories}
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.5\textwidth}
+          
+    \hSecond{Data-driven AI}
+    \begin{center}
+    \includegraphics[width=.8\textwidth]{img/neuralnet.jpg}
+    \end{center}
+
+    \vspace*{4ex}
+    
+    \begin{itemize}
+    \item Machine Learning
+    \item Signal Processing
+    \item Computer Vision
+    \end{itemize}
+
+    \end{column}
+    
+    \begin{column}{.5\textwidth}
+    \hFirst{Decision-driven AI}
+    \begin{center}
+    \includegraphics[width=.9\textwidth]{img/discreteopt.png}
+    \end{center}
+    \begin{itemize}
+    \item Constraint Programming
+    \item Combinatorial Optimization
+    \item Heuristic Optimization
+    \item Planning / Scheduling
+    \end{itemize}
+    
+    \end{column}
+  \end{columns}
+\end{frame}
+%
+
+
+\begin{frame}[fragile]{Our first model}
+\begin{lstlisting}
+var 0..2: x;
+var 0..2: y; 
+
+constraint x < y;
+
+solve maximize x + y;
+\end{lstlisting}
+
+\vspace*{2ex}
+
+\url{http://www.minizinc.org}
+
+\vspace*{2ex}
+
+\small
+\begin{verbatim}
+x = 1;
+y = 2;
+----------
+==========
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{A second example}
+\begin{lstlisting}
+var 0..2: x; % this notation is shorthand for the set {0,1,2}
+var 0..2: y;
+var 0..1: z; % {0,1}
+
+% c1
+constraint x != y /\ y != z /\ x != z;
+% c2
+constraint x + 1 = y;
+
+solve satisfy;
+\end{lstlisting}
+  \vspace*{3ex}
+    \alert{Can you give a solution to this problem?} \pause 
+
+\begin{itemize}
+\item $\Theta = \{ (x \to 1, y \to 2, z \to \textbf{?}), (x \to 0, y \to 1, z \to \textbf{?}) \}$ satisfy $c_2$; \pause
+\item $(x \to 0, y \to 1, z \to ?)$ cannot be extended to a solution since $z$ has to be 0 or 1 $\rightarrow$ has to violate 
+$c_1$ \pause
+\item Hence, the only solution is $(x \to 1, y \to 2, z \to 0)$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why modeling?}
+\begin{enumerate}
+\item Once stated (formally) -- solved many times
+\begin{itemize}
+\item Constraint-Solving
+\item SAT -- Boolean Satisfiability
+\item MIP -- Mixed Integer Programming
+\item Heuristic Optimization -- Genetic etc. 
+\end{itemize}
+\vspace*{1ex}
+\item Efficient and reliable algorithms provided by solvers
+\begin{itemize}
+\item Same algorithms for a variety of different problems
+\item Dedicated algorithms for recurring combinatorial substructures (\texttt{alldifferent})
+\end{itemize}
+\vspace*{1ex}
+\item Prototyping
+\begin{itemize}
+\item Specification becomes much clearer 
+\item Bespoke algorithm for concrete problem can be developed later 
+\end{itemize}
+
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Modeling in other CS domains}
+\begin{lstlisting}[language=sql]
+SELECT firstname, lastname
+FROM employees 
+WHERE age < 30
+\end{lstlisting}
+\vspace*{1ex}
+instead of 
+\vspace*{1ex}
+\begin{lstlisting}[language=java]
+Collection<Person> youngs = new ArrayList<>();
+for(Person p : allEmployees) {
+  if(p.getAge() < 30)
+    youngs.add(p);
+}
+\end{lstlisting}
+
+\begin{parchment}[Motivation]
+\centering 
+\alert{Constraint modeling for optimization problems $\approx$ SQL for database access} 
+\end{parchment}
+
+\end{frame}
+
+\begin{frame}{NP-Completeness}
+\begin{theorem}
+The decision problem associated to a constraint satisfaction/optimization problem is NP-complete.
+\end{theorem}
+
+\begin{center}
+\begin{figure}
+\includegraphics[width=.7\textwidth]{img/np_complete.png}
+\caption{\url{https://xkcd.com/287/} }
+\end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}{Why MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{One modeling language -- many solvers} 
+\end{parchment}
+\begin{textblock*}{2.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=\textwidth]{img/MiniZn_logo.jpg} 
+
+\end{textblock*}
+Supported solvers (selection)
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item Choco (CP)
+\item G12 (CP/LP/MIP)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{A relevant example \ldots}
+\small
+\lstinputlisting{models/cakes.mzn}
+\end{frame}

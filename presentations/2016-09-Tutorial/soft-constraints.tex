@@ -1,13 +1,35 @@
+\begin{frame}{Motivation}
+We could keep adding more and more desirable constraints
+
+\begin{itemize}
+\item ``Not only would I like to stand next to a friend, but Mike makes me look better than Joe.''
+\item ``This robot should not do the drilling task as its driller is almost broken.''
+\item ``This module should be deployed to server $A$ as its required dependencies are already there.''
+\end{itemize}
+
+\vspace*{1ex} \pause 
+but at some point, problems become \alert{unsatisfiable}.
+
+\vspace*{2ex} \pause 
+
+\begin{itemize}
+\item[-] $\rightarrow$ returning \texttt{UNSAT} is not an option in autonomic computing settings! \pause 
+\item[-] We want \emph{graceful} degradation: satisfy most 
+constraints (maybe even distinguish them)
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}
-\frametitle{Soft Constraint Solving}
+\frametitle{Over-Constrained Problems}
 
 \vspace*{1ex}
 
-In der Praxis: \cemph{überbestimmte} Probleme
+Consider: 
 
 \vspace*{2ex}
 
-$x, y, z \in \{1,2,3\}$ mit 
+$x, y, z \in \{1,2,3\}$ with 
 \bgroup\abovedisplayskip4pt\belowdisplayskip4pt
 \begin{align*}
   \mathrm{c}_1 &: x + 1 = y
@@ -19,17 +41,17 @@ $x, y, z \in \{1,2,3\}$ mit
 \egroup
 
 \begin{itemize}
-  \item Nicht alle Constraints können gleichzeitig erfüllt werden
+  \item Not all constraints can be satisfied simultaneously 
 \begin{itemize} \pause
-  \item e.\,g., $\mathrm{c}_2$ erzwingt $z = 3$ und $y = 1$, im Konflikt mit $\mathrm{c}_1$
+  \item e.\,g., $\mathrm{c}_2$ forces $z = 3$ and $y = 1$, making $\mathrm{c}_1$ impossible
 \end{itemize}
 
-  \item Wir \cemph{wählen} zwischen Zuweisungen, die $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ oder $\{ \mathrm{c}_2, \mathrm{c}_3 \}$ erfüllen.
+  \item We \cemph{choose} between solutions that satisfy either $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ or $\{ \mathrm{c}_2, \mathrm{c}_3 \}$.
 \end{itemize}
 
 \vspace*{2ex}
 
-Welche Zuweisungen $v \in [X \to D]$ sollen \alert{bevorzugt} werden?
+Which solutions $v \in [X \to D]$ are \alert{preferred}?
 
 \end{frame}
 
