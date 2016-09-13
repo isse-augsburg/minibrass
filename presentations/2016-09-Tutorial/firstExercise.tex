@@ -1,0 +1,28 @@
+\begin{frame}{MiniZinc: HelloWorld}
+\textbf{Exercise 1}
+
+Build a MiniZinc model \texttt{xopt.mzn} with a decision variable $x$ taking values from 0 to 10, with
+constraints to ensures that $x$ is divisible by 4, which outputs the value of $x$ that gives the minimum
+value of $(x-7)^2$.
+
+Test it using the precompiled IDE-bundle. Suppose you cannot use the \texttt{mod} function, how would you alternatively model that $x$
+is divisible by 4?
+
+\end{frame}
+
+\begin{frame}{MiniZinc: Arrays}
+\textbf{Exercise 2}
+Define a MiniZinc model \texttt{array.mzn} which takes an integer parameter $n$ defining the length of an
+array of numbers $x$ taking values from 0 to 9. Constrain the array so the sum of the numbers in
+the array is equal to the product of the numbers in the array. Output the resulting array.
+Test your model using the ``all solutions'' setting active in the IDE.
+
+\vspace*{2ex}
+
+ Add a constraint to ensure that the numbers in the array are non-decreasing, i.e. $x[1] \leq x[2] \leq
+\ldots \leq x[n]$. This should reduce the number of similar solutions. 
+How big a number can you solve with your model? Why do you think this happens?
+
+
+\end{frame}
+

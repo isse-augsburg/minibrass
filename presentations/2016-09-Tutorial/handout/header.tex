@@ -1,0 +1,86 @@
+%\usepackage{exdefs}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{color}
+
+\definecolor{isseorange}{RGB}{255,147,10}
+\definecolor{issegrey}{RGB}{80,85,82}
+
+
+\newcommand{\hFirst}[1]{{\color{isseorange} #1}}
+\newcommand{\hSecond}[1]{{\color{issegrey} #1}}
+
+\newcommand{\important}[1]{{\color{red} \textbf{#1}}}
+
+%Zeilenumbruch in Typewriter-Abschnitten
+\newcommand{\origttfamily}{}% sollte noch nicht definiert sein!
+\let\origttfamily=\ttfamily % alte Definition von \ttfamily sichern
+\renewcommand{\ttfamily}{\origttfamily \hyphenchar\font=`\-}
+
+%%% Parameter
+\newcommand{\dozent}{A.~Schiendorfer}
+\newcommand{\titel}{Solving Soft Constraint Problems in Autonomic Systems with MiniBrass}
+\newcommand{\semester}{FAS* 2016}
+
+%%% Seitenstil ändern
+\markright{\titel ~(\semester) -- Übungsblatt \blatt}
+%\pagestyle{headings}
+
+%keine Einrückung bei den Paragraphen
+\setlength{\parindent}{0pt}
+
+%%% Befehl für anderen Kopfzeile auf erster Seite
+\newcommand{\kopfErsteSeite}{
+  \thispagestyle{plain}
+  \vspace*{-3cm}
+  \noindent\mbox{University of Augsburg, Institute for Software \& Systems Engineering, \dozent}
+  \\
+}  
+
+%%% Befehl für Kopf von Angabenblatt
+\newcommand{\kopfAngabe}{
+  \vspace{0.3cm}
+  \begin{center}
+  {\LARGE\bf \titel \\(\semester)}\\[4ex]
+%  {\bf Übungsblatt \blatt ~(Bearbeitung bis: \abgabe)}\\[4ex]
+%  {\Large\bf \topic}
+  \end{center}
+%  \vspace{1cm}
+}
+
+%%% Befehl für Kopf von Lösungsblatt
+\newcommand{\kopfLoesung}{
+  \vspace{0.3cm}
+  \begin{center}
+  {\LARGE\bf \titel \\(\semester)}\\[4ex]
+  {\bf Lösungsvorschlag \blatt}\\[4ex]
+	{\Large\bf \topic}
+  \end{center}
+  \vspace{1cm}
+}
+
+%%% Befehl für Kopf von Korrekturblatt
+\newcommand{\kopfKorrektur}{
+  \vspace{0.3cm}
+  \begin{center}
+  {\LARGE\bf \titel \\(\semester)}\\[4ex]
+  {\bf Korrekturhinweise zu Blatt \blatt}
+  \end{center}
+  \vspace{1cm}
+}
+
+%%% weitere Befehle
+\renewcommand{\labelenumi}{\alph{enumi})}
+\newtheorem{nexercise}{Exercise}
+\newcommand{\uebung}[1]{\begin{nexercise} \textbf{(#1)} \end{nexercise} }
+
+
+
+
+%\renewcommand{\Fol}{\mklogicconnective{\rightharpoondown}}
+%\renewcommand{\tabf}{\mklogicctab{\rightharpoondown}}
+
+\newcommand{\0}{$\phantom{\bullet}$}
+\def\1{$\bullet$} %%% defined in tetex-0.4 by someone (xypic?)
+\newcommand{\D}{d}
+\newcommand{\BO}[1]{\makebox[0pt][l]{#1}}

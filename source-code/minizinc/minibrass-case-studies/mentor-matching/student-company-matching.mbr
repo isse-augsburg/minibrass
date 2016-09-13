@@ -1,0 +1,23 @@
+include "../defs.mbr";
+
+PVS: students = new ConstraintRelationships("students") {
+   soft-constraint raubholzdelphi: 'worksAt[raubholz] = delphi';
+   soft-constraint raubholzyouthlab: 'worksAt[raubholz] = youthlab';
+   soft-constraint gleichcupg: 'worksAt[gleich] = cupgainini';
+   
+   crEdges : '[| mbr.raubholzyouthlab, mbr.raubholzdelphi | mbr.gleichcupg, mbr.raubholzdelphi |]';
+   useSPD: 'true' ;
+}; 
+
+PVS: companies = new ConstraintRelationships("companies") {
+   soft-constraint delphi_meer: 'worksAt[meerfluss] = delphi';
+   soft-constraint delphi_gleich: 'worksAt[gleich] = delphi';
+   soft-constraint youthlab: 'worksAt[lustig] = youthlab';
+   
+   crEdges : '[| mbr.delphi_meer, mbr.delphi_gleich |]';
+   useSPD: 'true' ;
+}; 
+
+
+%solve ToWeighted(students) lex ToWeighted(companies);
+ solve ToWeighted(companies) lex ToWeighted(students);

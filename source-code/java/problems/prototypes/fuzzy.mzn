@@ -55,7 +55,7 @@ function var FVAL: f_1() =
 let {
   array[int] of float: satDegrees =  [0.23, 0.45, 0.8, 0.48] ;
   var FVAL: value; 
-  constraint binary_fuzzy(satDegrees, x, y, value);
+  constraint binary_fuzzy([0.23, 0.45, 0.8, 0.48], x, y, value);
 } in ( value );
 
 % another extensional form - with formal parameters (maybe nicer to see the scope) 

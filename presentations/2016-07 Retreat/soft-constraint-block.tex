@@ -1,0 +1,167 @@
+% block styles
+\tikzstyle{sensor}=[draw, fill=blue!20, text width=5em, 
+    text centered, minimum height=2.5em,drop shadow]    
+    
+\tikzstyle{alg} = [sensor, text width=5em, fill=isseorange!20, 
+    minimum height=13em, rounded corners, drop shadow]
+\tikzstyle{constraint}=[draw, circle, fill=issegrey!20, text width=1.2em, 
+    text centered, minimum height=1.5em,drop shadow]
+\tikzstyle{domainstore} = [alg, text width=5em, fill=isseorange!40, 
+    minimum height=4em, rounded corners]
+\tikzstyle{goodc} = [ForestGreen, font=\bfseries]
+\tikzstyle{badc} = [Red, font=\bfseries]
+\tikzstyle{okayc} = [LimeGreen, font=\bfseries]
+        
+\tikzset{
+vecArrow/.style={
+  thick
+  }
+}
+
+\tikzset{
+    mynode/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30,
+                   very thick, inner sep=\myinnersep*1em, minimum size=3em, text centered, outer sep=0, align=center},
+    innernode/.style={mynode, text width=3cm,  minimum height=1.5cm,
+                      top color=issegrey!20, bottom color=issegrey!60},
+    emphnode/.style={innernode, top color=isseorange!30, bottom color=isseorange!70}
+}
+
+% Define distances for bordering
+\def\blockdist{2.3}
+\def\edgedist{2.5}
+
+  \tikzset{
+    invisible/.style={opacity=0},
+    visible on/.style={alt={#1{}{invisible}}},
+    alt/.code args={<#1>#2#3}{%
+      \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+    },
+  }
+%  
+%\begin{frame}{Traditionelles Constraint-Solving}
+%\fontsize{8pt}{7.2}\selectfont
+%\begin{center}
+%\begin{tikzpicture}
+%% First row:
+% \node (search) [alg]  {Suche \phantom{$x = 5$} };
+% \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+% \node[below right] at (propag.north west) {Constraint Store $C$};
+% 
+% \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+% \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+% \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+% \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+%  
+% \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+% 
+% \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$x\gets5$} ([yshift=-2em]propag.north west);
+% \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [above,goodc,visible on=<4->] {$\top$} ([yshift=2em]propag.south west);
+% 
+% \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,goodc] {$\top$} (domainstore.west) ;
+% \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+% \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+% \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+%\end{tikzpicture}
+%\end{center}
+%\onslide<0>{
+%\begin{columns}[c] % contents are top vertically aligned
+%     \begin{column}[c]{7cm} % each column can also be its own 
+%\begin{itemize}
+%\item A set of satisfaction degrees $\mathbb{B} = \{ \bot, \top \}$
+%\item A combination operation $\wedge$
+%\item A neutral element $\top$
+%\item A partial order $(\mathbb{B}, \leq_\mathbb{B})$ with $\top <_\mathbb{B} \bot$.
+%\end{itemize}
+%\end{column}
+%     \begin{column}[c]{4.5cm} 
+%     \end{column} 
+%\end{columns}
+%}
+%
+%\end{frame}
+%
+%\begin{frame}{Traditionelles Constraint-Solving}
+%\fontsize{8pt}{7.2}\selectfont
+%\begin{center}
+%\begin{tikzpicture}
+%% First row:
+% \node (search) [alg]  {Suche $x = 5$};
+% \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+% \node[below right] at (propag.north west) {Constraint Store $C$};
+% 
+% \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+% \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+% \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+% \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+%  
+% \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+% 
+% \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+% \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,badc,visible on=<4->] {$\bot$} ([yshift=2em]propag.south west);
+% 
+% \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,badc] {$\bot$} (domainstore.west) ;
+% \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$\top$} (domainstore.150) ;
+% \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.120) ;
+% \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$\top$} (domainstore.68) ;
+%\end{tikzpicture}
+%\end{center}
+%\onslide<5->{
+%\begin{columns}[c] % contents are top vertically aligned
+%     \begin{column}[c]{7cm} % each column can also be its own 
+%\begin{itemize}
+%
+%\item Eine Menge von Bewertungen $\mathbb{B} = \{ \bot, \top \}$
+%\item Eine Kombination $\wedge$
+%\item Ein neutrales Element $\top$
+%\item Eine partielle Ordnung $(\mathbb{B}, \leq_\mathbb{B})$ with $\top <_\mathbb{B} \bot$.
+%\end{itemize}
+%   \end{column} 
+%     \begin{column}[c]{4.5cm} 
+%     \end{column} 
+%\end{columns}
+%}
+%\end{frame}
+
+\begin{frame}{Soft-Constraint-Solving}
+\fontsize{8pt}{7.2}\selectfont
+\begin{center}
+\begin{tikzpicture}
+% First row:
+ \node (search) [alg]  {Search $x = 5$};
+ \path (search.east)+(4.6,0) node (propag) [alg,text width =12em]  {};
+ \node[below right] at (propag.north west) {Constraint Store $C$};
+ 
+ \path (propag.west)+(0.8,-1.2) node (c1) [constraint] {$c_1$}; 
+ \path (propag.west)+(1.1,-0.2) node (c2) [constraint] {$c_2$}; 
+ \path (propag.west)+(2.0,0.4) node (c3) [constraint] {$c_3$}; 
+ \path (propag.west)+(3.2,0.7) node (c4) [constraint] {$c_4$};
+  
+ \path (propag.east)+(-1.2,-1.2) node (domainstore) [domainstore] {Domain Store $(D_x)_{x \in X}$}; 
+ 
+ \path [draw,vecArrow, ->] ([yshift=-2em]search.north east) -- node [above,visible on=<2->] {$y \gets 4$} ([yshift=-2em]propag.north west);
+ \path [draw,vecArrow, <-] ([yshift=2em]search.south east) -- node [below,okayc,visible on=<4->] {$4$} ([yshift=2em]propag.south west);
+ 
+ \path [draw, vecArrow, <->] (c1.east) -- node [below,visible on=<3->,okayc] {$4$} (domainstore.west) ;
+ \path [draw,vecArrow, <->] (c2.330) -- node [above right,visible on=<3->,goodc] {$0$} (domainstore.150) ;
+ \path [draw,vecArrow, <->] (c3.290) -- node [right,visible on=<3->,goodc] {$0$} (domainstore.120) ;
+ \path [draw,vecArrow, <->] (c4.south) -- node [right,visible on=<3->,goodc] {$0$} (domainstore.68) ;
+\end{tikzpicture}
+\end{center}
+\onslide<5->{
+\begin{columns}[c] % contents are top vertically aligned
+     \begin{column}[c]{7cm} % each column can also be its own environment
+    \begin{itemize}
+\item Eine Menge von Bewertungen, z.B., $\{ 0, \ldots, k \}$
+\item Eine Kombination $+$
+\item Ein neutrales Element $0$
+\item Eine partielle Ordnung $(\mathbb{N}, \geq)$ mit $0$ als Top 
+\end{itemize}
+   \end{column} \pause
+     \begin{column}[c]{4.5cm} 
+        Genannt \cemph{valuation structure}~\cite{Schiex1995valued}, bei totaler Ordnung, ansonsten \cemph{partial valuation structure}~\cite{Gadducci2013}.
+        Ähnlich:  \cite{Bistarelli1999}: c-Semiringe 
+     \end{column}
+\end{columns}
+    
+}
+\end{frame}

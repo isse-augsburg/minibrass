@@ -22,6 +22,7 @@ public enum MiniBrassSymbol {
 	RightCurlSy,        // }
 	AsteriskSy,         // *
 	LexSy,              // lex
+	ParetoSy,           // pareto
 	EqualsSy,           // =
 	StringLitSy,        // any string literal enclosed by ' or "
 	IdentSy, 
@@ -29,7 +30,9 @@ public enum MiniBrassSymbol {
 	SolveSy,            // solve
 	TypeSy,             // type
 	PvsSy,              // pvs
-	PVSTypeSy,              // PVSType (for types)
+	PVSTypeSy,          // PVSType (for types)
+	DefaultSy,          // default
+	WrappedBySy,        // wrappedBy
 	SetSy,              // set 
 	ArraySy,            // array
 	OfSy,               // of
@@ -40,6 +43,8 @@ public enum MiniBrassSymbol {
 	FloatLitSy,         // any float
 	DotsSy,             // .. 
 	ParamsSy,           // "params"
+	OffersSy,           // "offers"
+	HeuristicsSy,       // "heuristics"
 	InSy,               // "in"
 	InstantiatesSy,     // "instantiates"
 	WithSy,             // "with"

@@ -1,23 +1,26 @@
 package isse.mbr.parsing;
 
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.MorphedPVSInstance;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
+import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincParType;
+import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PVSParamInst;
 import isse.mbr.model.types.PVSParameter;
@@ -36,8 +39,10 @@ public class CodeGenerator {
 	private static final String OVERALL_KEY = "overall";
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
-	
+	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
+	public static final String TOP_LEVEL_OBJECTIVE = "topLevelObjective";
 	private List<String> leafValuations;
+	private boolean onlyMiniZinc;
 	
 	public String generateCode(MiniBrassAST model) {
 		 LOGGER.fine("Starting code generation");
@@ -65,6 +70,10 @@ public class CodeGenerator {
 			}
 		}
 		
+		// additional minizinc files specified in minibrass file
+		for(String addMinizincFile : model.getAdditionalMinizincIncludes()) {
+			sb.append(String.format("include \"%s\";\n", addMinizincFile));
+		}
 	}
 
 	private void addPvsInstances(StringBuilder sb, MiniBrassAST model) {
@@ -72,14 +81,28 @@ public class CodeGenerator {
 		AbstractPVSInstance topLevelInstance = deref(model.getSolveInstance());
 		
 		sb.append("\n% ---------------------------------------------------");
-		sb.append("\n% Overall exported predicate : \n");
+		sb.append("\n% Overall exported predicate (and objective in case of atomic top-level PVS) : \n");
 		sb.append("\n% ---------------------------------------------------\n");
 		
 		String pvsPred = encodeString("postBetter", topLevelInstance);
-		sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
+		if(!onlyMiniZinc)
+			sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
 
+		if( !(topLevelInstance instanceof CompositePVSInstance)) {
+			String topLevelOverall = getOverallValuation(topLevelInstance);
+			PVSInstance pvsInst = (PVSInstance) topLevelInstance; 
+			MiniZincVarType elementType = pvsInst.getType().instance.getElementType();
+			String encodedType = encode(elementType, pvsInst); 
+			sb.append(String.format("var %s: %s; \nconstraint %s = %s;\n",encodedType, TOP_LEVEL_OBJECTIVE, TOP_LEVEL_OBJECTIVE, topLevelOverall));
+		}
+		
+		sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
+		
 		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
+		if(!onlyMiniZinc)
+			sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsPred, topLevelInstance.getGeneratedBetterPredicate()));
+		
 		// add output line for valuation-carrying variables 
 		sb.append("\n% Add this line to your output to make use of minisearch\n");
 		sb.append("% [ \"\\n"+VALUATTIONS_PREFIX+" ");
@@ -104,35 +127,38 @@ public class CodeGenerator {
 			addPvs(right, sb, model);
 			
 			if(comp.getProductType() == ProductType.DIRECT) {
-				String pvsPred = encodeString("getBetter",  comp);
-				String leftBetter = encodeString("getBetter",  left);
-				String rightBetter = encodeString("getBetter",  right);
-				sb.append(String.format("predicate %s() = (%s()) /\\ (%s());\n", pvsPred, leftBetter, rightBetter));
+				String leftBetter = left.getGeneratedBetterPredicate();
+				String rightBetter = right.getGeneratedBetterPredicate();
+				comp.setGeneratedBetterPredicate(String.format("( (%s) /\\ (%s) )", leftBetter, rightBetter));
 					
 			} else { // lexicographic
-				String pvsPred = encodeString("getBetter",  comp);
-				String leftBetter = encodeString("getBetter",  left);
-				String rightBetter = encodeString("getBetter",  right);
+				String leftBetter = left.getGeneratedBetterPredicate();
+				String rightBetter = right.getGeneratedBetterPredicate();
 				
 				// get left objective variable 
 				String leftOverall = getOverallValuation(left);
+				comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ (sol(%s) = %s /\\ %s) )", leftBetter, leftOverall, leftOverall, rightBetter));
 				
-				sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
+				// sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
 			}
-		} else {
+			
+			// search heuristics as well  
+			sb.append("\n% Composite search Heuristics to be used in a model: \n");
+			
+			String leftHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, left);
+			String rightHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, right);
+			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, pvsInstance) + String.format(" = seq_search( [%s, %s]);",leftHeur,rightHeur);
+			sb.append(annDecl); sb.append('\n');
+		} 
+		else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
+			if(inst instanceof MorphedPVSInstance) {
+				MorphedPVSInstance minst = (MorphedPVSInstance) inst;
+				StringBuilder fromArguments = getInstanceArguments(minst.getMorphism().instance.getFrom().instance, inst);
+				minst.update(fromArguments);
+			}
 			String name = inst.getName();
-			/* 
-			What we generate for a PVSType<E, S>(n, times o mu : S^n -> E, leq : E x E, top : E)
-
-			array[1..n] of var S: softConstraintResults; % the applications of the individual soft constraints into the specification type
-			var E: overall; 
-			constraint overall = times(softConstraintResults); 
-			constraint forall(i in 1..n) (is_worse(softConstraintResults[i], top) ); % maybe not even necessary, useful
-			for minisearch: propagate "post( is_worse(sol(overall), overall) )" to BaB 
-			for combined PVS (e.g. PVS_1 x PVS_2): post (is_worse(sol(overall_1), sol(overall_2), overall1, overall2 )
-			generate string list of outputs of all overall values so minisearch can access them 
-			*/
+			
 			sb.append("\n% ---------------------------------------------------");
 			sb.append("\n%   PVS "+name);
 			sb.append("\n% ---------------------------------------------------\n");
@@ -144,13 +170,50 @@ public class CodeGenerator {
 			// prepare possible substitutions
 			Map<String, String> subs = prepareSubstitutions(inst);
 			
-			for(Entry<String, PVSParamInst> entry : inst.getParametersLinked().entrySet()) {
-				// first one should be nScs 
-				PVSParamInst pi = entry.getValue();
-				String def = String.format("%s : %s = %s; \n", encode(pi.parameter.getType(), inst),CodeGenerator.encodeIdent(pi.parameter, inst) , CodeGenerator.processSubstitutions(pi.expression, subs));
-				sb.append(def);
-			} 
+			// I actually want to go through every PVSParam and look for the proper inst
 			
+			for(PVSParameter pvsParam : inst.getInstanceParameters()) {
+				PVSParamInst pi = inst.getParametersInstantiated().get(pvsParam.getName());
+				// is it an array type (important for annotations) or not?
+				String paramExpression = null; 
+				String defaultValue = pvsParam.getDefaultValue();
+				
+				if(pvsParam.getType() instanceof ArrayType) {
+					if(pi == null) { // we need to collect the values from the individual soft constraints
+						StringBuilder exprBuilder = new StringBuilder("[");
+						boolean first = true;
+
+						for(SoftConstraint sc : inst.getSoftConstraints().values()) {
+							String annotValue = sc.getAnnotations().get(pvsParam.getName());
+							if(annotValue == null)
+								annotValue = defaultValue;
+							if(first)
+								first = false;
+							else 
+								exprBuilder.append(", ");
+							exprBuilder.append(annotValue);
+						}
+						exprBuilder.append("]");
+						paramExpression = exprBuilder.toString();
+					} else {
+						paramExpression = pi.expression;
+					}
+				} else {
+					if(pi != null)
+						paramExpression = pi.expression;
+					else 
+						paramExpression = defaultValue;
+				}
+				if(pvsParam.getWrappedBy() != null) {
+					paramExpression = String.format("%s(%s)", pvsParam.getWrappedBy(), paramExpression);
+				}
+				String def = String.format("%s : %s = %s; \n", encode(pvsParam.getType(), inst),CodeGenerator.encodeIdent(pvsParam, inst) , CodeGenerator.processSubstitutions(paramExpression, subs));
+				sb.append(def);
+			}
+			
+			StringBuilder instanceArguments = getInstanceArguments(pvsType, inst);
+			
+			// ------------------------------------------------------------- 
 			sb.append("\n% Decision variables: \n");
 			
 			String overallIdent = getOverallValuation(inst); 
@@ -167,32 +230,51 @@ public class CodeGenerator {
 			String topIdent = CodeGenerator.encodeString("top", inst);
 			sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
 			
+			// ------------------------------------------------------------- 
+			
 			sb.append("\n% MiniSearch predicates: \n");
-			// predicate getBetter() = x < sol(x) /\ y < sol(y);
-			// predicate getBetter() = isWorse(sol(lb), violatedScs)
-			String pvsPred = encodeString("postBetter", inst);
+			String getBetterString = String.format("%s(sol(%s), %s, %s)", pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString());
+			inst.setGeneratedBetterPredicate(getBetterString);
+			// sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
 			
-			StringBuilder instanceArguments = new StringBuilder();
-			boolean first = true;
-			for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
-				if(!first)
-					instanceArguments.append(", ");
-				else 
-					first = false;
-				String parIdent = CodeGenerator.encodeIdent(pvsParam, inst);
-				instanceArguments.append(parIdent);
-			}
-
-			sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
-			
-			sb.append(String.format("constraint %s = %s (%s,%s);\n", overallIdent, pvsType.getCombination() , valuationsArray,instanceArguments.toString()));
+			sb.append(String.format("constraint %s = %s (%s,%s);\n", overallIdent, pvsType.getCombination() , valuationsArray, instanceArguments.toString()));
 				
 			sb.append("\n% Soft constraints: \n");
 			for(SoftConstraint sc : inst.getSoftConstraints().values()) {
-				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(),sc.getMznLiteral()));
+				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(), CodeGenerator.processSubstitutions(sc.getMznLiteral(), subs) ));
+			}
+			
+			// ------------------------------------------------------------- 
+			sb.append("\n% Search Heuristics to be used in a model: \n");
+			String heuristicFunc = inst.getType().instance.getOrderingHeuristic();
+			
+			
+			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, inst);
+			sb.append(annDecl);
+			if( heuristicFunc != null) {
+				sb.append(" = ");
+				sb.append(String.format("%s(%s, %s, %s);\n", heuristicFunc, valuationsArray, overallIdent, instanceArguments.toString()));
+			} else {
+				
+				sb.append(";\n");
 			}
 		}
 		
+	}
+
+	private StringBuilder getInstanceArguments(PVSType pvsType, PVSInstance inst) {
+		StringBuilder instanceArguments = new StringBuilder();
+		boolean first = true;
+		
+		for(PVSParameter pvsParam : pvsType.getPvsParameters()) {
+			if(!first)
+				instanceArguments.append(", ");
+			else 
+				first = false;
+			String parIdent = CodeGenerator.encodeIdent(pvsParam, inst);
+			instanceArguments.append(parIdent);
+		}
+		return instanceArguments;
 	}
 
 	private Map<String, String> prepareSubstitutions(PVSInstance inst) {
@@ -204,9 +286,10 @@ public class CodeGenerator {
 		}
 		
 		// all parameters to their encoded id
-		for(PVSParamInst pi : inst.getParametersLinked().values()) {
-			String encodedIdent = CodeGenerator.encodeIdent(pi.parameter, inst);
-			substitutions.put(MBR_PREFIX+pi.parameter.getName(), encodedIdent);
+		for(PVSParamInst parInst : inst.getParametersInstantiated().values()) {
+			PVSParameter parameter = parInst.parameter;
+			String encodedIdent = CodeGenerator.encodeIdent(parameter, inst);
+			substitutions.put(MBR_PREFIX+parameter.getName(), encodedIdent);
 		}
 		return substitutions;
 	}
@@ -246,5 +329,13 @@ public class CodeGenerator {
 	
 	public static String encodeIdent(PVSParameter par, PVSInstance instance) {
 		return encodeString(par.getName(), instance);
+	}
+
+	public boolean isOnlyMiniZinc() {
+		return onlyMiniZinc;
+	}
+
+	public void setOnlyMiniZinc(boolean onlyMiniZinc) {
+		this.onlyMiniZinc = onlyMiniZinc;
 	}
 }

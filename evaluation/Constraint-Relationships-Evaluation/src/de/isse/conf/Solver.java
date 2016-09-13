@@ -7,7 +7,9 @@ public enum Solver {
 	NUMBERJACK("numberjack", "fzn_numberjack"), 
 	OR_TOOLS("or-tools","fzn-ort"), 
 	CHOCO("choco", "fzn-choco"), 
-	G12("g12_fd", "flatzinc");
+	G12("g12_fd", "flatzinc"),
+	GECODE_NAT("gecode","fzn-gecode"); // only default minisearch operation mode
+	
 
 	private String mznGlobal;
 	private String fznExec;

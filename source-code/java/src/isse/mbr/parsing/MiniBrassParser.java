@@ -7,13 +7,16 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Logger; 
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.MorphedPVSInstance;
+import isse.mbr.model.parsetree.Morphism;
+import isse.mbr.model.parsetree.Morphism.ParamMapping;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
@@ -41,7 +44,6 @@ import isse.mbr.model.types.SetType;
 public class MiniBrassParser {
 
 	private final static Logger LOGGER = Logger.getGlobal();
-	
 	
 	private Scanner scanner;
 	private MiniBrassSymbol currSy;
@@ -122,14 +124,16 @@ public class MiniBrassParser {
 	private void item(MiniBrassAST model) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.IncludeSy) {
 			getNextSy();
-			includeItem();
+			includeItem(model);
 		} else if(currSy == MiniBrassSymbol.TypeSy) {
 			getNextSy();
 			PVSType pvsType = typeItem();
 			model.registerPVSType(pvsType.getName(), pvsType);
 		} else if (currSy == MiniBrassSymbol.MorphismSy) {
 			getNextSy();
-			morphismItem();
+			Morphism m = morphismItem();
+			model.registerMorphism(m.getName(), m);
+			
 		} else if (currSy == MiniBrassSymbol.SolveSy) {
 			if(model.getSolveInstance() != null) {
 				throw new MiniBrassParseException("More than one solve item specified !");
@@ -226,7 +230,7 @@ public class MiniBrassParser {
 	private AbstractPVSInstance PVSDiProd(MiniBrassAST model) throws MiniBrassParseException {
 	
 		AbstractPVSInstance first = PVSAtom(model);
-		while(currSy == MiniBrassSymbol.AsteriskSy) {
+		while(currSy == MiniBrassSymbol.ParetoSy) {
 			getNextSy();
 			
 			AbstractPVSInstance next = PVSAtom(model);
@@ -243,8 +247,9 @@ public class MiniBrassParser {
 	}
 
 	/**
-	 * PVSAtom   -> "new" ident "(" stringlit "," intlit ("," MZNLiteral)* ")"          
+	 * PVSAtom   -> "new" ident "(" stringlit "," intlit ("," MZNLiteral)* ")"           
 	 *            |  ident
+	 *            |  ident "(" PVSAtom ")"
 	 *            | "(" PVSInst ")"
 	 * @throws MiniBrassParseException 
 	 * 
@@ -268,7 +273,7 @@ public class MiniBrassParser {
 			
 			// register the newly created instance
 			PVSInstance instance = new PVSInstance();
-						
+						 
 			int nScs = 0;
 			while(currSy != MiniBrassSymbol.RightCurlSy) {
 				// expect items (either soft constraint item or parameter value)
@@ -280,6 +285,8 @@ public class MiniBrassParser {
 					getNextSy();
 					expectSymbol(MiniBrassSymbol.IdentSy);
 					String constraintId = lexer.getLastIdent();
+					if(instance.getSoftConstraints().containsKey(constraintId))
+						throw new MiniBrassParseException("Double definition of constraint '"+constraintId+"' (id "+nScs+").");
 
 					getNextSy();
 					expectSymbolAndNext(MiniBrassSymbol.ColonSy);
@@ -290,11 +297,13 @@ public class MiniBrassParser {
 						throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
 					}
 					getNextSy();
+					SoftConstraint sc = new SoftConstraint(nScs, constraintId, mznExpression);
+					
 					// here we need optional annotations 
 					if(currSy == MiniBrassSymbol.DoubleColonSy) {
 						getNextSy();
 						expectSymbol(MiniBrassSymbol.IdentSy); 
-						String parameteName = lexer.getLastIdent();
+						String parameterName = lexer.getLastIdent();
 						getNextSy();
 						expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
 						expectSymbol(MiniBrassSymbol.StringLitSy);
@@ -302,13 +311,14 @@ public class MiniBrassParser {
 							throw new MiniBrassParseException("MiniZinc literal expression in instantiations must be enclosed in single quotes.");
 						}
 						String content = lexer.getLastIdent();
+						// store in annotations linked to soft constraint
+						sc.getAnnotations().put(parameterName, content);
 						
 						getNextSy();
 						expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
 						
 					} 					
 					expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
-					SoftConstraint sc = new SoftConstraint(nScs, constraintId, mznExpression);
 					
 					instance.getSoftConstraints().put(constraintId, sc);
 				} else {
@@ -338,13 +348,29 @@ public class MiniBrassParser {
 			return instance;
 		} else if (currSy == MiniBrassSymbol.IdentSy) {
 			String reference = lexer.getLastIdent();
-			ReferencedPVSInstance referencedPVSInstance = new ReferencedPVSInstance();
-			referencedPVSInstance.setReference(reference);
-			referencedPVSInstance.setName("RefTo-"+reference);
-			referencedPVSInstance.setReferencedInstance(new NamedRef<AbstractPVSInstance>(reference));
-			semChecker.scheduleUpdate(referencedPVSInstance.getReferencedInstance(), model.getPvsReferences());
+
 			getNextSy();
-			return referencedPVSInstance;
+			if(currSy == MiniBrassSymbol.LeftParenSy) {
+				getNextSy();
+				AbstractPVSInstance pvs = PVSAtom(model);
+				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				MorphedPVSInstance morphedInst = new MorphedPVSInstance();
+				morphedInst.setInput(pvs);
+				morphedInst.setMorphism(new NamedRef<Morphism>(reference));
+				semChecker.scheduleUpdate(morphedInst.getMorphism(), model.getMorphisms());
+				morphedInst.setName(reference+"_"+pvs.getName()+"_");
+				model.getPvsInstances().put(morphedInst.getName(), morphedInst);
+		
+				return morphedInst;
+			} else {
+				ReferencedPVSInstance referencedPVSInstance = new ReferencedPVSInstance();
+				referencedPVSInstance.setReference(reference);
+				referencedPVSInstance.setName("RefTo_"+reference);
+				referencedPVSInstance.setReferencedInstance(new NamedRef<AbstractPVSInstance>(reference));
+				semChecker.scheduleUpdate(referencedPVSInstance.getReferencedInstance(), model.getPvsReferences());
+				
+				return referencedPVSInstance;
+			}
 		} else if(currSy == MiniBrassSymbol.LeftParenSy) {
 			getNextSy();
 			AbstractPVSInstance inst = PVSInst(model);
@@ -369,8 +395,9 @@ public class MiniBrassParser {
 
 	/**
 	 * 	morphism ConstraintRelationships -> WeightedCsp: ToWeighted = weight_cr;
+	 * @return 
 	 */
-	private void morphismItem() throws MiniBrassParseException {
+	private Morphism morphismItem() throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		String morphFrom = lexer.getLastIdent();
 		getNextSy();
@@ -386,12 +413,53 @@ public class MiniBrassParser {
 		getNextSy();
 		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
 
+		Morphism m = new Morphism();
+		m.setFrom(new NamedRef<PVSType>(morphFrom));
+		m.setTo(new NamedRef<PVSType>(morphTo));
+		m.setName(morphName);
+		
+		// can have params 
+		if(currSy == MiniBrassSymbol.ParamsSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
+			// now a param item until we see RightCurlSy
+			while(currSy != MiniBrassSymbol.RightCurlSy) {
+				expectSymbol(MiniBrassSymbol.IdentSy);
+				String targetParamName = lexer.getLastIdent();
+				ParamMapping pm = new ParamMapping();
+				pm.setParam(targetParamName);
+				
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
+				
+				// now either we have a stringlit sy for a minizinc literal expression
+				if(currSy == MiniBrassSymbol.StringLitSy) {
+					pm.setMznExpression(lexer.getLastIdent());
+					getNextSy();
+				} else {
+					// or we have an ident for a function 
+					expectSymbol(MiniBrassSymbol.IdentSy);
+					pm.setMznFunction(lexer.getLastIdent());
+					getNextSy();
+				}
+				m.getParamMappings().put(pm.getParam(), pm);
+				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			}
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.InSy);
+		}
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		String mznFunctionName = lexer.getLastIdent();
 		getNextSy();
 
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		LOGGER.fine("Morphism "+morphName+" mapping "+morphFrom + " to "+morphTo + " with mzn function "+mznFunctionName);
+		m.setMznFunction(mznFunctionName);
+		
+		semChecker.scheduleUpdate(m.getFrom(), model.getPvsTypes());
+		semChecker.scheduleUpdate(m.getTo(), model.getPvsTypes());
+
+		return m;
 	}
 
 	/**
@@ -460,8 +528,26 @@ public class MiniBrassParser {
 			mapping(newType);
 		}
 		getNextSy();
-		if(currSy == MiniBrassSymbol.SemicolonSy) 
-			getNextSy(); // this should be EOF if only comments follow ...
+		
+		// we can have an optional "offers" block here
+		if(currSy == MiniBrassSymbol.OffersSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
+			
+			// currently only for heuristics
+			expectSymbolAndNext(MiniBrassSymbol.HeuristicsSy);
+			expectSymbolAndNext(MiniBrassSymbol.ArrowSy);
+			expectSymbol(MiniBrassSymbol.IdentSy);
+			String heuristicFunction = lexer.getLastIdent();
+			newType.setOrderingHeuristic(heuristicFunction);
+			
+			getNextSy();
+
+			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
+			
+		} 
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		
 		return newType;
 	}
@@ -478,6 +564,9 @@ public class MiniBrassParser {
 	 */
 	private PVSParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
 		PVSParameter returnParameter;
+		String defaultVal = null;
+		String wrapFunction = null;
+		
 		if(currSy == MiniBrassSymbol.ArraySy) {
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
@@ -507,6 +596,26 @@ public class MiniBrassParser {
 			expectSymbol(MiniBrassSymbol.IdentSy);
 			String name = lexer.getLastIdent();
 			getNextSy();
+			
+			// optional default value 
+			if(currSy == MiniBrassSymbol.DoubleColonSy) {
+				getNextSy();
+				if(currSy == MiniBrassSymbol.DefaultSy) {
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					defaultVal = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				} else {
+					expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					wrapFunction = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				}
+			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 
 			semChecker.scheduleArrayTypeCheck(arrayType, pendingIndexTypes, name);
@@ -518,6 +627,7 @@ public class MiniBrassParser {
 			}
 			
 			returnParameter = new PVSParameter(name, arrayType);
+			
 		} else {
 			MiniZincVarType varType = MiniZincVarType(scopeType); // could be int
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
@@ -527,9 +637,36 @@ public class MiniBrassParser {
 			LOGGER.fine("Registering parameter "+varType + ": "+ident);
 		
 			getNextSy();
+			
+			// optional default value 
+			if(currSy == MiniBrassSymbol.DoubleColonSy) {
+				getNextSy();
+				if(currSy == MiniBrassSymbol.DefaultSy) {
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					defaultVal = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				} else {
+					expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
+					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+					expectSymbol(MiniBrassSymbol.StringLitSy);
+					wrapFunction = lexer.getLastIdent();
+					getNextSy();
+					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+				}
+			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			semChecker.scheduleTypeDependencyCheck(scopeType, ident, varType);
 			returnParameter = new PVSParameter(ident, varType);
+		}
+		if(defaultVal != null) {
+			returnParameter.setDefaultValue(defaultVal);
+		}
+		
+		if(wrapFunction != null) {
+			returnParameter.setWrappedBy(wrapFunction);
 		}
 		return returnParameter;
 	}
@@ -660,21 +797,25 @@ public class MiniBrassParser {
 
 	/**
 	 * "include" ident ";" (just read ident, when entering
+	 * @param model2 
 	 * @throws MiniBrassParseException 
 	 */
-	private void includeItem() throws MiniBrassParseException {
+	private void includeItem(MiniBrassAST model) throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.StringLitSy);
 		// add this file to our work list
 		String fileName = lexer.getLastIdent();
-		
-		getNextSy();
-		
-		File referred = new File(currDir,fileName);
-		if(!visited.contains(referred)) {
-			worklist.add(referred);
+
+		if(fileName.endsWith(".mzn")) {
+			model.getAdditionalMinizincIncludes().add(fileName);
+		} else {
+			File referred = new File(currDir,fileName);
+			
+			if(!visited.contains(referred)) {
+				worklist.add(referred);
+			}
 		}
-		expectSymbol(MiniBrassSymbol.SemicolonSy);
 		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 	}
 
 	private void expectSymbol(MiniBrassSymbol expectedSy) throws MiniBrassParseException {

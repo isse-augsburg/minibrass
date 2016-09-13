@@ -269,8 +269,11 @@ public class ExperimentRunner {
 			globalsCmd = "";
 			
 		}
-		String underlyingCommand = "minisearch --solver " + flatzincExecutable + globalsCmd + " "
-				+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
+		String solverCmd = "--solver " + flatzincExecutable + globalsCmd + " ";
+		if(evalJob.solver == Solver.GECODE_NAT)
+			solverCmd = "";
+		
+		String underlyingCommand = "minisearch "+solverCmd 	+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
 
 		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag TODO make numberjack more tolerant regarding that
 			underlyingCommand = "minizinc "+ (evalJob.solver == Solver.NUMBERJACK ? "": "-a") +" -f " + flatzincExecutable + " -G" + minizincGlobals + " "
@@ -435,7 +438,7 @@ public class ExperimentRunner {
 				}
 				
 				if(line.toLowerCase().contains("error") ) {
-					throw new Exception("Apparently, an error happened.");
+					System.err.println("Apparently, an error happened.");
 				}
 			}
 			result.noSolutions = noSolutions;
@@ -489,7 +492,7 @@ public class ExperimentRunner {
 		// 2) build evaluation-conf.dzn file
 		StringBuilder sb = new StringBuilder();
 		sb.append("mostImportantFirst = " + mbConfig.mostImportantFirst.toString() + ";\n");
-		sb.append("propagateRedundant = " + mbConfig.propagateRedundant.toString() + ";\n");
+		sb.append("propagateWeights = " + mbConfig.propagateRedundant.toString() + ";\n");
 		sb.append("timeLimitMs = " + mbConfig.timeout.toString() + ";\n");
 
 		File confDzn = new File(evalDir, EVAL_CONF_FILE);

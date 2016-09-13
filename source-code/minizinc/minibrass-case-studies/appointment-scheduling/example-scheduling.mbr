@@ -1,0 +1,19 @@
+include "../defs.mbr";
+
+PVS: students = new WeightedCsp("students") {
+   k: '100';
+   soft-constraint raubholz:   'scheduled[raubholz] in {monday, tuesday}';   
+   soft-constraint schraubale: 'scheduled[schraubale] in {tuesday, wednesday}';
+   soft-constraint meerfluss:  'scheduled[meerfluss] in {tuesday}';
+   soft-constraint gleich:   'scheduled[gleich] in {monday, tuesday}';
+   soft-constraint lustig:     'scheduled[lustig] in {monday, wednesday}';
+   soft-constraint lustig-urlaub: 'scheduled[lustig] != tuesday' :: weights('101'); 
+}; 
+
+PVS: teachers = new CostFunctionNetwork("teachers") {
+   soft-constraint scheduledDates: 'scheduledDates';
+}; 
+
+
+solve students lex teachers;
+

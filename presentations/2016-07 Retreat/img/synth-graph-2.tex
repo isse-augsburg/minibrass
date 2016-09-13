@@ -1,0 +1,96 @@
+\tikzset{
+   main node/.style={rectangle,
+                     rounded corners,
+   					 fill=black!15,
+   					 draw,
+   					 minimum width=3.5em,
+   					 text centered,
+                     inner sep=2.5pt,	 
+   					 font=\sffamily
+   					},
+   treestyle/.style={rectangle,fill=black!15,draw,font=\sffamily},
+   constraint/.style={circle,fill=black!15,draw,font=\sffamily\small},
+   constraint_satisfied/.style = {constraint, fill=white},
+   constraint_violated/.style = {constraint, fill=black!25},
+}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.45cm,inner sep=1.5pt,outer sep = 0.0pt, thick] 
+%\tikzstyle{every node}=[font=\tiny]
+\begin{scope}[xshift=-6.0cm,yshift=-4.0cm]
+\node[main node, style={font=\sffamily\footnotesize}] at (0.1,1.5) {\minMaxViolation[1]};
+\node[main node, style={font=\sffamily\footnotesize}] at (3.2,1.5) {\minMaxViolation[2]};
+\node[main node, style={font=\sffamily\footnotesize}] at (6.3,1.5) {\minMaxViolation[3]};
+
+\draw [rounded corners,dashed,black!45] (-2,2) rectangle (9.0,1);
+\node[text width=3cm, anchor=west, right] at (-2.9, 1.5) { \hLevelOrg{1} };
+\draw [rounded corners,dashed,black!45] (-2,0.8) rectangle (9.0,-2.65);
+\node[text width=4cm, anchor=west, right] at (-2.9, -0.75) { \hLevelOrg{2} };
+
+% bio
+\draw [black!85,fill=forestgreen!35] (-1.8,0.6) rectangle (1.8,-2.5);
+\node[main node, style={font=\sffamily\footnotesize}] (5) at (0.05,-0.4) {\gasFull};
+\node[main node, style={font=\sffamily\footnotesize}] (6) [below left of=5,xshift=5.4] {\ecoSweet};
+\node[main node, style={font=\sffamily\footnotesize}] (7) [below right of=5,xshift=-3.1] {\onOff};
+%\node[main node, style={font=\sffamily\footnotesize},double] (hardConstraint) [below left of=7,xshift=-3.1,yshift=7] {$\mathsf{maxProd}$};
+\node[text width=4cm, anchor=west, left] at (2.3, 0.3) { \textbf{ConstraintRel.:}  $\mathtt{\biogas}$ $(b)$ };
+%\node[text width=2cm, anchor=west, left] at (0.4, 0.3) { CR \textsc{TPD} };
+
+% EV
+\draw [black!85,fill=black!35] (2.0,0.6) rectangle (5.6,-2.5);
+\node[main node, style={font=\sffamily\footnotesize}] (3) at (2.80,-0.4) {\prefBatteryLevel};
+\node[main node, style={font=\sffamily\footnotesize}] (4) at (4.58,-0.4)  {\earlyBird};
+\node[main node, style={font=\sffamily\footnotesize}] (8) [below right of=3] {\limitBatteryUsage};
+\node[text width=3cm, anchor=west, left] at (5.2, 0.3) { \textbf{ConstraintRel.:}  $\mathtt{\ev}$ $(c)$ };
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+% thermal
+\draw [black!85,fill=thermicred!25] (5.8,0.6) rectangle (8.8,-2.5);
+\draw [rounded corners,dashed,black!45] (5.9,0) rectangle (8.7,-1.3);
+\node[text width=4cm, anchor=west, right] at (5.9, 0.2) { \hLevelThermal{1} };
+\draw [rounded corners,dashed,black!45] (5.9,-1.8) rectangle (8.7,-2.4);
+\node[text width=4cm, anchor=west, right] at (5.9, -1.6) { \hLevelThermal{2} };
+\node[main node, style={font=\ttfamily\footnotesize}] (10) at (6.9,-0.4) {\ecoOpt};
+\node[main node, node distance=0.85cm, style={font=\sffamily\footnotesize}] (11) at (6.98,-1.0) {\inertia};
+\node[main node, node distance=0.85cm, style={font=\sffamily\footnotesize}] (12) at (6.98,-2.1) {\ecoGood};
+\node[text width=4cm, anchor=west, right] at (7.1, 0.3) { $\mathtt{\thermal}$ $(d)$ };
+
+\node[text width=2cm, anchor=west, left] at (10, -0.7) { \textbf{CFN:} \\ $\mathtt{h1}$ };
+
+\node[text width=2cm, anchor=west, left] at (10.1, -2.1) { \textbf{CFN:} \\ $\mathtt{h2}$ };
+
+\node[text width=2cm, anchor=west, left] at (10.1, 1.4) { \textbf{CFN:} \\ $\mathtt{orga}$ };
+
+\path[every node/.style={font=\sffamily\tiny}]
+  (8) edge node [right] {} (3)
+  (8) edge node [right] {} (4)
+  (6) edge node [right] {} (5)
+  (7) edge node [right] {} (5)
+;
+\end{scope}
+
+% \begin{scope}[xshift=-0.2cm,yshift=-0.9cm]
+% \node[text width=9cm,left] at (0.0, 0.0) {%
+% \begin{itemize}[itemsep=2pt]
+%   \item something interesting
+% \end{itemize}
+% };
+% \end{scope}
+
+\end{tikzpicture}
+%\caption{Case study depicting individual and organizational preference specifications in context.}
+\label{fig:preferencesCaseStudy}
+\end{figure}
+  
+
+
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% mode: TeX-PDF
+%%% mode: TeX-source-correlate
+%%% TeX-master: "../quality-quantity-soft-constraints.tex"
+%%% End:
+

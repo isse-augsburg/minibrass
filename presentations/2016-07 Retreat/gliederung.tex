@@ -1,0 +1,123 @@
+\documentclass[10pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Alexander Schiendorfer}
+\title{Preferences for Constraint Optimization in Self-Organizing Hierarchies}
+
+\begin{document}
+\tableofcontents
+\newpage
+\chapter{Introduction}
+\section{Motivation}
+\section{Contributions of the Thesis}
+
+\chapter{Application Scenarios}
+\section{Distributed Energy Management}
+\subsection{The Unit Commitment Problem}
+\subsection{Complexity of the Problem}
+\subsection{Hierarchies of Autonomous Virtual Power Plants}
+\subsection{Trust To Manage Uncertainty}
+\subsection{Related Work}
+
+\section{Preference-based University Tasks}
+\subsection{Exam Appointment Scheduling}
+\subsection{Mentor Matching [Constraints'16]*}
+\subsection{Multi-User Multi-Display Exhibitions [ModRef'15]*}
+\subsection{Related Work}
+
+%\section{Robotics}
+%\subsection{Task Allocation in Reconfigurable Swarms}
+%\subsection{Scheduling Assembly Tasks}
+%\subsection{Related Work}
+
+
+\chapter{Foundations}
+\section{Self-organization -- Designing Systems to Adapt}
+\section{Controlling Emergence -- The Restore Invariant Approach}
+\section{Classical Constraint Programming for Combinatorial Problems}
+\section{Over-Constrainedness in Practical Problems}
+\subsection{Partial Constraint Satisfaction}
+\subsection{Algebraic Structures for Soft Constraints}
+
+\section{Algorithms to Solve Soft Constraint Problems }
+\subsection{Branch-and-Bound Search}
+\subsection{Large-Neighborhood Search}
+\subsection{Optimization in Constraint Programming Solvers}
+
+\section{Mathematical Programming}
+\subsection{Linear Programming}
+\subsection{Mixed Integer Programming}
+
+\section{Modeling Languages}
+\subsection{MiniZinc and MiniSearch}
+\subsection{Essence}
+
+\chapter{Soft Constraints}
+\section{Specifying Optimal Behavior -- A Soft Corridor}
+
+\section{Qualitative Specification using Constraint Relationships [SGAI'13]*}
+\subsection{Syntax}
+\subsection{Semantics -- Dominance Properties}
+\subsection{Evaluation in the Energy Scenario [SEN-MAS'14]*}
+\section{Relationship with General Formalisms [ICTAI'14]*}
+\subsection{Free Construction of Partial Valuation Structures}
+\subsection{Free Construction of C-Semirings}
+\section{Mapping Organizations -- Combinations of Preference Structures [Wirsing'15]*}
+\subsection{Direct Product}
+\subsection{Lexicographic Product}
+\section{Applications of Constraint Relationships}
+\subsection{Distributed Energy Management [SEN-MAS'14]* }
+\subsection{Preference-based University Tasks}
+
+\chapter{MiniBrass -- A Modeling Language for Soft Constraints[Constraints'16]*}
+\section{Workflow}
+\section{Type Declarations}
+\section{Operators}
+\section{Consistency Checks and Utilities}
+\section{Soft Global Constraints}
+\section{PVS-based Generic Search}
+\subsection{Branch-and-Bound}
+\subsection{Large Neighborhood Search}
+\subsection{Adaptive Large Neighborhood Search}
+\section{Evaluation}
+\subsection{Benchmark Instances}
+\subsection{Comparison with \texttt{toulbar2}}
+\subsection{Efficiency of Generic Heuristics}
+\subsection{Comparing PVS-Types}
+
+
+\chapter{Supply Automata for Prosumers \allowbreak [SEN-MAS'14]*, [TCCI'15]*}
+\section{Challenges in Unit-Commitment}
+\section{Existing Formulations}
+\section{Automata-based Specification of Optimization Problems}
+\subsection{Syntax}
+\subsection{Semantics}
+\subsection{Translation to Mixed Integer Programs}
+\section{Examples}
+\subsection{Modeling Cold and Hot Start-up}
+\subsection{Scheduling a Biogas-Plant}
+%\section{Quality Assurance for Supply Automata}
+%\subsection{Simulation}
+%\subsection{Testing}
+%\subsection{Model Checking}
+\section{Related Work}
+
+\chapter{Abstraction of Collective Behavior [ICAART'14]* [TCCI'15]*}
+\section{Obtaining Simple Representations of Production Spaces}
+\section{Deriving Efficient Bounds for Future Time Steps}
+\section{Calculating Approximate Functions for Collectives}
+\subsection{Principle of Sampling Function Points}
+\subsection{Selection Strategies [SASO'15']*}
+\section{Relationship with Unit-Commitment Algorithms}
+\subsection{Regio-Central Robust Optimization [SAOS'14]}
+\subsection{Market-Based Robust Optimization [TAAS'15] [SASO'15]}
+
+\chapter{Conclusion, Discussion, and Future Challenges}
+\section{Summary of Research Contributions}
+\section{Open Research Challenges}
+
+
+
+\end{document}

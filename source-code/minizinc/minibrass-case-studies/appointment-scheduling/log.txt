@@ -1,0 +1,36 @@
+2016-07-20 13:15:00 INFO isse.mbr.parsing.MiniBrassCompiler doMain Processing example-scheduling.mbr to file example-scheduling_o.mzn
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem students: WeightedCsp, nScs: 6, params: [nScs=6, k=100]
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem teachers: CostFunctionNetwork, nScs: 1, params: [nScs=1]
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... ConstraintRelationships
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Next index: int(1 .. 2)
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter bool: useSPD
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: link_invert_booleans
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_cr
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: {}
+2016-07-20 13:15:00 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: ConstraintRelationships <set of int(1 .. nScs)(link_invert_booleans, is_worse_cr, {})>
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... CostFunctionNetwork
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: int(0 .. k)
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter isse.mbr.model.types.IntType@3695de1a: k
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: sum
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_weighted
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: 0
+2016-07-20 13:15:00 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: CostFunctionNetwork <int(0 .. k)(sum, is_worse_weighted, 0)>
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... WeightedCsp
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter isse.mbr.model.types.IntType@292898f5: k
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: weighted_sum
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_weighted
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: 0
+2016-07-20 13:15:00 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: WeightedCsp <int(0 .. k)(weighted_sum, is_worse_weighted, 0)>
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser morphismItem Morphism ToWeighted mapping ConstraintRelationships to WeightedCsp with mzn function id
+2016-07-20 13:15:00 FINE isse.mbr.parsing.SemanticChecker checkPvsInstances Checking PVS instances
+2016-07-20 13:15:00 FINER isse.mbr.parsing.MiniBrassParser parse I should optimize: ( (ref) -> students lex (ref) -> teachers )
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: students: [lit] PVS-Type: WeightedCsp <int(0 .. [lit] k)(weighted_sum, is_worse_weighted, 0)>, nScs: 6, params: [nScs=6, k=100]
+2016-07-20 13:15:00 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: teachers: [lit] PVS-Type: CostFunctionNetwork <int(0 .. [lit] k)(sum, is_worse_weighted, 0)>, nScs: 1, params: [nScs=1]
+2016-07-20 13:15:00 FINE isse.mbr.parsing.CodeGenerator generateCode Starting code generation

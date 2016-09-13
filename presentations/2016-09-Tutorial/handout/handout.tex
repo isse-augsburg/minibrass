@@ -1,0 +1,60 @@
+\documentclass[a4paper,10pt,fleqn]{article}
+\usepackage{german}
+\usepackage[utf8]{inputenc}
+\usepackage{a4wide}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\newcommand{\blatt}{01}
+\newcommand{\abgabe}{25.10.2015, 23:59 Uhr}
+\newcommand{\topic}{Selbst-organisierende Systeme und NetLogo}
+
+\input{header}
+
+\begin{document}
+\kopfErsteSeite
+\kopfAngabe
+
+
+\uebung{MiniZinc: HelloWorld}
+Build a MiniZinc model \texttt{xopt.mzn} with a decision variable $x$ taking values from 0 to 10, with
+constraints to ensures that $x$ is divisible by 4, which outputs the value of $x$ that gives the minimum
+value of $(x-7)^2$.
+
+Test it using the precompiled IDE-bundle. Suppose you cannot use the \texttt{mod} function, how would you alternatively model that $x$
+is divisible by 4?
+
+\uebung{Arrays}
+Define a MiniZinc model \texttt{array.mzn} which takes an integer parameter $n$ defining the length of an
+array of numbers $x$ taking values from 0 to 9. Constrain the array so the sum of the numbers in
+the array is equal to the product of the numbers in the array. Output the resulting array.
+Test your model using the ``all solutions'' setting active in the IDE. Add a constraint to ensure that the numbers in the array are non-decreasing, i.e. $x[1] \leq x[2] \leq
+\ldots \leq x[n]$. This should reduce the number of similar solutions. 
+How big a number can you solve with your model? Why do you think this happens?
+
+\uebung{Group Photo}
+Given a group of $n$ people, we must arrange them for a photo. The best
+photo is when people are next to their friends, so the aim is to arrange them so that each person
+is next to (to the left or right) with as many friends as possible. The data for the
+problem is given as
+%
+\begin{align*}
+& \texttt{n = <size of problem> ;} \\
+& \texttt{array[1..n,1..n] of var bool: friend; }
+\end{align*} 
+%
+where \texttt{friend[f1, f2]} means \texttt{f1} and \texttt{f2} are friends. You can assume that the friend array is symmetric.
+You should output a list of the people in their position to maximize the number of adjacent
+friends. For example given the data \texttt{groupphoto1.dzn}, you should output the placement of the guests as well as the objective value, i.e.,
+
+\begin{align*}
+& \texttt{Obj = 7; [4, 3, 5, 6, 8, 7, 1, 2]}
+\end{align*}
+
+\uebung{Modeling a Soft Constraint Problem}
+
+\uebung{Influence of Priorities}
+
+\end{document}

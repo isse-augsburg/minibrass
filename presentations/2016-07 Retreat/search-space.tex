@@ -1,0 +1,79 @@
+
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\begin{frame}[plain]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \lbag c_1, c_2, c_3 \rbag$}};
+\node (c1c2) at (-2,1) {\alert<2->{$\lbag c_1, c_2 \rbag$}};
+\node (c2c3) at (0,2) {$ \lbag c_2, c_3 \rbag$};
+\node (c1c3) at (2,1) {$\lbag c_1, c_3 \rbag$};
+
+\node (c1) at (0,3) {\alert<3->{$\lbag c_1 \rbag$}};
+\node (c2) at (-2,4) {\alert<4->{$\lbag c_2 \rbag$}};
+\node (c3) at (2,4) {$\lbag c_3 \rbag$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \lbag \rbag $};
+
+\node[text width=2cm] (verb) at (4,0) {     };
+\path[-]
+(bot) edge[highlight] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge (c2)
+(c2c3) edge (c3)
+(c1c2) edge[highlight] (c1)
+(c1c2) edge (c2)
+(c1) edge[highlight] (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+%(a) edge (b)
+%(b) edge (top)
+%(bot) edge (c)
+%(c) edge (top)
+;
+
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}[plain]
+\begin{center}
+\begin{tikzpicture}[scale=0.77,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = k$}};
+\node (k-1) at (0,1) {\alert{$k-1$}};
+\node (k-2) at (0,2) {\alert{$k-2$}};
+
+\node (dots) at (0,3) {$\ldots$};
+\node (1) at (0,4) {$1$};
+\node (top) at (0,5) {$\top = 0 $};
+
+\node[text width=2cm] (verb) at (4,0) {     };
+\path[-]
+(bot) edge[highlight] (k-1)
+(k-1) edge[highlight] (k-2)
+(k-2) edge (dots)
+(dots) edge (1)
+(1) edge (top)
+      ;
+%(a) edge (b)
+%(b) edge (top)
+%(bot) edge (c)
+%(c) edge (top)
+;
+
+\end{tikzpicture}
+\end{center}
+\end{frame}

@@ -1,0 +1,554 @@
+
+\begin{frame}[fragile]{Entscheidungsprobleme}
+
+\begin{center}
+
+\begin{tikzpicture}
+\matrix (m) [matrix of nodes,row sep=0.2em,column sep=0.2em,minimum width=2em]
+  {
+       \begin{minipage}[t]{.45\textwidth}
+       \begin{center}
+     \includegraphics[width=.7\textwidth]{img/muffins.jpg} \\
+     ``Wie viele Muffins von welcher Sorte?''
+     \end{center}
+     \end{minipage} 
+       & 
+     \begin{minipage}[t]{.5\textwidth}     
+     \begin{center}
+     \includegraphics[width=.45\textwidth]{img/levis.png} \\
+     ``Wann findet welche Vorlesung statt?''     
+       \end{center}
+     \end{minipage}  \\
+     \begin{minipage}[t]{.45\textwidth}     
+     \begin{center}
+     \includegraphics[width=.7\textwidth]{img/putzplan.jpg} \\
+     ``Wer macht wann welche Aufgaben?''
+       \end{center}
+     \end{minipage}  & 
+     
+     \begin{minipage}[t]{.45\textwidth}
+     \begin{center}
+           \includegraphics[width=.7\textwidth]{img/resti.jpg} \\
+           ``Was machen wir am Wochenende?'' 
+       \end{center}
+     \end{minipage}
+\\};
+     
+%  \path[-stealth]
+%    (m-1-1) edge node [left] {$\mathcal{B}_X$} (m-2-1)
+%            edge [double] node [below] {$\mathcal{B}_t$} (m-1-2)
+%    (m-2-1.east|-m-2-2) edge node [below] {$\mathcal{B}_T$}
+%            node [above] {$\exists$} (m-2-2)
+%    (m-1-2) edge node [right] {$\mathcal{B}_T$} (m-2-2)
+%            edge [dashed,-] (m-2-1);
+\end{tikzpicture}
+
+\end{center}
+\end{frame}
+
+\begin{frame}{Was haben diese Probleme gemeinsam?}
+\hFirst{Entscheidungen} \onslide<2->{\emph{(Variablen)}}
+\begin{itemize}
+\item Die Anzahl Schokomuffins oder Bananenmuffins
+\item Die Vorlesungen im Studienplan
+\item Die Freitags- und Samstagsaktivität
+\end{itemize}
+\pause
+
+\vspace*{2ex}
+
+\hFirst{Möglichkeiten} \onslide<3->{\emph{(Domänen)}}
+\begin{itemize}
+\item Schokomuffins: $\{0, \ldots, 20\}$
+\item Vorlesung ``Algorithmen 1'': $\{\mathrm{HS1}, \mathrm{HS2}, \mathrm{HS3}, \ldots \}$
+\end{itemize}
+
+\pause
+
+\vspace*{2ex}
+
+\hFirst{Abhängigkeiten} \onslide<4->{\emph{(Constraints)}}
+\begin{itemize}
+\item Das benötigte Mehl für $x$ Schoko- und $y$ Bananenmuffins darf 250g nicht übersteigen.
+\item In einem Raum kann gleichzeitig nur eine Veranstaltung stattfinden.
+\item Es darf nur 1 Schnitzlnight pro Wochenende geben.
+\end{itemize} \pause 
+\end{frame}
+
+\begin{frame}{Was haben diese Probleme gemeinsam?}
+\hFirst{Präferenzen} \onslide<2->{\emph{(Soft Constraints)}}
+\begin{itemize}
+\item Am Freitag, 08:00 \emph{sollte} keine Algorithmenübung stattfinden
+\item Bernd möchte ins Steakhouse, Ada zur Burgerei $\rightarrow$ Adas Präferenz ist \emph{wichtiger}
+\item Ich möchte weder putzen noch staubsaugen; Putzen ist aber \emph{schlimmer}
+\end{itemize}
+\pause
+
+\vspace*{2ex}
+und/oder
+\vspace*{2ex}
+
+\hFirst{Ziele} \onslide<3->{\emph{(Zielfunktionen)}}
+\begin{itemize}
+\item Maximiere den Ertrag durch Schoko/Bananenmix
+\item Maximiere die Anzahl der vorlesungsfreien Tage
+\end{itemize}
+
+\vspace*{2ex}
+\hfill ein \alert{Constraint-Satisfaction-(Optimization)-Problem} (CSP/COP)
+\end{frame}
+
+\begin{frame}{Autonome Systeme I: Adaptive Produktion}
+
+\begin{center}
+\includegraphics[width=.45\textwidth]{img/automobilindustrie.jpg}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Autonome Systeme I: Adaptive Produktion}
+
+\textbf{Ziel}: Weise Robotern Aufgaben so zu, dass sich ein korrekter Ressourcenfluss ergibt
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/produktionszelle.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}{Autonome Systeme II: Energiemanagement}
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/power_plants.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Autonome Systeme II: Energiemanagement}
+\textbf{Ziel}: Plane Kraftwerke so ein, dass sie die \alert{Last} gemeinsam erfüllen
+\input{img/problem}
+\end{frame}
+
+\begin{frame}{Ein klassisches CSP}
+\begin{center}
+\chessboard[clearboard,setpieces={Qf8, Qc7, Qe6, Qh5, Qa4, Qd3, Qb2, Qg1}]
+\end{center}
+\end{frame}
+
+\begin{frame}{Klassischer Ansatz}
+Entwickle eigenen Algorithmus \emph{from scratch}:
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/algo.png}
+\end{center}
+\hfill \emph{(Pomberger, Dobler, 2008)}
+\end{frame}
+
+\begin{frame}[fragile]{Modellieren statt Programmieren!}
+\alert{Alternative}: Schreibe \emph{ein} Modell -- teste \emph{viele} Algorithmen!
+
+\vspace*{1ex}
+
+\lstinputlisting{models/soft-queens-0.mzn}
+\begin{tikzpicture}
+\matrix (m) [matrix of nodes,row sep=0.2em,column sep=0em,minimum width=1em]
+  {
+  2 & 3 & 4 & 5 & \qquad & \qquad & \qquad & 0 & -1 & -2 & -3 \\
+  3 & 4 & 5 & 6 & \qquad & \qquad & \qquad & 1 & 0 & -1 & -2 \\
+  4 & 5 & 6 & 7 & \qquad & \qquad & \qquad & 2 & 1 & 0 & -1 \\
+  5 & 6 & 7 & 8 & \qquad & \qquad & \qquad & 3 & 2 & 1 & 0 \\  
+  };
+     
+%  \path[-stealth]
+%    (m-1-1) edge node [left] {$\mathcal{B}_X$} (m-2-1)
+%            edge [double] node [below] {$\mathcal{B}_t$} (m-1-2)
+%    (m-2-1.east|-m-2-2) edge node [below] {$\mathcal{B}_T$}
+%            node [above] {$\exists$} (m-2-2)
+%    (m-1-2) edge node [right] {$\mathcal{B}_T$} (m-2-2)
+%            edge [dashed,-] (m-2-1);
+\end{tikzpicture}
+
+\small
+\begin{verbatim}
+queens = array1d(1..8 ,[4, 6, 1, 5, 2, 8, 3, 7]);
+----------
+\end{verbatim}
+\copyright~Hakan Kjellerstrand, \url{http://www.hakank.org/minizinc}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Soft Constraint Programming in MiniBrass}
+ \alert{Constraint Programming}
+    \begin{itemize}
+    \item Deklarative Programmierung (ähnlich SQL, Prolog)
+    \item Trennung von \textbf{Modell} und \emph{Algorithmus}
+    \item Geeignet für kombinatorische Probleme unter harten Bedingungen (Physik!)
+    \item Modellierungssprache \hFirst{MiniZinc}
+    \end{itemize}
+
+    \vspace*{3ex}
+    
+\alert{Soft Constraint Programming}
+    \begin{itemize} 
+    \item Modellierung von \textbf{Nutzerpräferenzen}
+    \item Finde Lösungen, die \emph{so gut wie möglich} sind
+    \item Was bedeutet ``gut``?
+    \item Modellierungssprache \hFirst{MiniBrass}
+     \end{itemize}
+\end{frame}
+
+\begin{frame}{Künstliche Intelligenz: Einteilung}
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.5\textwidth}
+          
+    \hSecond{Data-driven AI}
+    \begin{center}
+    \includegraphics[width=.8\textwidth]{img/neuralnet.jpg}
+    \end{center}
+
+    \vspace*{4ex}
+    
+    \begin{itemize}
+    \item Machine Learning
+    \item Signal Processing
+    \item Computer Vision
+    \end{itemize}
+
+    \end{column}
+    
+    \begin{column}{.5\textwidth}
+    \hFirst{Decision-driven AI}
+    \begin{center}
+    \includegraphics[width=.9\textwidth]{img/discreteopt.png}
+    \end{center}
+    \begin{itemize}
+    \item Constraint Programming
+    \item Combinatorial Optimization
+    \item Heuristic Optimization
+    \item Planning / Scheduling
+    \end{itemize}
+    
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Warum modellieren?}
+\begin{enumerate}
+\item Einmal (formal) modelliert -- vielseitig gelöst
+\begin{itemize}
+\item Constraint-Solving
+\item SAT
+\item MIP 
+\item Heuristiken
+\end{itemize}
+\vspace*{1ex}
+\item Effiziente, (normalerweise) gut getestete Algorithmen in Lösern verbaut
+\begin{itemize}
+\item Gleiche Algorithmen für viele Probleme
+\item Spezialalgorithmen für wiederkehrende Teilprobleme (\texttt{alldifferent})
+\end{itemize}
+\vspace*{1ex}
+\item Prototyping
+\begin{itemize}
+\item Problemspezifikation wird klarer
+\item Spezialalgorithmus für konkretes Problem kann nachentwickelt werden
+\end{itemize}
+
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]{Verwandte Technik}
+\begin{lstlisting}[language=sql]
+SELECT firstname, lastname
+FROM employees 
+WHERE age < 30
+\end{lstlisting}
+\vspace*{1ex}
+statt 
+\vspace*{1ex}
+\begin{lstlisting}[language=java]
+Collection<Person> youngs = new ArrayList<>();
+for(Person p : allEmployees) {
+  if(p.getAge() < 30)
+    youngs.add(p);
+}
+\end{lstlisting}
+
+\begin{parchment}[Motivation]
+\centering 
+\alert{Constraint-Modellierung für Optimierungsprobleme $\approx$ SQL für Datenzugriff} 
+\end{parchment}
+
+\end{frame}
+
+\begin{frame}{NP-Vollständigkeit}
+\begin{theorem}
+Das zu einem CSP gehörende Entscheidungsproblem ist NP-vollständig.
+\end{theorem}
+
+\begin{center}
+\begin{figure}
+\includegraphics[width=.8\textwidth]{img/np_complete.png}
+\caption{\url{https://xkcd.com/287/} }
+\end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}{Warum MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{Eine Sprache -- viele Solver} 
+\end{parchment}
+\begin{textblock*}{2.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=\textwidth]{img/MiniZn_logo.jpg} 
+
+\end{textblock*}
+Unterstützte Solver
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item Choco (CP)
+\item G12 (CP/LP/MIP)
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Ein erstes Modell}
+\begin{lstlisting}
+var 0..2: x;
+var 0..2: y; 
+
+constraint x < y;
+
+solve maximize x + y;
+\end{lstlisting}
+
+\vspace*{2ex}
+
+\url{http://www.minizinc.org}
+
+\vspace*{2ex}
+
+\small
+\begin{verbatim}
+x = 1;
+y = 2;
+----------
+==========
+\end{verbatim}
+
+\end{frame}
+
+\begin{frame}[fragile]{Etwas interessanter \ldots}
+\small
+\lstinputlisting{models/cakes.mzn}
+\end{frame}
+
+\begin{frame}{Task-Zuweisung in Practice}
+\begin{itemize}
+\item Taskzuweisungsproblem (\emph{task allocation problem})
+
+\begin{itemize}
+\item [-] $n$ Roboter
+\item [-] $m$ Tasks
+\item [-] Gebe jedem Roboter einen \emph{unterschiedlichen} Task, und maximiere den Gewinn 
+\end{itemize}
+\item Beispielproblem:
+\begin{itemize}
+\item[-] $n = 4$, $m = 5$
+\end{itemize}
+\end{itemize}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+ & t1 & t2 & t3 & t4 & t5 \\ 
+\hline 
+r1 & 7 & 1 & 3 & 4 & 6 \\ 
+\hline 
+r2 & 8 & 2 & 5 & 1 & 4 \\ 
+\hline 
+r3 & 4 & 3 & 7 & 2 & 5 \\ 
+\hline 
+r4 & 3 & 1 & 6 & 3 & 6 \\ 
+\hline 
+\end{tabular} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Task-Zuweisung: Modell}
+\begin{lstlisting}
+% problem data 
+int: n; set of int: ROBOTS = 1..n;
+int: m; set of int: TASKS = 1..m;
+array[ROBOTS,TASKS] of int: profit;
+
+% decisions
+array[ROBOTS] of var TASKS: allocation;
+
+% goal
+solve maximize sum(r in ROBOTS) (profit[r, allocation[r]] );
+
+% have robots work on different tasks
+constraint alldifferent(allocation);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Wie funktioniert's?}
+Im Wesentlichen \ldots 
+\begin{center}
+\includegraphics[width=.4\textwidth]{img/sudoku.jpg}
+\end{center}
+\begin{enumerate}
+\item Streiche alle Kandidaten raus \onslide<2->{\emph{(Constraint Propagation)}}
+\item Fülle alle Felder aus, bei denen nur noch 1 Zahl in Frage kommt
+\item Wenn du nicht mehr weiterkommst $\rightarrow$ probiere aus \onslide<3->{\emph{(Backtracking Search)}}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Constraint-Propagation: Beispiel}
+\begin{center}
+\includegraphics[width=\textwidth]{img/constprop.png}
+\end{center}
+Entferne Werte, die zu keiner Lösung führen können. 
+\end{frame}
+
+
+\graphicspath{{img/}}
+\input{constraint-search}
+
+\begin{frame}[fragile]{Erstes Modell: Revisited}
+\begin{lstlisting}
+var 0..2: x;
+var 0..2: y; 
+
+constraint x < y;
+
+solve
+:: int_search([x,y], input_order, indomain_max, complete)
+maximize x + y;\end{lstlisting}
+
+
+\vspace*{2ex}
+
+\small
+\begin{verbatim}
+x = 1;
+y = 2;
+----------
+==========
+\end{verbatim}
+
+\end{frame}
+
+\input{soft-constraints}
+
+\begin{frame}[fragile]{Exam Scheduling}
+
+\textbf{Ziel}: Weise Prüfungsslots an Studenten zu sodass:
+\begin{itemize}
+\item Jeder Student ist zufrieden mit seinem Datum (\emph{stimmt zumindest zu})
+\item Die Anzahl von Prüfungs\emph{tagen} ist minimiert (um das Zeitbudget der Prüfer zu schonen)
+\end{itemize}
+
+%\vspace*{2ex}
+%\begin{parchment}
+\begin{center}
+\includegraphics[width=.15\textwidth]{img/voting.png}
+\hspace*{4ex}
+\includegraphics[width=.5\textwidth]{img/Voting.pdf}
+\end{center}
+%\end{parchment}
+
+\begin{itemize}
+\item Präferenzen von Studenten sollten nicht unterschiedlich hoch gewichtet werden
+\item Lösung (Prüfplan) ist eine geteilte Entscheidung
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Scheduling: Core Model}
+See \texttt{exam-scheduling-approval.mzn}:
+\begin{lstlisting}
+% Exam scheduling example with just a set of 
+% approved dates and *impossible* ones
+include "globals.mzn";
+include "soft_constraints/soft_constraints.mzn";
+
+int: n; set of int: STUDENT = 1..n; 
+int: m; set of int: DATE = 1..m;
+array[STUDENT] of set of DATE: possibles;
+array[STUDENT] of set of DATE: impossibles;
+
+% the actual decisions
+array[STUDENT] of var DATE: scheduled;
+
+int: minPerSlot = 0; int: maxPerSlot = 4;
+constraint global_cardinality_low_up(scheduled % minPerSlot, maxPerSlot
+constraint forall(s in STUDENT) (not (scheduled[s] in impossibles[s])); 
+ 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Scheduling: Preferences}
+See \texttt{exam-scheduling-approval.mzn}:
+\begin{lstlisting}
+% have a soft constraint for every student
+nScs = n;
+penalties = [ 1 | n in STUDENT]; % equally important in this case 
+
+constraint forall(s in STUDENT) ( 
+     (scheduled[s] in possibles[s]) <-> satisfied[s] ) ;
+var DATE: scheduledDates;
+% constrains that "scheduledDates" different 
+% values (appointments) appear in "scheduled"
+constraint  nvalue(scheduledDates, scheduled);
+
+% search variants 
+solve 
+:: int_search(satisfied, input_order, indomain_max, complete)
+search minimize_lex([scheduledDates, violateds]);   % pro teachers
+%search minimize_lex([violateds, scheduledDates]); % pro students
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Exam Scheduling: Realversuch}
+
+\begin{itemize}
+\item Gesammelte Präferenzen von 33 Studenten
+\item verteilt über 12 mögliche Termine (6 Tage, Vormittag und Nachmittag)
+\begin{itemize}
+\item[-] \emph{Approval} set 
+\item[-] \emph{Impossible} set 
+\end{itemize}
+
+\vspace*{2ex}
+
+\item Kombiniert mittels \alert{Approval Voting} (schöne wahltheoretische Eigenschaften!)
+\item Höchstens 4 pro Termin
+
+\item Findet optimale Lösung sofort (61 msec) 
+\begin{itemize}
+\item[-] \emph{Jeder} Student stimmt Termin zu
+\item[-] Wird mit der minimalen Anzahl von 9 Terminen erreicht
+\end{itemize}
+\item Eingesetzte Strategie:
+\end{itemize}
+\begin{lstlisting}
+search minimize_lex([violateds, scheduledDates]); % pro students
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Take-away Messages}
+\begin{parchment}[Take-away]
+\centering 
+\begin{enumerate}
+\item Innovative Software steht vor \emph{Constraint-Optimierungsproblemen}
+\vspace*{1ex}
+\item Modellierung für leistungsfähige Algorithmik
+\vspace*{1ex}
+\item Algebraische Strukturen sind ``in'' \texttt{;-)}
+\end{enumerate}
+\end{parchment}
+
+\url{schiendorfer@isse.de} \hfill Try it in your own projects!
+\end{frame}

@@ -164,8 +164,18 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.ParamsSy;
 				case "instantiates":
 					return MiniBrassSymbol.InstantiatesSy;
+				case "default":
+					return MiniBrassSymbol.DefaultSy;
+				case "wrappedBy":
+					return MiniBrassSymbol.WrappedBySy;
+				case "offers":
+					return MiniBrassSymbol.OffersSy;
+				case "heuristics":
+					return MiniBrassSymbol.HeuristicsSy;
 				case "lex":
 					return MiniBrassSymbol.LexSy;
+				case "pareto":
+					return MiniBrassSymbol.ParetoSy;
 				case "morph":
 					return MiniBrassSymbol.MorphismSy;
 				case "new":

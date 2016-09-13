@@ -19,6 +19,9 @@ import java.util.logging.Logger;
 public class MiniZincLauncher {
 	Collection<MiniZincResultListener> listeners;
 
+	private String flatzincExecutable = "fzn-gecode";
+	private String minizincGlobals = "gecode";  
+
 	private final static Logger LOGGER = Logger.getGlobal();
 	
 	public MiniZincLauncher() {
@@ -29,10 +32,23 @@ public class MiniZincLauncher {
 		listeners.add(listener);
 	}
 	
+
+	public void runMiniZincModel(File model, File data, int timeout) {
+		// for now, just use Gecode
+		
+		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
+	
+		String dataPath = data != null ? data.getPath() : "";
+		ProcessBuilder pb = new ProcessBuilder("minizinc", "-a","-f",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+		if(data != null)
+			pb.command().add(dataPath);
+		
+		runProcess(pb, timeoutInMillisecs);
+		cleanup();
+	}
+	
 	public void runMiniSearchModel(File model, File data, int timeout) {
 		// for now, just use Gecode
-		String flatzincExecutable = "fzn-gecode";
-		String minizincGlobals = "gecode";  
 		
 		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
 	
@@ -104,7 +120,7 @@ public class MiniZincLauncher {
 		Scanner sc = null;
 		final String optimalitySep = "==========";
 		final String solutionSep = "----------";
-
+		boolean error = false;
 		try {
 			sc = new Scanner(log);
 
@@ -118,6 +134,7 @@ public class MiniZincLauncher {
 				if (line.contains(optimalitySep)) {
 					// System.out.println("Solved optimally!");
 					for(MiniZincResultListener listener : listeners) {
+						listener.notifySolved();
 						listener.notifyOptimality();
 					}
 					broadcast = false;
@@ -133,7 +150,7 @@ public class MiniZincLauncher {
 				
 				if(line.toLowerCase().contains("error") ) {
 					broadcast = false; // not really necessary, but I like it for clarity
-					throw new Exception("Apparently, an error happened.");
+					error = true;
 				}
 				
 				if(broadcast) {
@@ -151,6 +168,8 @@ public class MiniZincLauncher {
 			if (sc != null)
 				sc.close();
 		}
+		if(error) 
+			System.err.println("Apparently, an error happened.");
 	}
 	
 	public static void main(String[] args) {
@@ -160,6 +179,22 @@ public class MiniZincLauncher {
 		
 		mznLauncher.runMiniSearchModel(model, data, 5);
 
+	}
+
+	public String getFlatzincExecutable() {
+		return flatzincExecutable;
+	}
+
+	public void setFlatzincExecutable(String flatzincExecutable) {
+		this.flatzincExecutable = flatzincExecutable;
+	}
+
+	public String getMinizincGlobals() {
+		return minizincGlobals;
+	}
+
+	public void setMinizincGlobals(String minizincGlobals) {
+		this.minizincGlobals = minizincGlobals;
 	}
 
 }
