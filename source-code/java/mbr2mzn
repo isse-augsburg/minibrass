@@ -1,2 +1,3 @@
 #!/bin/sh
-java -jar /home/alexander/Documents/Projects/git-new/Minizinc/minizinc-soft-constraints/source-code/java/mbr2mzn.jar "$@"
+SCRIPT_DIR="$(dirname "$0")/mbr2mzn.jar"
+java -jar $SCRIPT_DIR "$@"

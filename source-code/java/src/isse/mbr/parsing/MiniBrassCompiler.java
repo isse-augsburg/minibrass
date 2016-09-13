@@ -69,7 +69,7 @@ public class MiniBrassCompiler {
 		systemOut.setLevel(Level.ALL);
 
 		logger.addHandler(systemOut);
-		logger.setLevel(Level.ALL);
+		logger.setLevel(Level.SEVERE);
 
 		// Prevent logs from processed by default Console handler.
 		logger.setUseParentHandlers(false); // Solution 1
@@ -83,7 +83,7 @@ public class MiniBrassCompiler {
 		CodeGenerator codegen = new CodeGenerator();
 		codegen.setOnlyMiniZinc(minizincOnly);
 		String generatedCode = codegen.generateCode(model);
-
+		System.out.println("MiniBrass code compiled successfully to "+ output +".");
 		// write code to file
 		FileWriter fw = new FileWriter(output);
 		fw.write(generatedCode);
