@@ -1,0 +1,16 @@
+2016-07-20 09:20:57 INFO isse.mbr.parsing.MiniBrassCompiler doMain Processing classic.mbr to file classic_o.mzn
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser typeItem In type item
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser typeItem Working on type ... ConstraintRelationships
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser typeItem Specification type: bool
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Next index: int(1 .. 2)
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser parameterDecl Registering parameter bool: useSPD
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: link_invert_booleans
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser mapping Read function: is_worse_cr
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser mapping Read verbatim: {}
+2016-07-20 09:20:57 FINE isse.mbr.model.MiniBrassAST registerPVSType Registering PVS type ... PVS-Type: ConstraintRelationships <set of int(1 .. nScs)(link_invert_booleans, is_worse_cr, {})>
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem Got instance: 
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser pvsInstItem cr1: ConstraintRelationships, nScs: 3, params: [crEdges=[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |], nScs=3, useSPD=false]
+2016-07-20 09:20:57 FINE isse.mbr.parsing.SemanticChecker checkPvsInstances Checking PVS instances
+2016-07-20 09:20:57 FINER isse.mbr.parsing.MiniBrassParser parse I should optimize: (ref) -> cr1
+2016-07-20 09:20:57 FINE isse.mbr.parsing.MiniBrassParser parse Got instance: cr1: [lit] PVS-Type: ConstraintRelationships <set of int(1 .. [lit] nScs)(link_invert_booleans, is_worse_cr, {})>, nScs: 3, params: [crEdges=[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |], nScs=3, useSPD=false]
+2016-07-20 09:20:57 FINE isse.mbr.parsing.CodeGenerator generateCode Starting code generation

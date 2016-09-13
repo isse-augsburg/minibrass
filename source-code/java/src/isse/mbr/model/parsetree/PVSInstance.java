@@ -1,26 +1,29 @@
 package isse.mbr.model.parsetree;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.PVSParamInst;
+import isse.mbr.model.types.PVSParameter;
 import isse.mbr.model.types.PVSType;
 
 public class PVSInstance extends AbstractPVSInstance {
 	private NamedRef<PVSType> type;
 	private Map<String, String> parameterValues;
+	private Map<String, Map<String,String>> parameterArrayValues; // there is one map for every array-typed parameter
 	private Map<String, SoftConstraint> softConstraints;
-	private Map<String, PVSParamInst> parametersLinked; // gets done by semantic checker
+	protected Map<String, PVSParamInst> parametersInstantiated; // gets done by semantic checker
 	
 	private int numberScs;
 	
 	public PVSInstance() {
 		parameterValues = new HashMap<>();
-		softConstraints = new HashMap<>();
+		softConstraints = new LinkedHashMap<>(); 
+		parameterArrayValues = new HashMap<>();
 	}
 	
 	public NamedRef<PVSType> getType() {
@@ -49,16 +52,24 @@ public class PVSInstance extends AbstractPVSInstance {
 		return name + ": "+type + ", nScs: "+numberScs+ ", params: "+Arrays.toString(parameterValues.entrySet().toArray()); 
 	}
 
-	public Map<String, PVSParamInst> getParametersLinked() {
-		return parametersLinked;
+	public Map<String, PVSParamInst> getParametersInstantiated() {
+		return parametersInstantiated;
 	}
 
-	public void setParametersLinked(Map<String, PVSParamInst> parametersLinked) {
-		this.parametersLinked = parametersLinked;
+	public void setParametersInstantiated(Map<String, PVSParamInst> parametersLinked) {
+		this.parametersInstantiated = parametersLinked;
 	}
 
 	public Map<String, SoftConstraint> getSoftConstraints() {
 		return softConstraints;
+	}
+
+	public Map<String, Map<String, String>> getParameterArrayValues() {
+		return parameterArrayValues;
+	}
+
+	public List<PVSParameter> getInstanceParameters() {
+		return type.instance.getPvsParameters();
 	}
 
 }

@@ -1,0 +1,47 @@
+type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('transClosureWrap');
+    bool: useSPD :: default('true');
+  } in 
+  instantiates with "../mbr_types/cr_type.mzn" {
+    times -> link_invert_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+  }
+  offers {
+    heuristics -> getSearchHeuristicCR;
+  };
+  
+ type WeightedCsp = PVSType<bool, int> = 
+  params {
+    int: k :: default('1000'); 
+    array[1..nScs] of int: weights :: default('1');
+  } in  
+  instantiates with "../mbr_types/weighted_type.mzn" {
+    times -> weighted_sum;
+    is_worse -> is_worse_weighted;
+    top -> 0;
+ }
+ offers {
+    heuristics -> getSearchHeuristicWeighted;
+ };
+  
+    
+
+morph ConstraintRelationships -> WeightedCsp: ToWeighted = 
+  params {
+    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    weights = calculate_cr_weights;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+   
+
+
+PVS: cr1 = new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'x = 3' ;
+   soft-constraint c2: 'y = 3' ;
+   soft-constraint c3: 'z = 3' ;
+   
+   crEdges: '[| mbr.c3, mbr.c1 | mbr.c3, mbr.c2 |]';
+}; 
+
+solve ToWeighted(cr1);

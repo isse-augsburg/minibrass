@@ -35,6 +35,9 @@ public class MiniBrassCompiler {
 
 	private final static Logger LOGGER = Logger.getGlobal();
 
+	@Option(name = "-m", usage = "only MiniZinc code (top level PVS must be int)")
+	private boolean minizincOnly; // does not generate anything that is related to MiniSearch (i.e. annotations for getBetter-predicates)
+	
 	@Option(name = "-o", usage = "output compiled MiniZinc to this file", metaVar = "MZN-OUTPUT")
 	private File out = null;
 
@@ -42,6 +45,7 @@ public class MiniBrassCompiler {
 	private String minibrassFile;
 
 	public static class StdoutConsoleHandler extends ConsoleHandler {
+		@Override
 		protected void setOutputStream(OutputStream out) throws SecurityException {
 			super.setOutputStream(System.out);
 		}
@@ -65,7 +69,7 @@ public class MiniBrassCompiler {
 		systemOut.setLevel(Level.ALL);
 
 		logger.addHandler(systemOut);
-		logger.setLevel(Level.ALL);
+		logger.setLevel(Level.SEVERE);
 
 		// Prevent logs from processed by default Console handler.
 		logger.setUseParentHandlers(false); // Solution 1
@@ -77,8 +81,9 @@ public class MiniBrassCompiler {
 		MiniBrassParser parser = new MiniBrassParser();
 		MiniBrassAST model = parser.parse(input);
 		CodeGenerator codegen = new CodeGenerator();
+		codegen.setOnlyMiniZinc(minizincOnly);
 		String generatedCode = codegen.generateCode(model);
-
+		System.out.println("MiniBrass code compiled successfully to "+ output +".");
 		// write code to file
 		FileWriter fw = new FileWriter(output);
 		fw.write(generatedCode);
@@ -95,6 +100,9 @@ public class MiniBrassCompiler {
 			if (out == null) {
 				String mbrFilePrefix = minibrassFile.substring(0, minibrassFile.lastIndexOf('.'));
 				out = new File(mbrFilePrefix + "_o.mzn");
+			}
+			if(minizincOnly) {
+				LOGGER.info("Only generating MiniZinc (not MiniSearch) code"); 
 			}
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
@@ -124,6 +132,14 @@ public class MiniBrassCompiler {
 			LOGGER.severe("IO error: ");
 			e.printStackTrace();
 		}
+	}
+
+	public boolean isMinizincOnly() {
+		return minizincOnly;
+	}
+
+	public void setMinizincOnly(boolean minizincOnly) {
+		this.minizincOnly = minizincOnly;
 	}
 
 }

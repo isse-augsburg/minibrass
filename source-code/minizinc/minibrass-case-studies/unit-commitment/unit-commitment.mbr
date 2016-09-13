@@ -1,0 +1,39 @@
+include "../defs.mbr";
+
+PVS: orga = new CostFunctionNetwork("Orga") {
+    soft-constraint vio_1: 'violation[1]';
+    soft-constraint vio_2: 'violation[2]';
+    soft-constraint vio_3: 'violation[3]';
+    isWorstCase: 'true';
+};
+
+PVS: biogas = new ConstraintRelationships("biogas") {
+   soft-constraint gasFull: 'forall(w in WINDOW) (supply[w,biogas] >= 13)';
+   soft-constraint ecoSweet: 'forall(w in WINDOW) (supply[w,biogas] >= 14)';
+   soft-constraint onOff: 'forall(w in 1..T-1) ( abs(supply[w,biogas] - supply[w+1,biogas]) <= 1)';
+   
+   crEdges : '[| mbr.ecoSweet, mbr.gasFull | mbr.onOff, mbr.gasFull |]';
+   useSPD: 'true' ;
+}; 
+
+PVS: ev = new ConstraintRelationships("ev") {
+   soft-constraint prefBL: 'forall(w in WINDOW) (supply[w,EV] in 5..8)';
+   soft-constraint earlyBird: 'supply[2,EV] = 5 /\ supply[3,EV] = 5';
+   soft-constraint limitBU: 'sum(w in WINDOW) ( bool2int(supply[w,EV] == 11) ) <= 2';
+   
+   crEdges : '[| mbr.limitBU, mbr.prefBL |  mbr.limitBU, mbr.earlyBird |]';
+   useSPD: 'false' ;
+}; 
+
+PVS: therm1 = new CostFunctionNetwork("therm1") {
+  soft-constraint ecoOpt: 'sum(w in WINDOW) ( abs(supply[w,thermal] - 8) )';
+  soft-constraint inertia: 'sum(w in 1..T-1) ( abs(supply[w,thermal] - supply[w+1,thermal]))';
+};
+
+PVS: therm2 = new CostFunctionNetwork("therm2") {
+  soft-constraint ecoGood: 'sum(w in WINDOW) ( abs(supply[w,3] - 9) )';
+};
+
+PVS: overall = orga lex ( biogas pareto ev pareto  (therm1 lex therm2) );
+
+solve overall;

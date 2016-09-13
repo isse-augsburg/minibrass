@@ -1,15 +1,13 @@
 package isse.mbr.parsing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
@@ -17,7 +15,10 @@ import org.jgrapht.graph.DefaultEdge;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.parsetree.MorphedPVSInstance;
+import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.FloatType;
 import isse.mbr.model.types.IntType;
@@ -174,7 +175,20 @@ public class SemanticChecker {
 	public void checkPvsInstances(MiniBrassAST model) throws MiniBrassParseException {
 		LOGGER.fine("Checking PVS instances");
 		for( Entry<String, AbstractPVSInstance> entry : model.getPvsInstances().entrySet()) {
-			if(entry.getValue() instanceof PVSInstance) {
+			if (entry.getValue() instanceof MorphedPVSInstance) {
+				MorphedPVSInstance mi = (MorphedPVSInstance) entry.getValue();
+				mi.deref();
+				Morphism m = mi.getMorphism().instance;
+				if(! (mi.getConcreteInstance() instanceof PVSInstance)) {
+					throw new MiniBrassParseException("Invalid argument for morphism "+m.getName() + "(" +mi.getConcreteInstance()+ ") must be a concrete instance of type "+m.getFrom().instance);
+				} else {
+					PVSInstance decoratedPi = mi.getConcreteInstance();
+					if ( ! decoratedPi.getType().instance.getName().equals(m.getFrom().instance.getName())) {
+						throw new MiniBrassParseException("Invalid argument for morphism "+m.getName() + "(" +mi.getConcreteInstance() + ") must be a concrete instance of type "+m.getFrom().instance);						
+					}
+				}
+				
+			} else if(entry.getValue() instanceof PVSInstance) {
 				PVSInstance pvsInst = (PVSInstance) entry.getValue();
 				PVSType pvsType = pvsInst.getType().instance;
 				
@@ -185,6 +199,7 @@ public class SemanticChecker {
 				
 				List<PVSParameter> formalParameters =  pvsType.getPvsParameters();
 				HashMap<String, PVSParameter> lookupMap = new HashMap<>(formalParameters.size());
+				
 				for(PVSParameter formalPar : formalParameters){
 					lookupMap.put(formalPar.getName(), formalPar);
 				}
@@ -202,11 +217,36 @@ public class SemanticChecker {
 					
 					parInst.put(formalParameter.getName(), pi);
 				}
+				// make sure that, likewise, we do have an actual parameter for every formal parameter
+				
+				for(PVSParameter formalPar : formalParameters) {
+
+					if(formalPar.getDefaultValue() != null)
+						continue;
+					
+					PVSParamInst pi = parInst.get(formalPar.getName());
+					if(pi != null)
+						continue;
+					
+					if(formalPar.getType() instanceof ArrayType) {
+						// we need to make sure that there is an annotation present for *every* soft constraint now 
+						// in this case there is no default - otherwise we would have jumped out of the loop already
+						// maybe issue a warning, though, if one annotation was forgotten
+						for(SoftConstraint sc : pvsInst.getSoftConstraints().values()) {
+							if(!sc.getAnnotations().containsKey(formalPar.getName())) {
+								throw new MiniBrassParseException("Missing annotation ("+formalPar.getName()+") for soft constraint "+sc.getId()+"("+sc.getName()+") and no default set in instance "+pvsInst.getName()+"!");
+							}
+						}
+					} else {
+						throw new MiniBrassParseException("Undefined parameter "+formalPar.getName()+ " in instance " + pvsInst.getName());						
+					}
+				}
 				
 				// inject this back into instance:
-				pvsInst.setParametersLinked(parInst);	
+				pvsInst.setParametersInstantiated(parInst);	
 								
-			}
+			} 
+		
 		}
 		
 	}

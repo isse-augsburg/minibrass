@@ -1,2 +1,3 @@
 #!/bin/sh
-java -jar mbr2mzn.jar "$@"
+SCRIPT_DIR="$(dirname "$0")/mbr2mzn.jar"
+java -jar $SCRIPT_DIR "$@"

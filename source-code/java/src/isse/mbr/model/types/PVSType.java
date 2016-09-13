@@ -25,6 +25,7 @@ public class PVSType {
 	private List<PVSParameter> pvsParameters;
 	private Map<String, PVSParameter> paramMap;
 	private String implementationFile; 
+	private String orderingHeuristic;
 	private boolean isBounded; 
 	
 	public final static String N_SCS_LIT = "nScs";
@@ -131,5 +132,13 @@ public class PVSType {
 			pvsParameters.add(par);
 			paramMap.put(par.getName(), par);
 		}
+	}
+
+	public String getOrderingHeuristic() {
+		return orderingHeuristic;
+	}
+
+	public void setOrderingHeuristic(String orderingHeuristic) {
+		this.orderingHeuristic = orderingHeuristic;
 	}
 }

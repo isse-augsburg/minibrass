@@ -1,0 +1,3 @@
+mostImportantFirst = true;
+propagateRedundant = true;
+timeLimitMs = 600000;
