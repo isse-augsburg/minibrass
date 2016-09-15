@@ -1,0 +1,20 @@
+\begin{frame}{Group Photo as a Soft Constraint Problem} \small
+\textbf{Exercise 3}
+
+Now we would like to refine our group photo model with constraint relationships.
+Start by examining the ``pure'' MiniZinc model \texttt{groupphoto-pure.mzn} and test it with \texttt{groupphoto1.dzn}.
+We will augment this model with preferences, starting with person 3 (Carla). She has three preferences
+\begin{itemize}
+\item $\mathsf{c1}$: She would like to be placed next to person 2. (Hint: Use the provided \texttt{isNextTo} function.)
+\item $\mathsf{c2}$: She would like to be placed in the second row.
+\item $\mathsf{c3}$: Carla doesn't particularly like person 5. Hence, the Manhattan distance (provided as \texttt{manhattanDist}) between them should be greater than 4.
+\end{itemize}
+Constraint $\mathsf{c1}$ is most important to Carla, $\mathsf{c2}$ and $\mathsf{c3}$ are both less important than $\mathsf{c1}$ but incomparable. Write a preference model \texttt{groupphoto.mbr} that incorporates theses constraint relationships. Test the model (not in the IDE) using
+\begin{align*}
+&\texttt{mbr2mzn groupphoto.mbr} \\
+&\texttt{minisearch groupphoto.mzn groupphoto1.dzn} \\
+\end{align*}
+What is the best solution you get? What happens if we add another constraint $\mathsf{c4}$ that asks for person 5 not to be placed at either border (column $1$ or $m$)?
+
+\end{frame}
+
