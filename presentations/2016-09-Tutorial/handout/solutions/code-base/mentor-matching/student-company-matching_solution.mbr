@@ -1,0 +1,22 @@
+include "defs.mbr";
+
+PVS: students = new ConstraintRelationships("students") {
+   soft-constraint britneyDisney : 'worksAt[britney] = disney';
+   soft-constraint britneyWarner : 'worksAt[britney] = warner';
+   soft-constraint eminemUnia : 'worksAt[eminem] = uniaugsburg';
+   crEdges : '[|  mbr.britneyDisney , mbr.britneyWarner | mbr.eminemUnia, mbr.britneyDisney |]';
+   useSPD: 'true' ;
+}; 
+
+PVS: companies = new ConstraintRelationships("companies") {
+   soft-constraint disneyChristina : 'worksAt[christina] = disney';
+   soft-constraint disneyFalco : 'worksAt[falco] = disney';
+   soft-constraint uniaugsburg : 'worksAt[britney] = uniaugsburg';
+   
+   crEdges : '[| mbr.disneyFalco, mbr.uniaugsburg |]';
+   useSPD: 'true' ;
+}; 
+
+
+% solve ToWeighted(students) lex ToWeighted(companies);
+ solve ToWeighted(companies) lex ToWeighted(students);

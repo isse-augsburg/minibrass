@@ -53,8 +53,44 @@ friends. For example given the data \texttt{groupphoto1.dzn}, you should output 
 & \texttt{Obj = 7; [4, 3, 5, 6, 8, 7, 1, 2]}
 \end{align*}
 
-\uebung{Modeling a Soft Constraint Problem}
+\uebung{Modeling Group Photo as a Soft Constraint Problem}
+Now we would like to refine our group photo model with constraint relationships.
+Start by examining the ``pure'' MiniZinc model \texttt{groupphoto-pure.mzn} and test it with \texttt{groupphoto1.dzn}.
+We will augment this model with preferences, starting with person 3 (Carla). She has three preferences
+\begin{itemize}
+\item $\mathsf{c1}$: She would like to be placed next to person 2. (Hint: Use the provided \texttt{isNextTo} function.)
+\item $\mathsf{c2}$: She would like to be placed in the second row.
+\item $\mathsf{c3}$: Carla doesn't particularly like person 5. Hence, the Manhattan distance (provided as \texttt{manhattanDist}) between them should be greater than 4.
+\end{itemize}
+Constraint $\mathsf{c1}$ is most important to Carla, $\mathsf{c2}$ and $\mathsf{c3}$ are both less important than $\mathsf{c1}$ but incomparable. Write a preference model \texttt{groupphoto.mbr} that incorporates theses constraint relationships. Test the model (not in the IDE) using
+\begin{align*}
+&\texttt{mbr2mzn groupphoto.mbr} \\
+&\texttt{minisearch groupphoto.mzn groupphoto1.dzn} \\
+\end{align*}
+What is the best solution you get? What happens if we add another constraint $\mathsf{c4}$ that asks for person 5 not to be placed at either border (column $1$ or $m$)?
+\uebung{Mentor Matching -- Influence of Priorities}
+Inspect the pure MiniZinc model \texttt{student-company-matching.mzn} using the IDE. This core model only specifies feasible ``matchings'' but does not incorporate preferences. The MiniBrass file \texttt{student-company-matching.mbr} contains an empty declaration of two PVS, one for students, one for companies.
 
-\uebung{Influence of Priorities}
-
+Add the following soft constraints for the students: 
+\begin{itemize}
+\item Britney would like to work at Disney but even better, work at Warner
+\item Eminem wants to work at the University of Augsburg (of course) but this is less important than Britney being at Disney.
+\end{itemize}
+and for the companies:
+\begin{itemize}
+\item Disney would like that Christina works there.
+\item Disney would like that Falco works there.
+\item The university of Augsburg wants Britney.
+\item It is more important that Britney works at the University of Augsburg than Falco working at Disney.
+\end{itemize}
+Wrap both Constraint Relationship instances with a \texttt{ToWeighted} morphism and try both ways of doing a lexicographic product:
+\begin{align*}
+&\texttt{solve ToWeighted(students) lex ToWeighted(companies);} \\
+&\texttt{solve ToWeighted(companies) lex ToWeighted(students);}
+\end{align*}
+Finally test your approach with 
+\begin{align*}
+&\texttt{mbr2mzn student-company-matching.mbr } \\
+&\texttt{minisearch student-company-matching-mbr.mzn } \\
+\end{align*}
 \end{document}

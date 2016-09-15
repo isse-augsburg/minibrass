@@ -1,5 +1,5 @@
-%\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
-\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[10pt,xcolor={dvipsnames},fleqn]{beamer}
+%\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
 \usepackage{isse}
 
 
@@ -202,75 +202,34 @@ innertopmargin=\topskip,
 \input{soft-constraints}
 %\input{rationale}
 
+%
+\input{minibrass-lang}
 
-\begin{frame}[fragile]{PVS-Type Definitions}
-\begin{lstlisting}
-type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
-  params { 
-    array[int, 1..2] of 1..nScs: crEdges; % adjacency matrix
-    bool: useSPD;
-  } in 
-  instantiates with "../mbr_types/cr_type.mzn" {
-    times -> link_invert_booleans;
-    is_worse -> is_worse_cr;
-    top -> {};
-  };
-\end{lstlisting}
+\input{thirdExercise}
+
+\input{minibrass-tut}
+
+
+\input{case-studies}
+
+\begin{frame}[fragile]{Conclusion}
+
 \begin{itemize}
-\item \texttt{PVSType<S,E>} distinguishes
-\begin{itemize}
-\item[] Specification type $S$ 
-\item[] Element type $E$
-\end{itemize} 
-\item Combination operation: $\mathtt{times} : S^n \to E$
-\item Ordering relation: $\mathtt{isWorse} \subseteq E \times E$
+\item Soft constraints can be useful especially in autonomic computing settings
+\item Modeling problems independently from a solver can bring benefits
+\item Let us know if you can use MiniBrass 
 \end{itemize}
+\begin{center}
+
+\includegraphics[width=.4\textwidth]{img/minibrass.png}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/minibrass/}
+
+\end{center}
+
 \end{frame}
-
-\begin{frame}[fragile]{PVS-Types}
-\begin{lstlisting}
-type WeightedCsp = PVSType<bool, int> = 
-  params {
-    int: k; 
-    array[1..nScs] of 1..k: weights :: default('1');
-  } in  
-  instantiates with "../mbr_types/weighted_type.mzn" {
-    times -> weighted_sum;
-    is_worse -> is_worse_weighted;
-    top -> 0;
-  };
-  
-type CostFunctionNetwork = PVSType<0..k> = 
-  params {
-    int: k :: default('1000'); 
-  } in  instantiates with "../mbr_types/cfn_type.mzn" {
-    times -> sum;
-    is_worse -> is_worse_weighted; 
-    top -> 0;
- };
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{PVS-Instantiation for Weighted-CSp}
-\begin{lstlisting}
-PVS: cr1 = new WeightedCsp("cr1") {
-   soft-constraint c1: 'x + 1 = y' :: weights('2');
-   soft-constraint c2: 'z = y + 2' :: weights('1');
-   soft-constraint c3: 'x + y <= 3' :: weights('1');
-   
-   k : '20';
-}; 
-\end{lstlisting}
-\begin{itemize}
-\item Weights can be annotated 
-\item Or passed as array (\texttt{[2,1,1]}) %\item Aber können wir sie nicht auch berechnen? Aus Constraint Relationships? \pause 
-\end{itemize}
-\end{frame}
-
-%\input{search-space}
-
-%\input{case-studies}
-
 %\input{evaluation}
 
 %\input{conclusion}
@@ -281,7 +240,7 @@ PVS: cr1 = new WeightedCsp("cr1") {
 \begin{frame}[allowframebreaks]
         \frametitle{References}
         \bibliographystyle{apalike}
-        \bibliography{references}
+        \bibliography{../common,references}
 \end{frame}
 
 

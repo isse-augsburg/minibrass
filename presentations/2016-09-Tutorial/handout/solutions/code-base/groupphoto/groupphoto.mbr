@@ -1,0 +1,14 @@
+include "defs.mbr";    
+
+PVS: cr1 = new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'isNextTo(2,3)';
+   soft-constraint c2: 'personToRow[3] = 2';
+   soft-constraint c3: 'manhattanDist(3, 5) >= 4';
+   
+   % soft-constraint c4: 'personToCol[5] > 1 /\ personToCol[5] < m';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'true' ;
+}; 
+
+solve cr1;
