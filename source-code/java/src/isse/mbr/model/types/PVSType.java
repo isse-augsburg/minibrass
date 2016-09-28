@@ -17,7 +17,7 @@ import isse.mbr.parsing.MiniBrassParseException;
  */
 public class PVSType {
 	private MiniZincVarType specType;
-	private MiniZincVarType elementType;
+	private MiniZincParType elementType; // this can be an array as well
 	private String name;
 	private String combination;
 	private String order;
@@ -45,11 +45,11 @@ public class PVSType {
 		return "PVS-Type: "+name + " <" + elementType.toString() +"("+combination+", "+order+", "+top+ ")"+">";
 	}
 
-	public MiniZincVarType getElementType() {
+	public MiniZincParType getElementType() {
 		return elementType;
 	}
 
-	public void setElementType(MiniZincVarType elementType) {
+	public void setElementType(MiniZincParType elementType) {
 		this.elementType = elementType;
 	}
 

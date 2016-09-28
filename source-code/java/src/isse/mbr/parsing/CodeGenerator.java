@@ -25,6 +25,7 @@ import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PVSParamInst;
 import isse.mbr.model.types.PVSParameter;
 import isse.mbr.model.types.PVSType;
+import isse.mbr.model.types.PrimitiveType;
 
 /**
  * Creates a MiniZinc file that contains all predicates, variables etc.
@@ -91,9 +92,9 @@ public class CodeGenerator {
 		if( !(topLevelInstance instanceof CompositePVSInstance)) {
 			String topLevelOverall = getOverallValuation(topLevelInstance);
 			PVSInstance pvsInst = (PVSInstance) topLevelInstance; 
-			MiniZincVarType elementType = pvsInst.getType().instance.getElementType();
-			String encodedType = encode(elementType, pvsInst); 
-			sb.append(String.format("var %s: %s; \nconstraint %s = %s;\n",encodedType, TOP_LEVEL_OBJECTIVE, TOP_LEVEL_OBJECTIVE, topLevelOverall));
+			MiniZincParType elementType = pvsInst.getType().instance.getElementType();
+			appendOverall(sb, elementType, pvsInst, TOP_LEVEL_OBJECTIVE);
+			sb.append(String.format("constraint %s = %s;\n", TOP_LEVEL_OBJECTIVE, topLevelOverall));
 		}
 		
 		sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
@@ -218,7 +219,8 @@ public class CodeGenerator {
 			
 			String overallIdent = getOverallValuation(inst); 
 			leafValuations.add(overallIdent);
-			sb.append(String.format("var %s: %s;\n",encode(pvsType.getElementType(), inst), overallIdent));
+			appendOverall(sb, pvsType.getElementType(), inst, overallIdent);
+			
 			PVSParameter nScs = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
 			IntervalType sCSet = new IntervalType(new NumericValue(1), new NumericValue(nScs));
 			
@@ -228,12 +230,19 @@ public class CodeGenerator {
 			sb.append(String.format("array[%s] of var %s: %s;\n", sCSet.toMzn(inst), encode(pvsType.getSpecType(), inst), valuationsArray));
 		
 			String topIdent = CodeGenerator.encodeString("top", inst);
-			sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
+			// TODO check if "top" can be used for something useful, got troublesome due to array handling for now 
+			//sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
 			
 			// ------------------------------------------------------------- 
 			
 			sb.append("\n% MiniSearch predicates: \n");
-			String getBetterString = String.format("%s(sol(%s), %s, %s)", pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString());
+			// 
+			String lastSolutionDegree = String.format("sol(%s)", overallIdent);
+			if(pvsType.getElementType() instanceof ArrayType) {
+				ArrayType arrayType = (ArrayType) pvsType.getElementType();
+				lastSolutionDegree = String.format("[ sol(%s[i]) | i in index_set(%s)]", overallIdent,overallIdent);
+			}
+			String getBetterString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), lastSolutionDegree, overallIdent,instanceArguments.toString());
 			inst.setGeneratedBetterPredicate(getBetterString);
 			// sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
 			
@@ -260,6 +269,24 @@ public class CodeGenerator {
 			}
 		}
 		
+	}
+
+	private void appendOverall(StringBuilder sb, MiniZincParType elementType, PVSInstance inst, String overallIdent) {
+		if(elementType instanceof MiniZincVarType) {
+			sb.append(String.format("var %s: %s;\n",encode(elementType, inst), overallIdent));
+		} else { // must be Array then
+			ArrayType arrayType = (ArrayType) elementType;
+			sb.append("array[");
+			boolean first = true;
+			for(PrimitiveType pt :  arrayType.getIndexSets()) {
+				if(first)
+					first = false;
+				else 
+					sb.append(",");
+				sb.append(encode(pt,inst));
+			}
+			sb.append(String.format("] of var %s: %s;\n", encode(arrayType.getType(), inst), overallIdent));
+		}
 	}
 
 	private StringBuilder getInstanceArguments(PVSType pvsType, PVSInstance inst) {

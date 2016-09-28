@@ -1,0 +1,65 @@
+type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges;
+    bool: useSPD;
+  } in 
+  instantiates with "../mbr_types/cr_type.mzn" {
+    times -> link_invert_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+    % bot -> 1..nScs;
+  };
+  
+type WeightedCsp = PVSType<bool, int> = 
+  params {
+    int: k :: default('1000'); 
+    array[1..nScs] of int: weights :: default('1');
+  } in  
+  instantiates with "../mbr_types/weighted_type.mzn" {
+    times -> weighted_sum;
+    is_worse -> is_worse_weighted;
+    top -> 0;
+    % bot -> k+1;
+ };
+  
+type MultiWeightedCsp = PVSType<bool, array[1..d] of 0..k> = 
+  params {
+    int:  k :: default('1000'); 
+    int:  d :: default('1');
+    array[1..nScs,int] of int: weights :: default('1');
+  } in  
+  instantiates with "../mbr_types/weighted_type.mzn" {
+    times -> weighted_multi_sum;
+    is_worse -> is_worse_multi_weighted;
+    top -> 0; % [0 | i in 1..d]
+ };
+    
+
+morph ConstraintRelationships -> MultiWeightedCsp: ToMultiWeighted = 
+  params {
+    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    weights = calculate_cr_weights;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+   
+
+PVS: mcr1 = new MultiWeightedCsp("mcr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   weights : ' [| 2, 2 | 1, 2 | 2, 1 |]';
+   d : '2';
+   k : '5';
+};
+
+PVS: cr1 = new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+%solve ToMultiWeighted(cr1);
+solve mcr1;

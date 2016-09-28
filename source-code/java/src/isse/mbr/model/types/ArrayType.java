@@ -14,6 +14,7 @@ public class ArrayType implements MiniZincParType {
 
 	private MiniZincVarType type;
 	private List<PrimitiveType> indexSets;
+	private List<MiniZincVarType> pendingIndexTypes;
 	
 	public ArrayType() {
 		indexSets = new LinkedList<>();
@@ -51,6 +52,14 @@ public class ArrayType implements MiniZincParType {
 		arrayBuilder.append("] of ");
 		arrayBuilder.append(type.toMzn(instance));
 		return arrayBuilder.toString();
+	}
+
+	public void setPendingIndexTypes(List<isse.mbr.model.types.MiniZincVarType> pendingIndexTypes) {
+		this.pendingIndexTypes = pendingIndexTypes;
+	}
+
+	public List<MiniZincVarType> getPendingIndexTypes() {
+		return pendingIndexTypes;
 	} 
 	
 }

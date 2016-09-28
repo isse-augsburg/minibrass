@@ -23,3 +23,20 @@ let {
 
 } in 
 int_search(mifSatisfied, input_order, indomain_max, complete);
+
+% Multiweighted Constraint Type 
+function array[int] of var int: weighted_multi_sum(array[int] of var bool: lineSat,
+                                                   par int: nScs, par int: k, par int: d,
+                                                   array[int, int] of par int: weights) = 
+let {
+  set of int: SCS = index_set_1of2(weights);
+  set of int: DIM = index_set_2of2(weights);
+  array[SCS,DIM] of var int: pen = array2d(SCS,DIM,[ (1-bool2int(lineSat[i])) * weights[i,j]  | i in SCS, j in DIM ]);
+  array[DIM] of var int: sums = [sum(i in SCS) (pen[i,j]) |j in DIM];
+} in 
+sums;
+
+predicate is_worse_multi_weighted(array[int] of var int: x, array[int] of var int: y, 
+  par int: nScs, par int: k, par int: d,
+  array[int, int] of par int: weights) = 
+  forall(i in 1..d) (x[d] > y[d]);

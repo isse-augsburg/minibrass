@@ -26,6 +26,7 @@ import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
 import isse.mbr.model.types.IntType;
 import isse.mbr.model.types.IntervalType;
+import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.NumericValue;
@@ -486,14 +487,21 @@ public class MiniBrassParser {
 				
 		expectSymbolAndNext(MiniBrassSymbol.LeftAngleSy);		
 		
+		// TODO support arrays here
 		MiniZincVarType specType = MiniZincVarType(newType);
-		MiniZincVarType elementType = specType;
+		MiniZincParType elementType = specType;
 		
 		LOGGER.fine("Specification type: "+elementType);
 		if(currSy == MiniBrassSymbol.CommaSy) {
 			// Read the element type as well
 			getNextSy();
-			elementType = MiniZincVarType(newType);
+			elementType = MiniZincParType(newType);
+			if(elementType instanceof ArrayType) {
+				ArrayType arrayType = (ArrayType) elementType;
+				if(arrayType.getIndexSets().size() > 1) {
+					throw new MiniBrassParseException("Currently, only one-dimensional element types are supported");
+				}
+			}
 		}
 		
 		newType.setElementType(elementType);
@@ -568,29 +576,8 @@ public class MiniBrassParser {
 		String wrapFunction = null;
 		
 		if(currSy == MiniBrassSymbol.ArraySy) {
-			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
 			
-			ArrayType arrayType = new ArrayType();
-					
-			MiniZincVarType indexType = MiniZincVarType(scopeType);
-			
-			List<MiniZincVarType> pendingIndexTypes = new LinkedList<>();
-			pendingIndexTypes.add(indexType);
-			
-			while(currSy != MiniBrassSymbol.RightBracketSy) { 
-				expectSymbolAndNext(MiniBrassSymbol.CommaSy);
-				
-				indexType = MiniZincVarType(scopeType);
-				LOGGER.fine("Next index: "+indexType);
-				pendingIndexTypes.add(indexType);				
-			}
-			
-			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.OfSy);
-			MiniZincVarType varType = MiniZincVarType(scopeType);
-			
-			arrayType.setType(varType);
+			ArrayType arrayType = MiniZincArrayType(scopeType);
 			
 			expectSymbolAndNext(MiniBrassSymbol.ColonSy);
 			expectSymbol(MiniBrassSymbol.IdentSy);
@@ -618,11 +605,11 @@ public class MiniBrassParser {
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 
-			semChecker.scheduleArrayTypeCheck(arrayType, pendingIndexTypes, name);
+			semChecker.scheduleArrayTypeCheck(arrayType, arrayType.getPendingIndexTypes(), name);
 			
 			// dependency checks 
-			semChecker.scheduleTypeDependencyCheck(scopeType, name, varType);
-			for(MiniZincVarType pendingVarType : pendingIndexTypes) {
+			semChecker.scheduleTypeDependencyCheck(scopeType, name, arrayType.getType());
+			for(MiniZincVarType pendingVarType : arrayType.getPendingIndexTypes()) {
 				semChecker.scheduleTypeDependencyCheck(scopeType, name, pendingVarType);
 			}
 			
@@ -669,6 +656,33 @@ public class MiniBrassParser {
 			returnParameter.setWrappedBy(wrapFunction);
 		}
 		return returnParameter;
+	}
+
+	private ArrayType MiniZincArrayType(PVSType scopeType) throws MiniBrassParseException {
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
+		
+		ArrayType arrayType = new ArrayType();
+		MiniZincVarType indexType = MiniZincVarType(scopeType);
+		
+		List<MiniZincVarType> pendingIndexTypes = new LinkedList<>();
+		pendingIndexTypes.add(indexType);
+		
+		while(currSy != MiniBrassSymbol.RightBracketSy) { 
+			expectSymbolAndNext(MiniBrassSymbol.CommaSy);
+			
+			indexType = MiniZincVarType(scopeType);
+			LOGGER.fine("Next index: "+indexType);
+			pendingIndexTypes.add(indexType);				
+		}
+		
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.OfSy);
+		MiniZincVarType varType = MiniZincVarType(scopeType);
+		
+		arrayType.setType(varType);
+		arrayType.setPendingIndexTypes(pendingIndexTypes);
+		return arrayType;
 	}
 
 	/**
@@ -726,6 +740,29 @@ public class MiniBrassParser {
 		getNextSy();
 	}
 
+	/**
+	 * set of PRIMTYPE | PRIMTYPE
+	 * @throws MiniBrassParseException 
+	 */
+	private MiniZincParType MiniZincParType(PVSType scopeType) throws MiniBrassParseException {
+		if(currSy == MiniBrassSymbol.ArraySy) {
+			
+			ArrayType arrayType = MiniZincArrayType(scopeType);
+			semChecker.scheduleArrayTypeCheck(arrayType, arrayType.getPendingIndexTypes(), scopeType.getName());
+			
+			// dependency checks 
+			semChecker.scheduleTypeDependencyCheck(scopeType, scopeType.getName(), arrayType.getType());
+			for(MiniZincVarType pendingVarType : arrayType.getPendingIndexTypes()) {
+				semChecker.scheduleTypeDependencyCheck(scopeType, scopeType.getName(), pendingVarType);
+			}
+
+			return arrayType;
+		}
+		else {
+			return MiniZincVarType(scopeType);
+		}
+	}
+	
 	/**
 	 * set of PRIMTYPE | PRIMTYPE
 	 * @throws MiniBrassParseException 
