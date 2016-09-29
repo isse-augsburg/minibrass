@@ -11,6 +11,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import isse.mbr.extensions.ExternalMorphism;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
@@ -93,6 +94,7 @@ public class MiniBrassParser {
 			semChecker.updateReferences();
 			semChecker.executeArrayJobs();
 			semChecker.checkPvsInstances(model);
+			semChecker.checkMorphisms();
 			
 			LOGGER.finer("I should optimize: "+model.getSolveInstance());
 			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
@@ -134,7 +136,7 @@ public class MiniBrassParser {
 			getNextSy();
 			Morphism m = morphismItem();
 			model.registerMorphism(m.getName(), m);
-			
+			semChecker.validateMorphism(m);
 		} else if (currSy == MiniBrassSymbol.SolveSy) {
 			if(model.getSolveInstance() != null) {
 				throw new MiniBrassParseException("More than one solve item specified !");
@@ -422,6 +424,26 @@ public class MiniBrassParser {
 		// can have params 
 		if(currSy == MiniBrassSymbol.ParamsSy) {
 			getNextSy();
+			if(currSy == MiniBrassSymbol.GeneratedBySy) {
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+				expectSymbol(MiniBrassSymbol.StringLitSy);
+				String generationExpression = lexer.getLastIdent();
+				try {
+					@SuppressWarnings("unchecked")
+					Class<? extends ExternalMorphism> externalMorphism = (Class<? extends ExternalMorphism>) Class.forName(generationExpression);
+					ExternalMorphism em = externalMorphism.newInstance();
+					m.setExternalMorphism(em);
+				} catch (ClassNotFoundException e) {
+					throw new MiniBrassParseException("Class "+generationExpression + " in morphism "+morphName +" was not found!");
+				} catch (InstantiationException e) {
+					throw new MiniBrassParseException(e);
+				} catch (IllegalAccessException e) {
+					throw new MiniBrassParseException(e);
+				}
+				getNextSy();
+				expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			}
 			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 			// now a param item until we see RightCurlSy
 			while(currSy != MiniBrassSymbol.RightCurlSy) {
@@ -437,12 +459,16 @@ public class MiniBrassParser {
 				if(currSy == MiniBrassSymbol.StringLitSy) {
 					pm.setMznExpression(lexer.getLastIdent());
 					getNextSy();
+				} else if(currSy == MiniBrassSymbol.GeneratedSy) {
+					getNextSy();
+					pm.setGenerated(true); // call for external morphism object here
 				} else {
 					// or we have an ident for a function 
 					expectSymbol(MiniBrassSymbol.IdentSy);
 					pm.setMznFunction(lexer.getLastIdent());
 					getNextSy();
 				}
+				
 				m.getParamMappings().put(pm.getParam(), pm);
 				expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			}

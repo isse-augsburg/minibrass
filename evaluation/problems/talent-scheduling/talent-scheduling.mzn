@@ -68,7 +68,7 @@ array[LATE] of DUR: durLate;
 array[LATE] of SOFTCONSTRAINTS: scLate;
 
 % constraint firstJob[1] >= 4 <-> satisfied[3];
-constraint forall(e in EARLY) (lastJob[ actorEarl[e] ] >= durEarl[e] <-> satisfied[scEarl[e]] );
+constraint forall(e in EARLY) (firstJob[ actorEarl[e] ] >= durEarl[e] <-> satisfied[scEarl[e]] );
 
 % constraint lastJob[2] <= 9 <-> satisfied[4];
 constraint forall(l in LATE) (lastJob[ actorLate[l] ] <= durLate[l] <-> satisfied[scLate[l]] );

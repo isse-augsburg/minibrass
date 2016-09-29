@@ -43,11 +43,13 @@ public class SemanticChecker {
 	private Queue<ReferenceJob> referenceJobs;
 	private Queue<ArrayJob> arrayJobs;
 	private Map<String, DirectedGraph<String, DefaultEdge>> parameterDependencies;
+	private Queue<Morphism> morphisms;
 	
 	public SemanticChecker() {
 		referenceJobs = new LinkedList<>();
 		arrayJobs = new LinkedList<>();
 		parameterDependencies = new HashMap<String, DirectedGraph<String,DefaultEdge>>();
+		morphisms = new LinkedList<>();
 	}
 
 	private static class ReferenceJob {
@@ -247,6 +249,26 @@ public class SemanticChecker {
 								
 			} 
 		
+		}
+		
+	}
+
+	public void validateMorphism(Morphism m) {
+		morphisms.add(m);		
+	}
+
+	public void checkMorphisms() throws MiniBrassParseException {
+		for(Morphism m : morphisms) { 
+			// we need to have a parameter mapping for every parameter of the *to* type
+			PVSType toType = m.getTo().instance;
+			
+			for(PVSParameter pvsParam : toType.getPvsParameters()) {
+				if(PVSType.N_SCS_LIT.equals(pvsParam.getName()))
+					continue;
+				if(!m.getParamMappings().containsKey(pvsParam.getName())){
+					throw new MiniBrassParseException("Missing parameter definition for \""+pvsParam.getName() + "\" in morphism \""+m.getName()+"\"");
+				}
+			}
 		}
 		
 	}

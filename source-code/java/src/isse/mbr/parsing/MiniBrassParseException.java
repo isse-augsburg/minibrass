@@ -6,6 +6,10 @@ public class MiniBrassParseException extends Exception {
 		super(string);
 	}
 
+	public MiniBrassParseException(Throwable cause) {
+		super(cause);
+	}
+
 	/**
 	 * 
 	 */
