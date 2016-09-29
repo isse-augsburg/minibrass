@@ -3,6 +3,7 @@ package isse.mbr.model.parsetree;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import isse.mbr.extensions.ExternalMorphism;
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.PVSType;
 
@@ -17,11 +18,17 @@ public class Morphism {
 	private String name;
 	private String mznFunction;
 	private Map<String, ParamMapping> paramMappings;
+	private ExternalMorphism externalMorphism;
 	
 	public static class ParamMapping {
 		private String param; 
 		private String mznExpression;
 		private String mznFunction;
+		private boolean generated; // by external morphism
+		
+		public ParamMapping() {
+			this.generated = false;
+		}
 		
 		public String getParam() {
 			return param;
@@ -40,6 +47,14 @@ public class Morphism {
 		}
 		public void setMznFunction(String mznFunction) {
 			this.mznFunction = mznFunction;
+		}
+
+		public boolean isGenerated() {
+			return generated;
+		}
+
+		public void setGenerated(boolean generated) {
+			this.generated = generated;
 		}
 	}
 	
@@ -74,6 +89,15 @@ public class Morphism {
 
 	public Map<String, ParamMapping> getParamMappings() {
 		return paramMappings;
+	}
+	
+	public ExternalMorphism getExternalMorphism() {
+		return externalMorphism;
+	}
+
+	public void setExternalMorphism(ExternalMorphism externalMorphism) {
+		this.externalMorphism = externalMorphism;
 	} 
 	
+
 }

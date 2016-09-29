@@ -17,6 +17,7 @@ public class PVSInstance extends AbstractPVSInstance {
 	private Map<String, Map<String,String>> parameterArrayValues; // there is one map for every array-typed parameter
 	private Map<String, SoftConstraint> softConstraints;
 	protected Map<String, PVSParamInst> parametersInstantiated; // gets done by semantic checker
+	protected Map<String, String> generatedCodeParameters; // for external morphisms
 	
 	private int numberScs;
 	
@@ -24,6 +25,7 @@ public class PVSInstance extends AbstractPVSInstance {
 		parameterValues = new HashMap<>();
 		softConstraints = new LinkedHashMap<>(); 
 		parameterArrayValues = new HashMap<>();
+		generatedCodeParameters = new HashMap<>();
 	}
 	
 	public NamedRef<PVSType> getType() {
@@ -70,6 +72,14 @@ public class PVSInstance extends AbstractPVSInstance {
 
 	public List<PVSParameter> getInstanceParameters() {
 		return type.instance.getPvsParameters();
+	}
+
+	public Map<String, String> getGeneratedCodeParameters() {
+		return generatedCodeParameters;
+	}
+
+	public void setGeneratedCodeParameters(Map<String, String> generatedCodeParameters) {
+		this.generatedCodeParameters = generatedCodeParameters;
 	}
 
 }

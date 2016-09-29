@@ -90,6 +90,7 @@ public class MorphedPVSInstance extends PVSInstance {
 	
 	/**
 	 * @param fromArguments
+	 * @param instance 
 	 */
 	public void update(StringBuilder fromArguments) {
 		Map<String, PVSParamInst> parInst = new LinkedHashMap<>();
@@ -98,14 +99,20 @@ public class MorphedPVSInstance extends PVSInstance {
 		// now put instantiations for all the morphed result parameters (those of type "to")
 		PVSType toType = morphism.instance.getTo().instance;
 		
+		
 		for(ParamMapping parMapping : morphism.instance.getParamMappings().values()) {
 			PVSParameter par = toType.getParamMap().get(parMapping.getParam());
 			PVSParamInst pi = new PVSParamInst();
 			pi.parameter = par; 
-			if(parMapping.getMznExpression()!=null){
-				pi.expression = parMapping.getMznExpression();
+			if(parMapping.isGenerated()) {
+				pi.setGenerated(true);
+				
 			} else {
-				pi.expression = parMapping.getMznFunction()+"("+fromArguments.toString()+")";
+				if(parMapping.getMznExpression() != null){
+					pi.expression = parMapping.getMznExpression();
+				} else {
+					pi.expression = parMapping.getMznFunction()+"("+fromArguments.toString()+")";
+				}
 			}
 			parInst.put(par.getName(), pi);
 		}

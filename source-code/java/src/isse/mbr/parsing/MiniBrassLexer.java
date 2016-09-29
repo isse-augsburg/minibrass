@@ -166,6 +166,10 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.InstantiatesSy;
 				case "default":
 					return MiniBrassSymbol.DefaultSy;
+				case "generatedBy":
+					return MiniBrassSymbol.GeneratedBySy;
+				case "generated":
+					return MiniBrassSymbol.GeneratedSy;
 				case "wrappedBy":
 					return MiniBrassSymbol.WrappedBySy;
 				case "offers":

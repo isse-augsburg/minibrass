@@ -39,4 +39,4 @@ sums;
 predicate is_worse_multi_weighted(array[int] of var int: x, array[int] of var int: y, 
   par int: nScs, par int: k, par int: d,
   array[int, int] of par int: weights) = 
-  forall(i in 1..d) (x[d] > y[d]);
+  forall(i in 1..d) (x[i] >= y[i]) /\ exists(i in 1..d)(x[i] > y[i]);

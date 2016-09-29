@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import isse.mbr.extensions.ExternalMorphism;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
@@ -153,10 +154,14 @@ public class CodeGenerator {
 		} 
 		else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
+			ExternalMorphism em = null;
 			if(inst instanceof MorphedPVSInstance) {
 				MorphedPVSInstance minst = (MorphedPVSInstance) inst;
 				StringBuilder fromArguments = getInstanceArguments(minst.getMorphism().instance.getFrom().instance, inst);
 				minst.update(fromArguments);
+				em = minst.getMorphism().instance.getExternalMorphism();	
+				if(em != null)
+					em.setFromInstance(inst);
 			}
 			String name = inst.getName();
 			
@@ -175,6 +180,7 @@ public class CodeGenerator {
 			
 			for(PVSParameter pvsParam : inst.getInstanceParameters()) {
 				PVSParamInst pi = inst.getParametersInstantiated().get(pvsParam.getName());
+
 				// is it an array type (important for annotations) or not?
 				String paramExpression = null; 
 				String defaultValue = pvsParam.getDefaultValue();
@@ -197,18 +203,31 @@ public class CodeGenerator {
 						exprBuilder.append("]");
 						paramExpression = exprBuilder.toString();
 					} else {
-						paramExpression = pi.expression;
+						if(!pi.generated) {
+							paramExpression = pi.expression;
+						} else {
+							pi.expression = em.getParameterString(pvsParam);
+							paramExpression = pi.expression;
+						}
 					}
 				} else {
-					if(pi != null)
-						paramExpression = pi.expression;
+					if(pi != null) {
+						if(!pi.generated)
+							paramExpression = pi.expression;
+						else {
+							pi.expression = em.getParameterString(pvsParam);
+							paramExpression = pi.expression;
+						}
+					}
 					else 
 						paramExpression = defaultValue;
 				}
 				if(pvsParam.getWrappedBy() != null) {
 					paramExpression = String.format("%s(%s)", pvsParam.getWrappedBy(), paramExpression);
 				}
-				String def = String.format("%s : %s = %s; \n", encode(pvsParam.getType(), inst),CodeGenerator.encodeIdent(pvsParam, inst) , CodeGenerator.processSubstitutions(paramExpression, subs));
+				String generatedParamExpression = CodeGenerator.processSubstitutions(paramExpression, subs);
+				inst.getGeneratedCodeParameters().put(pvsParam.getName(), generatedParamExpression);
+				String def = String.format("%s : %s = %s; \n", encode(pvsParam.getType(), inst),CodeGenerator.encodeIdent(pvsParam, inst), generatedParamExpression);
 				sb.append(def);
 			}
 			
@@ -239,7 +258,6 @@ public class CodeGenerator {
 			// 
 			String lastSolutionDegree = String.format("sol(%s)", overallIdent);
 			if(pvsType.getElementType() instanceof ArrayType) {
-				ArrayType arrayType = (ArrayType) pvsType.getElementType();
 				lastSolutionDegree = String.format("[ sol(%s[i]) | i in index_set(%s)]", overallIdent,overallIdent);
 			}
 			String getBetterString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), lastSolutionDegree, overallIdent,instanceArguments.toString());
