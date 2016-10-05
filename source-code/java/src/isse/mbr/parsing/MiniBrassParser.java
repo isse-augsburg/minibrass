@@ -2,6 +2,8 @@ package isse.mbr.parsing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -53,6 +55,7 @@ public class MiniBrassParser {
 	private Set<File> visited;
 	private Set<File> worklist;
 	private File currDir;
+	private File mbrStdDir;
 	private MiniBrassAST model; 
 	private SemanticChecker semChecker;
 	private int lexCounter;
@@ -70,7 +73,25 @@ public class MiniBrassParser {
 		visited = new HashSet<>();
 		
 		lexCounter = 0;
+		mbrStdDir = null;
+		
 		try{
+			URL jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation();	
+
+			try {
+				File classPathDir = new File(jarLocation.toURI());
+				File siblingStd = new File(classPathDir.getParentFile(), "mbr_std");
+				if(siblingStd.exists())
+					mbrStdDir = siblingStd;
+				else {
+					File cousinStd = new File(classPathDir.getParentFile().getParentFile(), "mbr_std");
+					if(cousinStd.exists())
+						mbrStdDir = cousinStd;
+				}
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			
 			while(!worklist.isEmpty()) {
 				File next = worklist.iterator().next();
 				worklist.remove(next);
@@ -872,6 +893,13 @@ public class MiniBrassParser {
 			model.getAdditionalMinizincIncludes().add(fileName);
 		} else {
 			File referred = new File(currDir,fileName);
+			if(!referred.exists())  {
+				if(mbrStdDir != null) {
+					referred = new File(mbrStdDir, fileName);
+					if(!referred.exists())
+						throw new MiniBrassParseException("Could not find file "+fileName + " in either working directory or MiniBrass standard lib");
+				}
+			}
 			
 			if(!visited.contains(referred)) {
 				worklist.add(referred);

@@ -6,7 +6,6 @@ import isse.mbr.extensions.ExternalMorphism;
 import isse.mbr.extensions.domain.DirectedGraph;
 import isse.mbr.extensions.domain.UtilityStructure;
 import isse.mbr.model.parsetree.PVSInstance;
-import isse.mbr.model.types.PVSParamInst;
 
 /**
  * This hook is intended to take a MiniZinc-encoded graph,
@@ -17,16 +16,23 @@ import isse.mbr.model.types.PVSParamInst;
 public class MultiWeighting extends ExternalMorphism {
 	@Override
 	public void process(PVSInstance fromInstance) {
-		PVSParamInst pi = fromInstance.getParametersInstantiated().get("crEdges");
 		String generatedCrEdges = fromInstance.getGeneratedCodeParameters().get("crEdges");
-		
+		int nScs = fromInstance.getNumberSoftConstraints();
+		processMiniZincString(generatedCrEdges, nScs);
+	}
+
+	public DirectedGraph processMiniZincString(String generatedCrEdges, int nScs) {
+
 		// TODO for now, we expect a literal graph in the form "[| 2, 1 | 1, 0 |]"
 		// assumes strictly that soft constraints are labeled from 1 to nScs
 		String processed = generatedCrEdges.replaceAll("\\[\\|", "");
 		processed = processed.replaceAll("\\|\\]", "").trim();
+		processed = processed.replaceAll("transClosureWrap", "");
+		processed = processed.replaceAll("\\(", "");
+		processed = processed.replaceAll("\\)", "");
+		
 		StringTokenizer tok = new StringTokenizer(processed, "|");
 		
-		int nScs = fromInstance.getNumberSoftConstraints();
 		DirectedGraph dag = new DirectedGraph(nScs);
 		
 		while(tok.hasMoreTokens()) {
@@ -54,6 +60,7 @@ public class MultiWeighting extends ExternalMorphism {
 		// 
 		calculatedParameters.put("weights", mzGraphBuilder.toString());
 		calculatedParameters.put("d", Integer.toString(us.getSize()));
+		return dag;
 	}
 
 }
