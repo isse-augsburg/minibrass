@@ -275,14 +275,12 @@ public class CodeGenerator {
 			sb.append("\n% Search Heuristics to be used in a model: \n");
 			String heuristicFunc = inst.getType().instance.getOrderingHeuristic();
 			
-			
 			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, inst);
 			sb.append(annDecl);
 			if( heuristicFunc != null) {
 				sb.append(" = ");
 				sb.append(String.format("%s(%s, %s, %s);\n", heuristicFunc, valuationsArray, overallIdent, instanceArguments.toString()));
-			} else {
-				
+			} else {				
 				sb.append(";\n");
 			}
 		}
