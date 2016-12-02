@@ -1,7 +1,11 @@
 package isse.mbr.parsing;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -322,10 +326,12 @@ public class CodeGenerator {
 
 	private Map<String, String> prepareSubstitutions(PVSInstance inst) {
 		HashMap<String, String> substitutions = new HashMap<>();
-
+		List<String> keys = new ArrayList<>();
+		
 		// all soft constraints map to their id
 		for(SoftConstraint sc:  inst.getSoftConstraints().values()) {
 			substitutions.put(MBR_PREFIX + sc.getName(), Integer.toString(sc.getId()));
+			keys.add(sc.getName());
 		}
 		
 		// all parameters to their encoded id
@@ -333,8 +339,22 @@ public class CodeGenerator {
 			PVSParameter parameter = parInst.parameter;
 			String encodedIdent = CodeGenerator.encodeIdent(parameter, inst);
 			substitutions.put(MBR_PREFIX+parameter.getName(), encodedIdent);
+			keys.add(parameter.getName());
 		}
-		return substitutions;
+		
+		LinkedHashMap<String, String> subs = new LinkedHashMap<>();
+		Collections.sort(keys, new Comparator<String>() {
+
+			@Override
+			public int compare(String arg0, String arg1) {
+				return Integer.compare(arg1.length(), arg0.length());
+			}
+		});
+		for(String s : keys) {
+			String prefixed = MBR_PREFIX+s;
+			subs.put(prefixed, substitutions.get(prefixed) );
+		}
+		return subs;
 	}
 
 	private static String processSubstitutions(String expression, Map<String, String> subs) {
