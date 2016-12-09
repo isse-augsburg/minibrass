@@ -63,7 +63,14 @@ morph ConstraintRelationships -> WeightedCsp: ToWeighted =
     k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
     weights = calculate_cr_weights;
   } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
-   
+
+morph ConstraintRelationships -> WeightedCsp: ToWeightedExt = 
+  params generatedBy('isse.mbr.extensions.weighting.SingleWeighting') {
+%    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    k = generated ;
+    weights = generated ;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+      
 
 morph ConstraintRelationships -> MultiWeightedCsp: ToMultiWeighted = 
   params generatedBy('isse.mbr.extensions.weighting.MultiWeighting') {
