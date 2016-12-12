@@ -1,5 +1,7 @@
 package isse.mbr.model.types;
 
+import isse.mbr.parsing.WrapInformation;
+
 /**
  * Represents a single parameter that can be added to a PVSType; 
  * amounts to the *formal* parameter that includes a default value;
@@ -10,10 +12,10 @@ package isse.mbr.model.types;
  *
  */
 public class PVSParameter {
-	String name;
-	MiniZincParType type;
-	String defaultValue;
-	String wrappedBy;
+	private String name;
+	private MiniZincParType type;
+	private String defaultValue;
+	private WrapInformation wrappedBy;
 	
 	public PVSParameter(String name, MiniZincParType type) {
 		super();
@@ -64,11 +66,11 @@ public class PVSParameter {
 		this.defaultValue = defaultValue;
 	}
 
-	public String getWrappedBy() {
+	public WrapInformation  getWrappedBy() {
 		return wrappedBy;
 	}
 
-	public void setWrappedBy(String wrappedBy) {
+	public void setWrappedBy(WrapInformation  wrappedBy) {
 		this.wrappedBy = wrappedBy;
 	}
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import isse.mbr.extensions.ExternalMorphism;
+import isse.mbr.extensions.ExternalParameterWrap;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
@@ -50,7 +51,7 @@ public class CodeGenerator {
 	private List<String> leafValuations;
 	private boolean onlyMiniZinc;
 	
-	public String generateCode(MiniBrassAST model) {
+	public String generateCode(MiniBrassAST model) throws MiniBrassParseException {
 		 LOGGER.fine("Starting code generation");
 		// for now, just fill a string builder and print the console 
 		StringBuilder sb = new StringBuilder("% ===============================================\n");
@@ -82,7 +83,7 @@ public class CodeGenerator {
 		}
 	}
 
-	private void addPvsInstances(StringBuilder sb, MiniBrassAST model) {
+	private void addPvsInstances(StringBuilder sb, MiniBrassAST model) throws MiniBrassParseException {
 		// start with solve item then continue only its referenced instances (that can play an active role)
 		AbstractPVSInstance topLevelInstance = deref(model.getSolveInstance());
 		
@@ -123,7 +124,7 @@ public class CodeGenerator {
 		sb.append("\\n\"]\n");
 	}
 
-	private void addPvs(AbstractPVSInstance pvsInstance, StringBuilder sb, MiniBrassAST model) {
+	private void addPvs(AbstractPVSInstance pvsInstance, StringBuilder sb, MiniBrassAST model) throws MiniBrassParseException {
 		if(pvsInstance instanceof CompositePVSInstance) {
 			CompositePVSInstance comp = (CompositePVSInstance) pvsInstance;
 			AbstractPVSInstance left = deref(comp.getLeftHandSide());
@@ -227,7 +228,13 @@ public class CodeGenerator {
 						paramExpression = defaultValue;
 				}
 				if(pvsParam.getWrappedBy() != null) {
-					paramExpression = String.format("%s(%s)", pvsParam.getWrappedBy(), paramExpression);
+					if(WrapInformation.MINIZINC.equals(pvsParam.getWrappedBy().wrapLanguage)) {
+						paramExpression = String.format("%s(%s)", pvsParam.getWrappedBy().wrapFunction, paramExpression);
+					}
+					if(WrapInformation.JAVA.equals(pvsParam.getWrappedBy().wrapLanguage)) {
+						ExternalParameterWrap epw = pvsParam.getWrappedBy().getExternalWrap();
+						paramExpression = epw.process(inst, pvsParam, CodeGenerator.processSubstitutions(paramExpression, subs));
+					}
 				}
 				String generatedParamExpression = CodeGenerator.processSubstitutions(paramExpression, subs);
 				inst.getGeneratedCodeParameters().put(pvsParam.getName(), generatedParamExpression);

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import isse.mbr.extensions.ExternalMorphism;
+import isse.mbr.extensions.ExternalParameterWrap;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
@@ -46,6 +47,7 @@ import isse.mbr.model.types.SetType;
  *
  */
 public class MiniBrassParser {
+
 
 	private final static Logger LOGGER = Logger.getGlobal();
 	
@@ -620,7 +622,7 @@ public class MiniBrassParser {
 	private PVSParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
 		PVSParameter returnParameter;
 		String defaultVal = null;
-		String wrapFunction = null;
+		WrapInformation wrapInformation = null;
 		
 		if(currSy == MiniBrassSymbol.ArraySy) {
 			
@@ -642,12 +644,7 @@ public class MiniBrassParser {
 					getNextSy();
 					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
 				} else {
-					expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
-					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
-					expectSymbol(MiniBrassSymbol.StringLitSy);
-					wrapFunction = lexer.getLastIdent();
-					getNextSy();
-					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+					wrapInformation = wrappedByAnnotation(scopeType);
 				}
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
@@ -683,12 +680,7 @@ public class MiniBrassParser {
 					getNextSy();
 					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
 				} else {
-					expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
-					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
-					expectSymbol(MiniBrassSymbol.StringLitSy);
-					wrapFunction = lexer.getLastIdent();
-					getNextSy();
-					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+					wrapInformation = wrappedByAnnotation(scopeType);
 				}
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
@@ -699,10 +691,48 @@ public class MiniBrassParser {
 			returnParameter.setDefaultValue(defaultVal);
 		}
 		
-		if(wrapFunction != null) {
-			returnParameter.setWrappedBy(wrapFunction);
+		if(wrapInformation != null) {
+			returnParameter.setWrappedBy(wrapInformation);
 		}
 		return returnParameter;
+	}
+
+	private WrapInformation wrappedByAnnotation(PVSType scopeType) throws MiniBrassParseException {
+		WrapInformation wi = new WrapInformation();
+		expectSymbolAndNext(MiniBrassSymbol.WrappedBySy);
+		expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+		expectSymbol(MiniBrassSymbol.StringLitSy);
+		// this could actually be just the identifier for the language 
+		wi.wrapLanguage = lexer.getLastIdent();
+		getNextSy();
+		if(currSy == MiniBrassSymbol.CommaSy) {
+			getNextSy();
+			expectSymbol(MiniBrassSymbol.StringLitSy);
+			wi.wrapFunction = lexer.getLastIdent();
+			getNextSy();
+		} else {
+			wi.wrapFunction = wi.wrapLanguage;
+			wi.wrapLanguage = WrapInformation.MINIZINC;						
+		}
+		expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+		if( ! WrapInformation.MINIZINC.equals(wi.wrapLanguage) && ! WrapInformation.JAVA.equals(wi.wrapLanguage))
+			throw new MiniBrassParseException("Unrecognized preprocessing (wrappedBy) language: "+wi.wrapLanguage);
+		
+		if(WrapInformation.JAVA.equals(wi.wrapLanguage)) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends ExternalParameterWrap> externalParameterWrap = (Class<? extends ExternalParameterWrap>) Class.forName(wi.wrapFunction);
+				ExternalParameterWrap epw = externalParameterWrap.newInstance();
+				wi.setExternalWrap(epw);
+			} catch (ClassNotFoundException e) {
+				throw new MiniBrassParseException("Class "+wi.wrapFunction + " in wrappedBy annotation was not found!");
+			} catch (InstantiationException e) {
+				throw new MiniBrassParseException(e);
+			} catch (IllegalAccessException e) {
+				throw new MiniBrassParseException(e);
+			}
+		}
+		return wi;
 	}
 
 	private ArrayType MiniZincArrayType(PVSType scopeType) throws MiniBrassParseException {
