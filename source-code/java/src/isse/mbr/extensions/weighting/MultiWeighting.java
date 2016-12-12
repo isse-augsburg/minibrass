@@ -1,7 +1,5 @@
 package isse.mbr.extensions.weighting;
 
-import java.util.StringTokenizer;
-
 import isse.mbr.extensions.ExternalMorphism;
 import isse.mbr.extensions.domain.DirectedGraph;
 import isse.mbr.extensions.domain.UtilityStructure;
@@ -25,23 +23,10 @@ public class MultiWeighting extends ExternalMorphism {
 
 		// TODO for now, we expect a literal graph in the form "[| 2, 1 | 1, 0 |]"
 		// assumes strictly that soft constraints are labeled from 1 to nScs
-		String processed = generatedCrEdges.replaceAll("\\[\\|", "");
-		processed = processed.replaceAll("\\|\\]", "").trim();
-		processed = processed.replaceAll("transClosureWrap", "");
-		processed = processed.replaceAll("\\(", "");
-		processed = processed.replaceAll("\\)", "");
-		
-		StringTokenizer tok = new StringTokenizer(processed, "|");
-		
+	
 		DirectedGraph dag = new DirectedGraph(nScs);
-		
-		while(tok.hasMoreTokens()) {
-			String nextEdge = tok.nextToken().trim();
-			String[] splitted = nextEdge.split(",");
-			int fromId = Integer.parseInt(splitted[0].trim())-1;
-			int toId = Integer.parseInt(splitted[1].trim())-1;
-			dag.markEdge(fromId, toId);
-		} 
+		dag.parse(generatedCrEdges);
+
 		MultipleUtilities mu = new MultipleUtilities();
 		UtilityStructure us = mu.findUtilities(dag);
 		

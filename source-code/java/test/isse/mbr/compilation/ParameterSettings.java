@@ -24,6 +24,8 @@ public class ParameterSettings {
 	private String typeWithoutDef;
 	private String typeWithDef;
 	private String typeWithWrap;
+	private String typeWithWrapJava;
+	private String typeWithWrapJavaWrongClass;
 	private String typeWithWrapTypo;
 	private String minizincModel = "test-models/classicWrapped.mzn";
 	
@@ -68,7 +70,29 @@ public class ParameterSettings {
 				+ "  is_worse -> is_worse_cr;"
 				+ "  top -> {};"
 				+ "};";
-				  
+		
+		typeWithWrapJavaWrongClass = "type ConstraintRelationships = PVSType<bool, set of 1..nScs> = "
+				+ " params {"
+				+ " array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('java','transClosureWrap');"
+				+ " bool: useSPD :: default('true');"
+				+ "} in  "
+				+ "instantiates with \"../mbr_types/cr_type.mzn\" {"
+				+ "  times -> link_invert_booleans;"
+				+ "  is_worse -> is_worse_cr;"
+				+ "  top -> {};"
+				+ "};";
+		
+		typeWithWrapJava = "type ConstraintRelationships = PVSType<bool, set of 1..nScs> = "
+				+ " params {"
+				+ " array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('java','isse.mbr.extensions.preprocessing.TransitiveClosure');"
+				+ " bool: useSPD :: default('true');"
+				+ "} in  "
+				+ "instantiates with \"../mbr_types/cr_type.mzn\" {"
+				+ "  times -> link_invert_booleans;"
+				+ "  is_worse -> is_worse_cr;"
+				+ "  top -> {};"
+				+ "};";
+		
 		typeWithWrapTypo = "type ConstraintRelationships = PVSType<bool, set of 1..nScs> = "
 				+ " params {"
 				+ " array[int, 1..2] of 1..nScs: crEdges :: wrappsedBy('transClosureWrap');"
@@ -82,12 +106,13 @@ public class ParameterSettings {
 				  
 		
 		tempFile = File.createTempFile("testing", ".mbr");
+		// tempFile =  new File("test-models/testing.mbr");
 		tempOutput = new File("test-models/testing_o.mzn");
 	}
 	
 	@After
 	public void tearDown() {
-		tempFile.delete();
+	    tempFile.delete();
 		tempOutput.delete();
 	}
 
@@ -149,6 +174,81 @@ public class ParameterSettings {
 		
 		Assert.assertFalse(listener.isSolved());
 		Assert.assertTrue(listener.isCyclic());
+	}
+	
+	
+	@Test(expected=MiniBrassParseException.class)
+	public void testWrappedJavaCyclic() throws IOException, MiniBrassParseException {
+		String instantiation = "PVS: cr1 = new ConstraintRelationships(\"cr1\") {"
+				+ "   soft-constraint c1: 'x + 1 = y' ;"
+				+ "   soft-constraint c2: 'z = y + 2' ;"
+				+ "   soft-constraint c3: 'x + y <= 3' ;"
+				+ "   crEdges : '[| mbr.c3, mbr.c2 | mbr.c2, mbr.c3 |]';"
+				+ "}; "
+				+ "solve cr1;";
+		
+		String combined = typeWithWrapJava + instantiation;
+		writeSilent(tempFile, combined);
+		
+		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		compiler.compile(tempFile, tempOutput);
+ 
+		Assert.assertTrue(tempOutput.exists());
+		
+		// 2. execute minisearch
+		
+		BasicTestListener listener = new BasicTestListener();
+		launcher.addMiniZincResultListener(listener);
+		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
+		
+		Assert.assertFalse(listener.isSolved());
+	}
+	
+	@Test
+	public void testWrappedJava() throws IOException, MiniBrassParseException {
+		String instantiation = "PVS: cr1 = new ConstraintRelationships(\"cr1\") {"
+				+ "   soft-constraint c1: 'x + 1 = y' ;"
+				+ "   soft-constraint c2: 'z = y + 2' ;"
+				+ "   soft-constraint c3: 'x + y <= 3' ;"
+				+ "   crEdges : '[| mbr.c3, mbr.c2 | mbr.c2, mbr.c1 |]';"
+				+ "}; "
+				+ "solve cr1;";
+		
+		String combined = typeWithWrapJava + instantiation;
+		writeSilent(tempFile, combined);
+		
+		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		compiler.compile(tempFile, tempOutput);
+ 
+		Assert.assertTrue(tempOutput.exists());
+		
+		// 2. execute minisearch
+		
+		BasicTestListener listener = new BasicTestListener();
+		launcher.addMiniZincResultListener(listener);
+		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
+		
+		Assert.assertTrue(listener.isSolved());
+		Assert.assertFalse(listener.isCyclic());
+	}
+	
+	
+	@Test (expected=MiniBrassParseException.class)
+	public void testWrappedJavaWrong() throws IOException, MiniBrassParseException {
+		String instantiation = "PVS: cr1 = new ConstraintRelationships(\"cr1\") {"
+				+ "   soft-constraint c1: 'x + 1 = y' ;"
+				+ "   soft-constraint c2: 'z = y + 2' ;"
+				+ "   soft-constraint c3: 'x + y <= 3' ;"
+				+ "   crEdges : '[| mbr.c3, mbr.c2 | mbr.c2, mbr.c3 |]';"
+				+ "}; "
+				+ "solve cr1;";
+		
+		String combined = typeWithWrapJavaWrongClass + instantiation;
+		writeSilent(tempFile, combined);
+		
+		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		compiler.compile(tempFile, tempOutput);
+ 
 	}
 	
 	@Test (expected=MiniBrassParseException.class)
