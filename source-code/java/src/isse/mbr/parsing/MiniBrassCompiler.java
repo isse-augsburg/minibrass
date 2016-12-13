@@ -38,6 +38,9 @@ public class MiniBrassCompiler {
 	@Option(name = "-m", usage = "only MiniZinc code (top level PVS must be int)")
 	private boolean minizincOnly; // does not generate anything that is related to MiniSearch (i.e. annotations for getBetter-predicates)
 	
+	@Option(name = "-h", usage = "generate heuristics for search (can lead to long flatzinc compilation)")
+	private boolean genHeuristics;
+	
 	@Option(name = "-o", usage = "output compiled MiniZinc to this file", metaVar = "MZN-OUTPUT")
 	private File out = null;
 
@@ -81,7 +84,9 @@ public class MiniBrassCompiler {
 		MiniBrassParser parser = new MiniBrassParser();
 		MiniBrassAST model = parser.parse(input);
 		CodeGenerator codegen = new CodeGenerator();
-		codegen.setOnlyMiniZinc(minizincOnly);
+		codegen.setOnlyMiniZinc(isMinizincOnly());
+		codegen.setGenHeuristics(isGenHeuristics());
+		
 		String generatedCode = codegen.generateCode(model);
 		System.out.println("MiniBrass code compiled successfully to "+ output +".");
 		// write code to file
@@ -103,6 +108,9 @@ public class MiniBrassCompiler {
 			}
 			if(minizincOnly) {
 				LOGGER.info("Only generating MiniZinc (not MiniSearch) code"); 
+			}
+			if(genHeuristics) {
+				LOGGER.info("Generate search heuristics as well"); 
 			}
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
@@ -140,6 +148,14 @@ public class MiniBrassCompiler {
 
 	public void setMinizincOnly(boolean minizincOnly) {
 		this.minizincOnly = minizincOnly;
+	}
+
+	public boolean isGenHeuristics() {
+		return genHeuristics;
+	}
+
+	public void setGenHeuristics(boolean genHeuristics) {
+		this.genHeuristics = genHeuristics;
 	}
 
 }

@@ -50,6 +50,7 @@ public class CodeGenerator {
 	public static final String TOP_LEVEL_OBJECTIVE = "topLevelObjective";
 	private List<String> leafValuations;
 	private boolean onlyMiniZinc;
+	private boolean genHeuristics;
 	
 	public String generateCode(MiniBrassAST model) throws MiniBrassParseException {
 		 LOGGER.fine("Starting code generation");
@@ -102,8 +103,9 @@ public class CodeGenerator {
 			appendOverall(sb, elementType, pvsInst, TOP_LEVEL_OBJECTIVE);
 			sb.append(String.format("constraint %s = %s;\n", TOP_LEVEL_OBJECTIVE, topLevelOverall));
 		}
-		
-		sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
+	
+		if(genHeuristics)
+			sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
 		
 		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
@@ -150,12 +152,13 @@ public class CodeGenerator {
 			}
 			
 			// search heuristics as well  
-			sb.append("\n% Composite search Heuristics to be used in a model: \n");
-			
-			String leftHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, left);
-			String rightHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, right);
-			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, pvsInstance) + String.format(" = seq_search( [%s, %s]);",leftHeur,rightHeur);
-			sb.append(annDecl); sb.append('\n');
+			if(genHeuristics) {
+				sb.append("\n% Composite search Heuristics to be used in a model: \n");
+				String leftHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, left);
+				String rightHeur = CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, right);
+				String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, pvsInstance) + String.format(" = seq_search( [%s, %s]);",leftHeur,rightHeur);
+				sb.append(annDecl); sb.append('\n');
+			}
 		} 
 		else {
 			PVSInstance inst = (PVSInstance) pvsInstance;
@@ -283,16 +286,18 @@ public class CodeGenerator {
 			}
 			
 			// ------------------------------------------------------------- 
-			sb.append("\n% Search Heuristics to be used in a model: \n");
-			String heuristicFunc = inst.getType().instance.getOrderingHeuristic();
-			
-			String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, inst);
-			sb.append(annDecl);
-			if( heuristicFunc != null) {
-				sb.append(" = ");
-				sb.append(String.format("%s(%s, %s, %s);\n", heuristicFunc, valuationsArray, overallIdent, instanceArguments.toString()));
-			} else {				
-				sb.append(";\n");
+			if(genHeuristics) {
+				sb.append("\n% Search Heuristics to be used in a model: \n");
+				String heuristicFunc = inst.getType().instance.getOrderingHeuristic();
+				
+				String annDecl = "ann: "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, inst);
+				sb.append(annDecl);
+				if( heuristicFunc != null) {
+					sb.append(" = ");
+					sb.append(String.format("%s(%s, %s, %s);\n", heuristicFunc, valuationsArray, overallIdent, instanceArguments.toString()));
+				} else {				
+					sb.append(";\n");
+				}
 			}
 		}
 		
@@ -407,5 +412,13 @@ public class CodeGenerator {
 
 	public void setOnlyMiniZinc(boolean onlyMiniZinc) {
 		this.onlyMiniZinc = onlyMiniZinc;
+	}
+
+	public boolean isGenHeuristics() {
+		return genHeuristics;
+	}
+
+	public void setGenHeuristics(boolean genHeuristics) {
+		this.genHeuristics = genHeuristics;
 	}
 }
