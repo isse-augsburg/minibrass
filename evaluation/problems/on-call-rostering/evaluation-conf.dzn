@@ -1,2 +1,2 @@
-useMIF = false;
-propagateWeights = true;
+mostImportantFirst = true;
+propagateRedundant = true;
