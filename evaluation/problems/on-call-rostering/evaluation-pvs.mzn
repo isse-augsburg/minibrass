@@ -1,1 +1,2 @@
-include "soft_constraints/pvs_spd.mzn";
+set of int: violatedScs = {}; % just for compatible execution with or-tools
+include "soft_constraints/weighting_spd.mzn";
