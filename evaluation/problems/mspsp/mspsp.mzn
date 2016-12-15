@@ -112,7 +112,7 @@ constraint
                             exists(k in has_skills[j])(rr[k, i] > 0)
                 }
         } in (
-            if card(WTasks) > 1 /\ propagateWeights then
+            if card(WTasks) > 1 /\ propagateRedundant then
                 cumulative(
                     [ s[i]              | i in WTasks ],
                     [ d[i]              | i in WTasks ],
