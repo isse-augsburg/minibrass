@@ -66,6 +66,7 @@ public class SearchHeuristicTest {
 	public void testActivatedHeuristics() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
+		compiler.setGenHeuristics(true);
 		compiler.compile(new File(minibrassModel), output);
 		Assert.assertTrue(output.exists());
 		
@@ -92,6 +93,7 @@ public class SearchHeuristicTest {
 	public void testWeightedHeuristics() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
+		compiler.setGenHeuristics(true);
 		compiler.compile(new File(minibrassWeightedModel), output);
 		Assert.assertTrue(output.exists());
 		

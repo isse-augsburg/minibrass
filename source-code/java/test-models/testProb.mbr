@@ -1,0 +1,11 @@
+% A minimalistic probabilistic CSP
+    
+include "defs.mbr";
+
+PVS: pz1 = new ProbabilisticConstraints("pz1") {
+   soft-constraint c1: 's1 + s2 >= 8' :: probs('0.9');
+   soft-constraint c2: 's1 + s2 >= 10' :: probs('0.7');
+   soft-constraint c3: 's1 + s2 >= 12' :: probs('0.2'); 
+}; 
+
+solve pz1;

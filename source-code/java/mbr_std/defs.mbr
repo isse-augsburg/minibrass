@@ -56,7 +56,16 @@ type FuzzyConstraints = PVSType<0.0 .. 1.0> =
     is_worse -> is_worse_fuzzy;
     top -> 1.0;
 };
-    
+
+type ProbabilisticConstraints = PVSType<bool, 0.0 .. 1.0> = 
+  params {
+    array[1..nScs] of float: probs :: default('1.0');
+  } in  
+  instantiates with "soft_constraints/mbr_types/probabilistic_type.mzn" {
+    times -> prod;
+    is_worse -> is_worse_prob;
+    top -> 1.0;
+};    
     
 morph ConstraintRelationships -> WeightedCsp: ToWeighted = 
   params {
