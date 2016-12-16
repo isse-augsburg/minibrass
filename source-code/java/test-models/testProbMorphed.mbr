@@ -17,4 +17,4 @@ PVS: pz1 = new ProbabilisticConstraints("pz1") {
    soft-constraint c3: 's1 + s2 >= 12' :: probs('0.2'); 
 }; 
 
-solve pz1;
+solve ProbToWeighted(pz1);
