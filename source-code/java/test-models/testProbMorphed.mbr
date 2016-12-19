@@ -2,14 +2,6 @@
     
 include "defs.mbr";
 
-% a morphism converting a probabilistic CSP to weighted CSP using log
-morph ProbabilisticConstraints -> WeightedCsp: ProbToWeighted = 
-  params generatedBy('isse.mbr.extensions.weighting.ProbWeighting') {
-    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
-    weights = generated ;
-  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
-      
-
 
 PVS: pz1 = new ProbabilisticConstraints("pz1") {
    soft-constraint c1: 's1 + s2 >= 8' :: probs('0.9');
