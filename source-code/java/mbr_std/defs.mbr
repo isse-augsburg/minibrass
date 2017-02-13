@@ -1,7 +1,7 @@
 % ========================================
 % PVS Types
 % ========================================
-type ConstraintRelationships = PVSType<bool, set of 1..nScs> = 
+type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
   params { 
     array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('java', 'isse.mbr.extensions.preprocessing.TransitiveClosure');
     bool: useSPD :: default('true');
@@ -84,13 +84,13 @@ type ProbCostFunctionNetwork = PVSType<float> =
 % MORPHISMS
 % ========================================
   
-morph ConstraintRelationships -> WeightedCsp: ToWeighted = 
+morph ConstraintPreferences -> WeightedCsp: ToWeighted = 
   params {
     k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
     weights = calculate_cr_weights;
   } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
 
-morph ConstraintRelationships -> WeightedCsp: ToWeightedExt = 
+morph ConstraintPreferences -> WeightedCsp: ToWeightedExt = 
   params generatedBy('isse.mbr.extensions.weighting.SingleWeighting') {
 %    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
     k = generated ;
@@ -98,7 +98,7 @@ morph ConstraintRelationships -> WeightedCsp: ToWeightedExt =
   } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
       
 
-morph ConstraintRelationships -> MultiWeightedCsp: ToMultiWeighted = 
+morph ConstraintPreferences -> MultiWeightedCsp: ToMultiWeighted = 
   params generatedBy('isse.mbr.extensions.weighting.MultiWeighting') {
     k = 'mbr.nScs * max(i in 1..mbr.nScs, j in 1..mbr.d) (mbr.weights[i,j]) ';
     d = generated;
