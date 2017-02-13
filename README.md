@@ -34,7 +34,7 @@ output ["n = \(n)"] ++
 ```
 
 that is accompanied by this MiniBrass model
-```matlab
+```python
 type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
   params { 
     array[int, 1..2] of 1..nScs: crEdges;
