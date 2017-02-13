@@ -12,7 +12,7 @@ More specifically, we aim to provide
 - Integration of soft global constraints
 
 To see a "Hello, World"-example, consider the following hard constraint model in MiniZinc
-```matlab
+```c++
 include "classic_o.mzn"; % output of minibrass
 include "soft_constraints/pvs_gen_search.mzn"; % for generic branch and bound
 
@@ -34,7 +34,7 @@ output ["n = \(n)"] ++
 ```
 
 that is accompanied by this MiniBrass model
-```python
+```c++
 type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
   params { 
     array[int, 1..2] of 1..nScs: crEdges;
