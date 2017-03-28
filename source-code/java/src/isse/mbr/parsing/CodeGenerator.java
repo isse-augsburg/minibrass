@@ -47,7 +47,6 @@ public class CodeGenerator {
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
-	public static final String TOP_LEVEL_OBJECTIVE = "topLevelObjective";
 	private List<String> leafValuations;
 	private boolean onlyMiniZinc;
 	private boolean genHeuristics;
@@ -94,18 +93,18 @@ public class CodeGenerator {
 		
 		String pvsPred = encodeString("postBetter", topLevelInstance);
 		if(!onlyMiniZinc)
-			sb.append(String.format("function ann:  postGetBetter() = %s();\n",pvsPred));
+			sb.append(String.format("function ann:  " + MiniZincKeywords.POST_GET_BETTER +"() = %s();\n",pvsPred));
 
 		if( !(topLevelInstance instanceof CompositePVSInstance)) {
 			String topLevelOverall = getOverallValuation(topLevelInstance);
 			PVSInstance pvsInst = (PVSInstance) topLevelInstance; 
 			MiniZincParType elementType = pvsInst.getType().instance.getElementType();
-			appendOverall(sb, elementType, pvsInst, TOP_LEVEL_OBJECTIVE);
-			sb.append(String.format("constraint %s = %s;\n", TOP_LEVEL_OBJECTIVE, topLevelOverall));
+			appendOverall(sb, elementType, pvsInst, MiniZincKeywords.TOP_LEVEL_OBJECTIVE);
+			sb.append(String.format("constraint %s = %s;\n", MiniZincKeywords.TOP_LEVEL_OBJECTIVE, topLevelOverall));
 		}
 	
 		if(genHeuristics)
-			sb.append("ann: pvsSearchHeuristic = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
+			sb.append("ann: "+MiniZincKeywords.PVS_SEARCH_HEURISTIC +" = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
 		
 		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
