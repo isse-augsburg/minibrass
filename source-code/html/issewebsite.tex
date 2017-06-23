@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{color}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+%\usepackage[dvipsnames,table]{xcolor}
+
+\lstdefinelanguage{MiniZinc}
+{	morekeywords={var,morph,let,in,pareto,lex,par,offers,int,solve,output,not,search,satisfy,new,endif,maximize,params,instantiates,with,bool,in,type,PVS,PVSType,minimize,float,constraint,soft,sum,forall,exists,array,of,include,predicate,then,commit,post,set,function,if,else,repeat,next,ann,break},
+	sensitive=false,
+	morecomment=[l]{\%},
+	morecomment=[s]{/*}{*/},
+	morestring=[b]",
+	morestring=[b]',
+}
+
+\lstset
+{   stringstyle=\ttfamily\color{blue},
+	tabsize=2,
+	showstringspaces=false,
+	numberfirstline=false,
+	%flexiblecolumns=true,
+	captionpos=b,	
+	backgroundcolor=\color{lightlightgray},
+	frame=single,
+	%xleftmargin=\parindent,
+	numberstyle={\ttfamily\fontsize{6pt}{6pt}\selectfont}
+}
+\lstset{language=MiniZinc}
+
+\def\mystyle{}
+
+
+\begin{document}
+
+\Css{div.lstlisting .ecit-1000 {font-family: monospace;color:darkred; font-style:normal;}}
+\Css{div.lstlisting .ectt-1000 {font-family: monospace;color:black}} 
+\Css{div.lstlisting .ecss-1000 {font-family: monospace;color:red}} 
+\Css{div.lstlisting .ecbx-1000 {font-family: monospace;color:forestgreen}}
+\Css{div.lstlisting { background-color: \#F0F0F0; border: 1px solid black; padding: 5px;} }
+
+\section{Test!}
+
+\begin{lstlisting}
+include "classic_o.mzn"; % output of minibrass
+include "soft_constraints/pvs_gen_search.mzn"; 
+
+% the basic, "classic" CSP 
+set of int: DOM = 1..3;
+
+var DOM: x; var DOM: y; var DOM: z;
+
+solve 
+:: int_search([x,y,z], input_order, indomain_min, complete)
+search pvs_BAB();
+
+output ["x = \(x); y = \(y); z = \(z)"] ++ 
+       [ "\nValuations:  overall = \(topLevelObjective)\n"];
+
+\end{lstlisting}
+
+\begin{lstlisting}
+include "defs.mbr";
+
+PVS: cr1 = new ConstraintPreferences("cr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+solve cr1;
+\end{lstlisting}
+
+\end{document}

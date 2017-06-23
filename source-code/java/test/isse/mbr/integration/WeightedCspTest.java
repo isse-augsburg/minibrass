@@ -29,6 +29,7 @@ public class WeightedCspTest {
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler();
+	
 		launcher = new MiniZincLauncher();
 	}
 

@@ -1,0 +1,115 @@
+% ========================================
+% PVS Types
+% ========================================
+type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('java', 'isse.mbr.extensions.preprocessing.TransitiveClosure');
+    bool: useSPD :: default('true');
+  } in 
+  instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
+    times -> link_invert_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+  }
+  offers {
+    heuristics -> getSearchHeuristicCR;
+  };
+ 
+%     
+    
+type CostFunctionNetwork = PVSType<0..k> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "soft_constraints/mbr_types/cfn_type.mzn" {
+    times -> sum;
+    is_worse -> is_worse_weighted; 
+    top -> 0;
+ };
+  
+type MultiWeightedCsp = PVSType<bool, array[1..d] of 0..k> = 
+  params {
+    int:  k :: default('1000'); 
+    int:  d :: default('1');
+    array[1..nScs,1..d] of int: weights :: default('1');
+  } in  
+  instantiates with "soft_constraints/mbr_types/weighted_type.mzn" {
+    times -> weighted_multi_sum;
+    is_worse -> is_worse_multi_weighted;
+    top -> 0; % [0 | i in 1..d]
+ };
+ 
+type WeightedCsp = PVSType<bool, int> = 
+  params {
+    int: k :: default('1000'); 
+    array[1..nScs] of int: weights :: default('1');
+  } in  
+  instantiates with "soft_constraints/mbr_types/weighted_type.mzn" {
+    times -> weighted_sum;
+    is_worse -> is_worse_weighted;
+    top -> 0;
+ }
+ offers {
+    heuristics -> getSearchHeuristicWeighted;
+ };
+  
+type FuzzyConstraints = PVSType<0.0 .. 1.0> = 
+  instantiates with "soft_constraints/mbr_types/fuzzy_type.mzn" {
+    times -> min;
+    is_worse -> is_worse_fuzzy;
+    top -> 1.0;
+};
+
+type ProbabilisticConstraints = PVSType<bool, 0.0 .. 1.0> = 
+  params {
+    array[1..nScs] of float: probs :: default('1.0');
+  } in  
+  instantiates with "soft_constraints/mbr_types/probabilistic_type.mzn" {
+    times -> prod;
+    is_worse -> is_worse_prob;
+    top -> 1.0;
+};    
+    
+type ProbCostFunctionNetwork = PVSType<float> = 
+  params {
+    array[1..nScs] of float: probs :: default('1.0');
+  } in  
+  instantiates with "soft_constraints/mbr_types/probabilistic_type.mzn" {
+    times -> prob_weighted_sum;
+    is_worse -> is_worse_prob_cost; 
+    top -> k;
+ };
+  
+% ========================================
+% MORPHISMS
+% ========================================
+  
+morph ConstraintPreferences -> WeightedCsp: ToWeighted = 
+  params {
+    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    weights = calculate_cr_weights;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+
+morph ConstraintPreferences -> WeightedCsp: ToWeightedExt = 
+  params generatedBy('isse.mbr.extensions.weighting.SingleWeighting') {
+%    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    k = generated ;
+    weights = generated ;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+      
+
+morph ConstraintPreferences -> MultiWeightedCsp: ToMultiWeighted = 
+  params generatedBy('isse.mbr.extensions.weighting.MultiWeighting') {
+    k = 'mbr.nScs * max(i in 1..mbr.nScs, j in 1..mbr.d) (mbr.weights[i,j]) ';
+    d = generated;
+    weights = generated ;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+   
+% a morphism converting a probabilistic CSP to weighted CSP using log
+morph ProbabilisticConstraints -> WeightedCsp: ProbToWeighted = 
+  params generatedBy('isse.mbr.extensions.weighting.ProbWeighting') {
+    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    weights = generated ;
+  } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
+      
+

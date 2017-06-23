@@ -6,18 +6,31 @@
 include "minisearch.mzn";
 
 % only declare minisearch function that posts a constraint which solution has to surpassed
-function ann: postGetBetter(); % = post(getBetter2(sol(x)));
+function ann: postGetBetter(); 
+function ann: postNotGetWorse();
 
+% Classical branch-and-bound search based on PVS.
+% Requires every solution to be *better* than the previous one
 function ann: pvs_BAB() =
        repeat(
-           if next() then %:: int_search(satisfied, input_order, indomain_min, complete) then
+           if next() then 
                  print("Intermediate solution:") /\ print() /\
                  commit() /\ postGetBetter()
            else break endif
        );
        
+% Derived branch-and-bound search based on PVS.
+% Requires every solution not to be *dominated* by any previous one       
+function ann: pvs_BAB_NonDom() =
+       repeat(
+           if next() then
+                 print("Intermediate solution:") /\ print() /\
+                 commit() /\ postNotGetWorse()
+           else break endif
+       );
        
-% adapted from lns_max an objective value (the set of violated constraints towards {}, in our case)
+              
+% adapted from lns_max an objective value
 function ann: pvs_LNS (array[int] of var int: x,
                    int: iterations, float: d, int: exploreTime) = 
     repeat (i in 1..iterations) (
