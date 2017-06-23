@@ -64,4 +64,26 @@ public class MiniZincKeywords {
 	 */
 	public static final String POST_GET_BETTER = "postGetBetter";
 
+	/**
+	 * the name of the overall top level "get better" predicate that the PVS-based searches 
+	 * in "soft_constraints/pvs_gen_search.mzn" expect
+	 * 
+	 * ann: postNotGetWorse = ...
+	 * --
+	 * 
+	 * defined in "soft_constraints/pvs_gen_search.mzn"
+	 * --------------------------------------------------------------------------------------------------
+	 * | % only declare minisearch function that posts a constraint that the next solution degree must not be explicitly worse or equal to another
+	 * | function ann: postNotGetWorse(); % = post(getBetter2(sol(x)));
+	 * | 
+	 * function ann: pvs_BAB() =
+	 * repeat(
+	 *     if next() then %:: int_search(satisfied, input_order, indomain_min, complete) then
+	 *        print("Intermediate solution:") /\ print() /\
+	 *        commit() /\ postNotGetWorse()
+	 *        else break endif
+	 *     );
+     * --------------------------------------------------------------------------------------------------  
+	 */
+	public static final String POST_NOT_GET_WORSE = "postNotGetWorse";
 }

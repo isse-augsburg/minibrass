@@ -91,10 +91,14 @@ public class CodeGenerator {
 		sb.append("\n% Overall exported predicate (and objective in case of atomic top-level PVS) : \n");
 		sb.append("\n% ---------------------------------------------------\n");
 		
-		String pvsPred = encodeString("postBetter", topLevelInstance);
-		if(!onlyMiniZinc)
-			sb.append(String.format("function ann:  " + MiniZincKeywords.POST_GET_BETTER +"() = %s();\n",pvsPred));
-
+		String pvsBetter = encodeString(MiniZincKeywords.POST_GET_BETTER, topLevelInstance);
+		String pvsNotWorse = encodeString(MiniZincKeywords.POST_NOT_GET_WORSE, topLevelInstance);
+		
+		if(!onlyMiniZinc) {
+			sb.append(String.format("function ann:  " + MiniZincKeywords.POST_GET_BETTER +"() = %s();\n",pvsBetter));
+			sb.append(String.format("function ann:  " + MiniZincKeywords.POST_NOT_GET_WORSE +"() = %s();\n",pvsNotWorse));
+		}
+		
 		if( !(topLevelInstance instanceof CompositePVSInstance)) {
 			String topLevelOverall = getOverallValuation(topLevelInstance);
 			PVSInstance pvsInst = (PVSInstance) topLevelInstance; 
@@ -108,9 +112,23 @@ public class CodeGenerator {
 		
 		leafValuations = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
-		if(!onlyMiniZinc)
-			sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsPred, topLevelInstance.getGeneratedBetterPredicate()));
 		
+		if(!onlyMiniZinc) {
+			sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsBetter, topLevelInstance.getGeneratedBetterPredicate()));
+		
+			StringBuilder equalityBuilder = new StringBuilder();
+			boolean firstLeaf = true;
+			for(String leafValuation : leafValuations) {
+				if(firstLeaf)
+					firstLeaf = false;
+				else
+					equalityBuilder.append(" /\\ ");
+				equalityBuilder.append(String.format("sol(%s) = %s", leafValuation, leafValuation));
+			}
+			
+			String negatedGetNotWorse = "not ( ("+ equalityBuilder.toString() +") \\/ (" + topLevelInstance.getGeneratedNotWorsePredicate()+ "))";
+			sb.append(String.format("\nfunction ann: %s() = post(%s);\n",pvsNotWorse, negatedGetNotWorse ));
+		}
 		// add output line for valuation-carrying variables 
 		sb.append("\n% Add this line to your output to make use of minisearch\n");
 		sb.append("% [ \"\\n"+VALUATTIONS_PREFIX+" ");
@@ -138,14 +156,17 @@ public class CodeGenerator {
 				String leftBetter = left.getGeneratedBetterPredicate();
 				String rightBetter = right.getGeneratedBetterPredicate();
 				comp.setGeneratedBetterPredicate(String.format("( (%s) /\\ (%s) )", leftBetter, rightBetter));
-					
+				comp.setGeneratedNotWorsePredicate(String.format("( (%s) /\\ (%s) )", rightBetter, leftBetter));
 			} else { // lexicographic
 				String leftBetter = left.getGeneratedBetterPredicate();
 				String rightBetter = right.getGeneratedBetterPredicate();
 				
 				// get left objective variable 
 				String leftOverall = getOverallValuation(left);
+				String rightOverall = getOverallValuation(right);
+				
 				comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ (sol(%s) = %s /\\ %s) )", leftBetter, leftOverall, leftOverall, rightBetter));
+				comp.setGeneratedNotWorsePredicate(String.format("( (%s) \\/ (sol(%s) = %s /\\ %s) )", rightBetter, rightOverall, rightOverall, leftBetter));
 				
 				// sb.append(String.format("predicate %s() = (%s() ) \\/ ( sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter, leftOverall, leftOverall, rightBetter));
 			}
@@ -273,8 +294,11 @@ public class CodeGenerator {
 			if(pvsType.getElementType() instanceof ArrayType) {
 				lastSolutionDegree = String.format("[ sol(%s[i]) | i in index_set(%s)]", overallIdent,overallIdent);
 			}
-			String getBetterString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), lastSolutionDegree, overallIdent,instanceArguments.toString());
+			String getBetterString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), lastSolutionDegree, overallIdent, instanceArguments.toString());
+			String notGetWorseString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), overallIdent, lastSolutionDegree, instanceArguments.toString());
 			inst.setGeneratedBetterPredicate(getBetterString);
+			inst.setGeneratedNotWorsePredicate(notGetWorseString);
+			
 			// sb.append(String.format("function ann: %s() = post(%s(sol(%s), %s, %s));\n",pvsPred, pvsType.getOrder(), overallIdent, overallIdent,instanceArguments.toString()));
 			
 			sb.append(String.format("constraint %s = %s (%s,%s);\n", overallIdent, pvsType.getCombination() , valuationsArray, instanceArguments.toString()));
