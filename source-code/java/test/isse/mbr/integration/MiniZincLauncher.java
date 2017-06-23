@@ -21,7 +21,8 @@ public class MiniZincLauncher {
 
 	private String flatzincExecutable = "fzn-gecode";
 	private String minizincGlobals = "gecode";  
-
+	private boolean useDefault = false; // passing no arguments to minizinc/minisearch
+	
 	private final static Logger LOGGER = Logger.getGlobal();
 	
 	public MiniZincLauncher() {
@@ -39,7 +40,13 @@ public class MiniZincLauncher {
 		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
 	
 		String dataPath = data != null ? data.getPath() : "";
-		ProcessBuilder pb = new ProcessBuilder("minizinc", "-a","-f",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+		ProcessBuilder pb;
+		if(useDefault) {
+			pb = new ProcessBuilder("minizinc", "-a", model.getPath());
+		} else {
+			pb = new ProcessBuilder("minizinc", "-a","-f",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+		}
+		
 		if(data != null)
 			pb.command().add(dataPath);
 		
@@ -53,7 +60,12 @@ public class MiniZincLauncher {
 		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
 	
 		String dataPath = data != null ? data.getPath() : "";
-		ProcessBuilder pb = new ProcessBuilder("minisearch","--solver",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+		ProcessBuilder pb;
+		if(useDefault) {
+			pb = new ProcessBuilder("minisearch", model.getPath());
+		} else {
+			pb = new ProcessBuilder("minisearch","--solver",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+		}
 		if(data != null)
 			pb.command().add(dataPath);
 		
@@ -129,7 +141,7 @@ public class MiniZincLauncher {
 			while (sc.hasNextLine()) {
 				String line = sc.nextLine();
 				boolean broadcast = true;	
-	//			System.out.println(line);
+				//System.out.println(line);
 
 				if (line.contains(optimalitySep)) {
 					// System.out.println("Solved optimally!");
@@ -195,6 +207,14 @@ public class MiniZincLauncher {
 
 	public void setMinizincGlobals(String minizincGlobals) {
 		this.minizincGlobals = minizincGlobals;
+	}
+
+	public boolean isUseDefault() {
+		return useDefault;
+	}
+
+	public void setUseDefault(boolean useDefault) {
+		this.useDefault = useDefault;
 	}
 
 }

@@ -1,0 +1,22 @@
+type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges;
+    bool: useSPD;
+  } in 
+  instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
+    times -> link_invert_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+};
+    
+
+PVS: cr1 = new ConstraintPreferences("cr1") {
+   soft-constraint c1: 'x in {2,3}';
+   soft-constraint c2: 'x in {1,3}';
+   soft-constraint c3: 'x in {1,2}';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+solve cr1;
