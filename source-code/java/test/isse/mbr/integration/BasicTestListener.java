@@ -15,6 +15,7 @@ import isse.mbr.parsing.CodeGenerator;
 public class BasicTestListener implements MiniZincResultListener {
 
 	private boolean solved;
+	private int solutionCounter;
 	private boolean optimally;
 	private String customString;
 	private boolean cyclic;
@@ -23,6 +24,7 @@ public class BasicTestListener implements MiniZincResultListener {
 	
 	public BasicTestListener() {
 		this.solved = false;
+		this.solutionCounter = 0;
 		this.optimally = false;
 		this.cyclic = false;
 		this.objectives = new HashMap<>();
@@ -71,6 +73,7 @@ public class BasicTestListener implements MiniZincResultListener {
 	@Override
 	public void notifySolved() {
 		this.solved = true;
+		++this.solutionCounter;
 	}
 
 	public boolean isSolved() {
@@ -95,5 +98,13 @@ public class BasicTestListener implements MiniZincResultListener {
 
 	public boolean isCyclic() {
 		return cyclic;
+	}
+
+	public int getSolutionCounter() {
+		return solutionCounter;
+	}
+
+	public void setSolutionCounter(int solutionCounter) {
+		this.solutionCounter = solutionCounter;
 	}
 }
