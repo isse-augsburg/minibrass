@@ -34,7 +34,7 @@
           <p><a href="http://www.isse.uni-augsburg.de/"><img src="images/isse.png" style = "width: 150px; height: auto; "  alt="Institute for Software and Systems Engineering"></a>
              <a href="https://www.informatik.uni-augsburg.de/en/"><img src="images/uniaweb.png" style = "width: 200px; height: auto; margin-left:40px;"  alt="University of Augsburg"></a></p>
 
-        <h1>FAS*-Tutorial Resources</h1>
+  <!--      <h1>FAS*-Tutorial Resources</h1>
         <img style = "width: 50%" src="images/FASStar.jpg" />
         <ul>
         <li><a href = "https://megastore.uni-augsburg.de/get/ujMkOoiIKS/">MiniBrass bundle for Windows (64 bit)</a></li>
@@ -49,6 +49,7 @@
         <li><a href = "tutorial/handout.pdf">Handout</a></li>
         
         </ul>
+  -->
         <h1>
 <a id="what-are-constraint-relationships-about" class="anchor" href="#what-are-constraint-relationships-about" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Optimization with Preferences</h1>
 
@@ -67,86 +68,85 @@
 
 <h2>
 <a id="quick-example" class="anchor" href="#quick-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quick Example</h2>
+First, we define variables, domains, and conventional hard constraints
+<pre><code>include "classic_o.mzn"; % output of minibrass
+include "soft_constraints/pvs_gen_search.mzn"; 
 
-<pre><code>% A really simplistic over-constrained model
-% X: {x,y,z} D_i = {1,2,3}, i in X
-%    * c1: x + 1 = y 
-%    * c2: z = y + 2
-%    * c3: x + y &lt;= 3
-% -------------------------------------------
+% the basic, "classic" CSP 
+set of int: DOM = 1..3;
 
-% import libraries as bundle for a quick start
-include "minisearch.mzn"; % include the search minisearch lite
-include "soft_constraints/minisearch_bundle.mzn";
+var DOM: x; var DOM: y; var DOM: z;
 
-var 1..3: x; 
-var 1..3: y;
-var 1..3: z;
-
-% read as "soft constraint c1 is satisfied iff x + 1 = y"
-constraint x + 1 = y &lt;-&gt; satisfied[1];
-constraint z = y + 2 &lt;-&gt; satisfied[2];
-constraint x + y &lt;= 3 &lt;-&gt; satisfied[3];
-
-% soft constraint data specific to this model
-nScs = 3; % number of soft constraints
-
-% Constraint Relationships: 
-%    c1
-%  c2  c3
-% -----------------------------------------
-% three soft constraints c1, c2, c3
-%    c2 less imp than c1,
-%    c3 less imp than c1,  
-
-nCrEdges = 2;
-crEdges = [| 2, 1 | 3, 1 |];
-
-% uses a specific branch-and-bound search to perform optimization
 solve 
-:: seq_search( [
-    % generic soft constraint search heuristic 
-    int_search([satisfied[mostImpFirst[i]] | i in SOFTCONSTRAINTS], 
-               input_order, indomain_max, complete),
-    % problem-specific heuristic
-    int_search([x,y,z], input_order, indomain_max, complete)] )
+:: int_search([x,y,z], input_order, indomain_min, complete)
+search pvs_BAB();
 
-
-search time_limit(3000, strictlyBetterBAB(violatedScs)) /\ 
-       if hasSol() then print() 
-       else print("No solution found\n") endif;
-
-output ["Obj: \(penSum) by violating {\(violatedScs) } : " ++
-        " x -&gt; \(x), y  -&gt; \(y), z -&gt; \(z)"];
+output ["x = \(x); y = \(y); z = \(z)"] ++ 
+       [ "\nValuations:  overall = \(topLevelObjective)\n"];
 </code></pre>
+ to then go on and define our <emph>preference model</emph>
+<pre><code>include "defs.mbr";
 
+PVS: cr1 = new ConstraintPreferences("cr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+solve cr1;
+</code></pre>
 <h2>
 <a id="download-and-installation" class="anchor" href="#download-and-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Download and Installation</h2>
 
 <h3>
-<a id="quickest-start" class="anchor" href="#quickest-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quickest start:</h3>
+<a id="quickest-start" class="anchor" href="#quickest-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Quickest start (only requires MiniBrass and MiniZinc):</h3>
+
 
 <ol>
-<li>Download and install the newest MiniZinc IDE version from <a href="http://www.minizinc.org/">http://www.minizinc.org/</a>
-</li>
+<li>Download and install the newest MiniZinc IDE version from <a href="http://www.minizinc.org/">http://www.minizinc.org/</a></li>
+<li>Download <a href="http://www.isse.uni-augsburg.de/software/minibrass/mbr2mzn.zip">mbr2mzn.jar</a></li>
 <li>Download <a href="http://www.isse.uni-augsburg.de/software/minibrass/soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
 <li>Locate the directory "./share/minizinc/std" of your MiniZinc installation</li>
 <li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
-<li>Run the above code (smallexample_minizinc.mzn in <a href="http://www.isse.uni-augsburg.de/software/minibrass/codeexamples.zip">codeexamples.zip</a>)</li>
+<li>Download and extract the  <a href="http://www.isse.uni-augsburg.de/software/minibrass/codeexamples.zip">code examples</a>
+<li>Compile the preference model by using <code>java -jar mbr2mzn.jar -m smallexample_minizinc.mbr</code></li>
+<li>Run <code>minizinc smallexample_minizinc.mzn </code>: Your output should state 
+<pre>
+x = 1; y = 2; z = 1
+Valuations:  overall = 1
+----------
+==========
+</pre></li>
 </ol>
 
 <h3>
-<a id="slightly-slower-start" class="anchor" href="#slightly-slower-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Slightly slower start:</h3>
+<a id="slightly-slower-start" class="anchor" href="#slightly-slower-start" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Slightly slower start (requires MiniBrass, MiniZinc and MiniSearch):</h3>
 
 <ol>
-<li>Build MiniSearch according to the instructions at <a href="http://www.minizinc.org/minisearch/">MiniSearch</a>
-</li>
-<li>Download <a href="http://www.isse.uni-augsburg.de/software/minibrass/soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
+<li>Build MiniSearch according to the instructions at <a href="http://www.minizinc.org/minisearch/">MiniSearch</a></li>
+<li>Download <a href="http://www.isse.uni-augsburg.de/software/minibrass/mbr2mzn.zip">mbr2mzn.jar</a></li>
+<li>Download <a href="http://www.isse.uni-augsburg.de/software/minibrass/soft_constraints.zip">soft-constraints.zip</a> and unpack it</li>
 <li>Locate the directory "./share/minizinc/std" of your MiniSearch installation</li>
 <li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
-<li>Run the above code (smallexample.mzn in <a href="http://www.isse.uni-augsburg.de/software/minibrass/codeexamples.zip">codeexamples.zip</a>) to see custom search and variable ordering heuristics in action.</li>
+<li>Download and extract the  <a href="http://www.isse.uni-augsburg.de/software/minibrass/codeexamples.zip">code examples</a>
+<li>Compile the preference model by using <code>java -jar mbr2mzn.jar smallexample_minisearch.mbr</code></li>
+<li>Run <code>minisearch smallexample_minisearch.mzn </code>: Your output should state 
+<pre>
+Intermediate solution:x = 1; y = 1; z = 1
+Valuations:  overall = 1..2
+----------
+Intermediate solution:x = 1; y = 1; z = 3
+Valuations:  overall = 1..1
+----------
+Intermediate solution:x = 1; y = 2; z = 1
+Valuations:  overall = 2..2
+----------
+==========
+</pre>
 </ol>
-
 <h3>
 <a id="after-starting" class="anchor" href="#after-starting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>After starting:</h3>
 
