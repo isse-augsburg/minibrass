@@ -377,22 +377,6 @@ Valuations:  overall = 1
 </ol>
 
 Slightly slower start (requires MiniBrass, MiniZinc and MiniSearch):
-<ol>
-<li>Download and install the newest MiniZinc IDE version from <a href="http://www.minizinc.org/">http://www.minizinc.org/</a></li>
-
-<li>Download <a href="soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
-<li>Locate the directory "./share/minizinc/std" of your MiniZinc installation</li>
-<li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
-<li>Download and extract the  <a href="codeexamples.zip">code examples</a>
-<li>Compile the preference model by using <code>java -jar mbr2mzn.jar -m smallexample_minizinc.mbr</code></li>
-<li>Run <code>minizinc smallexample_minizinc.mzn </code>: Your output should state 
-<pre>
-x = 1; y = 2; z = 1
-Valuations:  overall = 1
-----------
-==========
-</pre></li>
-</ol>
 
 <ol>
 <li>Build MiniSearch according to the instructions at <a href="http://www.minizinc.org/minisearch/">MiniSearch</a></li>
@@ -416,12 +400,12 @@ Valuations:  overall = 2..2
 ==========
 </pre>
 </ol>
-
+<!--
 After starting: 
 <ol>
 <li>Have a look at these <a href="Case-Studies.zip">case studies</a>  to get a better idea.</li> 
 </ol>
-
+-->
 <h2>Citing</h2>
 
 If you plan to use constraint relationships in your research, please consider citing
