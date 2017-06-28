@@ -62,7 +62,7 @@ public class ExperimentRunner {
 	private static final boolean ONLY_ONE_CONFIG = false;
 
 	public static void main(String[] args) throws IOException {
-		String propertiesFile = "experiments/experiment.properties";
+		String propertiesFile = "experiments/experiment2.properties";
 		if (args.length > 0) {
 			propertiesFile = args[0];
 		}
@@ -273,13 +273,15 @@ public class ExperimentRunner {
 		if(evalJob.solver == Solver.GECODE_NAT)
 			solverCmd = "";
 		
-		String underlyingCommand = "minisearch "+solverCmd 	+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath();
+		String chocoHack = "-Dchoco="+ (evalJob.solver==Solver.CHOCO);
+		
+		String underlyingCommand = "minisearch "+solverCmd	+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath()  + " " + chocoHack;
 
 		if(evalJob.config.search == SearchType.BAB_NATIVE) { // when using native search, resort to minizinc for the -a flag TODO make numberjack more tolerant regarding that
 			underlyingCommand = "minizinc "+ (evalJob.solver == Solver.NUMBERJACK ? "": "-a") +" -f " + flatzincExecutable + " -G" + minizincGlobals + " "
-					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() ;
+					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath()  + " " + chocoHack;
 			if(evalJob.solver == Solver.NUMBERJACK) { // Numberjack, unfortunately, needs some special treatment
-				underlyingCommand = "mzn_numberjack " + modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() + " -t "+timeOutInSeconds;
+				underlyingCommand = "mzn_numberjack " + modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() + " " + chocoHack + " "+ " -t "+timeOutInSeconds;
 					
 			} 
 		}
