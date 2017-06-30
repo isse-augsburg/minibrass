@@ -62,7 +62,7 @@ public class ExperimentRunner {
 	private static final boolean ONLY_ONE_CONFIG = false;
 
 	public static void main(String[] args) throws IOException {
-		String propertiesFile = "experiments/experiment2.properties";
+		String propertiesFile = "experiments/experiment3.properties";
 		if (args.length > 0) {
 			propertiesFile = args[0];
 		}
@@ -281,7 +281,7 @@ public class ExperimentRunner {
 			underlyingCommand = "minizinc "+ (evalJob.solver == Solver.NUMBERJACK ? "": "-a") +" -f " + flatzincExecutable + " -G" + minizincGlobals + " "
 					+ modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath()  + " " + chocoHack;
 			if(evalJob.solver == Solver.NUMBERJACK) { // Numberjack, unfortunately, needs some special treatment
-				underlyingCommand = "mzn_numberjack " + modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() + " " + chocoHack + " "+ " -t "+timeOutInSeconds;
+				underlyingCommand = "mzn_numberjack2 " + modelFile.getPath() + " " + instanceFile.getPath() + " " + confFile.getPath() + " "+ " -t "+timeOutInSeconds;
 					
 			} 
 		}

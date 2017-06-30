@@ -13,10 +13,10 @@ public class MiniBrassConfig implements Serializable {
 	public Boolean mostImportantFirst;
 
 	// if I chose BAB_NON_DOM, I (currently) can't use SPD!
-	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT", "LNS", "BAB_NATIVE"})
+	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT","BAB_WEIGHTED", "LNS", "BAB_NATIVE"})
 	public Boolean useSPD;
 	
-	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT", "LNS"})
+	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"BAB_STRICT","BAB_WEIGHTED", "LNS"})
 	public Boolean propagateRedundant; 
 	
 	@DependsOn(parameter="search",enumClass={SearchType.class}, allowedValues={"LNS"})
