@@ -29,3 +29,11 @@ CREATE TABLE IF NOT EXISTS JobResult
     FOREIGN KEY(ConfigId) REFERENCES Config(ID),
     FOREIGN KEY(SolverId) REFERENCES Solver(ID)
 ) ;
+
+CREATE TABLE IF NOT EXISTS ProblemInformation
+   (
+    Problem        VARCHAR(100)     NOT NULL,  
+    Instance       VARCHAR(100)  NOT NULL,  
+    MaxObjectiveSpd   INTEGER       NOT NULL,
+    MaxObjectiveTpd   INTEGER       NOT NULL
+) ;
