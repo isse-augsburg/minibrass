@@ -4,14 +4,14 @@ Create View If not Exists PvsData as
 SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
 JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
 INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 0 and SearchType = 1 and Solved = 1
+where SPD = 1 and MIF = 1 and SearchType = 1 and Solved = 1
 order by problem, instance, elapsedSecs, solverId ;
 
 Create View If not Exists NativeData as 
 SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
 JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
 INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 0 and SearchType = 3 
+where SPD = 1 and MIF = 1 and SearchType = 3 
 order by problem, instance, elapsedSecs, solverId ;
 
 Create View If not Exists PvsNativeSummary as 
@@ -24,6 +24,7 @@ where pd.Problem = nd.Problem and
 	  pd.SolverId = nd.SolverId
 order by pd.problem, pd.instance, pd.solverName;
 
-Select Problem,
+Select Problem, SolverName,
  AVG(AbsOverhead), AVG(RelOverhead) 
-FROM PvsNativeSummary WHERE Problem != "soft-queens"
+FROM PvsNativeSummary
+GROUP By Problem,SolverName

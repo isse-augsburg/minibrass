@@ -21,12 +21,10 @@ Select pd.Problem, pd.Instance, pd.SolverName, pd.elapsedSecs as "Smyth-Elapsed"
 from PvsData pd, NativeData nd
 where pd.Problem = nd.Problem and 
       pd.Instance = nd.Instance and 
-	  pd.SolverId = nd.SolverId and
-	  pd.Problem != "soft-queens"
+	  pd.SolverId = nd.SolverId
 order by pd.problem, pd.instance, pd.solverName;
 
-Select Problem,SolverName,
+Select Problem,
  AVG(AbsOverhead), AVG(RelOverhead) 
 FROM PvsNativeSummary 
--- where SolverName != "GECODE"
-GROUP BY Problem, SolverName
+Group By Problem
