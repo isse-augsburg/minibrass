@@ -4,7 +4,7 @@ Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiv
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("talent-scheduling", "film117.dzn", 36, 198);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("talent-scheduling", "MobStory.dzn", 36, 198);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("talent-scheduling", "concert.dzn", 22, 102);
-Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("talent-scheduling", "small.dzn", 15);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("talent-scheduling", "small.dzn", 15, 51);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("photo", "photo1.dzn", 38, 268);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("photo", "photo2.dzn", 53, 1167);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("photo", "photo3.dzn", 55, 1169);
@@ -19,3 +19,10 @@ Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiv
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("mspsp", "hard_02.dzn", 29, 166);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("mspsp", "hard_03.dzn", 38, 177);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("mspsp", "hard_04.dzn", 25, 141);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "4s-10d.dzn", 37, 70);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "4s-23d.dzn", 117, 442);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "5s-30d.dzn", 115, 500);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "6s-35d.dzn", 133, 584);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "8s-40d.dzn", 197, 762);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "10s-50d.dzn", 245, 954);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES ("on-call-rostering", "10s-50d2.dzn", 191, 1135);
