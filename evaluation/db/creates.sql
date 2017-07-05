@@ -35,5 +35,6 @@ CREATE TABLE IF NOT EXISTS ProblemInformation
     Problem        VARCHAR(100)     NOT NULL,  
     Instance       VARCHAR(100)  NOT NULL,  
     MaxObjectiveSpd   INTEGER       NOT NULL,
-    MaxObjectiveTpd   INTEGER       NOT NULL
+    MaxObjectiveTpd   INTEGER       NOT NULL,
+    PRIMARY KEY(Problem,Instance)
 ) ;

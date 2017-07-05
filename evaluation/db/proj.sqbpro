@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/alexander/Documents/Projects/git-new/Minizinc/minibrass/evaluation/db/results.db"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1290"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="Config"/><default_encoding codec=""/><browsetable_info data="AAAAAQAAAAwAQwBvAG4AZgBpAGcAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////"/></tab_browse><tab_sql><sql name="instanceCount.sql">SELECT Instance FROM PvsData Group By Instance</sql><sql name="query-native-vs-strictbab-overhead.sql">Drop View PvsData; Drop View NativeData; Drop View PvsNativeSummary;
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/alexander/Documents/Projects/git-new/Minizinc/minibrass/evaluation/db/results.db"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1290"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="Config"/><default_encoding codec=""/><browsetable_info data="AAAAAgAAACQAUAByAG8AYgBsAGUAbQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAADABDAG8AbgBmAGkAZwAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8="/></tab_browse><tab_sql><sql name="instanceCount.sql">SELECT Instance FROM PvsData Group By Instance</sql><sql name="query-native-vs-strictbab-overhead.sql">Drop View PvsData; Drop View NativeData; Drop View PvsNativeSummary;
 
 Create View If not Exists PvsData as 
 SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
@@ -27,34 +27,7 @@ order by pd.problem, pd.instance, pd.solverName;
 Select Problem, SolverName,
  AVG(AbsOverhead), AVG(RelOverhead) 
 FROM PvsNativeSummary
-GROUP By Problem,SolverName</sql><sql name="query-native-solver-comparison_spd-tpd.sql">
-Drop View NativeDataCompSpd; Drop View NativeDataCompTpd; Drop View NativeSpd; Drop View NativeTpd;
-
-Create View If not Exists NativeDataCompSpd as 
-SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, solved FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0
-order by problem, instance, objective asc, elapsedSecs, solverId ;
-
-Create View If not Exists NativeDataCompTpd as 
-SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, solved FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 0 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0
-order by problem, instance, objective asc, elapsedSecs, solverId ;
-
-CREATE VIEW IF not Exists NativeSpd as 
-SELECT problem, instance, solverName, solverId, elapsedSecs, Objective, Optimally, Solved FROM NativeDataCompSpd;
-
-CREATE VIEW IF not Exists NativeTpd as 
-SELECT problem, instance, solverName, solverId, elapsedSecs as elapsedSecsTpd, Objective as ObjectiveTpd, Optimally as OptimallyTPD, Solved as SolvedTPD FROM NativeDataCompTpd;
-
-Select nspd.problem, nspd.instance, nspd.solvername, elapsedSecs as elapsedSecsSpd, Objective as ObjectiveSpd, Optimally as OptimallySpd, Solved as SolvedSpd, 
-       elapsedSecsTpd, objectiveTpd, solvedTpd
-From
-NativeSpd nspd, NativeTpd ntpd
-Where nspd.problem = ntpd.problem and nspd.instance = ntpd.instance and nspd.solverId = ntpd.solverId;</sql><sql name="query-native-solver-comparison.sql">
+GROUP By Problem,SolverName</sql><sql name="query-native-solver-comparison.sql">
 Drop View NativeDataComp;
 Create View If not Exists NativeDataComp as 
 SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, solved FROM 
@@ -65,4 +38,85 @@ order by problem, instance, objective asc, elapsedSecs, solverId ;
 
 Select problem, solverId, SolverName, AVG(elapsedSecs), AVG(Objective), AVG(solved) From NativeDataComp
 Group By problem, solverId, SolverName
-Order by problem, AVG(elapsedSecs), AVG(objective)</sql><current_tab id="3"/></tab_sql></sqlb_project>
+Order by problem, AVG(elapsedSecs), AVG(objective)</sql><sql name="insertsProblemInformation.sql">Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film103.dzn&quot;, 36, 198);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film105.dzn&quot;, 36, 198);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film114.dzn&quot;, 36, 198);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film117.dzn&quot;, 36, 198);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;MobStory.dzn&quot;, 36, 198);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;concert.dzn&quot;, 22, 102);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;small.dzn&quot;, 15, 51);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;photo&quot;, &quot;photo1.dzn&quot;, 38, 268);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;photo&quot;, &quot;photo2.dzn&quot;, 53, 1167);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;photo&quot;, &quot;photo3.dzn&quot;, 55, 1169);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;soft-queens&quot;, &quot;soft-queens-8.dzn&quot;, 4, 5);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;soft-queens&quot;, &quot;soft-queens-16.dzn&quot;, 4, 5);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;soft-queens&quot;, &quot;soft-queens-30.dzn&quot;, 4, 5);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;easy_01.dzn&quot;, 29, 166);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;easy_04.dzn&quot;, 29, 166);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;medium_01.dzn&quot;, 27, 166);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;medium_02.dzn&quot;, 27, 166);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;medium_04.dzn&quot;, 29, 166);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;hard_02.dzn&quot;, 29, 166);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;hard_03.dzn&quot;, 38, 177);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;mspsp&quot;, &quot;hard_04.dzn&quot;, 25, 141);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;4s-10d.dzn&quot;, 37, 70);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;4s-23d.dzn&quot;, 117, 442);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;5s-30d.dzn&quot;, 115, 500);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;6s-35d.dzn&quot;, 133, 584);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;8s-40d.dzn&quot;, 197, 762);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;10s-50d.dzn&quot;, 245, 954);
+Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;10s-50d2.dzn&quot;, 191, 1135);
+</sql><sql name="SQL 9">SELECT jr.problem, jr.instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, case when solved then Objective else pi.MaxObjectiveSpd end as &quot;Objective&quot;, Optimally, cf.ID as ConfigId, solved FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID INNER JOIN ProblemInformation pi on (jr.Problem = pi.Problem and jr.Instance = pi.Instance) 
+where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0 and SolverId != 6
+order by jr.problem, jr.instance, objective asc, elapsedSecs, solverId</sql><sql name="creates.sql">CREATE TABLE IF NOT EXISTS Config 
+( ID INTEGER PRIMARY KEY,
+  Timeout        INTEGER     NOT NULL,
+  SearchType     INTEGER     NOT NULL,
+  SPD            BOOLEAN     NOT NULL,   
+  MIF            BOOLEAN     NOT NULL, 
+  PropRed        BOOLEAN     NOT NULL,
+  LnsProb        REAL ,
+  LnsIter        INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS Solver 
+( ID INTEGER PRIMARY KEY,
+  SolverName     VARCHAR(100)     NOT NULL
+);
+
+
+CREATE TABLE IF NOT EXISTS JobResult
+   ( ID INTEGER PRIMARY KEY AUTOINCREMENT,
+     Problem        VARCHAR(100)     NOT NULL,  
+    Instance       VARCHAR(100)  NOT NULL,  
+    SolverId       INTEGER NOT NULL,
+    ConfigId       INTEGER NOT NULL,
+    Solved         BOOLEAN  NOT NULL, 
+    Optimally      BOOLEAN  NOT NULL, 
+    Objective      INTEGER  NOT NULL, 
+    NoSolutions    INTEGER  NOT NULL, 
+    ElapsedSecs    REAL  NOT NULL,
+    FOREIGN KEY(ConfigId) REFERENCES Config(ID),
+    FOREIGN KEY(SolverId) REFERENCES Solver(ID)
+) ;
+
+CREATE TABLE IF NOT EXISTS ProblemInformation
+   (
+    Problem        VARCHAR(100)     NOT NULL,  
+    Instance       VARCHAR(100)  NOT NULL,  
+    MaxObjectiveSpd   INTEGER       NOT NULL,
+    MaxObjectiveTpd   INTEGER       NOT NULL,
+    PRIMARY KEY(Problem,Instance)
+) ;
+</sql><sql name="query-native-solver-comparison-pure.sql">-- Explicitly ignores native Gecode since there is absolutely no difference with the Weighted MiniZinc Model
+
+Select problem, solverId, SolverName, round(AVG(elapsedSecs),2) as &quot;ElapsedSecs&quot;, round(AVG(Objective),2) as &quot;Objective&quot;, round(AVG(solved),2) as &quot;Solved&quot; From
+( SELECT jr.problem, jr.instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, case when solved then Objective else pi.MaxObjectiveSpd end as &quot;Objective&quot;, Optimally, cf.ID as ConfigId, solved FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID INNER JOIN ProblemInformation pi on (jr.Problem = pi.Problem and jr.Instance = pi.Instance) 
+where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0 and SolverId != 6
+order by jr.problem, jr.instance, objective asc, elapsedSecs, solverId)
+Group By problem, solverId, SolverName
+Order by problem, AVG(elapsedSecs), AVG(objective)</sql><current_tab id="6"/></tab_sql></sqlb_project>

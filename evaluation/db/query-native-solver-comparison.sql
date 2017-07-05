@@ -7,5 +7,6 @@ INNER JOIN Solver sv ON jr.SolverId = sv.ID
 where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0
 order by problem, instance, objective asc, elapsedSecs, solverId ;
 
-Select problem, solverId, SolverName, elapsedSecs, case when solved then Objective else -1 end, solved From NativeDataComp
-Order by problem, elapsedSecs, objective
+Select problem, solverId, SolverName, AVG(elapsedSecs), AVG(Objective), AVG(solved) From NativeDataComp
+Group By problem, solverId, SolverName
+Order by problem, AVG(elapsedSecs), AVG(objective)
