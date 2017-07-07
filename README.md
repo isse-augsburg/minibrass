@@ -74,6 +74,13 @@ MiniBrass is based on these open source projects:
 * **source-code/kiv** contains PVS-related proofs in the KIV theorem prover
 * **example-problems** shows problems referred to in the documentation
 
+### Test cases
+
+To be able to run the test cases from Eclipse, make sure to start it in interactive mode 
+```
+bash -ic ./eclipse
+```
+
 ### Todos
 
 
