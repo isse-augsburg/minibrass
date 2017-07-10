@@ -59,7 +59,7 @@ PVS: cr1 = new ConstraintPreferences("cr1") {
 solve cr1;
 ```
 
-For a *user-centered* perspective, please refer to our [main page](http://isse-augsburg.github.io/constraint-relationships/).
+For a *user-centered* perspective, please refer to our [main page](http://isse-augsburg.github.io/minibrass/).
 
 ### Tech
 
