@@ -1,0 +1,3 @@
+mostImportantFirst = false;
+propagateWeights = false;
+timeLimitMs = 600000;
