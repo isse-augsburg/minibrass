@@ -9,10 +9,10 @@
 % First, we need an identifier for all elements
 % in our underlying set |P| (called "P" here) 
 
-int: maxP = 2;
+int: maxP = 3;
 set of int: P = 1..maxP;
 include "soft_constraints/cr_consistency.mzn";
-array[int, 1..2] of P : pOrderRelation = transClosure(P,[| 2, 1 |]); 
+array[int, 1..2] of P : pOrderRelation = transClosure(P,[| 3,1 | 3, 2 |]); 
 
 % This is just a preparation for the case when we have
 % a number of soft constraints -- each mapping to
@@ -41,8 +41,8 @@ predicate isSmythWorseOrEqual (
   int: le = min(index_set_1of2(edges));
   int: ue = max(index_set_1of2(edges));
 
-  array[P] of set of P: lessThans = 
-    [ {p | p in P where exists(e in le..ue) 
+  array[P] of set of P: lessThanOrEquals = 
+    [ {q} union {p | p in P where exists(e in le..ue) 
          (edges[e,1] = p /\ edges[e,2] = q)} |  q in P];
 
   % the two components of the witness function
@@ -68,7 +68,7 @@ predicate isSmythWorseOrEqual (
   % p = witnessElem[l,q]
   (
     % p must not be 0      and p must be leq than q    
-    witnessElem[j,q] != 0 /\ witnessElem[j,q] in lessThans[q] /\ 
+    witnessElem[j,q] != 0 /\ witnessElem[j,q] in lessThanOrEquals[q] /\ 
     % k must be between 1 and the actual number of p-occurrences in T
     witnessOcc[j,q] >= 1 /\ witnessOcc[j,q] <= T[witnessElem[j,q]]
   );
