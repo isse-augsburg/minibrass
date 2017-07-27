@@ -1,0 +1,22 @@
+type FreePVS = PVSType<mset of 1..maxP> = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges;
+    int: maxP;
+  } in 
+  instantiates with "free_pvs_type.mzn" {
+    times -> multiset_union;
+    is_worse -> isSmythWorse;
+    top -> {};
+  };
+    
+
+PVS: cr1 = new FreePVS("cr1") {
+   soft-constraint c1: 'if x + 1 = y then [0,0,0] else [1,0,0] endif';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+solve cr1;
