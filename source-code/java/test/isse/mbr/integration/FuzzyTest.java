@@ -19,7 +19,7 @@ public class FuzzyTest {
 	String minizincModel = "test-models/fuzzy.mzn";
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
-	
+	 
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler();

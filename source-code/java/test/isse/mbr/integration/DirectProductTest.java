@@ -17,7 +17,7 @@ import isse.mbr.parsing.MiniBrassParseException;
  * @author Alexander Schiendorfer
  *
  */
-public class DirectProductTest {
+public class DirectProductTest { 
 
 	String minibrassModel = "test-models/testMin.mbr";
 	String minibrassTwoPVSModel = "test-models/testMinTwo.mbr";

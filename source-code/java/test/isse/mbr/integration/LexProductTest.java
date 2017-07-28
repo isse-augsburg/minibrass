@@ -23,7 +23,7 @@ public class LexProductTest {
 	String minibrassLexInvModel = "test-models/testLexInv.mbr";
 	String minibrassCompiled = "test-models/testLex_o.mzn";
 	String minizincLexModel = "test-models/testLex.mzn";
-	private MiniBrassCompiler compiler;
+	private MiniBrassCompiler compiler; 
 	private MiniZincLauncher launcher;
 	
 	@Before

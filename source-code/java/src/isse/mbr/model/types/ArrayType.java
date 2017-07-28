@@ -10,9 +10,9 @@ import isse.mbr.model.parsetree.PVSInstance;
  * @author Alexander Schiendorfer
  *
  */
-public class ArrayType implements MiniZincParType {
+public class ArrayType implements MiniZincArrayLike {
 
-	private MiniZincVarType type;
+	private MiniZincVarType elementType;
 	private List<PrimitiveType> indexSets;
 	private List<MiniZincVarType> pendingIndexTypes;
 	
@@ -22,14 +22,14 @@ public class ArrayType implements MiniZincParType {
 	
 	public ArrayType(MiniZincVarType type, List<PrimitiveType> indexSets) {
 		super();
-		this.type = type;
+		this.elementType = type;
 		this.indexSets = indexSets;
 	}
-	public MiniZincVarType getType() {
-		return type;
+	public MiniZincVarType getElementType() {
+		return elementType;
 	}
-	public void setType(MiniZincVarType type) {
-		this.type = type;
+	public void setElementType(MiniZincVarType type) {
+		this.elementType = type;
 	}
 	public List<PrimitiveType> getIndexSets() {
 		return indexSets;
@@ -50,7 +50,7 @@ public class ArrayType implements MiniZincParType {
 			arrayBuilder.append(indexType.toMzn(instance));
 		}
 		arrayBuilder.append("] of ");
-		arrayBuilder.append(type.toMzn(instance));
+		arrayBuilder.append(elementType.toMzn(instance));
 		return arrayBuilder.toString();
 	}
 
@@ -60,6 +60,11 @@ public class ArrayType implements MiniZincParType {
 
 	public List<MiniZincVarType> getPendingIndexTypes() {
 		return pendingIndexTypes;
+	}
+
+	@Override
+	public ArrayType getArrayType() {
+		return this;
 	} 
 	
 }

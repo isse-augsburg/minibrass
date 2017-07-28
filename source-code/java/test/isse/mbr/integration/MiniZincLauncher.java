@@ -22,6 +22,7 @@ public class MiniZincLauncher {
 	private String flatzincExecutable = "fzn-gecode";
 	private String minizincGlobals = "gecode";  
 	private boolean useDefault = false; // passing no arguments to minizinc/minisearch
+	private boolean debug = false;
 	
 	private final static Logger LOGGER = Logger.getGlobal();
 	
@@ -141,7 +142,8 @@ public class MiniZincLauncher {
 			while (sc.hasNextLine()) {
 				String line = sc.nextLine();
 				boolean broadcast = true;	
-				//System.out.println(line);
+				if(debug)
+					System.out.println(line);
 
 				if (line.contains(optimalitySep)) {
 					// System.out.println("Solved optimally!");
@@ -215,6 +217,14 @@ public class MiniZincLauncher {
 
 	public void setUseDefault(boolean useDefault) {
 		this.useDefault = useDefault;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 }
