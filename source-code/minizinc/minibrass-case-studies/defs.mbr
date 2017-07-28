@@ -38,7 +38,7 @@ type WeightedCsp = PVSType<bool, 0..k> =
 
 morph ConstraintRelationships -> WeightedCsp: ToWeighted = 
   params {
-    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i]) ';
+    k = 'mbr.nScs * max(i in 1..mbr.nScs) (mbr.weights[i])';
     weights = calculate_cr_weights;
   } in id; % the "in" values denotes the function that is applied to each soft constraint (here just identity)
    

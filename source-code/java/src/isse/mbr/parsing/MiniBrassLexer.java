@@ -190,6 +190,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.WithSy;
 				case "set":
 					return MiniBrassSymbol.SetSy;
+				case "mset":
+					return MiniBrassSymbol.MSetSy;
 				case "array":
 					return MiniBrassSymbol.ArraySy;
 				case "of":

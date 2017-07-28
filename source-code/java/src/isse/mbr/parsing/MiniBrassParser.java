@@ -32,6 +32,7 @@ import isse.mbr.model.types.IntType;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.MiniZincVarType;
+import isse.mbr.model.types.MultiSetType;
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PVSParameter;
@@ -537,7 +538,7 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.LeftAngleSy);		
 		
 		// TODO support arrays here
-		MiniZincVarType specType = MiniZincVarType(newType);
+		MiniZincParType specType = MiniZincParType(newType);
 		MiniZincParType elementType = specType;
 		
 		LOGGER.fine("Specification type: "+elementType);
@@ -652,7 +653,7 @@ public class MiniBrassParser {
 			semChecker.scheduleArrayTypeCheck(arrayType, arrayType.getPendingIndexTypes(), name);
 			
 			// dependency checks 
-			semChecker.scheduleTypeDependencyCheck(scopeType, name, arrayType.getType());
+			semChecker.scheduleTypeDependencyCheck(scopeType, name, arrayType.getElementType());
 			for(MiniZincVarType pendingVarType : arrayType.getPendingIndexTypes()) {
 				semChecker.scheduleTypeDependencyCheck(scopeType, name, pendingVarType);
 			}
@@ -757,7 +758,7 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.OfSy);
 		MiniZincVarType varType = MiniZincVarType(scopeType);
 		
-		arrayType.setType(varType);
+		arrayType.setElementType(varType);
 		arrayType.setPendingIndexTypes(pendingIndexTypes);
 		return arrayType;
 	}
@@ -828,12 +829,21 @@ public class MiniBrassParser {
 			semChecker.scheduleArrayTypeCheck(arrayType, arrayType.getPendingIndexTypes(), scopeType.getName());
 			
 			// dependency checks 
-			semChecker.scheduleTypeDependencyCheck(scopeType, scopeType.getName(), arrayType.getType());
+			semChecker.scheduleTypeDependencyCheck(scopeType, scopeType.getName(), arrayType.getElementType());
 			for(MiniZincVarType pendingVarType : arrayType.getPendingIndexTypes()) {
 				semChecker.scheduleTypeDependencyCheck(scopeType, scopeType.getName(), pendingVarType);
 			}
 
 			return arrayType;
+		} else if (currSy == MiniBrassSymbol.MSetSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
+			NumericValue maxMultiplicity = getNumericExpr(scopeType);
+			expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
+			expectSymbol(MiniBrassSymbol.OfSy);
+			getNextSy();
+			PrimitiveType pt = primType(scopeType);
+			return new MultiSetType(maxMultiplicity, pt);
 		}
 		else {
 			return MiniZincVarType(scopeType);
@@ -851,7 +861,8 @@ public class MiniBrassParser {
 			getNextSy();
 			PrimitiveType pt = primType(scopeType);
 			return new SetType(pt);
-		} else {
+		} 
+		else {
 			return primType(scopeType);
 		}
 	}

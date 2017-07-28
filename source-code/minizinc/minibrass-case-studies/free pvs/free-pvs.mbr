@@ -1,7 +1,8 @@
-type FreePVS = PVSType<mset of 1..maxP> = 
+type FreePVS = PVSType<mset[maxPerSc] of 1..maxP> = 
   params { 
     array[int, 1..2] of 1..nScs: crEdges;
     int: maxP;
+    int: maxPerSc;
   } in 
   instantiates with "free_pvs_type.mzn" {
     times -> multiset_union;
@@ -15,8 +16,9 @@ PVS: cr1 = new FreePVS("cr1") {
    soft-constraint c2: 'z = y + 2';
    soft-constraint c3: 'x + y <= 3';
    
-   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
-   useSPD: 'false' ;
+   crEdges : '[| 2, 1 | 3, 1 |]';
+   maxP: '3' ;
+   maxPerSc : '2';
 }; 
 
 solve cr1;
