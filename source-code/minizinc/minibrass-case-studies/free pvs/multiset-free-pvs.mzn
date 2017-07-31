@@ -28,9 +28,17 @@ constraint forall(p in P, l in PosOCCS where l <= U[p]) (
   witnessElem[l,p] in P /\ witnessElem[l,p] <= p /\ witnessOcc[l,p] >= 1 /\ witnessOcc[l,p] <= T[witnessElem[l,p]]
 );
 
-constraint forall(p,p1 in P, l,l1 in PosOCCS where l <= U[p] /\ l1 <= U[p1]) ( 
-  witnessElem[l,p] = witnessElem[l1,p1] /\ witnessOcc[l,p] = witnessOcc[l1,p1] -> l = l1 /\ p = p1 
-); 
+array[OCCS,P] of var int: cantoredWitness;
+constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p]*maxP + witnessElem[i,p]);
+include "alldifferent_except_0.mzn";
+constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);  
+
+%constraint forall(p,p1 in P, l,l1 in PosOCCS where l <= U[p] /\ l1 <= U[p1]) ( 
+%  witnessElem[l,p] = witnessElem[l1,p1] /\ witnessOcc[l,p] = witnessOcc[l1,p1] -> l = l1 /\ p = p1 
+%); 
+
+constraint T = [1, 0];
+constraint U = [2, 1]; 
 %predicate isWorse(array[int] of var int: T,
 %                  array[int] of var int: U) = let {
 
@@ -45,5 +53,5 @@ output ["T = \(T) \n" ++
         "Witness = \n"] ++
        [  "g(\(l), \(p)) |-> (\(witnessOcc[l,p]), \(witnessElem[l,p]))\n"
        | p in P, l in OCCS 
- ];
+ ] ++ ["Cantored: \([cantoredWitness[i,p] | i in OCCS, p in P])\n"];
 solve satisfy;
