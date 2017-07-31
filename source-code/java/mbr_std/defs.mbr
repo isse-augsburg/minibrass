@@ -1,6 +1,19 @@
 % ========================================
 % PVS Types
 % ========================================
+type FreePVS = PVSType<mset[maxOccurrences] of 1..maxP> = 
+  params { 
+    array[int, 1..2] of 1..nScs: partialOrdering  :: wrappedBy('java', 'isse.mbr.extensions.preprocessing.TransitiveClosure');
+    int: maxP;
+    int: maxPerSc;
+    int: maxOccurrences :: default('mbr.nScs * mbr.maxPerSc');
+  } in 
+  instantiates with "soft_constraints/mbr_types/free-pvs-type.mzn" {
+    times -> multiset_union;
+    is_worse -> isSmythWorse;
+    top -> {};
+};
+
 type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
   params { 
     array[int, 1..2] of 1..nScs: crEdges :: wrappedBy('java', 'isse.mbr.extensions.preprocessing.TransitiveClosure');
@@ -14,8 +27,7 @@ type ConstraintPreferences = PVSType<bool, set of 1..nScs> =
   offers {
     heuristics -> getSearchHeuristicCR;
   };
- 
-%     
+          
     
 type CostFunctionNetwork = PVSType<0..k> = 
   params {
