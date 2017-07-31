@@ -47,11 +47,11 @@ predicate isSmythWorseOrEqual (
   % assume h(j,q) = (i,p):
   array[OCCS,P] of var P0: witnessElem;   % witnessElem[j,q] = p 
   array[OCCS,P] of var OCCS: witnessOcc;  % witnessOcc[j,q] = it
-  %array[OCCS,P] of var 0 .. maxP + (maxOccPerSc * nScs+maxP)*(maxOccPerSc * nScs+maxP+1) div 2: cantoredWitness;
-  array[OCCS,P] of var int: cantoredWitness;
-  constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p]*maxP + witnessElem[i,p]);
+  array[OCCS,P] of var 0 .. maxP + (maxOccPerSc * nScs+maxP)*(maxOccPerSc * nScs+maxP+1) div 2: cantoredWitness;
+  %array[OCCS,P] of var int: cantoredWitness;
+  %constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p]*maxP + witnessElem[i,p]);
 
-  %constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = p + (i+p)*(i+p+1) / 2); 
+  constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p] + (witnessElem[i,p]+witnessOcc[i,p])*(witnessElem[i,p]+witnessOcc[i,p]+1) / 2); 
   % injectivity (respecting partiality of the witness)
   constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);  
   
