@@ -1,3 +1,5 @@
+include "alldifferent_except_0.mzn";
+
 predicate isSmythWorse (
               array[int] of var int: T,
               array[int] of var int: U,
@@ -8,7 +10,8 @@ predicate isSmythWorse (
               int: maxOccurrences
           ) = let {
   set of int: P = 1..maxP;
-  set of int: OCCS = 0..maxPerSc*maxOccurrences;
+  par int: maxOcc = maxPerSc*maxOccurrences;
+  set of int: OCCS = 0..maxOcc;
   set of int: PosOCCS = OCCS diff {0};
 
   int: le = min(index_set_1of2(edges));
@@ -27,7 +30,7 @@ predicate isSmythWorse (
   % assume h(j,q) = (i,p):
   array[OCCS,P] of var P0: witnessElem;   % witnessElem[j,q] = p 
   array[OCCS,P] of var OCCS: witnessOcc;  % witnessOcc[j,q] = it
-
+  
   % First, we make sure all (j,q) tuples for occurrences j greater than the 
   % actual number of q elements in U map to non-existence
   constraint forall(q in P, j in OCCS where j > U[q]) ( 
@@ -46,10 +49,19 @@ predicate isSmythWorse (
     witnessOcc[j,q] >= 1 /\ witnessOcc[j,q] <= T[witnessElem[j,q]]
   );
 
-  % lastly, we have to assert injectivity of our witness -- only with a decomposition and no global
-  constraint forall(q,q1 in P, j,j1 in PosOCCS where j <= U[q] /\ j1 <= U[q1]) ( 
-    witnessElem[j,q] = witnessElem[j1,q1] /\ witnessOcc[j,q] = witnessOcc[j1,q1] -> j = j1 /\ q = q1 
-  );
+  % lastly, we have to assert injectivity of our witness 
+  % literally, we would want that: 
+
+  %constraint forall(q,q1 in P, j,j1 in PosOCCS where j <= U[q] /\ j1 <= U[q1]) ( 
+  %  witnessElem[j,q] = witnessElem[j1,q1] /\ witnessOcc[j,q] = witnessOcc[j1,q1] -> j = j1 /\ q = q1 
+  %);
+
+  % but that leads to a large decomposition, so we cantorize our 2D witness to 1D and 
+  % use alldifferent
+  array[OCCS,P] of var 0..maxOcc*maxP + maxP: cantoredWitness;
+  constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p]*maxP + witnessElem[i,p]);
+  
+  constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);  
   
   % make sure we have inequality
   constraint exists(i in P) (T[i] != U[i]);

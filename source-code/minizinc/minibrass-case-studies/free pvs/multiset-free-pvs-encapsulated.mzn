@@ -24,6 +24,8 @@ int: maxOccPerSc = 1; % sets a finite upper bound for every individual soft cons
 set of int: OCCS = 0 .. maxOccPerSc * nScs; % each value can be voted for at most maxPerSc * nScs times, if every soft constraint gets to offer a multiset
 set of int: PosOCCS = OCCS diff {0}; % useful for the definition of our witness
 
+include "alldifferent_except_0.mzn";
+
 %% =================================
 %% The overall gradings T and U 
 %% are encoded multisets over P
@@ -44,6 +46,13 @@ predicate isSmythWorseOrEqual (
   % assume h(j,q) = (i,p):
   array[OCCS,P] of var P0: witnessElem;   % witnessElem[j,q] = p 
   array[OCCS,P] of var OCCS: witnessOcc;  % witnessOcc[j,q] = it
+  %array[OCCS,P] of var 0 .. maxP + (maxOccPerSc * nScs+maxP)*(maxOccPerSc * nScs+maxP+1) div 2: cantoredWitness;
+  array[OCCS,P] of var int: cantoredWitness;
+  constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p]*maxP + witnessElem[i,p]);
+
+  %constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = p + (i+p)*(i+p+1) / 2); 
+  % injectivity (respecting partiality of the witness)
+  constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);  
 
   % First, we make sure all (j,q) tuples for occurrences j greater than the 
   % actual number of q elements in U map to non-existence
@@ -64,9 +73,9 @@ predicate isSmythWorseOrEqual (
   );
 
   % lastly, we have to assert injectivity of our witness -- only with a decomposition and no global
-  constraint forall(q,q1 in P, j,j1 in PosOCCS where j <= U[q] /\ j1 <= U[q1]) ( 
-    witnessElem[j,q] = witnessElem[j1,q1] /\ witnessOcc[j,q] = witnessOcc[j1,q1] -> j = j1 /\ q = q1 
-);
+  %constraint forall(q,q1 in P, j,j1 in PosOCCS where j <= U[q] /\ j1 <= U[q1]) ( 
+   % witnessElem[j,q] = witnessElem[j1,q1] /\ witnessOcc[j,q] = witnessOcc[j1,q1] -> j = j1 /\ q = q1 
+  %);
 } in (
   true
 ); 
