@@ -29,10 +29,11 @@ public class FreePVSMultiSetTest {
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
+		
 	}
 	
 	@Test
-	public void testDom() throws IOException, MiniBrassParseException {
+	public void testFreePvs() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -51,8 +52,17 @@ public class FreePVSMultiSetTest {
 		
 		// for the objective, we observe the sequence {{3,3}}, {{3}}, {{1}}
 		String obj = "topLevelObjective";
-		Assert.assertEquals("3..3", listener.getObjectives().get(obj));
-		Assert.assertEquals(2, listener.getSolutionCounter());
+		String[] expecteds = new String[] {"[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]" };
+
+		// 3 "actual" solutions and one optimality notification
+		Assert.assertEquals(4, listener.getSolutionCounter());
+		int index = 0;
+		for(String expected : expecteds) {
+			String actual =	 listener.getObjectiveSequences().get(obj).get(index);
+			Assert.assertEquals(expected, actual);
+			++index;
+		}
+
 		
 	}
 

@@ -25,6 +25,7 @@ set of int: OCCS = 0 .. maxOccPerSc * nScs; % each value can be voted for at mos
 set of int: PosOCCS = OCCS diff {0}; % useful for the definition of our witness
 
 include "alldifferent_except_0.mzn";
+include "value_precede_chain.mzn"; % for some symmetry breaking 
 
 %% =================================
 %% The overall gradings T and U 
@@ -53,7 +54,8 @@ predicate isSmythWorseOrEqual (
   %constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = p + (i+p)*(i+p+1) / 2); 
   % injectivity (respecting partiality of the witness)
   constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);  
-
+  
+  constraint value_precede_chain(OCCS, [witnessOcc[i,p] | i in OCCS, p in P]);
   % First, we make sure all (j,q) tuples for occurrences j greater than the 
   % actual number of q elements in U map to non-existence
   constraint forall(q in P, j in OCCS where j > U[q]) ( 

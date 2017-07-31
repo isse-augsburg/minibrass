@@ -1,4 +1,5 @@
 include "alldifferent_except_0.mzn";
+include "value_precede_chain.mzn"; % for some symmetry breaking 
 
 predicate isSmythWorse (
               array[int] of var int: T,
@@ -62,7 +63,9 @@ predicate isSmythWorse (
   constraint forall(i in OCCS, p in P) (cantoredWitness[i,p] = witnessOcc[i,p]*maxP + witnessElem[i,p]);
   
   constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);  
-  
+  % a bit of symmetry breaking
+ %constraint value_precede_chain(OCCS, [witnessOcc[i,p] | i in OCCS, p in P]);
+
   % make sure we have inequality
   constraint exists(i in P) (T[i] != U[i]);
 } in (
