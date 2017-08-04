@@ -3,19 +3,105 @@
 \end{frame}
 
 \begin{frame}{Evaluation-Probleme}
+Originalprobleme aus der \emph{MiniZinc-Benchmark-Library}; versehen um zusätzliche Soft Constraints als Constraint Preferences
+
+\vspace*{1ex}
+
 \begin{description}
-\item[\textbf{Soft N-Queens}] is a toy SCSP that adds three artificial soft constraints with a preference relation over them to a classical $N$-queens problem~(such as, e.g., having a queen in the center of the grid), not to be mistaken with the $M$-queens optimization problem.
-\item[\textbf{Photo Placement}] asks to put in place people close to their friends -- in its original version it was already designed to handle preferences but we (morally questionably) allowed for some friends to be \emph{more important} to stand close to than others.
-\item[\textbf{Talent Scheduling}] aims at scheduling movie scenes to be shot including various actors cost-effectively. We augmented the conventional problem with preferences to avoid being simultaneously on set with a rival actor and early/late times for specific scenes.
-\item[\textbf{On-call Rostering}] requires to assign staff members to days in a rostering period, respecting work constraints and unavailabilities. The original formulation already contained preferences for not being on-call for more than two days in a row or not being on-call for a weekend and a consecutive day. We modeled these existing preferences in MiniBrass and added additional ones regarding preferred coworkers.
-\item[\textbf{Multi-Skilled Project Scheduling}] (MSPSP) is a variant of resource-constrained project scheduling and asks to assign a set of tasks to workers such that the required set of skills for a task is provided by its assigned worker. To add soft constraints, we again allowed  workers to state with whom they would like to work and which tasks they would like to work on or which ones they would rather avoid.
+\item[\textbf{Soft N-Queens}] N-Damen mit Zusatzbedingungen (z.B. 1 Dame in der Mitte)
+\item[\textbf{Photo Placement}] Platziere Personen auf Foto neben gewünschten anderen (manche lieber als andere)
+\item[\textbf{Talent Scheduling}] Plane Szenen und Drehtage; Szenen sollten nicht zu früh beginnen/spät enden; Manche Schauspiele gehen einander lieber aus dem Weg
+\item[\textbf{On-call Rostering}] Belegungsplan für Bereitschaftsdienste unter arbeitsrechtlichen Bedingungen. Präferenzen für/gegen gewissen Daten bzw. Kooperation mit Kollegen
+\item[\textbf{Multi-Skilled Project Scheduling}] Weise zeitgebundene Tasks an Agenten mit mehreren Capabilities zu (unter Einhaltung von Präzedenz) -- ähnlich zu ODP/COMBO
 \end{description}
 
 \end{frame}
 
-\begin{frame}{Solver-Vergleich auf Weighted CSP}
+\begin{frame}{Eckdaten}
+
+\begin{table}
+\centering
+{
+\label{tab:resultsSolverComparison}
+
+\begin{tabular}{l|l}
+\toprule
+Konfigurationen &  16 \\
+Probleme & 5 \\
+Instanzen & 28 \\
+Solver & 7 \\
+\midrule
+\textbf{Versuchte Probleme} & 1793 \\
+\textbf{Gelöste Probleme} & 1289 (71.9\%) \\
+\textbf{Optimal gelöste Probleme} & 1250 (69.7\%) \\
+\bottomrule
+\end{tabular}
+
+}
+\end{table}
+\end{frame}
+
+\begin{frame}{Kompatibilität}
+\begin{table}
+\centering
+{
+\scriptsize
+\label{tab:resultsSolverComparison}
+
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill} }lcccccc}
+\toprule
+ & Gecode & JaCoP & OR-Tools & Choco & G12 & Toulbar2 \\
+\midrule
+Free PVS & \checkfull & \checkfull & \checknot & \checknot & \checknot & \checknot \\ 
+Constraint Preferences & \checkfull & \checkfull & \checknot & \checknot & \checknot & \checknot \\
+Fuzzy CSP & \checkfull & \checkfull & \checkhalf & \checkhalf & \checkhalf & \checkhalf \\
+Probabilistic CSP & \checkfull & \checkfull & \checkhalf & \checkhalf & \checkhalf & \checkhalf \\
+Max CSP  & \checkfull & \checkfull & \checkfull & \checkfull & \checkfull & \checkfull \\
+Weighted CSP  & \checkfull & \checkfull & \checkfull & \checkfull & \checkfull & \checkfull \\
+Cost Function Networks  & \checkfull & \checkfull & \checkfull & \checkfull & \checkfull & \checkfull \\
+\bottomrule
+\end{tabular*}
+
+}
+\end{table}
+
+\begin{itemize}
+\item \checkfull \ldots voll unterstützt
+\item \checkhalf \ldots teils unterstützt durch Morphismen
+\item \checknot \ldots nicht unterstützt
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Solver-Vergleich auf Weighted CSP}
+\vspace*{2ex}
+\begin{columns}[onlytextwidth]
+    \begin{column}{.45\textwidth}
+    \centering \hFirst{Klassische Solver}
+
+    \vspace*{1ex}
+
+    \includegraphics[width=.2\columnwidth]{img/gecode.png}    
+    \includegraphics[width=.2\columnwidth]{img/JACOP.png}
+    
+    \includegraphics[width=.2\columnwidth]{img/choco.png}
+    \includegraphics[width=.2\columnwidth]{img/orLogo.png}
+
+    \includegraphics[width=.5\columnwidth]{img/nictaorg.png}
+	
+    \end{column}
+    \begin{column}{.45\textwidth}
+    \centering \hSecond{Soft Constraint Solver Solver}
+
+    \vspace*{1ex}
+    
+    \includegraphics[scale=0.4]{img/toulbar2-0.png}
+    \end{column}
+\end{columns}
+\begin{lstlisting}
+solve ToWeighted(constraintPrefs1);
+\end{lstlisting}
 \begin{parchment}[Evaluationsfrage]
-How fast and effectively (in terms of finding optima) can WCSP instances be solved by encoding them as COPs versus using a dedicated solver?
+Wie schnell und effektiv (hinsichtlich des Findens von Optima) können Weighted-Instanzen durch klassische Constraint Solver gegenüber dedizierten Soft Constraint Solvern gelöst werden?
 \end{parchment}
 \end{frame}
 
@@ -106,9 +192,87 @@ How fast and effectively (in terms of finding optima) can WCSP instances be solv
 \end{table}
 \end{frame}
 
-\begin{frame}{Vergleich Weighted vs Constraint Preferences}
+\begin{frame}[fragile]{Vergleich Constraint Preferences vs Weighted}
+\vspace*{6ex}
+
+\begin{columns}[onlytextwidth]
+    \begin{column}{.45\textwidth}
+    \centering \hFirst{Constraint Preferences}
+    
+    \vspace*{2ex}
+    
+\begin{tikzpicture}[auto,->,
+                    >=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small},
+                    bg/.style={shape=rectangle, rounded corners,
+    draw, align=center,
+    top color=white, bottom color=issegrey!15},
+                    pvs/.style={shape=rectangle, rounded corners,
+    draw=isseorange!50,fill=white, align=center}]
+ 
+\node[pvs,text width=4.8cm,anchor=north west, text height=2.8cm] at (5.7,-1) {};
+\node at (9.4, -2.4) {\includegraphics[width=2.3cm]{img/search-space.pdf} }; 
+
+\node[anchor=west,font=\small] at (5.7,-1.3) {$\mathit{PVS}\langle P \rangle $};
+\node[anchor=west,font=\normalsize] at (5.7,-3.6) {$\langle \finmsets(P), \mcup, \smytheq{P}, \lbag \rbag \rangle$};
+
+\node[constraint node,label=west:$\lbag \mathrm{c}_1 \rbag$] (p1) at (7, -2)                   {$\mathrm{c}_1$};
+\node[constraint node,label=east:$\lbag \mathrm{c}_2 \rbag$] (p2) at ($ (p1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node,label=north:$\lbag \mathrm{c}_3 \rbag$] (p3) at ($ (p1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (p2) edge (p1)
+  (p3) edge (p1)
+  ;
+
+\end{tikzpicture}
+
+\begin{lstlisting}
+solve constraintPrefs1;
+\end{lstlisting}
+    \end{column}
+    \begin{column}{.45\textwidth}
+    \centering \hSecond{Weighted}
+    
+    \vspace*{2ex}
+    
+    \begin{tikzpicture}[auto,->,
+                    >=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small},
+                    bg/.style={shape=rectangle, rounded corners,
+    draw, align=center,
+    top color=white, bottom color=issegrey!15},
+                    pvs/.style={shape=rectangle, rounded corners,
+    draw=isseorange!50,fill=white, align=center}]
+
+\node[pvs,draw=CornflowerBlue,text width=3.5cm,anchor=north west, text height=2.8cm] at (0.5,-1) {};
+ \node[anchor=west,font=\small] at (0.5,-1.3) {$\mathit{Weighted}(P)$};
+  \node[anchor=west,font=\normalsize] at (0.5,-3.6) {$\langle \mathbb{N}, +, \geq, 0 \rangle$};
+  
+\node[constraint node,label=west:2] (w1) at (2, -2)                   {$\mathrm{c}_1$};
+\node[constraint node,label=west:1] (w2) at ($ (w1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint node,label=west:1] (w3) at ($ (w1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+\node at (3.6, -2.4) {\includegraphics[width=.55cm]{img/search-space-weighted.pdf} }; 
+
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (w2) edge (w1)
+  (w3) edge (w1)
+  ;
+ 
+
+\end{tikzpicture}
+\begin{lstlisting}
+solve ToWeighted(constraintPrefs1);
+\end{lstlisting}
+    \end{column}
+  \end{columns}  
+  
 \begin{parchment}[Evaluationsfrage]
-Is optimizing according to the Smyth-ordering much more expensive than solving a weighted counterpart obtained by a morphism?
+Ist es wesentlich teurer nach Smyth zu optimieren, anstatt ein gewichtetes Problem zu verwenden?
+
 \end{parchment}
 \end{frame}
 
@@ -161,14 +325,213 @@ Is optimizing according to the Smyth-ordering much more expensive than solving a
 }
 \end{table}
 \end{frame}
+\tikzstyle{highlight}=[isseorange,ultra thick]
+\tikzstyle{highlight2}=[CornflowerBlue,ultra thick]
 
-\begin{frame}
+\begin{frame}[fragile]{Nicht-Dominiert versus Strikte Verbesserung}
+\vspace*{6ex}
+
+\begin{columns}[onlytextwidth]
+    \begin{column}{.45\textwidth}
+    \centering \hSecond{Nicht-Dominiert}
+    
+    \vspace*{2ex}
+    
+\begin{tikzpicture}[scale=0.5,transform shape,auto]
+
+% single PVS
+\node [highlight2] (bot) at (0,0) {$\bot = \{c_1, c_2, c_3 \}$};
+\node [highlight2] (c1c2) at (-2,1) {$\{c_1, c_2\}$};
+\node[highlight2] (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {$\{c_1\}$};
+\node [highlight2] (c2) at (-2,4) {$\{c_2\}$};
+\node [highlight2](c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[highlight2](c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge[highlight2] (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge[highlight2] (c2)
+(c2c3) edge[highlight2] (c3)
+(c1c2) edge (c1)
+(c1c2) edge (c2)
+(c1) edge (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+
+\end{tikzpicture}
+
+\begin{lstlisting}
+solve 
+search pvs_BAB_NonDom();  
+\end{lstlisting}
+    \end{column}
+    \begin{column}{.45\textwidth}
+    \centering \hFirst{Strikte Verbesserung}
+    
+    \vspace*{2ex}
+    
+\begin{tikzpicture}[scale=0.5,transform shape,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {\alert{$\{c_1, c_2\}$}};
+\node (c2c3) at (0,2) {\alert{$\{c_2, c_3\}$}};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {$\{c_1\}$};
+\node (c2) at (-2,4) {\alert{$\{c_2\}$}};
+\node (c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[highlight] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge[highlight]  (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge[highlight]  (c2)
+(c2c3) edge (c3)
+(c1c2) edge (c1)
+(c1c2) edge (c2)
+(c1) edge (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+
+\end{tikzpicture}
+
+\begin{lstlisting}
+solve 
+search pvs_BAB();  
+\end{lstlisting}
+    \end{column}
+  \end{columns}  
+  
+\begin{parchment}[Evaluationsfrage]
+Wieviel Overhead erzeugt das Suchen aller (unvergleichbar) optimalen Lösungen gegenüber dem Suchein \emph{einer} optimalen Lösung?
+\end{parchment}
+\end{frame}
+
+
+\begin{frame}[fragile]{Nicht-Dominiert versus Strikte Verbesserung}
+\begin{columns}[onlytextwidth]
+    \begin{column}{.45\textwidth}
+    \centering \hSecond{Nicht-Dominiert}
+    
+    \vspace*{2ex}
+    
+\begin{tikzpicture}[scale=0.5,transform shape,auto]
+
+% single PVS
+\node [highlight2] (bot) at (0,0) {$\bot = \{c_1, c_2, c_3 \}$};
+\node [highlight2] (c1c2) at (-2,1) {$\{c_1, c_2\}$};
+\node[highlight2] (c2c3) at (0,2) {$\{c_2, c_3\}$};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {$\{c_1\}$};
+\node [highlight2] (c2) at (-2,4) {$\{c_2\}$};
+\node [highlight2](c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[highlight2](c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge[highlight2] (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge[highlight2] (c2)
+(c2c3) edge[highlight2] (c3)
+(c1c2) edge (c1)
+(c1c2) edge (c2)
+(c1) edge (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+
+\end{tikzpicture}
+
+    \end{column}
+    \begin{column}{.45\textwidth}
+    \centering \hFirst{Strikte Verbesserung}
+    
+    \vspace*{2ex}
+    
+\begin{tikzpicture}[scale=0.5,transform shape,auto]
+
+% single PVS
+\node (bot) at (0,0) {\alert{$\bot = \{c_1, c_2, c_3 \}$}};
+\node (c1c2) at (-2,1) {\alert{$\{c_1, c_2\}$}};
+\node (c2c3) at (0,2) {\alert{$\{c_2, c_3\}$}};
+\node (c1c3) at (2,1) {$\{c_1, c_3\}$};
+
+\node (c1) at (0,3) {$\{c_1\}$};
+\node (c2) at (-2,4) {\alert{$\{c_2\}$}};
+\node (c3) at (2,4) {$\{c_3\}$};
+%\node (a) at (-1,0.5) {$a$};
+%\node (b) at (-1,1.5) {$b$};
+%\node (c) at (1,1) {$c$};
+\node (top) at (0,5) {$\top = \emptyset$};
+
+
+\path[-]
+(bot) edge[highlight] (c1c2)
+      edge (c2c3)
+      edge (c1c3)
+(c1c2) edge[highlight]  (c2c3)
+(c1c3) edge (c2c3)
+(c1c3) edge (c1)
+(c1c3) edge (c3)
+(c2c3) edge[highlight]  (c2)
+(c2c3) edge (c3)
+(c1c2) edge (c1)
+(c1c2) edge (c2)
+(c1) edge (c2)
+(c1) edge (c3)
+(c2) edge (top)
+(c1) edge (top)
+(c3) edge (top)
+      ;
+
+\end{tikzpicture}
+
+    \end{column}
+  \end{columns}  
 \begin{table}
 \centering
 {
 \scriptsize
-\caption{Comparison of runtimes between searching for all optima instead of a strict domination improvement. 
-We only considered \emph{solved} instances in this evaluation. Bold-face highlighting indicates the faster search type. Values are averaged over instances and solvers. }
+
 \label{tab:compDomNonDom}
 
 
@@ -193,9 +556,42 @@ We only considered \emph{solved} instances in this evaluation. Bold-face highlig
 
 \end{frame}
 
-\begin{frame}{Vergleich MIF vs. Standard}
+\begin{frame}[fragile]{Vergleich MIF vs. Standard}
+\vspace*{2ex}
+
+\begin{lstlisting}
+type WeightedCsp = PVSType<bool, int> = 
+  params {[..]  } in  
+  instantiates with "soft_constraints/mbr_types/weighted_type.mzn" { [...] }
+ offers {
+    heuristics -> getSearchHeuristicWeighted;
+ };
+ \end{lstlisting}
+
+\begin{columns}[onlytextwidth]
+    \begin{column}{.45\textwidth}
+    \centering \hFirst{Most-Important First}
+
+    \vspace*{1ex}
+
+\begin{lstlisting}
+solve 
+:: pvsSearchHeuristic
+search pvs_BAB();
+\end{lstlisting}
+    \end{column}
+    \begin{column}{.45\textwidth}
+    \centering \hSecond{Standard-Suche}
+
+    \vspace*{1ex}
+    \begin{lstlisting}
+solve 
+search pvs_BAB();
+\end{lstlisting}
+    \end{column}
+\end{columns}
 \begin{parchment}[Evaluationsfrage]
-Can a generic heuristic (MIF) for soft constraint problems speed up the search for optima?
+Kann die generische MIF-Suchheuristik die Suche nach Optima beschleunigen?
 \end{parchment}
 \end{frame}
 
@@ -208,7 +604,7 @@ Can a generic heuristic (MIF) for soft constraint problems speed up the search f
 \label{tab:compDiffsMif}
 
 
-\subcaption*{Grouped by solvers.}
+\subcaption*{Gruppiert nach Solvern.}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill} }ld{1.1}d{1.1}d{1.1}d{1.1}d{1.1}d{1.1}d{1.1}}
 \toprule
  &  \multicolumn{1}{c}{Choco} & \multicolumn{1}{c}{G12} & \multicolumn{1}{c}{Gecode} & \multicolumn{1}{c}{JaCoP} & \multicolumn{1}{c}{Toulbar2} & \multicolumn{1}{c}{OR-Tools} \\
@@ -220,7 +616,7 @@ Ratio MIF wins &  0.64 & 0.32 & 0.29 & 0.46 & 0.57 & 0.32 \\
 \end{tabular*}
 
 \bigskip
-\subcaption*{Grouped by problems.}
+\subcaption*{Gruppiert nach Problemen.}
 
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill} }ld{1.1}d{1.1}d{1.1}d{1.1}d{1.1}d{1.1}}
 \toprule
