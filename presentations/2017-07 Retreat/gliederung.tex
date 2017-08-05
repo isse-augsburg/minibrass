@@ -1,0 +1,178 @@
+\documentclass[10pt,a4paper]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Alexander Schiendorfer}
+\title{Soft Constraints for Large Self-organizing Systems}
+
+\begin{document}
+
+
+\begingroup
+\let\clearpage\relax
+{\Huge \textbf{Soft Constraints for}}
+
+\vspace*{2ex}
+
+{\Huge   \textbf{Large Self-organizing Systems}}
+
+\tableofcontents*
+\endgroup
+\newpage
+
+\chapter{Introduction}
+\section{Motivation}
+\section{Contributions of the Thesis}
+
+\chapter{Application Scenarios}
+\section{Distributed Power Systems}
+\subsection{The Unit Commitment Problem}
+\subsection{Complexity of the Problem}
+\subsection{Related Work}
+
+
+\section{Self-organizing Robotic Systems}
+\subsection{Task Allocation in Reconfigurable Swarms [ECAS'16]}
+\subsection{Self-organizing Resource-Flow Systems}
+\subsection{Related Work}
+
+\section{Preference-oriented Adaptive Systems}
+\subsection{Exam Appointment Scheduling}
+\subsection{Mentor Matching [Constraints'17]*}
+\subsection{Multi-User Multi-Display Exhibitions [ModRef'15]*}
+\subsection{Related Work}
+
+\part{Soft Constraints for Corridors of Optimal Behavior}
+
+\chapter{Foundations}
+\section{Self-organization -- Designing Systems to Adapt}
+\section{Controlling Emergence -- The Restore Invariant Approach}
+\subsection{Corridors of Correct Behavior }
+\subsection{Classical Constraint Programming for Combinatorial Problems}
+\section{Over-Constrainedness in Practical Problems -- From Correctness to Optimality}
+\subsection{Partial Constraint Satisfaction}
+\subsection{Specific Soft Constraint Formalisms}
+\subsection{Algebraic Structures for Soft Constraints}
+
+\section{Algorithms to Solve Soft Constraint Problems }
+\subsection{Branch-and-Bound Search}
+\subsection{Large-Neighborhood Search}
+\subsection{Optimization in Constraint Programming Solvers}
+
+\section{Modeling Languages}
+\subsection{MiniZinc and MiniSearch}
+\subsection{Essence}
+\subsection{Numberjack}
+
+\chapter{Soft Constraints with Constraint Preferences}
+\section{Qualitative Specification using Constraint Preferences [SGAI'13]*}
+\subsection{Syntax}
+\subsection{Semantics -- Dominance Properties}
+\subsection{Transforming Constraint Preferences to Weighted Constraints}
+\subsection{Evaluation in the Energy Scenario [SEN-MAS'14]*}
+\section{Applications of Constraint Preferences}
+\subsection{Distributed Energy Management [SEN-MAS'14]* }
+\subsection{Multi-User Multi-Display Content Selection [ModRef'15]}
+
+\chapter{Designing Algebraic Structures for Soft Constraints [Constraints'17]}
+\section{Abstracting Concrete Soft Constraint Formalisms -- Requirements and Goals}
+\section{Relationship of Constraint Preferences with General Formalisms [ICTAI'14]*}
+\section{Building Algebraic Structures from Partial Orders}
+\subsection{Free Construction of Partial Valuation Structures over Partial Orders [Constraints'17]*}
+\subsection{Free Construction of C-Semirings over Partial Valuation Structures [Constraints'17]*}
+\section{Mapping Organizations -- Combinations of Preference Structures [Wirsing'15]*}
+\subsection{Direct Product to Form Pareto-Orderings}
+\subsection{Lexicographic Product to Form Hierarchical Precedence}
+
+\chapter{MiniBrass -- A Modeling Language for Soft Constraints[Constraints'17]*}
+\section{Workflow}
+\section{Type Declarations}
+\section{PVS Types with Example Usages}
+\subsection{Comparative Specifications}
+\subsubsection{The Free PVS}
+\subsubsection{Constraint Preferences}
+\subsection{Cost-based Specifications}
+\subsubsection{Max CSP}
+\subsubsection{Weighted Constraints}
+\subsubsection{Cost Function Networks}
+\subsection{Real-Valued Specifications}
+\subsubsection{Fuzzy Constraints}
+\subsubsection{Probabilistic Constraints}
+\subsubsection{Possibilistic Constraints}
+\section{Operators -- Direct and Lexicographic Products}
+\section{A User-friendly Graphical Modeling Interface}
+\section{Consistency Checks and Utilities}
+\section{Soft Global Constraints}
+\section{PVS-based Generic Search}
+\subsection{Branch-and-Bound}
+\subsection{Large Neighborhood Search}
+\subsection{Adaptive Large Neighborhood Search}
+
+
+\chapter{Evaluation}
+\section{Modeling Application Scenarios in MiniBrass}
+
+
+\subsection{Unit Commitment in Distributed Power Systems}
+\subsection{Task Allocation in Reconfigurable Swarms}
+\subsection{Self-organizing Resource-Flow Systems}
+\subsection{Multi-User Multi-Display Content Selection}
+\subsection{Mentor-Matching and Appointment Scheduling}
+\section{Benchmark Instances}
+\subsection{Comparing Performance: Encoded Weighted CSP versus Native Toulbar2}
+\subsection{Comparing Models: Smyth-Optimization versus Weighted-Optimization}
+\subsection{Comparing Search Heuristics: Most Important First versus Default}
+
+\subsection{Efficiency of Generic Heuristics}
+
+\part{Self-organized Hierarchical Power Systems} 
+\chapter{Foundations}
+\section{Decentralized Power Management}
+\subsection{Current and Future Power Management Systems}
+\subsection{Smart Grids}
+
+\section{Mathematical Programming}
+\subsection{Linear Programming}
+\subsection{Mixed Integer Programming}
+
+
+\chapter{Autonomous Virtual Power Plants to Decompose Distributed Unit Commitment [Vw. Steghöfer,Anders,Siefert]}
+\section{Hierarchies of Autonomous Virtual Power Plants [Vw. Anders]}
+\section{Trust To Manage Uncertainty [Vw. Anders]}
+\section{Soft Constraints in AVPPs [SEN-MAS'14]*}
+
+\chapter{Supply Automata to Specify the Dynamics of Prosumers \allowbreak  [TCCI'15]*}
+\section{Challenges in Unit-Commitment}
+\section{Existing Formulations}
+\section{Automata-based Specification of Optimization Problems}
+\subsection{Syntax}
+\subsection{Semantics}
+\subsection{Translation to Mixed Integer Programs}
+\section{Examples}
+\subsection{Modeling Cold and Hot Start-up}
+\subsection{Scheduling a Biogas-Plant}
+\section{Related Work}
+
+\chapter{Abstraction of Collective Behavior [ICAART'14]* [TCCI'15]*}
+\section{Obtaining Simple Representations of Production Spaces}
+\section{Deriving Efficient Bounds for Future Time Steps}
+\section{Calculating Approximate Functions for Collectives}
+\subsection{Principle of Sampling Function Points}
+\subsection{Selection by means of Active Learning [SASO'15']*}
+\section{Relationship with Unit-Commitment Algorithms}
+\subsection{Regio-Central Robust Optimization [SAOS'14]}
+\subsection{Market-Based Robust Optimization [TAAS'15] [SASO'15]}
+\section{Related Work}
+
+\chapter{Evaluation}
+\section{Efficiency of Abstractions in a Regio-Central Setting [ICAART'14]* [TCCI'15]*}
+\section{Efficiency of Abstractions in a Market-Based Setting [TAAS'15]*}
+\section{Improving Accuracy of Sampling Abstraction by Active Learning [TAAS'15]*}
+\chapter{Conclusion, Discussion, and Future Challenges}
+\section{Summary of Research Contributions}
+\section{Open Research Challenges}
+
+
+
+\end{document}
