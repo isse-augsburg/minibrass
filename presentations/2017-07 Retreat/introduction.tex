@@ -14,79 +14,65 @@
 %comment out to revert to previous/default definitions
 \setbeamertemplate{footline}{}
 
-\begin{frame}{Fahrplanerstellungsproblem}
-\textbf{Ziel}: Plane Kraftwerke so ein, dass sie die \alert{Last} gemeinsam erfüllen
+\begin{frame}{Fahrplanerstellung in Energiesystemen}
+\textbf{Ziel}: Stelle sicher, dass \alert{Erzeugung} (Supply) und \alert{Verbrauch} (Demand) in Balance sind.
 \input{img/problem}
 \end{frame}
 }
 
 
-\begin{frame}{Hierarchisches Energiemanagement} \large
+\begin{frame}{Selbstorganisierende Ressourcenflusssysteme}
+\textbf{Ziel}: Weise Tasks an Roboter zu, sodass ein korrekter \alert{Ressourcenfluss} entsteht
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/produktionszelle.pdf}
+\end{center}
 
-\begin{figure}
-\centering
-\input{overview}
-\label{fig:hierarchical-decomposition}
-\end{figure}
-\end{frame}
-
-
-\begin{frame}{Soft Constraints} \large
-\begin{figure}
-\centering
-\input{soft-constraint-intro}
-\end{figure}
-\vspace*{-2.4ex}
-\onslide<5->{\textbf{Ziel:} Integration von Individualpräferenzen.}
-\end{frame}
-
-\begin{frame}
-\frametitle{Präferenzen im Constraint-Solving}
-
-Constraint-Problem $((X, D), C)$
-\begin{itemize}
-  \item \cemph{Variablen} $X$,
-\cemph{Domänen} $D = (D_x)_{x \in X}$,
-\cemph{Constraints} $C$
-\end{itemize}
-
-\vspace*{1ex}
-
-In der Praxis: \cemph{unerfüllbare} Probleme
-
-\vspace*{2ex}
-
-$((\{ \mathrm{x}, \mathrm{y}, \mathrm{z} \},
-\mathrm{D}_{\mathrm{x}} = \mathrm{D}_{\mathrm{y}} =
-\mathrm{D}_{\mathrm{z}} = \{ 1, 2, 3 \}), \{ \mathrm{c}_1,
-\mathrm{c}_2, \mathrm{c}_3 \})$ mit
-\bgroup\abovedisplayskip4pt\belowdisplayskip4pt
-\begin{align*}
-  \mathrm{c}_1 &: \mathrm{x} + 1 = \mathrm{y}
-\\[-.4ex]
-  \mathrm{c}_2 &: \mathrm{z} = \mathrm{y} + 2
-\\[-.4ex]
-  \mathrm{c}_3 &: \mathrm{x} + \mathrm{y} \leq 3
-\end{align*}
-\egroup
-
-\begin{itemize}
-  \item Nicht alle Constraints können gleichzeitig erfüllt werden
-\begin{itemize}
-  \item z.\,B., $\mathrm{c}_2$ erzwingt $\mathrm{z} = 3$ und $\mathrm{y} = 1$, im Konflikt zu $\mathrm{c}_1$
-\end{itemize}
-
-  \item Ein Agent wählt also zwischen Belegungen, die $\{ \mathrm{c}_1, \mathrm{c}_3 \}$ oder $\{ \mathrm{c}_2, \mathrm{c}_3 \}$ erfüllen.
-\end{itemize}
-
-\vspace*{2ex}
-
-Welche Belegungen $v \in [X \to D]$ sollen \cemph{bevorzugt} werden?
+\hfill \cite{seebach2010software}, SASO
 
 \end{frame}
 
+%\begin{frame}{Hierarchisches Energiemanagement} \large
+%
+%\begin{figure}
+%\centering
+%\input{overview}
+%\label{fig:hierarchical-decomposition}
+%\end{figure}
+%\end{frame}
 
-\begin{frame}{(Soft) Constraints in der Energie}
+
+\begin{frame}[fragile]
+\frametitle{Constraint Satisfaction Probleme}
+
+\vspace*{4ex}
+
+\alert{Ziel:} Belege (endlich viele) Variablen aus $X$ mit einem aus (endlich vielen) Werten aus $D$ sodass alle Constraints $C$ erfüllt werden.
+
+
+\begin{itemize}
+\item [-] $n$ Roboter, $m$ Tasks
+\item [-] Gebe jedem Roboter einen \emph{unterschiedlichen} Task, stelle sicher, dass jeder Task belegt ist 
+\end{itemize}
+
+\begin{lstlisting}
+% problem data 
+int: n; set of int: ROBOTS = 1..n;
+int: m; set of int: TASKS = 1..m;
+
+% decisions
+array[ROBOTS] of var TASKS: allocation;
+
+% goal
+solve satisfy;
+
+% have robots work on different tasks
+constraint alldifferent(allocation);
+constraint forall(t in TASKS) (exists(r in ROBOT) (allocation[r] = t));
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}{Energie: Nicht nur Hard Constraints}
 
 \alert{Harte} Constraints aus Supply Automata:
 \begin{equation}
@@ -108,7 +94,50 @@ oder Änderungsgeschwindigkeit
 \end{equation}
 \end{frame}
 
-\input{soft-constraint-block}
+\begin{frame}
+    \frametitle{Soft Constraint Programming in MiniBrass}
+ \alert{Constraint Programming}
+    \begin{itemize}
+    \item Deklarative Programmierung (ähnlich SQL, Prolog)
+    \item Trennung von \textbf{Modell} und \emph{Algorithmus}
+    \item Geeignet für kombinatorische Probleme unter harten Bedingungen (Physik!)
+    \item Modellierungssprache \hFirst{MiniZinc}
+    \end{itemize}
+
+    \vspace*{3ex}
+    
+\alert{Soft Constraint Programming}
+    \begin{itemize} 
+    \item Modellierung von \textbf{Nutzerpräferenzen}
+    \item Finde Lösungen, die \emph{so gut wie möglich} sind
+    \item Was bedeutet ``gut``?
+    \item Modellierungssprache \hFirst{MiniBrass}
+     \end{itemize}
+\end{frame}
+
+\begin{frame}{Warum MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{Eine Sprache -- viele Solver} 
+\end{parchment}
+\begin{textblock*}{2.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=\textwidth]{img/MiniZn_logo.jpg} 
+
+\end{textblock*}
+Unterstützte Solver
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item Choco (CP)
+\item G12 (CP/LP/MIP)
+\end{itemize}
+
+\end{frame}
+
+
+%\input{soft-constraint-block}
 
 \begin{frame}{Partial Valuation Structures}
 Zugrundeliegende \alert{algebraische Struktur}: Partielle Bewertungsstruktur (\emph{partial valuation structure, partiell geordnetes, kommutatives Monoid)}
