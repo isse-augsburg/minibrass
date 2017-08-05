@@ -44,11 +44,13 @@
 \begin{frame}[fragile]
 \frametitle{Constraint Satisfaction Probleme}
 
-\vspace*{4ex}
+\vspace*{5ex}
 
 \alert{Ziel:} Belege (endlich viele) Variablen aus $X$ mit einem aus (endlich vielen) Werten aus $D$ sodass alle Constraints $C$ erfüllt werden.
 
+\vspace*{1ex}
 
+\textbf{Beispiel}
 \begin{itemize}
 \item [-] $n$ Roboter, $m$ Tasks
 \item [-] Gebe jedem Roboter einen \emph{unterschiedlichen} Task, stelle sicher, dass jeder Task belegt ist 
@@ -67,10 +69,42 @@ solve satisfy;
 
 % have robots work on different tasks
 constraint alldifferent(allocation);
-constraint forall(t in TASKS) (exists(r in ROBOT) (allocation[r] = t));
+constraint forall(t in TASKS) (exists(r in ROBOTS) (allocation[r] = t));
 \end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Constraint Optimization Probleme}
+
+\vspace*{4ex}
+
+\alert{Ziel:} Suche die beste Belegung, sodass eine Zielfunktion $f : [X \to D] \to \mathbb{Z}$ minimiert (oder maximiert) wird.
+
+\vspace*{1ex}
+
+\textbf{Beispiel}
+\begin{itemize}
+\item [-] $n$ (steuerbare) Supplier, $m$ (steuerbare) Consumer decken Residuallast
+\end{itemize}
+
+\begin{lstlisting}
+% problem data 
+int: n; set of int: SUPPLIERS = 1..n;
+array[SUPPLIERS] of int: costs;
+int: m; set of int: CONSUMERS = 1..m;
+int: residualLoad;
+
+% decisions
+array[SUPPLIERS] of var 0..100: supply;
+array[CONSUMERS] of var 0..100: demand;
+
+% goal
+solve minimize sum(s in SUPPLIERS)(costs[s]*supply[s]);
+
+% have robots work on different tasks
+constraint sum(supply) - sum(demand) - residualLoad = 0; 
+\end{lstlisting}
+\end{frame}
 
 \begin{frame}{Energie: Nicht nur Hard Constraints}
 
