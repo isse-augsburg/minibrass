@@ -1,5 +1,5 @@
-\documentclass[9pt,xcolor={dvipsnames},fleqn]{beamer}
-%\documentclass[handout,10pt,xcolor={dvipsnames},fleqn]{beamer}
+%\documentclass[9pt,xcolor={dvipsnames},fleqn]{beamer}
+\documentclass[handout,9pt,xcolor={dvipsnames},fleqn]{beamer}
 \usepackage{isse}
 
 
@@ -115,7 +115,7 @@ innertopmargin=\topskip,
 % Biogas Constraints
 \newcommand{\biogas}{biogas}
 \newcommand{\biogasShort}{bio}
-\newcommand{\gasFull}{\ensuremath{\constraintName{gasFull}_\mathtt{\biogasShort}}}
+\newcommand{\gasFull}{\ensuremath{\constraintName{gasNotFull}_\mathtt{\biogasShort}}}
 \newcommand{\ecoSweet}{\ensuremath{\constraintName{ecoSweet}_\mathtt{\biogasShort}}}
 \newcommand{\onOff}{\ensuremath{\constraintName{onOff}_\mathtt{\biogasShort}}}
 % Thermal Plant Constraints
@@ -129,7 +129,7 @@ innertopmargin=\topskip,
 \newcommand{\ev}{EV}
 \newcommand{\limitBatteryUsage}{\ensuremath{\constraintName{limitBU}_\mathtt{\ev}}}
 \newcommand{\prefBatteryLevel}{\ensuremath{\constraintName{prefBL}_\mathtt{\ev}}}
-\newcommand{\earlyBird}{\ensuremath{\constraintName{earlyBird}_\mathtt{\ev}}}
+\newcommand{\earlyBird}{\ensuremath{\constraintName{BLmorning}_\mathtt{\ev}}}
 % Organization
 \newcommand{\org}{org}
 \newcommand{\minMaxViolation}{\ensuremath{\constraintName{violation}_\mathtt{\org}}}

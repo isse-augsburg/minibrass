@@ -21,24 +21,26 @@
 }
 
 
+
+\begin{frame}{Hierarchisches Energiemanagement} \large
+
+\begin{figure}
+\centering
+\input{overview}
+\label{fig:hierarchical-decomposition}
+\end{figure}
+\end{frame}
+
 \begin{frame}{Selbstorganisierende Ressourcenflusssysteme}
 \textbf{Ziel}: Weise Tasks an Roboter zu, sodass ein korrekter \alert{Ressourcenfluss} entsteht
 \begin{center}
 \includegraphics[width=.7\textwidth]{img/produktionszelle.pdf}
 \end{center}
 
-\hfill \cite{seebach2010software}, SASO
+\hfill \cite{seebach2010software}
 
 \end{frame}
 
-%\begin{frame}{Hierarchisches Energiemanagement} \large
-%
-%\begin{figure}
-%\centering
-%\input{overview}
-%\label{fig:hierarchical-decomposition}
-%\end{figure}
-%\end{frame}
 
 
 \begin{frame}[fragile]
@@ -78,7 +80,7 @@ constraint forall(t in TASKS) (exists(r in ROBOTS) (allocation[r] = t));
 
 \vspace*{4ex}
 
-\alert{Ziel:} Suche die beste Belegung, sodass eine Zielfunktion $f : [X \to D] \to \mathbb{Z}$ minimiert (oder maximiert) wird.
+\alert{Ziel:} Suche die beste Belegung, sodass eine \textbf{skalare} Zielfunktion $f : [X \to D] \to \mathbb{Z}$ minimiert (oder maximiert) wird.
 
 \vspace*{1ex}
 
@@ -142,12 +144,13 @@ oder Änderungsgeschwindigkeit
     
 \alert{Soft Constraint Programming}
     \begin{itemize} 
-    \item Modellierung von \textbf{Nutzerpräferenzen}
+    \item Modellierung von \textbf{Präferenzen}
     \item Finde Lösungen, die \emph{so gut wie möglich} sind
     \item Was bedeutet ``gut``?
     \item Modellierungssprache \hFirst{MiniBrass}
      \end{itemize}
 \end{frame}
+
 
 \begin{frame}{Warum MiniZinc?}
 \begin{parchment}[Rationale]
@@ -170,49 +173,227 @@ Unterstützte Solver
 
 \end{frame}
 
+\tikzset{
+   pvsNode/.style={rectangle, 
+                   rounded corners,
+                   minimum width=8cm,
+                   minimum height=5cm,
+                   draw,
+                   dashed},
+   sigNode/.style={rectangle, draw, solid},
+   cpLogo/.style={fill=black,circle,minimum width=.5em},
+   main node/.style={rectangle,
+                     rounded corners,
+   					 fill=black!15,
+   					 draw,
+   					 minimum width=3.5em,
+   					 text centered,
+                     inner sep=2.5pt,	 
+   					 font=\sffamily\footnotesize
+   					},
+   weightNode/.style={rectangle,
+                     rounded corners,
+   					 fill=black,
+   					 draw,
+   					 minimum width=3.5em,
+                     inner sep=2.5pt,	 
+   					 font=\sffamily\footnotesize
+   					}  					
+}
 
-%\input{soft-constraint-block}
+\begin{frame}{Welche Arten von Soft Constraints?}
 
-\begin{frame}{Partial Valuation Structures}
-Zugrundeliegende \alert{algebraische Struktur}: Partielle Bewertungsstruktur (\emph{partial valuation structure, partiell geordnetes, kommutatives Monoid)}
-\begin{itemize}
-\item $(M, \cdot_M, \varepsilon_M, \leq_M)$ 
-\item $m \cdot_m \varepsilon_M = m$
-\item $m \leq_M \varepsilon_M$ ($\varepsilon_M = \top_M$)
-\item $m \leq_M n \rightarrow m \cdot_M o \leq_M n \cdot_M o$
-\end{itemize}
+Was machen wir nun mit \alert{$\mathsf{inertia}_{\mathsf{therm}}$} und 
+\alert{$\mathsf{ecoSweet}_{\mathsf{bio}}$}?
+\begin{description}
+
+\item[\textbf{Max-CSP}] Erfülle so viele Constraints wie möglich \hfill \hSecond{\cite{FreuderW92}} \pause 
+\item[\textbf{Weighted CSP}] Minimiere die Summe der verletzten Constraints nach Gewicht \pause \hfill \hSecond{\cite{shapiro1981structural}}
+\item[\textbf{Fuzzy CSP}] Erfülle den (minimalen) Erfüllungsgrad (zwischen 0 und 1) über alle Soft Constraints \hfill \hSecond{\cite{ruttkay1994fuzzy}} \pause 
+\end{description} \pause 
+
+\vspace*{1ex}
+
+\ldots und natürlich 
+
+\vspace*{1ex}
+
+\begin{description}
+\item[\textbf{Constraint Preferences}] (früher \emph{Constraint Relationships}): Definiere partielle Wichtigkeitsordnung über Constraints; erhebe diese zu Mengen von verletzten oder erfüllten Constraints \hfill \hFirst{\cite{Schiendorfer13}}
+\end{description}
+
+\vspace*{1ex}
+\begin{parchment}[Zentrale Frage]
+$\rightarrow$ Was sind die Gemeinsamkeiten? Was müssen wir ``minimal'' tun?
+\end{parchment}
+\end{frame}
+
+\begin{frame}{Beispiel: Max-CSP}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% weighted constraints%s logo
+\node[cpLogo,scale=0.7,transform shape,] at (0.3,-.45) {};
+\node[cpLogo,scale=0.7,transform shape,draw,fill=white] at (0.6,-.1) {};
+\node[cpLogo,scale=0.7,transform shape,] at (0.4,-.75) {};
+\node[cpLogo,scale=0.7,transform shape,draw] at (0.65,-.4) {};
+\node[cpLogo,scale=0.7,transform shape,] at (0.3,-.45) {};
+\node[cpLogo,scale=0.7,transform shape,draw,fill=white] at (0.9,-.6) {};
+
+\node[cpLogo,scale=0.7,transform shape,] at (1.0,-.2) {};
+\node[cpLogo,scale=0.7,transform shape,draw,fill=white] at (0.9,-.6) {};
+
+\end{scope}
+
+\node[main node,draw,anchor=west] (limitBu) at ($ (outer.center) + (-1,0.1)$)   {\limitBatteryUsage};
+
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (earlyBird) at ($(limitBu.west)+(-.9,-.8)$)  {\earlyBird};
+
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (prefBatteryLevel) at ($(limitBu.west)+(1.2,-.6)$)  {\prefBatteryLevel};
+
+
+\end{scope}
+
+\end{tikzpicture}
+oder
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% weighted constraints%s logo
+\coordinate (beginLogo) at (0.4,0.0);
+\node[cpLogo,anchor=south] (upLogo) at ($(beginLogo)+(0.3,-.45)$) {};
+
+\draw [fill=black] ($(beginLogo)+(0,-.7)$) -- ($(beginLogo)+(0.1,-.4)$) -- ($(beginLogo)+(0.5,-.4)$) -- ($(beginLogo)+(0.6,-.7)$) -- ($(beginLogo)+(0,-.7)$);
+
+
+\end{scope}
+
+\node[weightNode,text=white,anchor=west,text width=1.5cm,text height=.19cm,align=right] (bg) at ($ (outer.center) + (-1,0.1)$)   {\hfill 78};
+\node[main node,draw,anchor=west] (limitBu) at ($ (outer.center) + (-1,0.1)$)   {\limitBatteryUsage};
+
+\node[weightNode,text=white,anchor=west,text width=1.75cm,text height=.19cm,align=right] (bg2) at ($(limitBu.west)+(0,-.5)$)   {\hfill 14};
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (earlyBird) at ($(limitBu.west)+(0,-.5)$)  {\earlyBird};
+
+\node[weightNode,text=white,anchor=west,text width=1.3cm,text height=.19cm,align=right] (bg3) at ($(earlyBird.west)+(0,-.5)$)   {\hfill 3};
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (prefBatteryLevel) at ($(earlyBird.west)+(0,-.5)$)  {\prefBatteryLevel};
+
+
+\end{scope}
+
+\end{tikzpicture}
+
 \vspace*{2ex}
 
-\begin{columns}[onlytextwidth,T]
-    
-    \begin{column}{.7\textwidth}
-          
-    \hSecond{Abstrakt}
-    
-    \begin{itemize}
-    \item $M$ \ldots Elemente
-    \item $\cdot_M$ \ldots Kombination von Bewertungen
-    \item $\varepsilon_M$ \ldots neutrales, ``bestes'' Element
-    \item $\leq_M$ \ldots Ordnung, links ``schlechter''
-    \end{itemize}
-    \end{column}
-    
-    \begin{column}{.3\textwidth}
-  	\hFirst{Konkret}  
-  	 \begin{itemize}
-    \item $\{0, \ldots, k \}$ 
-    \item $+_k$
-    \item $0$ 
-    \item $\geq$
-    \end{itemize}
-    \end{column}
-  \end{columns}
+oder 
 
-  \vspace*{2ex}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% constraint relationship logo
+\node[cpLogo] (upLogo) at (.55,-.2) {};
+\node[cpLogo,below left of=upLogo] (leftLogo) {};
+\node[cpLogo,below right of=upLogo] (rightLogo) {};  
+
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=3cm,scale=.5,transform shape]
+
+% constraint relationship logo
+\node[fill,circle,OliveGreen] (upLogo) at ($ (outer.north east) + (-1.3,-0.2) $) {};
+\node[fill,circle,BrickRed,below of=upLogo] (centerLogo) {};
+\node[fill,circle,gray,left of=centerLogo] (leftLogo) {};
+\node[fill,circle,gray,right of=centerLogo] (rightLogo) {};  
+\node[below of=centerLogo,yshift=.4em,font=\Large] {$\mathrm{SPD}$};
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (centerLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+
+\end{scope}
+
+% EV
+
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (8) at ($ (outer.center) + (0,-.8)$)   {\limitBatteryUsage};
+
+\node[main node, style={font=\sffamily\footnotesize},above right of=8] (4)  {\earlyBird};
+
+\node[main node, style={font=\sffamily\footnotesize},above left of=8] (3) {\prefBatteryLevel};
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\path[every node/.style={font=\sffamily\tiny},->]
+  (8) edge node [right] {} (3)
+  (8) edge node [right] {} (4)
+;
+
+\end{scope}
+
+\end{tikzpicture}
+\end{figure}
+\end{frame}
+\begin{frame}{Algebra zur Hilfe}
+
+Wir benötigen \ldots 
+
+\begin{itemize}
+\item Eine Menge $M$ von Erfüllungsgraden, z.B. $[0.0, 1.0]$ oder $\{0, 1, \ldots k\}$ oder $2^{C_s}$. \pause 
+\item Eine partielle Ordnung $\leq_M$ über $M$: $m \leq_M n$ drückt aus, dass $m$ \emph{schlechter} als $n$ ist \pause 
+\item Eine Kombinationsoperation $\cdot_M$, um zwei Elemente aus $M$ miteinander zu verrechnen  \pause 
+\item Ein bestes Element $\varepsilon_M$, um \emph{volle Zufriedenheit} auszudrücken \pause
+\end{itemize}
+  
+  Gemeinsam nennen wir $(M, \cdot_M, \varepsilon_M, \leq_M)$ eine \textbf{partielle Bewertungsstruktur}.
   
   \hfill \emph{\cite{Gadducci2013,SchiendorferPvs2015}}
 \end{frame}
 
+
+%\input{soft-constraint-block}
 
 \begin{frame}[fragile]{PVS--Idee}
 \begin{center}
@@ -223,7 +404,7 @@ Weighted CSP (WCSP)& $\mathbb{N}$ & $+$ & $\geq$ & $0$ \\
 Cost Function Network (CFN)& $\{0,\ldots,k\}$ & $+$/$\max$ & $\geq$ & $0$ \\ 
 Fuzzy CSP & $[0,1]$ & $\min$ & $\leq$  & 1 \\ 
 Inclusion Max CSP & $2^{C_s}$ & $\cup$ & $\supseteq$  & $\emptyset$ \\ 
-Constraint Relationships (CR)\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\mcup$ & $\supseteq_{\mathsf{SPD}}$ & $\lbag \rbag$ \\ 
+Constraint Preferences (CP)\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\mcup$ & $\supseteq_{\mathsf{SPD}}$ & $\lbag \rbag$ \\ 
 \end{tabular} 
 \end{center}
 
@@ -232,13 +413,241 @@ Implementiere Lösungsverfahren für Constraint-Probleme, die durch Bewertungsst
 \end{parchment}
 \end{frame}
 
-\begin{frame}{Soft Constraints} \large
-\begin{figure}
-\centering
-\input{soft-constraint-intro}
-\end{figure}
-\vspace*{-2.4ex}
-\onslide<5->{\textbf{Ziel:} Integration von Individualpräferenzen.}
+\begin{frame}{Kombinationen~\cite{SchiendorferPvs2015}}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+%% FIRST OVERALL LAYER 
+
+\draw[CornflowerBlue,thick,fill=white] (-0.4,2.95) rectangle (11.7,-5.1);
+\node[CornflowerBlue] at (0, 2.9) {$\ltimes \quad \mathtt{lex}$};
+\draw[CornflowerBlue,thick] (-0.4,1) -- (11.7,1);
+
+% the logo
+
+\begin{scope}[yshift=2.45cm]
+
+\node[pvsNode,minimum width=11.5cm,minimum height=1.5cm] (outer) at (0,0) {};
+
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% cost function networks logo
+
+\node at (.1,-.3) {\Huge \EUR};
+\node at (.6,-0.1) {\Large $\mathbb{Z}$};
+
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=1.7cm,scale=.5,transform shape]
+
+% cfn logos
+\draw[thick,->] ($(outer.east) + (-1.3,1.4)$) -- ($(outer.east) + (-1.3,0.6)$);
+\node[font=\Large,anchor=east] at ($(outer.east) + (-0.5,0.3)$) {$\mathrm{Minimize}$};
+
+
+\node[font=\Huge,anchor=east] at ($(outer.east) + (-2.7,1.1)$) {$\mathrm{\max}$};
+\node[font=\Large,anchor=east] at ($(outer.east) + (-2.7,0.3)$) {$\mathrm{Maximum}$};
+
+\end{scope}
+
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.1)$) {  $\mathtt{\biogas1}$ };
+% EV
+\begin{scope}[node distance = 1.5cm]
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (cm) at ($ (outer.center) + (-0.6,-0.5)$)   {$\mathtt{costsMaint}$};
+
+\node[main node, style={font=\sffamily\footnotesize},right of=cm] (cf)  {$\mathtt{costsFuel}$};
+\end{scope}
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\end{scope}
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+\draw[isseorange,thick] (-0.2,0.7) rectangle (11.6,-5);
+\draw[isseorange,thick,dotted] (4.5,0.7) -- (4.5,-5);
+\node[isseorange] at (0, 0.7) {$\times \quad \mathtt{pareto}$};
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% constraint relationship logo
+\node[cpLogo] (upLogo) at (.55,-.2) {};
+\node[cpLogo,below left of=upLogo] (leftLogo) {};
+\node[cpLogo,below right of=upLogo] (rightLogo) {};  
+
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=3cm,scale=.5,transform shape]
+
+% constraint relationship logo
+\node[fill,circle,OliveGreen] (upLogo) at ($ (outer.north east) + (-1.3,-0.2) $) {};
+\node[fill,circle,BrickRed,below of=upLogo] (centerLogo) {};
+\node[fill,circle,gray,left of=centerLogo] (leftLogo) {};
+\node[fill,circle,gray,right of=centerLogo] (rightLogo) {};  
+\node[below of=centerLogo,yshift=.4em,font=\Large] {$\mathrm{SPD}$};
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (centerLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% EV
+
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.7)$) {  $\mathtt{\ev}$ };
+
+
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (8) at ($ (outer.center) + (0,-.8)$)   {\limitBatteryUsage};
+
+\node[main node, style={font=\sffamily\footnotesize},above right of=8] (4)  {\earlyBird};
+
+\node[main node, style={font=\sffamily\footnotesize},above left of=8] (3) {\prefBatteryLevel};
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\path[every node/.style={font=\sffamily\tiny},->]
+  (8) edge node [right] {} (3)
+  (8) edge node [right] {} (4)
+;
+
+\end{scope}
+
+
+%% SECOND PVS 
+%%%%%%%%%%%%%%%%%%%
+% First Layer
+\begin{scope}[xshift=5.2cm]
+\node[pvsNode,minimum width=6cm,minimum height=1.8cm] (outer) at (0,0) {};
+
+\draw[CornflowerBlue,thick] (-0.2,0.5) rectangle (6.2,-4.9);
+\draw[CornflowerBlue,thick] (-0.2,-2) -- (6.2,-2);
+\node[CornflowerBlue] at (0, 0.5) {$\ltimes \quad \mathtt{lex}$};
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% cost function networks logo
+
+\node at (.1,-.3) {\Huge \EUR};
+\node at (.6,-0.1) {\Large $\mathbb{Z}$};
+
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=1.7cm,scale=.5,transform shape]
+
+% cfn logos
+\draw[thick,<-] ($(outer.east) + (-1.3,1.4)$) -- ($(outer.east) + (-1.3,0.6)$);
+\node[font=\Large,anchor=east] at ($(outer.east) + (-0.5,0.3)$) {$\mathrm{Maximize}$};
+
+
+\node[font=\Huge,anchor=east] at ($(outer.east) + (-2.7,1.1)$) {$\mathrm{\sum}$};
+\node[font=\Large,anchor=east] at ($(outer.east) + (-2.7,0.3)$) {$\mathrm{Sum}$};
+
+\end{scope}
+
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.1)$) {  $\mathtt{\biogas1}$ };
+% EV
+\begin{scope}[node distance = 1.5cm]
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (cm) at ($ (outer.center) + (-0.6,-0.5)$)   {$\mathtt{costsMaint}$};
+
+\node[main node, style={font=\sffamily\footnotesize},right of=cm] (cf)  {$\mathtt{costsFuel}$};
+\end{scope}
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\end{scope}
+
+%% SECOND LAYER 
+\begin{scope}[xshift=5.2cm,yshift=-2.3cm]
+\node[pvsNode,minimum width=6cm,minimum height=2.5cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% constraint relationship logo
+\node[cpLogo] (upLogo) at (.55,-.2) {};
+\node[cpLogo,below left of=upLogo] (leftLogo) {};
+\node[cpLogo,below right of=upLogo] (rightLogo) {};  
+
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=3cm,scale=.5,transform shape]
+
+% constraint relationship logo
+\node[fill,circle,OliveGreen] (upLogo) at ($ (outer.north east) + (-1.3,-0.2) $) {};
+\node[fill,circle,BrickRed,below of=upLogo] (centerLogo) {};
+\node[fill,circle,BrickRed,left of=centerLogo] (leftLogo) {};
+\node[fill,circle,BrickRed,right of=centerLogo] (rightLogo) {};  
+\node[below of=centerLogo,yshift=.4em,font=\Large] {$\mathrm{TPD}$};
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (centerLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+
+\end{scope}
+
+% BIOGAS Plant 
+\begin{scope}[node distance =1.2cm]
+\node[main node, anchor=center, style={font=\sffamily\footnotesize}] (gf) at ($ (outer.center) + (0,0)$) {\gasFull};
+\node[main node, style={font=\sffamily\footnotesize}] (ecs) [below left of=gf,xshift=5.4] {\ecoSweet};
+\node[main node, style={font=\sffamily\footnotesize}] (ono) [below right of=gf,xshift=-3.1] {\onOff};
+\end{scope}
+%\node[main node, style={font=\sffamily\footnotesize},double] (hardConstraint) [below left of=7,xshift=-3.1,yshift=7] {$\mathsf{maxProd}$};
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.7)$) {  $\mathtt{\biogas2}$ };
+
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\path[every node/.style={font=\sffamily\tiny},->]
+  (ono) edge node [right] {} (gf)
+  (ecs) edge node [right] {} (gf)
+;
+
+\end{scope}
+\end{tikzpicture}
 \end{frame}
 
 \begin{frame}{Kombinationen~\cite{SchiendorferPvs2015}}
