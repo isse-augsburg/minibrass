@@ -1,0 +1,241 @@
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+%% FIRST OVERALL LAYER 
+
+\draw[CornflowerBlue,thick,fill=white] (-0.4,2.95) rectangle (11.7,-5.1);
+\node[CornflowerBlue] at (0, 2.9) {$\ltimes \quad \mathtt{lex}$};
+\draw[CornflowerBlue,thick] (-0.4,0.8) -- (11.7,0.8);
+
+% the logo
+
+\begin{scope}[yshift=2.45cm]
+
+\node[pvsNode,minimum width=11.5cm,minimum height=1.6cm] (outer) at (0,0) {};
+
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% cost function networks logo
+
+\node at (.1,-.3) {\Huge \EUR};
+\node at (.6,-0.1) {\Large $\mathbb{Z}$};
+
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=1.7cm,scale=.5,transform shape]
+
+% cfn logos
+\draw[thick,->] ($(outer.east) + (-1.3,1.4)$) -- ($(outer.east) + (-1.3,0.6)$);
+\node[font=\Large,anchor=east] at ($(outer.east) + (-0.5,0.3)$) {$\mathrm{Minimize}$};
+
+
+\node[font=\Huge,anchor=east] at ($(outer.east) + (-2.7,1.1)$) {$\mathrm{\Max}$};
+\node[font=\Large,anchor=east] at ($(outer.east) + (-2.7,0.3)$) {$\mathrm{Maximum}$};
+
+\end{scope}
+
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.1)$) {  $\mathtt{avppGoals}$ };
+% EV
+\begin{scope}[node distance = 3.5cm]
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (cm) at ($ (outer.center) + (-3.6,-0.5)$)   {$\mathtt{remainingResidualLoad[1]}$};
+
+\node[main node, anchor=west,style={font=\sffamily\footnotesize},right of=cm] (cf)  {$\mathtt{remainingResidualLoad[2]}$};
+\node[main node, anchor=west,style={font=\sffamily\footnotesize},right of=cf] (ck)  {$\mathtt{remainingResidualLoad[3]}$};
+\end{scope}
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\end{scope}
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+\draw[isseorange,thick] (-0.2,0.7) rectangle (11.6,-5);
+\draw[isseorange,thick,dotted] (4.5,0.7) -- (4.5,-5);
+\node[isseorange] at (0, 0.7) {$\times \quad \mathtt{pareto}$};
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% constraint relationship logo
+\node[cpLogo] (upLogo) at (.55,-.2) {};
+\node[cpLogo,below left of=upLogo] (leftLogo) {};
+\node[cpLogo,below right of=upLogo] (rightLogo) {};  
+
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=3cm,scale=.5,transform shape]
+
+% constraint relationship logo
+\node[fill,circle,OliveGreen] (upLogo) at ($ (outer.north east) + (-1.3,-0.2) $) {};
+\node[fill,circle,BrickRed,below of=upLogo] (centerLogo) {};
+\node[fill,circle,gray,left of=centerLogo] (leftLogo) {};
+\node[fill,circle,gray,right of=centerLogo] (rightLogo) {};  
+\node[below of=centerLogo,yshift=.4em,font=\Large] {$\mathrm{SPD}$};
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (centerLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% EV
+
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.7)$) {  $\mathtt{\ev}$ };
+
+
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (8) at ($ (outer.center) + (0,-.8)$)   {\limitBatteryUsage};
+
+\node[main node, style={font=\sffamily\footnotesize},above right of=8] (4)  {\earlyBird};
+
+\node[main node, style={font=\sffamily\footnotesize},above left of=8] (3) {\prefBatteryLevel};
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\path[every node/.style={font=\sffamily\tiny},->]
+  (8) edge node [right] {} (3)
+  (8) edge node [right] {} (4)
+;
+
+\end{scope}
+
+
+%% SECOND PVS 
+%%%%%%%%%%%%%%%%%%%
+% First Layer
+\begin{scope}[xshift=5.2cm]
+\node[pvsNode,minimum width=6cm,minimum height=1.8cm] (outer) at (0,0) {};
+
+\draw[CornflowerBlue,thick] (-0.2,0.5) rectangle (6.2,-4.9);
+\draw[CornflowerBlue,thick] (-0.2,-2) -- (6.2,-2);
+\node[CornflowerBlue] at (0, 0.5) {$\ltimes \quad \mathtt{lex}$};
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% cost function networks logo
+
+\node at (.1,-.3) {\Huge \EUR};
+\node at (.6,-0.1) {\Large $\mathbb{Z}$};
+
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=1.7cm,scale=.5,transform shape]
+
+% cfn logos
+\draw[thick,<-] ($(outer.east) + (-1.3,1.4)$) -- ($(outer.east) + (-1.3,0.6)$);
+\node[font=\Large,anchor=east] at ($(outer.east) + (-0.5,0.3)$) {$\mathrm{Maximize}$};
+
+
+\node[font=\Huge,anchor=east] at ($(outer.east) + (-2.7,1.1)$) {$\mathrm{\sum}$};
+\node[font=\Large,anchor=east] at ($(outer.east) + (-2.7,0.3)$) {$\mathrm{Sum}$};
+
+\end{scope}
+
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.1)$) {  $\mathtt{\biogas1}$ };
+% EV
+\begin{scope}[node distance = 1.5cm]
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (cm) at ($ (outer.center) + (-0.6,-0.5)$)   {$\mathtt{costsMaint}$};
+
+\node[main node, style={font=\sffamily\footnotesize},right of=cm] (cf)  {$\mathtt{costsFuel}$};
+\end{scope}
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\end{scope}
+
+%% SECOND LAYER 
+\begin{scope}[xshift=5.2cm,yshift=-2.3cm]
+\node[pvsNode,minimum width=6cm,minimum height=2.5cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% constraint relationship logo
+\node[cpLogo] (upLogo) at (.55,-.2) {};
+\node[cpLogo,below left of=upLogo] (leftLogo) {};
+\node[cpLogo,below right of=upLogo] (rightLogo) {};  
+
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=3cm,scale=.5,transform shape]
+
+% constraint relationship logo
+\node[fill,circle,OliveGreen] (upLogo) at ($ (outer.north east) + (-1.3,-0.2) $) {};
+\node[fill,circle,BrickRed,below of=upLogo] (centerLogo) {};
+\node[fill,circle,BrickRed,left of=centerLogo] (leftLogo) {};
+\node[fill,circle,BrickRed,right of=centerLogo] (rightLogo) {};  
+\node[below of=centerLogo,yshift=.4em,font=\Large] {$\mathrm{TPD}$};
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (centerLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+
+\end{scope}
+
+% BIOGAS Plant 
+\begin{scope}[node distance =1.2cm]
+\node[main node, anchor=center, style={font=\sffamily\footnotesize}] (gf) at ($ (outer.center) + (0,0)$) {\gasFull};
+\node[main node, style={font=\sffamily\footnotesize}] (ecs) [below left of=gf,xshift=5.4] {\ecoSweet};
+\node[main node, style={font=\sffamily\footnotesize}] (ono) [below right of=gf,xshift=-3.1] {\onOff};
+\end{scope}
+%\node[main node, style={font=\sffamily\footnotesize},double] (hardConstraint) [below left of=7,xshift=-3.1,yshift=7] {$\mathsf{maxProd}$};
+\node[ anchor=center] at  ($ (outer.center) + (0.2,.7)$) {  $\mathtt{\biogas2}$ };
+
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\path[every node/.style={font=\sffamily\tiny},->]
+  (ono) edge node [right] {} (gf)
+  (ecs) edge node [right] {} (gf)
+;
+
+\end{scope}
+\end{tikzpicture}
+
+\vspace*{-3cm}
+\pause 
+\begin{parchment}[In Code]
+\texttt{solve avppGoals lex (EV pareto (biogas1 lex biogas2))}
+\end{parchment}

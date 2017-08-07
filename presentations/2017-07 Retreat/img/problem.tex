@@ -1,0 +1,174 @@
+\tikzset{
+    trajectory/.style={issegrey},
+    emph/.style={isseorange},
+    trajectorynode/.style={issegrey},
+    demand/.style={MidnightBlue, thick},
+    firstTraj/.style={ForestGreen},
+    secTraj/.style={BrickRed}
+} 
+\begin{figure}
+\begin{tikzpicture}[scale=0.85,transform shape]
+    % Draw axes
+    \draw [<->,thick] (0,5) node (yaxis) [above] {$P(t)$}
+        |- (8.5,0) node (xaxis) [right] {$t$};
+        
+    \node[overlay,text width=1.9cm, text centered, anchor=south, right] at (7.7,4.5)
+    { \small 
+    \begin{itemize} 
+    \item[] { \color{MidnightBlue} \onslide<2->{\textbf{Demand}} } 
+    \item[] { \color{ForestGreen} \onslide<3->{Biogas $a$} } 
+    \item[] { \color{BrickRed} \onslide<4->{Biogas $b$} }  
+    \item[] { \color{isseorange} \onslide<5->{\textbf{Supply}} }    
+    \end{itemize}
+    };        
+       
+	
+%	\node[text width = 1.5cm ,text centered, anchor=west, right] at (2.5, 1)
+%	{
+%		$\mathbf{+}$
+%	};
+	
+    %\node[text width=2.5cm, text centered, anchor=west, right] at (4,-.5)
+    %{
+    %		Kraftwerk $\mathsf{b}$
+	%}; 
+	
+	%\node[text width = 1.5cm ,text centered, anchor=west, right] at (6.5, 1)
+	%{
+	%	$\mathbf{=}$
+%	};
+	%\node[text width=2.5cm, text centered, anchor=west, right] at (8,-.5)
+    %{
+    %		Demand
+	%};      
+    
+     % draw second trajectory first graph 
+     \onslide<2->{
+    \draw[trajectory,demand] (0,3.9) coordinate (d20) -- (1,4.6) coordinate (d21);
+    \draw[trajectory,demand] (d21) -- (2,4.4) coordinate (d22);
+    \draw[trajectory,demand] (d22) -- (3,4.7) coordinate (d23);
+    \draw[trajectory,demand] (d23) -- (4,3.5) coordinate (d24);
+    \draw[trajectory,demand] (d24) -- (5,3.5) coordinate (d25);
+    \draw[trajectory,demand] (d25) -- (6,3.5) coordinate (d26);
+    \draw[trajectory,demand] (d26) -- (7,4.0) coordinate (d27);
+    \draw[trajectory,demand] (d27) -- (8,4.5) coordinate (d28);
+    
+    % now for the circles
+    \fill[trajectorynode,demand] (d21) circle (1pt);
+    \fill[trajectorynode,demand] (d22) circle (1pt);
+    \fill[trajectorynode,demand] (d23) circle (1pt);
+    \fill[trajectorynode,demand] (d24) circle (1pt);    
+    \fill[trajectorynode,demand] (d25) circle (1pt);
+    \fill[trajectorynode,demand] (d26) circle (1pt);
+    \fill[trajectorynode,demand] (d27) circle (1pt);
+    \fill[trajectorynode,demand] (d28) circle (1pt);
+    }
+        
+    \onslide<3->{
+    % now for the first plant   
+    \draw[trajectory,firstTraj] (0,1.9) coordinate (p10) -- (1,2.0) coordinate (p11);
+    \draw[trajectory,firstTraj] (p11) -- (2,2.4) coordinate (p12);
+    \draw[trajectory,firstTraj] (p12) -- (3,2.4) coordinate (p13);
+    \draw[trajectory,firstTraj] (p13) -- (4,2.2) coordinate (p14);
+    \draw[trajectory,firstTraj] (p14) -- (5,2.4) coordinate (p15);
+    \draw[trajectory,firstTraj] (p15) -- (6,2.4) coordinate (p16);
+    \draw[trajectory,firstTraj] (p16) -- (7,2.4) coordinate (p17);                   
+    \draw[trajectory,firstTraj] (p17) -- (8,2.6) coordinate (p18);
+    
+    	\onslide<6>{
+       \draw[trajectory,firstTraj,very thick] (p11) -- (p12);	
+       \node[overlay,align=left,rectangle callout,%
+             callout absolute pointer=(p11.west),xshift=-.5cm,yshift=-1.5cm,fill=isseorange!50] at (p12) {
+            \scriptsize \textbf{Must} ramp up \\ \scriptsize due to inertia};
+       
+	}    
+    
+ 	\onslide<8>{
+       \draw[trajectory,firstTraj,very thick] (p15) -- (p16);	
+       \draw[trajectory,firstTraj,very thick] (p16) -- (p17);
+       
+          \node[overlay,align=left,rectangle callout,%
+             callout absolute pointer=(p16.north),xshift=-.5cm,yshift=0.55cm,fill=isseorange!50] at (p15) {
+           \scriptsize  Wait 2 steps for \\ \scriptsize further ramp-up};
+	} 
+	
+    % now for the circles of the first graph
+    \fill[trajectorynode,firstTraj] (p11) circle (1pt);
+    \fill[trajectorynode,firstTraj] (p12) circle (1pt);
+    \fill[trajectorynode,firstTraj] (p13) circle (1pt);
+    \fill[trajectorynode,firstTraj] (p14) circle (1pt);    
+    \fill[trajectorynode,firstTraj] (p15) circle (1pt);
+    \fill[trajectorynode,firstTraj] (p16) circle (1pt);
+    \fill[trajectorynode,firstTraj] (p17) circle (1pt);
+    \fill[trajectorynode,firstTraj] (p18) circle (1pt);        
+    }
+    
+    \onslide<4->{
+    % now for the second plant   
+    \draw[trajectory,secTraj] (0,2.0) coordinate (p20) -- (1,2.6) coordinate (p21);
+    \draw[trajectory,secTraj] (p21) -- (2,2.0) coordinate (p22);
+    \draw[trajectory,secTraj] (p22) -- (3,2.2) coordinate (p23);
+    \draw[trajectory,secTraj] (p23) -- (4,1.5) coordinate (p24);
+    \draw[trajectory,secTraj] (p24) -- (5,1.4) coordinate (p25);
+    \draw[trajectory,secTraj] (p25) -- (6,1.2) coordinate (p26);
+    \draw[trajectory,secTraj] (p26) -- (7,1.6) coordinate (p27);                   
+    \draw[trajectory,secTraj] (p27) -- (8,1.9) coordinate (p28);
+	\onslide<6>{
+       \draw[trajectory,secTraj,very thick] (p21) -- (p22);	
+       \node[overlay,align=left,rectangle callout,%
+             callout absolute pointer=(p21.north),xshift=+1cm,yshift=.5cm,fill=isseorange!50] at (p21) {
+            \scriptsize Has to compensate};
+	}    
+	
+	\onslide<7>{
+       \draw[trajectory,secTraj,very thick] (p23) -- (p24);	
+       \node[overlay,align=left,rectangle callout,%
+             callout absolute pointer=(p24.south),xshift=+1cm,yshift=-.8cm,fill=isseorange!50] at (p24) {
+             \scriptsize Cannot ramp down further \\ \scriptsize due to inertia};
+	}    
+    
+     % now for the circles of the second graph
+    \fill[trajectorynode,secTraj] (p21) circle (1pt);
+    \fill[trajectorynode,secTraj] (p22) circle (1pt);
+    \fill[trajectorynode,secTraj] (p23) circle (1pt);
+    \fill[trajectorynode,secTraj] (p24) circle (1pt);    
+    \fill[trajectorynode,secTraj] (p25) circle (1pt);
+    \fill[trajectorynode,secTraj] (p26) circle (1pt);
+    \fill[trajectorynode,secTraj] (p27) circle (1pt);
+    \fill[trajectorynode,secTraj] (p28) circle (1pt);
+    }
+    
+    \onslide<5->{
+    % draw joint production first graph 
+    \draw[trajectory,emph] (0,3.9) coordinate (s20) -- (1,4.6) coordinate (s21);
+    \draw[trajectory,emph] (s21) -- (2,4.4) coordinate (s22);
+    \draw[trajectory,emph] (s22) -- (3,4.6) coordinate (s23);
+    \draw[trajectory,emph] (s23) -- (4,3.7) coordinate (s24);
+    \draw[trajectory,emph] (s24) -- (5,3.8) coordinate (s25);
+    \draw[trajectory,emph] (s25) -- (6,3.6) coordinate (s26);
+    \draw[trajectory,emph] (s26) -- (7,4.0) coordinate (s27);
+    \draw[trajectory,emph] (s27) -- (8,4.5) coordinate (s28);
+    
+	% now for the circles of the sum
+    \fill[trajectorynode,emph] (s21) circle (1pt);
+    \fill[trajectorynode,emph] (s22) circle (1pt);
+    \fill[trajectorynode,emph] (s23) circle (1pt);
+    \fill[trajectorynode,emph] (s24) circle (1pt);    
+    \fill[trajectorynode,emph] (s25) circle (1pt);
+    \fill[trajectorynode,emph] (s26) circle (1pt);
+    \fill[trajectorynode,emph] (s27) circle (1pt);
+    \fill[trajectorynode,emph] (s28) circle (1pt);
+    }
+    
+	\node[text centered, anchor=north] at (1,0) { 1 }; \draw[thick] (1,0.05) -- (1,-.05);
+	\node[text centered, anchor=north] at (2,0) { 2 }; \draw[thick] (2,0.05) -- (2,-.05);
+	\node[text centered, anchor=north] at (3,0) { 3 }; \draw[thick] (3,0.05) -- (3,-.05);	
+	\node[text centered, anchor=north] at (4,0) { 4 }; \draw[thick] (4,0.05) -- (4,-.05);
+	\node[text centered, anchor=north] at (5,0) { 5 }; \draw[thick] (5,0.05) -- (5,-.05);
+	\node[text centered, anchor=north] at (6,0) { 6 }; \draw[thick] (6,0.05) -- (6,-.05);
+	\node[text centered, anchor=north] at (7,0) { 7 }; \draw[thick] (7,0.05) -- (7,-.05);	
+	\node[text centered, anchor=north] at (8,0) { 8 }; \draw[thick] (8,0.05) -- (8,-.05);
+	    
+
+\end{tikzpicture}
+\end{figure}  
