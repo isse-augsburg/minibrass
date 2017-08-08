@@ -2,41 +2,20 @@
 
 \begin{enumerate}
 \item Weitgehende algebraische Konzepte zur Modellierung von Präferenzstrukturen in der Literatur
-\item Constraint Relationships und Weiterentwicklung von PVS-Produkten für Hierarchien $\checkmark$ \pause 
+\item Free PVS, Constraint Preferences, PVS-Produkte für Hierarchien $\checkmark$ \pause 
 \vspace*{1ex}
-\item Es gibt genau einen dedizierten Soft-Constraint-Solver, \texttt{toulbar2} für weighted CSP; keine Sprache, nur Binärformat
+\item Es gibt genau einen dedizierten Soft-Constraint-Solver, \texttt{toulbar2} für weighted CSP; wir können abstraktere Typen behandeln
 \vspace*{1ex} \pause 
-\item Modellierungssprache für Präferenzen entwickelt, die Soft-Constraints auf klassische Constraints reduziert $\checkmark$
+\item Modellierungssprache für Präferenzen weiterentwickelt $\checkmark$
 \begin{itemize}
-\item[-] Kann auch Weighted Probleme direkt für \texttt{toulbar2} übersetzen
+\item[-] Graphische Schnittstelle (benutzer-orientiert) $\checkmark$
+\item[-] Unsere gängigen Fallstudien lassen sich abbilden $\checkmark$
+\item[-] Erweiterbarkeit gegeben $\checkmark$
 \end{itemize}
 \vspace*{1ex}
 \pause 
-\item Evaluierung demonstriert Vorteile durch Solver-Unabhängigkeit: Für z.B. Scheduling-Probleme sind Reduktionen schneller als dedizierte Soft-Constraint-Solver
+\item Ausführliche Evaluierung auf \alert{Benchmark}-Problemen demonstriert Vorteile durch Solver-Unabhängigkeit: Für z.B. Scheduling-Probleme sind Reduktionen schneller als dedizierte Soft-Constraint-Solver
+\item Optimierung nach abstrakten Ordnungen problemlos möglich; Übergang zwischen PVS-Modellen leicht
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{Kooperationen}
-\begin{itemize}
-\item[] \alert{Konzepte, Sprachdesign MiniBrass}
-\begin{itemize}
-\item[-] AS, Alexander Knapp, Gerrit, Oliver 
-\end{itemize}
-\vspace*{1ex}
-
-\item[] \alert{Anwendungen, Multiagenten-Einsatz}
-\begin{itemize}
-\item[-] Alexander Schubert (MSc-Thesis: Einsatz von Voting-Verfahren), Markus Tolls (MSc-Thesis: Formalisierung von Task-Allocation-Problemen)
-\item[-] TeamBots (Ludwig, Miroslav)
-\item[-] Testen von SO-Systemen (Benedikt, Hella, Axel) 
-\end{itemize}
-\vspace*{1ex}
-\item[] \alert{Outreach}
-\begin{itemize}
-\item Vortrag Helmholtz-Zentrum München
-\item Vortrag FH Hagenberg
-\item Tutorial @ SASO 2016
-\end{itemize}
-
-\end{itemize}
-\end{frame}
