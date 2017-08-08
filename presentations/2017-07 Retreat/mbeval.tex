@@ -1,7 +1,3 @@
-\begin{frame}{Evaluations-Setup}
-
-\end{frame}
-
 \begin{frame}{Evaluation-Probleme}
 Originalprobleme aus der \emph{MiniZinc-Benchmark-Library}; versehen um zusätzliche Soft Constraints als Constraint Preferences
 
@@ -45,12 +41,12 @@ Solver & 7 \\
 \begin{table}
 \centering
 {
-\scriptsize
+\small
 \label{tab:resultsSolverComparison}
 
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill} }lcccccc}
 \toprule
- & Gecode & JaCoP & OR-Tools & Choco & G12 & Toulbar2 \\
+ & Gecode & JaCoP & OR-Tools & Choco & G12 & Toulbar2* \\
 \midrule
 Free PVS & \checkfull & \checkfull & \checknot & \checknot & \checknot & \checknot \\ 
 Constraint Preferences & \checkfull & \checkfull & \checknot & \checknot & \checknot & \checknot \\
@@ -68,7 +64,8 @@ Cost Function Networks  & \checkfull & \checkfull & \checkfull & \checkfull & \c
 \begin{itemize}
 \item \checkfull \ldots voll unterstützt
 \item \checkhalf \ldots teils unterstützt durch Morphismen
-\item \checknot \ldots nicht unterstützt
+\item { \checknot \ldots nicht unterstützt }
+\item \color{black} * \ldots Dedizierter Soft Constraint Solver
 \end{itemize}
 \end{frame}
 
@@ -90,7 +87,7 @@ Cost Function Networks  & \checkfull & \checkfull & \checkfull & \checkfull & \c
 	
     \end{column}
     \begin{column}{.45\textwidth}
-    \centering \hSecond{Soft Constraint Solver Solver}
+    \centering \hSecond{Soft Constraint Solver} (Toulbar2)
 
     \vspace*{1ex}
     
@@ -217,9 +214,9 @@ Wie schnell und effektiv (hinsichtlich des Findens von Optima) können Weighted-
 \node[anchor=west,font=\small] at (5.7,-1.3) {$\mathit{PVS}\langle P \rangle $};
 \node[anchor=west,font=\normalsize] at (5.7,-3.6) {$\langle \finmsets(P), \mcup, \smytheq{P}, \lbag \rbag \rangle$};
 
-\node[constraint node,label=west:$\lbag \mathrm{c}_1 \rbag$] (p1) at (7, -2)                   {$\mathrm{c}_1$};
-\node[constraint node,label=east:$\lbag \mathrm{c}_2 \rbag$] (p2) at ($ (p1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
-\node[constraint node,label=north:$\lbag \mathrm{c}_3 \rbag$] (p3) at ($ (p1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+\node[constraint,label=west:$\lbag \mathrm{c}_1 \rbag$] (p1) at (7, -2)                   {$\mathrm{c}_1$};
+\node[constraint,label=east:$\lbag \mathrm{c}_2 \rbag$] (p2) at ($ (p1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint,label=north:$\lbag \mathrm{c}_3 \rbag$] (p3) at ($ (p1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
 %  
 \path[every node/.style={font=\sffamily\tiny}]
   (p2) edge (p1)
@@ -251,9 +248,9 @@ solve constraintPrefs1;
  \node[anchor=west,font=\small] at (0.5,-1.3) {$\mathit{Weighted}(P)$};
   \node[anchor=west,font=\normalsize] at (0.5,-3.6) {$\langle \mathbb{N}, +, \geq, 0 \rangle$};
   
-\node[constraint node,label=west:2] (w1) at (2, -2)                   {$\mathrm{c}_1$};
-\node[constraint node,label=west:1] (w2) at ($ (w1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
-\node[constraint node,label=west:1] (w3) at ($ (w1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+\node[constraint,label=west:2] (w1) at (2, -2)                   {$\mathrm{c}_1$};
+\node[constraint,label=west:1] (w2) at ($ (w1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint,label=west:1] (w3) at ($ (w1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
 \node at (3.6, -2.4) {\includegraphics[width=.55cm]{img/search-space-weighted.pdf} }; 
 
 %  
@@ -298,21 +295,21 @@ Ist es wesentlich teurer nach Smyth zu optimieren, anstatt ein gewichtetes Probl
 \midrule
 \multicolumn{2}{l}{On-Call Rostering (5 instances)  }   \\
 \midrule
-   Gecode & 220.46 & \textbf{133}.\textbf{32} & 14.52 & 3.20 & 7.20 \\
-   Native Gecode & 192.50 & \textbf{133}.\textbf{32} & 14.52 & 3.20 & 25.20 \\
-   JaCoP & 194.06 & \textbf{135}.\textbf{28} & 14.52 & 3.20 & 26.80 \\
+   Gecode & 220.46 & \textbf{133}.\textbf{32} & (14.52) & 3.20 & 7.20 \\
+   Native Gecode & 192.50 & \textbf{133}.\textbf{32} & (14.52) & 3.20 & 25.20 \\
+   JaCoP & 194.06 & \textbf{135}.\textbf{28} & (14.52) & 3.20 & 26.80 \\
 \midrule
 \multicolumn{2}{l}{Photo Placement (3 instances)  }   \\
 \midrule
-   Gecode & 6.69 & \textbf{1}.\textbf{03} & 0.68 & 13.00 & 13.00 \\
-   Native Gecode & \textbf{9}.\textbf{96} & 22.22 & 0.80 & 13.33 & 13.33 \\
-   JaCoP & 15.73 & \textbf{3}.\textbf{18} & 0.80 & 13.33 & 13.33 \\
+   Gecode & 6.69 & \textbf{1}.\textbf{03} & (0.68) & 13.00 & 13.00 \\
+   Native Gecode & \textbf{9}.\textbf{96} & 22.22 & (0.80) & 13.33 & 13.33 \\
+   JaCoP & 15.73 & \textbf{3}.\textbf{18} & (0.80) & 13.33 & 13.33 \\
 \midrule
 \multicolumn{2}{l}{Soft N-Queens (3 instances)  }   \\
 \midrule
-   Gecode & \textbf{3}.\textbf{45} & 210.02 & 0.30 & 1.67 & 2.00 \\
-   Native Gecode & \textbf{3}.\textbf{49} & 210.02 & 0.30 & 1.67 & 1.33 \\
-   JaCoP & \textbf{3}.\textbf{94} & 57.22 & 0.30 & 0.33 & 1.00 \\
+   Gecode & \textbf{3}.\textbf{45} & 210.02 & (0.30) & 1.67 & 2.00 \\
+   Native Gecode & \textbf{3}.\textbf{49} & 210.02 & (0.30) & 1.67 & 1.33 \\
+   JaCoP & \textbf{3}.\textbf{94} & 57.22 & (0.30) & 0.33 & 1.00 \\
 \midrule
 \multicolumn{2}{l}{Talent Scheduling (6 instances)  }   \\
 \midrule
