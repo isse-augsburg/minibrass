@@ -1,44 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/alexander/Documents/Projects/git-new/Minizinc/minibrass/evaluation/db/results.db"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1290"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="Config"/><default_encoding codec=""/><browsetable_info data="AAAAAgAAACQAUAByAG8AYgBsAGUAbQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAADABDAG8AbgBmAGkAZwAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8="/></tab_browse><tab_sql><sql name="instanceCount.sql">SELECT Instance FROM PvsData Group By Instance</sql><sql name="query-native-vs-strictbab-overhead.sql">Drop View PvsData; Drop View NativeData; Drop View PvsNativeSummary;
-
-Create View If not Exists PvsData as 
-SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 1 and SearchType = 1 and Solved = 1
-order by problem, instance, elapsedSecs, solverId ;
-
-Create View If not Exists NativeData as 
-SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 1 and SearchType = 3 
-order by problem, instance, elapsedSecs, solverId ;
-
-Create View If not Exists PvsNativeSummary as 
-Select pd.Problem, pd.Instance, pd.SolverName, pd.elapsedSecs as &quot;Smyth-Elapsed&quot;, pd.Objective as &quot;Smyth-Obj&quot;, nd.elapsedSecs as &quot;Weights-Elapsed&quot;, nd.Objective as &quot;Weights-Objective&quot; ,
-       pd.elapsedSecs - nd.elapsedSecs as &quot;AbsOverhead&quot;, pd.elapsedSecs / nd.elapsedSecs as &quot;RelOverhead&quot;
-
-from PvsData pd, NativeData nd
-where pd.Problem = nd.Problem and 
-      pd.Instance = nd.Instance and 
-	  pd.SolverId = nd.SolverId
-order by pd.problem, pd.instance, pd.solverName;
-
-Select Problem, SolverName,
- AVG(AbsOverhead), AVG(RelOverhead) 
-FROM PvsNativeSummary
-GROUP By Problem,SolverName</sql><sql name="query-native-solver-comparison.sql">
-Drop View NativeDataComp;
-Create View If not Exists NativeDataComp as 
-SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, solved FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0
-order by problem, instance, objective asc, elapsedSecs, solverId ;
-
-Select problem, solverId, SolverName, AVG(elapsedSecs), AVG(Objective), AVG(solved) From NativeDataComp
-Group By problem, solverId, SolverName
-Order by problem, AVG(elapsedSecs), AVG(objective)</sql><sql name="insertsProblemInformation.sql">Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film103.dzn&quot;, 36, 198);
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/home/alexander/Documents/Projects/git-new/Minizinc/minibrass/evaluation/db/results.db"/><window><current_tab id="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1290"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="Config"/><default_encoding codec=""/><browsetable_info data="AAAAAgAAACQAUAByAG8AYgBsAGUAbQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAADABDAG8AbgBmAGkAZwAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8="/></tab_browse><tab_sql><sql name="instanceCount.sql">SELECT Instance FROM PvsData Group By Instance</sql><sql name="insertsProblemInformation.sql">Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film103.dzn&quot;, 36, 198);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film105.dzn&quot;, 36, 198);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film114.dzn&quot;, 36, 198);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;talent-scheduling&quot;, &quot;film117.dzn&quot;, 36, 198);
@@ -66,11 +26,7 @@ Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiv
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;8s-40d.dzn&quot;, 197, 762);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;10s-50d.dzn&quot;, 245, 954);
 Insert Into  ProblemInformation (Problem, Instance, MaxObjectiveSpd, MaxObjectiveTpd) VALUES (&quot;on-call-rostering&quot;, &quot;10s-50d2.dzn&quot;, 191, 1135);
-</sql><sql name="SQL 9">SELECT jr.problem, jr.instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, case when solved then Objective else pi.MaxObjectiveSpd end as &quot;Objective&quot;, Optimally, cf.ID as ConfigId, solved FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID INNER JOIN ProblemInformation pi on (jr.Problem = pi.Problem and jr.Instance = pi.Instance) 
-where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0 and SolverId != 6
-order by jr.problem, jr.instance, objective asc, elapsedSecs, solverId</sql><sql name="creates.sql">CREATE TABLE IF NOT EXISTS Config 
+</sql><sql name="creates.sql">CREATE TABLE IF NOT EXISTS Config 
 ( ID INTEGER PRIMARY KEY,
   Timeout        INTEGER     NOT NULL,
   SearchType     INTEGER     NOT NULL,
@@ -110,13 +66,78 @@ CREATE TABLE IF NOT EXISTS ProblemInformation
     MaxObjectiveTpd   INTEGER       NOT NULL,
     PRIMARY KEY(Problem,Instance)
 ) ;
-</sql><sql name="query-native-solver-comparison-pure.sql">-- Explicitly ignores native Gecode since there is absolutely no difference with the Weighted MiniZinc Model
+</sql><sql name="query-native-vs-strictbab-overhead-views.sql">DROP View IF exists PvsData; Drop View IF exists NativeData; Drop View IF exists PvsNativeSummary;
 
-Select problem, solverId, SolverName, round(AVG(elapsedSecs),2) as &quot;ElapsedSecs&quot;, round(AVG(Objective),2) as &quot;Objective&quot;, round(AVG(solved),2) as &quot;Solved&quot; From
-( SELECT jr.problem, jr.instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, case when solved then Objective else pi.MaxObjectiveSpd end as &quot;Objective&quot;, Optimally, cf.ID as ConfigId, solved FROM 
+Create TEMPORARY View IF NOT EXISTS PvsData as 
+SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
 JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID INNER JOIN ProblemInformation pi on (jr.Problem = pi.Problem and jr.Instance = pi.Instance) 
-where SPD = 1 and MIF = 0 and SearchType = 3 AND cf.PropRed = 0 and SolverId != 6
-order by jr.problem, jr.instance, objective asc, elapsedSecs, solverId)
-Group By problem, solverId, SolverName
-Order by problem, AVG(elapsedSecs), AVG(objective)</sql><current_tab id="6"/></tab_sql></sqlb_project>
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+where SPD = 1 and MIF = 1 and SearchType = 1 and Solved = 1
+order by problem, instance, elapsedSecs, solverId ;
+
+Create TEMPORARY View  IF NOT EXISTS NativeData as 
+SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+where SPD = 1 and MIF = 0 and SearchType = 3 
+order by problem, instance, elapsedSecs, solverId ;
+
+Create TEMPORARY View IF NOT EXISTS PvsNativeSummary as 
+Select pd.Problem, pd.Instance, pd.SolverName, pd.elapsedSecs as &quot;SmythElapsed&quot;, pd.Objective as &quot;SmythObj&quot;, nd.elapsedSecs as &quot;WeightsElapsed&quot;, nd.Objective as &quot;WeightsObjective&quot; ,
+       pd.elapsedSecs - nd.elapsedSecs as &quot;AbsOverhead&quot;, pd.elapsedSecs / nd.elapsedSecs as &quot;RelOverhead&quot;
+
+from PvsData pd, NativeData nd
+where pd.Problem = nd.Problem and 
+      pd.Instance = nd.Instance and 
+	  pd.SolverId = nd.SolverId
+order by pd.problem, pd.instance, pd.solverName;
+
+</sql><sql name="query-native-solver-comparison-pure-query.sql">Select Problem, SolverName, 
+  AVG(SmythElapsed), AVG(WeightsElapsed),
+  AVG(AbsOverhead), AVG(RelOverhead),
+  AVG(WeightsObjective), AVG(SmythObj)
+FROM PvsNativeSummary
+GROUP By Problem,SolverName</sql><sql name="query-mif-comp-solver.sql">SELECT SolverName, 
+--AVG(MifElapsed), AVG(NormalElapsed), 
+AVG(diff), SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+FROM 
+MifSummary
+GROUP BY SolverName 
+</sql><sql name="query-mif-comp.sql">Drop View If Exists MifData; Drop View If Exists NoMifData; Drop View If Exists MifSummary ;
+
+Create View If not Exists MiFData as 
+SELECT problem, instance, SolverName, jr.SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, cf.SearchType FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+where SPD = 1 and MIF = 1 and timeout &gt; 10000 and PropRed = 0
+order by problem, instance, elapsedSecs, solverId ;
+
+Create View If not Exists NoMiFData as 
+SELECT problem, instance, SolverName, jr.SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, cf.SearchType FROM 
+JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
+INNER JOIN Solver sv ON jr.SolverId = sv.ID 
+where SPD = 1 and MIF = 0 and timeout &gt; 10000 and PropRed = 0
+order by problem, instance, elapsedSecs, solverId ;
+
+--Select Avg(Diff) From (
+--Select md.elapsedSecs - nmd.elapsedSecs as diff 
+--From MifData as md, NoMifData as nmd
+--Where md.problem = nmd.problem and md.instance = nmd.instance and md.SolverName = nmd.SolverName 
+--)
+
+Create View If not Exists MifSummary as 
+Select md.Problem, md.Instance, md.SolverName, md.elapsedSecs as &quot;MIFelapsed&quot;, nmd.elapsedSecs as &quot;NormalElapsed&quot;, 
+md.elapsedSecs - nmd.elapsedSecs as diff,
+md.elapsedSecs &lt; nmd.elapsedSecs as &quot;MifWins&quot; 
+--SELECT * 
+From MifData as md, NoMifData as nmd
+Where md.problem = nmd.problem and md.instance = nmd.instance and md.SolverId = nmd.SolverId and md.SearchType = nmd.SearchType;
+
+SELECT SolverName, 
+--AVG(MifElapsed), AVG(NormalElapsed), 
+AVG(diff) as &quot;Diff&quot;, SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+FROM 
+MifSummary
+GROUP BY SolverName 
+
+</sql><current_tab id="6"/></tab_sql></sqlb_project>

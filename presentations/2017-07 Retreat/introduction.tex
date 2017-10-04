@@ -1,0 +1,569 @@
+
+
+{
+
+\addtobeamertemplate{background canvas}{\transfade[duration=0.001]}{}
+%gets rid of bottom navigation bars
+\setbeamertemplate{footline}[frame number]{}
+
+%gets rid of bottom navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+%gets rid of footer
+%will override 'frame number' instruction above
+%comment out to revert to previous/default definitions
+%\setbeamertemplate{footline}{}
+
+%\begin{frame}{Fahrplanerstellung in Energiesystemen}
+%\textbf{Ziel}: Stelle sicher, dass \alert{Erzeugung} (Supply) und \alert{Verbrauch} (Demand) in Balance sind.
+%\input{img/problem}
+%\end{frame}
+}
+%
+
+
+\begin{frame}{Hierarchisches Energiemanagement} \large
+
+\begin{figure}
+\centering
+\input{overview}
+\label{fig:hierarchical-decomposition}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Selbstorganisierende Ressourcenflusssysteme}
+\textbf{Ziel}: Weise Tasks an Roboter zu, sodass ein korrekter \alert{Ressourcenfluss} entsteht
+\begin{center}
+\includegraphics[width=.7\textwidth]{img/produktionszelle.pdf}
+\end{center}
+
+\hfill \cite{seebach2010software}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Constraint Satisfaction Probleme}
+
+\vspace*{5ex}
+
+\alert{Ziel:} Belege (endlich viele) Variablen aus $X$ mit einem aus (endlich vielen) Werten aus $D$ sodass alle Constraints $C$ erfüllt werden.
+
+\vspace*{1ex}
+
+\textbf{Beispiel}
+\begin{itemize}
+\item [-] $n$ Roboter, $m$ Tasks
+\item [-] Gebe jedem Roboter einen \emph{unterschiedlichen} Task, stelle sicher, dass jeder Task belegt ist 
+\end{itemize}
+
+\begin{lstlisting}
+% problem data 
+int: n; set of int: ROBOTS = 1..n;
+int: m; set of int: TASKS = 1..m;
+
+% decisions
+array[ROBOTS] of var TASKS: allocation;
+
+% goal
+solve satisfy;
+
+% have robots work on different tasks
+constraint alldifferent(allocation);
+constraint forall(t in TASKS) (exists(r in ROBOTS) (allocation[r] = t));
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Constraint Optimization Probleme}
+
+\vspace*{4ex}
+
+\alert{Ziel:} Suche die beste Belegung, sodass eine \textbf{skalare} Zielfunktion $f : [X \to D] \to \mathbb{Z}$ minimiert (oder maximiert) wird.
+
+\vspace*{1ex}
+
+\textbf{Beispiel}
+\begin{itemize}
+\item [-] $n$ (steuerbare) Supplier, $m$ (steuerbare) Consumer decken Residuallast
+\end{itemize}
+
+\begin{lstlisting}
+% problem data 
+int: n; set of int: SUPPLIERS = 1..n;
+array[SUPPLIERS] of int: costs;
+int: m; set of int: CONSUMERS = 1..m;
+int: residualLoad;
+
+% decisions
+array[SUPPLIERS] of var 0..100: supply;
+array[CONSUMERS] of var 0..100: demand;
+
+% goal
+solve minimize sum(s in SUPPLIERS)(costs[s]*supply[s]);
+
+% have robots work on different tasks
+constraint sum(supply) - sum(demand) - residualLoad = 0; 
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{Energie: Nicht nur Hard Constraints}
+
+\alert{Harte} Constraints aus Supply Automata:
+\begin{equation}
+\mathsf{hardBounds}: \forall t \in T, a \in A : m[a][t] = \mathsf{on} \rightarrow P_{\mathrm{min}} \leq S[a][t] \leq P_{\mathrm{max}} \nonumber
+\end{equation}
+
+\pause
+\vspace*{2ex}
+\alert{Weiche} Constraints anlagenspezifisch (z.B. Präferenz für 350 bis 390 KW):
+\begin{equation}
+\mathsf{ecoSweet}_{\mathsf{bio}}: \forall t \in T : m[\mathsf{biogas}][t] = \mathsf{on} \rightarrow 350 \leq S[\mathsf{biogas}][t] \leq 390 \nonumber
+\end{equation}
+
+\pause
+\vspace*{2ex}
+oder Änderungsgeschwindigkeit
+\begin{equation}
+\mathsf{inertia}_{\mathsf{therm}}: \forall t \in T : |S[\mathsf{biogas}][t] - S[\mathsf{biogas}][t+1] | \leq 10 \nonumber
+\end{equation}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Soft Constraint Programming in MiniBrass}
+ \alert{Constraint Programming}
+    \begin{itemize}
+    \item Deklarative Programmierung (ähnlich SQL, Prolog)
+    \item Trennung von \textbf{Modell} und \emph{Algorithmus}
+    \item Geeignet für kombinatorische Probleme unter harten Bedingungen (Physik!)
+    \item Modellierungssprache \hFirst{MiniZinc}
+    \end{itemize}
+
+    \vspace*{3ex}
+    
+\alert{Soft Constraint Programming}
+    \begin{itemize} 
+    \item Modellierung von \textbf{Präferenzen}
+    \item Finde Lösungen, die \emph{so gut wie möglich} sind
+    \item Was bedeutet ``gut``?
+    \item Modellierungssprache \hFirst{MiniBrass}
+     \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Warum MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{Eine Sprache -- viele Solver} 
+\end{parchment}
+\begin{textblock*}{2.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=\textwidth]{img/MiniZn_logo.jpg} 
+
+\end{textblock*}
+Unterstützte Solver
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item Choco (CP)
+\item G12 (CP/LP/MIP)
+\end{itemize}
+
+\end{frame}
+
+\tikzset{
+   pvsNode/.style={rectangle, 
+                   rounded corners,
+                   minimum width=8cm,
+                   minimum height=5cm,
+                   draw,
+                   dashed},
+   sigNode/.style={rectangle, draw, solid},
+   cpLogo/.style={fill=black,circle,minimum width=.5em},
+   main node/.style={rectangle,
+                     rounded corners,
+   					 fill=black!15,
+   					 draw,
+   					 minimum width=3.5em,
+   					 text centered,
+                     inner sep=2.5pt,	 
+   					 font=\sffamily\footnotesize
+   					},
+   weightNode/.style={rectangle,
+                     rounded corners,
+   					 fill=black,
+   					 draw,
+   					 minimum width=3.5em,
+                     inner sep=2.5pt,	 
+   					 font=\sffamily\footnotesize
+   					}  					
+}
+
+\begin{frame}{Welche Arten von Soft Constraints?}
+
+Was machen wir nun mit \alert{$\mathsf{inertia}_{\mathsf{therm}}$} und 
+\alert{$\mathsf{ecoSweet}_{\mathsf{bio}}$}?
+\begin{description}
+
+\item[\textbf{Max-CSP}] Erfülle so viele Constraints wie möglich \hfill \hSecond{\cite{FreuderW92}} \pause 
+\item[\textbf{Weighted CSP}] Minimiere die Summe der verletzten Constraints nach Gewicht \pause \hfill \hSecond{\cite{shapiro1981structural}}
+\item[\textbf{Fuzzy CSP}] Erfülle den (minimalen) Erfüllungsgrad (zwischen 0 und 1) über alle Soft Constraints \hfill \hSecond{\cite{ruttkay1994fuzzy}} \pause 
+\end{description} \pause 
+
+\vspace*{1ex}
+
+\ldots und natürlich 
+
+\vspace*{1ex}
+
+\begin{description}
+\item[\textbf{Constraint Preferences}] (früher \emph{Constraint Relationships}): Definiere partielle Wichtigkeitsordnung über Constraints; erhebe diese zu Mengen von verletzten oder erfüllten Constraints \hfill \hFirst{\cite{Schiendorfer13}}
+\end{description}
+
+\vspace*{1ex}
+\begin{parchment}[Zentrale Frage]
+$\rightarrow$ Was sind die Gemeinsamkeiten? Was müssen wir ``minimal'' tun?
+\end{parchment}
+\end{frame}
+
+\begin{frame}{Beispiel: Modellierungsarten}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% weighted constraints%s logo
+\node[cpLogo,scale=0.7,transform shape,] at (0.3,-.45) {};
+\node[cpLogo,scale=0.7,transform shape,draw,fill=white] at (0.6,-.1) {};
+\node[cpLogo,scale=0.7,transform shape,] at (0.4,-.75) {};
+\node[cpLogo,scale=0.7,transform shape,draw] at (0.65,-.4) {};
+\node[cpLogo,scale=0.7,transform shape,] at (0.3,-.45) {};
+\node[cpLogo,scale=0.7,transform shape,draw,fill=white] at (0.9,-.6) {};
+
+\node[cpLogo,scale=0.7,transform shape,] at (1.0,-.2) {};
+\node[cpLogo,scale=0.7,transform shape,draw,fill=white] at (0.9,-.6) {};
+
+\end{scope}
+
+\node[main node,draw,anchor=west] (limitBu) at ($ (outer.center) + (-1,0.1)$)   {\limitBatteryUsage};
+
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (earlyBird) at ($(limitBu.west)+(-.9,-.8)$)  {\earlyBird};
+
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (prefBatteryLevel) at ($(limitBu.west)+(1.2,-.6)$)  {\prefBatteryLevel};
+
+
+\end{scope}
+
+\end{tikzpicture}
+oder
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% weighted constraints%s logo
+\coordinate (beginLogo) at (0.4,0.0);
+\node[cpLogo,anchor=south,scale=.8] (upLogo) at ($(beginLogo)+(0.3,-.45)$) {};
+
+\draw [fill=black] ($(beginLogo)+(0,-.7)$) -- ($(beginLogo)+(0.1,-.4)$) -- ($(beginLogo)+(0.5,-.4)$) -- ($(beginLogo)+(0.6,-.7)$) -- ($(beginLogo)+(0,-.7)$);
+
+
+\end{scope}
+
+\node[weightNode,text=white,anchor=west,text width=1.5cm,text height=.19cm,align=right] (bg) at ($ (outer.center) + (-1,0.1)$)   {\hfill 78};
+\node[main node,draw,anchor=west] (limitBu) at ($ (outer.center) + (-1,0.1)$)   {\limitBatteryUsage};
+
+\node[weightNode,text=white,anchor=west,text width=1.75cm,text height=.19cm,align=right] (bg2) at ($(limitBu.west)+(0,-.5)$)   {\hfill 14};
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (earlyBird) at ($(limitBu.west)+(0,-.5)$)  {\earlyBird};
+
+\node[weightNode,text=white,anchor=west,text width=1.3cm,text height=.19cm,align=right] (bg3) at ($(earlyBird.west)+(0,-.5)$)   {\hfill 3};
+\node[main node, anchor=west, style={font=\sffamily\footnotesize}] (prefBatteryLevel) at ($(earlyBird.west)+(0,-.5)$)  {\prefBatteryLevel};
+
+
+\end{scope}
+
+\end{tikzpicture}
+
+\vspace*{2ex}
+
+oder 
+
+\begin{tikzpicture}[>=stealth',shorten >=1pt,anchor=north west] 
+
+
+\begin{scope}
+\node[pvsNode,minimum width=4cm,minimum height=3cm] (outer) at (0,0) {};
+
+% the logo
+
+\begin{scope}[node distance=.6cm]
+
+\draw [shading=axis,bottom color=black!10,top color=white,rounded corners] (0,0) -- (0,-1) -- (1.3,-1) -- (1.7,0) -- (0,0);
+\draw(0,-1) -- ($ (outer.north east) + (0,-1) $);
+
+
+% constraint relationship logo
+\node[cpLogo] (upLogo) at (.55,-.2) {};
+\node[cpLogo,below left of=upLogo] (leftLogo) {};
+\node[cpLogo,below right of=upLogo] (rightLogo) {};  
+
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+\end{scope}
+
+% spd parameter
+\begin{scope}[node distance=.7cm,xshift=3cm,scale=.5,transform shape]
+
+% constraint relationship logo
+\node[fill,circle,OliveGreen] (upLogo) at ($ (outer.north east) + (-1.3,-0.2) $) {};
+\node[fill,circle,BrickRed,below of=upLogo] (centerLogo) {};
+\node[fill,circle,gray,left of=centerLogo] (leftLogo) {};
+\node[fill,circle,gray,right of=centerLogo] (rightLogo) {};  
+\node[below of=centerLogo,yshift=.4em,font=\Large] {$\mathrm{SPD}$};
+\path[->]
+  (leftLogo) edge node [right] {} (upLogo)
+  (centerLogo) edge node [right] {} (upLogo)
+  (rightLogo) edge node [right] {} (upLogo)
+;
+
+\end{scope}
+
+% EV
+
+
+\node[main node, anchor=center,style={font=\sffamily\footnotesize}] (8) at ($ (outer.center) + (0,-.8)$)   {\limitBatteryUsage};
+
+\node[main node, style={font=\sffamily\footnotesize},above right of=8] (4)  {\earlyBird};
+
+\node[main node, style={font=\sffamily\footnotesize},above left of=8] (3) {\prefBatteryLevel};
+
+%\node[text width=2cm, anchor=west, left] at (4.3, 0.3) { CR };
+%\node[text width=1cm, anchor=east, left] at (5.3, -2.3) { \textsc{SPD} };
+
+
+\path[every node/.style={font=\sffamily\tiny},->]
+  (8) edge node [right] {} (3)
+  (8) edge node [right] {} (4)
+;
+
+\end{scope}
+
+\end{tikzpicture}
+\end{figure}
+\end{frame}
+\begin{frame}{Algebra zur Hilfe}
+
+Wir benötigen \ldots 
+
+\begin{itemize}
+\item Eine Menge $M$ von Erfüllungsgraden, z.B. $[0.0, 1.0]$ oder $\{0, 1, \ldots k\}$ oder $2^{C_s}$. \pause 
+\item Eine partielle Ordnung $\leq_M$ über $M$: $m \leq_M n$ drückt aus, dass $m$ \emph{schlechter} als $n$ ist \pause 
+\item Eine Kombinationsoperation $\cdot_M$, um zwei Elemente aus $M$ miteinander zu verrechnen  \pause 
+\item Ein bestes Element $\varepsilon_M$, um \emph{volle Zufriedenheit} auszudrücken \pause
+\end{itemize}
+  
+  Gemeinsam nennen wir $(M, \cdot_M, \varepsilon_M, \leq_M)$ eine \textbf{partielle Bewertungsstruktur}.
+  
+  \hfill \emph{\cite{Gadducci2013,SchiendorferPvs2015}}
+\end{frame}
+
+
+%\input{soft-constraint-block}
+
+\begin{frame}[fragile]{PVS--Idee}
+\begin{center}
+\begin{tabular}{l|c|c|c|c}
+\textbf{Konkrete PVS-Typen} & $M$ & $\cdot_M$ & $\leq_M$ & $\varepsilon_M$ \\ 
+\hline 
+Weighted CSP (WCSP)& $\mathbb{N}$ & $+$ & $\geq$ & $0$ \\ 
+Cost Function Network (CFN)& $\{0,\ldots,k\}$ & $+$/$\max$ & $\geq$ & $0$ \\ 
+Fuzzy CSP & $[0,1]$ & $\min$ & $\leq$  & 1 \\ 
+Inclusion Max CSP & $2^{C_s}$ & $\cup$ & $\supseteq$  & $\emptyset$ \\ 
+Constraint Preferences (CP)\footnote{$C_s$ is the set of soft constraints, $\supseteq_{\mathsf{SPD}}$ is the SPD-ordering on sets.} &$\mathcal{M}^{\mathrm{fin}} (C_s)$ & $\mcup$ & $\supseteq_{\mathsf{SPD}}$ & $\lbag \rbag$ \\ 
+\end{tabular} 
+\end{center}
+
+\begin{parchment}[Hauptidee]
+Implementiere Lösungsverfahren für Constraint-Probleme, die durch Bewertungsstrukturen geordnet sind. Instantiiere für konkrete Probleme.
+\end{parchment}
+\end{frame}
+
+\begin{frame}{Beispiel: Kombinationen~\cite{SchiendorferPvs2015}}
+\input{img/combination}
+\end{frame}
+
+
+\begin{frame}[fragile]{MiniBrass}
+
+\begin{center}
+
+\includegraphics[width=.5\textwidth]{img/minibrass.png}
+
+\vspace*{2ex}
+
+\url{http://isse-augsburg.github.io/minibrass/}
+
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]{MiniBrass: HelloWorld}
+\begin{columns}[onlytextwidth,T]
+    
+    \begin{column}{.40\textwidth}
+          
+    \hSecond{Basismodell (MiniZinc)}
+    \begin{lstlisting}
+include "hello_o.mzn"; 
+include "soft_constraints/
+   pvs_gen_search.mzn"; 
+% the basic, "classic" CSP 
+set of int: DOM = 1..3;
+
+var DOM: x; var DOM: y; 
+var DOM: z;
+% add. *hard* constraints
+% e.g. constraint x < y;
+
+solve search pvs_BAB();
+\end{lstlisting}
+    \end{column}
+    
+    \begin{column}{.55\textwidth}
+  	\hFirst{Präferenzmodell (MiniBrass)} 
+  	\begin{lstlisting}
+PVS: cr1 = 
+  new ConstraintRelationships("cr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | 
+                  mbr.c3, mbr.c1 |]';
+   useSPD: 'true' ;
+}; 
+
+solve cr1;
+\end{lstlisting}
+
+    \end{column}
+  \end{columns}
+  \pause
+  \begin{verbatim}
+Solution:  x = 1; y = 2; z = 1
+Valuations:  mbr_overall_cr1 = {c2}
+----------
+==========
+  \end{verbatim}
+  \begin{textblock*}{3cm}[1,1](\textwidth+0.5cm,\textheight-0.3cm)
+%\textblockcolour{issegrey!20}
+\begin{center}
+\begin{tikzpicture}[auto,
+                    ->,>=stealth',shorten >=1pt,thick,
+                    node distance=.7cm,inner sep=2pt,
+                    constraint/.style={circle,fill=black!15,draw,font=\sffamily\small}]
+\node[constraint] (1) at (0, 0)                   {$\mathrm{c}_1$};
+\node[constraint] (2) at ($ (1) + (-0.8, -0.8) $) {$\mathrm{c}_2$};  
+\node[constraint] (3) at ($ (1) + ( 0.8, -0.8) $) {$\mathrm{c}_3$};  
+%  
+\path[every node/.style={font=\sffamily\tiny}]
+  (2) edge (1)
+  (3) edge (1)
+  ;
+  
+
+\end{tikzpicture}
+\end{center}
+\end{textblock*}
+\end{frame}
+
+\begin{frame}{MiniBrass: Workflow} \small
+\tikzset{
+    process/.style={rectangle,rounded corners,draw=black, top color=isseorange!5, bottom color=isseorange!30},
+    file/.style={rectangle,draw=black}
+}
+\begin{center}
+%\vspace*{-10ex}
+\begin{tikzpicture}[>=stealth,auto,every node/.style={
+anchor=base,
+text depth=.5ex,
+text height=2ex,
+minimum height=2ex,
+align=center,
+circle,
+minimum width=1em}]
+\matrix (magic) [nodes in empty cells, ampersand replacement=\&,row sep=0.5cm,column sep=0.5cm]
+{
+\node{}; \&\node[draw, file,isseorange,thick](mbrlibs){\texttt{mbrlibs.mzn}}; \& \& \node[draw, file,isseorange,thick](types){\texttt{types.mbr}}; \\
+\node {};\& \node[draw, file,CornflowerBlue,thick](mbr){\texttt{prefs.mbr}};   \& \& \node[draw, isseorange,thick,process](mbr2mzn){\texttt{mbr2mzn}}; \\
+\node {};\& \& \& \node[draw, file,isseorange,thick](compiledMzn){\emph{prefs\_o.mzn}}; \\
+%    \&  \&  \node(inv){}; \&  \\
+\node {};\& \node[draw, file,CornflowerBlue!80](f1){\texttt{model.mzn}}; \& \& \node[draw, process](mzn2fzn){\texttt{mzn2fzn}}; \& \& \node[draw, file](output){\emph{output}};  \\
+%    \&  \&  \node(inv){}; \&  \\
+\node {};\& \node[draw, file,CornflowerBlue!80](mod){\texttt{data.dzn}}; \& \&  \\
+\node {};\& \node[draw, file](mznlibs){\texttt{mznlibs.mzn}};\& \& \node[draw, file](fzn){\texttt{compiled.fzn}}; \& \& \node[draw, process](solve){\texttt{solve}};  \\
+\node {};\& \& \\
+};
+
+\draw[dashed,->] (f1) -- (mzn2fzn);
+\draw[dashed,->] (mbr) -- (mbr2mzn);
+\draw[dashed,->] (mod) -- (mzn2fzn);
+\draw[dashed,-] (types) -- (mbrlibs);
+\draw[dashed,-] (types) -- (mbr);
+%\draw[dashed,->] (mbrlibs) -- (mzn2fzn);
+%\draw[dashed] (mbrlibs) -- (mbr);
+\draw[dashed,->] (compiledMzn) -- (mzn2fzn);
+\draw[dashed,->] (mznlibs) -- (mzn2fzn);
+\draw[dashed,->] (fzn) -- (solve);
+\draw[->] (mbr2mzn) -- (compiledMzn);
+
+\draw[->] (mzn2fzn) -- (fzn);
+\draw[->] (solve) -- (output);
+%\draw[dashed] (globals) -- (inv);
+
+%\onslide<4->{  
+%\node[overlay,align=left,rectangle callout,%
+%      callout absolute pointer=(mbrlibs.west),fill=CornflowerBlue!50] at (-4.5,5) {PVS-Prädikate};}
+
+\onslide<4->{  
+\node[overlay,align=left,rectangle callout,%
+      callout absolute pointer=(mbrlibs.north),fill=isseorange!50] at (-3,7.5) {Implementierte Funktionen und Prädikate};}
+            
+\onslide<3->{  
+\node[overlay,align=left,rectangle callout,%
+      callout absolute pointer=(types.north),fill=isseorange!50] at (2,7.5) {PVS-Typdefinitionen};} 
+     
+\onslide<3->{  
+\node[overlay,align=left,rectangle callout,%
+      callout absolute pointer=(mbr.west),fill=CornflowerBlue!50] at (-3.7,4.5) {PVS-Instanzen, Kombinationen};} 
+     
+\end{tikzpicture}
+\end{center}
+\vspace*{-25ex}
+
+\end{frame}

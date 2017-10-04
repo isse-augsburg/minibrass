@@ -59,7 +59,7 @@ PVS: cr1 = new ConstraintPreferences("cr1") {
 solve cr1;
 ```
 
-For a *user-centered* perspective, please refer to our [main page](http://isse-augsburg.github.io/constraint-relationships/).
+For a *user-centered* perspective, please refer to our [main page](http://isse-augsburg.github.io/minibrass/).
 
 ### Tech
 
@@ -73,6 +73,13 @@ MiniBrass is based on these open source projects:
 * **source-code/minizinc** contains the MiniBrass library containing predicates and functions in MiniZinc
 * **source-code/kiv** contains PVS-related proofs in the KIV theorem prover
 * **example-problems** shows problems referred to in the documentation
+
+### Test cases
+
+To be able to run the test cases from Eclipse, make sure to start it in interactive mode 
+```
+bash -ic ./eclipse
+```
 
 ### Todos
 

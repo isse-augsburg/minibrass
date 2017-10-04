@@ -22,7 +22,7 @@ public class SoftGlobalsTest {
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler();
 		launcher = new MiniZincLauncher();
-	}
+	} 
 
 	@Test
 	public void testMorphism() throws IOException, MiniBrassParseException {

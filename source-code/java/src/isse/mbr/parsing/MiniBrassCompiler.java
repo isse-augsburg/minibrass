@@ -31,7 +31,7 @@ import isse.mbr.model.MiniBrassAST;
  * @author Alexander Schiendorfer
  *
  */
-public class MiniBrassCompiler {
+public class MiniBrassCompiler { 
 
 	private final static Logger LOGGER = Logger.getGlobal();
 

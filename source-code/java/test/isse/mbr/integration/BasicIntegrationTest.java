@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
@@ -15,7 +16,7 @@ import isse.mbr.parsing.MiniBrassParseException;
  * sure everything compiles smoothly and we get the correct optimum
  * @author Alexander Schiendorfer
  *
- */
+ */ 
 public class BasicIntegrationTest {
 
 	String minibrassModel = "test-models/classic.mbr";

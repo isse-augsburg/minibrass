@@ -1,6 +1,8 @@
 package isse.mbr.integration;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -20,6 +22,7 @@ public class BasicTestListener implements MiniZincResultListener {
 	private String customString;
 	private boolean cyclic;
 	private Map<String, String> objectives;
+	private Map<String, List<String>> objectiveSequences;
 	private Map<String, String> lastSolution;
 	
 	public BasicTestListener() {
@@ -29,7 +32,9 @@ public class BasicTestListener implements MiniZincResultListener {
 		this.cyclic = false;
 		this.objectives = new HashMap<>();
 		this.lastSolution = new HashMap<>();
+		this.objectiveSequences = new HashMap<>(); 
 	}
+	
 	
 	@Override
 	public void notifyOptimality() {
@@ -54,13 +59,21 @@ public class BasicTestListener implements MiniZincResultListener {
 				Scanner sc = new Scanner(tok);
 				String id = sc.next();
 				sc.next(); // "="
-				String val = sc.next();
+				String val = sc.nextLine().trim();
 				
 				if(solutionLine)
 					lastSolution.put(id, val);
-				else
+				else {
+					
 					objectives.put(id, val);
-				
+					if(objectiveSequences.containsKey(id)) {
+						objectiveSequences.get(id).add(val);
+					} else {
+						List<String> values = new LinkedList<>();
+						values.add(val);
+						objectiveSequences.put(id, values);								
+					}
+				}
 				sc.close();
 			}
 		}
@@ -106,5 +119,15 @@ public class BasicTestListener implements MiniZincResultListener {
 
 	public void setSolutionCounter(int solutionCounter) {
 		this.solutionCounter = solutionCounter;
+	}
+
+
+	public Map<String, List<String>> getObjectiveSequences() {
+		return objectiveSequences;
+	}
+
+
+	public void setObjectiveSequences(Map<String, List<String>> objectiveSequences) {
+		this.objectiveSequences = objectiveSequences;
 	}
 }

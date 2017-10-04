@@ -25,7 +25,7 @@ public class MorphismTest {
 		launcher = new MiniZincLauncher();
 	}
 
-	@Test
+	@Test 
 	public void testMorphism() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);

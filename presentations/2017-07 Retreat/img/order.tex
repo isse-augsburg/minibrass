@@ -1,0 +1,111 @@
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,
+  thick,main node/.style={circle,inner sep=1.5pt,fill=black!15,draw,font=\sffamily}, scale=1.15,
+   pvs/.style={shape=rectangle, rounded corners,draw=issegrey!50,align=center}]
+%%%%%%%%%%%%%%%%%% Orderings and embeddings
+
+\node (t) at (4.3,6.5) {{$\top$}};
+\node [text width=2.4cm](labelR) at ($(t)+(1,.7)$) {$\mathsf{P}$};
+
+\node (r2) at ($(t)-(0.5,1)$) {{$\RN{2}$}};
+\node (a2) at ($(t)-(-0.5,1)$) {{$2$}};
+
+\node (r1) at ($(r2)-(0,1)$) {{$\RN{1}$}};
+\node (a1) at ($(a2)-(0,1)$) {{$1$}};
+
+
+\path[-,thin]
+(r1) edge (r2)
+     edge (a2)
+(a1) edge (r2)
+     edge (a2)
+(a2) edge (t)
+(r2) edge (t)
+;      
+
+  
+   
+
+%%%%%%%%%%%%%%%%%% SCSP problem
+  \node[main node,minimum size = 12pt,text depth=.25ex,anchor=west,label=west:] (x) at (0,3) {$x$} ;
+  \node[main node,minimum size = 12pt,text depth=.25ex,label=west:] (y) at ($(x)+(4.5,0)$) {$y$};  
+  \node[main node,minimum size = 12pt,text depth=.25ex,label=east:] (z) at ($(x)+(9,0)$) {$z$};  
+  \node[anchor=north west] (scsplabel) at ($(x)+(-.5,.7)$) {\color{issegrey} $SCSP$};
+
+\node[pvs,dotted,text width=11.85cm,anchor=north west, text height=3.4cm] at ($(scsplabel.north west)+(-.3,0)$) {};
+  \path[-,thin]
+    (x) edge (y)
+    (y) edge (z)
+  ;
+  \draw [thin,densely dashed,-] (x.south) -- ( $ (x.south) + (0,-.45)$); 
+  \draw [thin,densely dashed,-] (y.south) -- ( $ (y.south) + (0,-.45)$);
+  \draw [thin,densely dashed,-] (z.south) -- ( $ (z.south) + (0,-.45)$);   
+  
+  \node[anchor=north] (mux) at ($(x)+(0,-.5)$) {
+\begin{tabular}{|c|c|}
+  \hline 
+  $x$ & $\mu_x$ \\ 
+  \hline 
+  0 & 1 \\ 
+  1 & 2 \\ 
+  \hline 
+  \end{tabular}   
+  };  
+  
+  \node[anchor=north] (muy) at ($(y)+(0,-.5)$) {
+\begin{tabular}{|c|c|}
+  \hline 
+  $y$ & $\mu_y$ \\ 
+  \hline 
+  0 & 1 \\ 
+  1 & 2 \\ 
+  \hline 
+  \end{tabular}   
+  };  
+  
+    \node[anchor=north] (muz) at ($(z)+(0,-.5)$) {
+\begin{tabular}{|c|c|}
+  \hline 
+  $z$ & $\mu_z$ \\ 
+  \hline 
+  0 & $\RN{2}$ \\ 
+  1 & 1 \\ 
+  \hline 
+  \end{tabular}   
+  };  
+  
+    \node[anchor=north] (muyx) at ($(x)+(2.25,-.5)$) {
+\begin{tabular}{|c|c|c|}
+  \hline 
+  $x$ & $y$ & $\mu_{xy}$ \\ 
+  \hline 
+  0 & 0 & $\top$\\ 
+  0 & 1 & $\RN{2}$\\ 
+  1 & 0 & 2\\ 
+  1 & 1 & 1\\  
+  \hline 
+  \end{tabular}   
+  };  
+
+    \node[anchor=north] (muyz) at ($(y)+(2.25,-.5)$) {
+\begin{tabular}{|c|c|c|}
+   \hline 
+  $y$ & $z$ & $\mu_{yz}$ \\ 
+  \hline 
+  0 & 0 & $\RN{2}$\\ 
+  0 & 1 & $\RN{1}$\\ 
+  1 & 0 & $2$\\ 
+  1 & 1 & 1\\ 
+  \hline 
+  \end{tabular}   
+  };    
+  
+  \draw [thin,densely dashed,-] ($(muyx.north)+(0,.5)$) -- ($(muyx.north)+(0,-0.1)$);  
+  
+  \draw [thin,densely dashed,-] ($(muyz.north)+(0,.5)$) -- ($(muyz.north)+(0,-0.1)$);  
+%\node[anchor=west] at (-.7, -3.5) { \textbf{Elimination order}:$\langle x, y, z \rangle$};
+
+% |x| = \twopartdef { x } {x \geq 0} {-x} {x < 0}
+%\node[anchor=west] at (-.7, -3.8) {\textbf{Embedding } into $\cSRngfree{\mathsf{R}}$: };
+
+\end{tikzpicture}

@@ -1,0 +1,119 @@
+
+\begin{frame}{Praxis: Dedizierte Soft-Constraint-Solver}
+Third International CSP Competition (CPAI’08)
+\begin{center}
+\includegraphics[width=.8\textwidth]{img/cpai08.png}
+\end{center}
+{ \color{isseorange} \texttt{toulbar2} ist der einzige dedizierte Weighted-CSP-Solver}
+
+\textbf{Fazit:} Nur \emph{ein} Solver für eine Teilklasse der PVS-Probleme!
+\end{frame}
+
+\begin{frame}[fragile]{State of the Art: \texttt{toulbar2}}
+Eingabeformat: \texttt{wcsp}
+
+\vspace*{2ex}
+
+\begin{verbatim}
+SAMPLE-PROB 3 3 3 4
+3 3 3
+2 0 1 2 2
+0 1 0 
+1 2 0
+2 1 2 1 1
+0 2 0
+2 0 1 1 6
+0 0 0
+0 1 0
+0 2 0 
+1 0 0 
+1 1 0
+2 0 0
+\end{verbatim}
+Hoher Gap zwischen Theorie und Praxis (Anwendbarkeit, Modellierungsstärke); häufig nur Fokus auf Performanz!
+\end{frame}
+
+\begin{frame}{Praxis: Konventionelle Constraint-Optimierung}
+Im Constraint Programming:
+\begin{itemize}
+\item Fokus auf \emph{klassischen} Constraint-Lösern
+\item Erweiterung auf einfache Optimierung (Branch \& Bound)
+\item Zielfunktion kann skalare Variable (\texttt{int} oder \texttt{float}) sein
+%\item { \color{isseorange} \texttt{toulbar2} ist der einzige dedizierte Weighted-CSP-Solver}
+\end{itemize}
+
+\vspace*{2ex}
+
+In der mathematischen Programmierung:
+
+\begin{itemize}
+\item Probleme müssen gewisse Struktur aufweisen (lineare Constraints, quadratische Constraints, etc.)
+\item Schlecht geeignet für beliebige Ordnungen nach denen optimiert werden soll
+\item Wir planen allerdings mit heterogenen PVS!
+\end{itemize}
+
+\vspace*{1ex} \pause 
+\textbf{Fazit:} Meist ad-hoc Kodierungen und geringer Support für die vielfältigen Präferenzformalismen
+\end{frame}
+
+\begin{frame}{Warum MiniZinc?}
+\begin{parchment}[Rationale]
+\centering 
+\alert{Eine Modellierungssprache -- viele Solver} 
+\end{parchment}
+
+\begin{textblock*}{4.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=.4\textwidth]{img/MiniZn_logo.jpg}
+\hfill
+\includegraphics[width=.4\textwidth]{img/data61.jpg} 
+
+\includegraphics[width=1\textwidth]{img/nictaorg.png}
+
+\end{textblock*}
+\emph{Reduziere Soft-Constraint-Probleme auf konventionelle Constraint-Probleme}
+
+\begin{itemize}
+\item Gecode (CP)
+\item JaCoP (CP)
+\item Google Optimization Tools (CP)
+\item CPLEX (CP/LP/MIP)
+\item G12 (CP/LP/MIP)
+\item \ldots
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MiniZinc-Challenge}
+Findet jährlich seit 2008 statt. Klassische Constraint-Probleme in MiniZinc werden an teilnehmende Solver geschickt.
+
+\begin{center}
+Gewinner 2015
+
+\includegraphics[width=.5\textwidth]{img/ergeb2015.png}
+
+
+\end{center}
+\begin{tabular}{|c|c|}
+\hline 
+Jahr & Teilnehmende Solver \\ 
+\hline 
+2015 & 20 \\ 
+\hline 
+2014 & 18 \\ 
+\hline 
+2013 & 10 \\ 
+\hline 
+2012 & 9 \\ 
+\hline 
+\end{tabular} 
+
+\begin{textblock*}{4.cm}[1,1](\textwidth-.5cm,\textheight-1.03cm)
+
+\includegraphics[width=.4\textwidth]{img/MiniZn_logo.jpg}
+\hfill
+\includegraphics[width=.4\textwidth]{img/data61.jpg} 
+
+%\includegraphics[width=1\textwidth]{img/nictaorg.png}
+
+\end{textblock*}
+\end{frame}

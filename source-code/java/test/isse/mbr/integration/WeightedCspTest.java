@@ -23,7 +23,7 @@ public class WeightedCspTest {
 	String minibrassModelAnnot = "test-models/weightedAnnot.mbr";
 	String minibrassCompiled = "test-models/classic_o.mzn";
 	String minizincModel = "test-models/classic.mzn";
-	private MiniBrassCompiler compiler;
+	private MiniBrassCompiler compiler; 
 	private MiniZincLauncher launcher;
 	
 	@Before
