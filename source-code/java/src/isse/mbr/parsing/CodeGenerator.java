@@ -25,6 +25,7 @@ import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.IntervalType;
+import isse.mbr.model.types.MiniZincArrayLike;
 import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NumericValue;
@@ -47,9 +48,14 @@ public class CodeGenerator {
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
-	private List<String> leafValuations;
+	public static final String ITER_VARIABLE_PREFIX = "mbr_iter_var_";
+	public static final String AUX_VARIABLE_PREFIX = "mbr_aux_var_";
+	
+
 	private boolean onlyMiniZinc;
 	private boolean genHeuristics;
+
+	private List<PVSInstance> leafInstances;
 	
 	public String generateCode(MiniBrassAST model) throws MiniBrassParseException {
 		 LOGGER.fine("Starting code generation");
@@ -110,7 +116,7 @@ public class CodeGenerator {
 		if(genHeuristics)
 			sb.append("ann: "+MiniZincKeywords.PVS_SEARCH_HEURISTIC +" = "+CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
 		
-		leafValuations = new LinkedList<>();
+		leafInstances = new LinkedList<>();
 		addPvs(deref(topLevelInstance), sb, model);
 		
 		if(!onlyMiniZinc) {
@@ -118,12 +124,22 @@ public class CodeGenerator {
 		
 			StringBuilder equalityBuilder = new StringBuilder();
 			boolean firstLeaf = true;
-			for(String leafValuation : leafValuations) {
+			for(PVSInstance leafInstance : leafInstances) {
+				String leafValuation = getOverallValuation(leafInstance); 
 				if(firstLeaf)
 					firstLeaf = false;
 				else
 					equalityBuilder.append(" /\\ ");
-				equalityBuilder.append(String.format("sol(%s) = %s", leafValuation, leafValuation));
+				// now this must be available for arrays as well
+				if(leafInstance.getType().instance.getElementType() instanceof MiniZincArrayLike) {
+					ArrayType at  = ( (MiniZincArrayLike) leafInstance.getType().instance.getElementType() ).getArrayType();
+					String comprehensionString = getComprehensionString(at , leafInstance );
+					String indexString = getIndexString(at, leafInstance );
+					String equalArrays  = String.format("[ sol(%s["+indexString+"]) | "+comprehensionString+"] = %s ", leafValuation, leafValuation);
+					equalityBuilder.append(equalArrays);
+				} else {
+					equalityBuilder.append(String.format("sol(%s) = %s", leafValuation, leafValuation));
+				}
 			}
 			
 			String negatedGetNotWorse = "not ( ("+ equalityBuilder.toString() +") \\/ (" + topLevelInstance.getGeneratedNotWorsePredicate()+ "))";
@@ -133,7 +149,8 @@ public class CodeGenerator {
 		sb.append("\n% Add this line to your output to make use of minisearch\n");
 		sb.append("% [ \"\\n"+VALUATTIONS_PREFIX+" ");
 		boolean first = true;
-		for(String val : leafValuations) {
+		for(PVSInstance leafInstance : leafInstances) {
+			String val = getOverallValuation(leafInstance);
 			if(!first)
 				sb.append("; ");
 			else 
@@ -271,7 +288,8 @@ public class CodeGenerator {
 			sb.append("\n% Decision variables: \n");
 			
 			String overallIdent = getOverallValuation(inst); 
-			leafValuations.add(overallIdent);
+			leafInstances.add(inst);
+			
 			appendOverall(sb, pvsType.getElementType(), inst, overallIdent);
 			
 			PVSParameter nScs = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
@@ -279,9 +297,14 @@ public class CodeGenerator {
 			
 			String valuationsArray = CodeGenerator.encodeString("valuations", inst);
 			
-			
-			sb.append(String.format("array[%s] of var %s: %s;\n", sCSet.toMzn(inst), encode(pvsType.getSpecType(), inst), valuationsArray));
-		
+			MiniZincParType specType = pvsType.getSpecType();
+			if(specType instanceof MiniZincVarType) {
+				sb.append(String.format("array[%s] of var %s: %s;\n", sCSet.toMzn(inst), encode(pvsType.getSpecType(), inst), valuationsArray));
+			} else {
+				MiniZincArrayLike arrayLike = (MiniZincArrayLike) specType; 
+				ArrayType arrayType = arrayLike.getArrayType();
+				sb.append(String.format("array[%s,%s] of var %s: %s;\n", sCSet.toMzn(inst), getArrayIndexSets(arrayType, inst), encode(arrayType.getElementType(), inst), valuationsArray));
+			}
 			String topIdent = CodeGenerator.encodeString("top", inst);
 			// TODO check if "top" can be used for something useful, got troublesome due to array handling for now 
 			//sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
@@ -291,11 +314,14 @@ public class CodeGenerator {
 			sb.append("\n% MiniSearch predicates: \n");
 			// 
 			String lastSolutionDegree = String.format("sol(%s)", overallIdent);
-			if(pvsType.getElementType() instanceof ArrayType) {
-				lastSolutionDegree = String.format("[ sol(%s[i]) | i in index_set(%s)]", overallIdent,overallIdent);
+			if(pvsType.getElementType() instanceof MiniZincArrayLike) {
+				String comprehensionString = getComprehensionString( ( (MiniZincArrayLike) pvsType.getElementType()).getArrayType(), inst );
+				String indexString = getIndexString( ( (MiniZincArrayLike) pvsType.getElementType()).getArrayType(), inst );
+				lastSolutionDegree = String.format("[ sol(%s["+indexString+"]) | "+comprehensionString+"]", overallIdent);
 			}
 			String getBetterString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), lastSolutionDegree, overallIdent, instanceArguments.toString());
 			String notGetWorseString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), overallIdent, lastSolutionDegree, instanceArguments.toString());
+			
 			inst.setGeneratedBetterPredicate(getBetterString);
 			inst.setGeneratedNotWorsePredicate(notGetWorseString);
 			
@@ -305,7 +331,19 @@ public class CodeGenerator {
 				
 			sb.append("\n% Soft constraints: \n");
 			for(SoftConstraint sc : inst.getSoftConstraints().values()) {
-				sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(), CodeGenerator.processSubstitutions(sc.getMznLiteral(), subs) ));
+				if(pvsType.getElementType() instanceof MiniZincArrayLike) {
+					MiniZincArrayLike mal = (MiniZincArrayLike) pvsType.getElementType();
+					ArrayType at = mal.getArrayType();
+					String arrayDecisionVariable = getArrayDecisionVariable(pvsType.getElementType(), inst, AUX_VARIABLE_PREFIX+sc.getId());
+					String auxIdent = AUX_VARIABLE_PREFIX+sc.getId();
+					sb.append(arrayDecisionVariable+ " = "+CodeGenerator.processSubstitutions(sc.getMznLiteral(), subs)+";\n");
+					String indexString = getIndexString(at, inst);
+					String comprehensions = getComprehensionString(at, inst);
+					sb.append(String.format("constraint forall(%s) ( %s[%d,%s] = %s[%s] );\n\n",comprehensions, valuationsArray, sc.getId(), indexString,auxIdent,indexString ));
+				} else {
+					sb.append(String.format("constraint %s[%d] = (%s);\n",valuationsArray,sc.getId(), CodeGenerator.processSubstitutions(sc.getMznLiteral(), subs) ));
+				}
+				
 			}
 			
 			// ------------------------------------------------------------- 
@@ -326,22 +364,59 @@ public class CodeGenerator {
 		
 	}
 
+	private String getIndexString(ArrayType arrayType, PVSInstance inst) {
+		StringBuilder sbBuilder = new StringBuilder(); 
+
+		for(int i = 0; i < arrayType.getIndexSets().size(); ++i) {
+			if(i > 0)
+				sbBuilder.append(",");
+			sbBuilder.append(ITER_VARIABLE_PREFIX+i);
+			++i;
+		}
+		return sbBuilder.toString();
+	}
+
+	private String getComprehensionString(ArrayType arrayType, PVSInstance inst) {
+		StringBuilder sbBuilder = new StringBuilder(); 
+		int i = 0;
+		for(PrimitiveType index : arrayType.getIndexSets()) {
+			sbBuilder.append(String.format("%s in %s", ITER_VARIABLE_PREFIX+i, encode(index,inst)));
+			++i;
+		}
+		return sbBuilder.toString();
+	}
+
 	private void appendOverall(StringBuilder sb, MiniZincParType elementType, PVSInstance inst, String overallIdent) {
 		if(elementType instanceof MiniZincVarType) {
 			sb.append(String.format("var %s: %s;\n",encode(elementType, inst), overallIdent));
-		} else { // must be Array then
-			ArrayType arrayType = (ArrayType) elementType;
-			sb.append("array[");
-			boolean first = true;
-			for(PrimitiveType pt :  arrayType.getIndexSets()) {
-				if(first)
-					first = false;
-				else 
-					sb.append(",");
-				sb.append(encode(pt,inst));
-			}
-			sb.append(String.format("] of var %s: %s;\n", encode(arrayType.getType(), inst), overallIdent));
+		} else { // must be MiniZincArrayLike then
+			String arrayDecisionVariable = getArrayDecisionVariable(elementType, inst, overallIdent);
+			sb.append(arrayDecisionVariable + ";\n");
 		}
+	}
+
+	private String getArrayDecisionVariable(MiniZincParType elementType, PVSInstance inst, String arrayIdent) {
+		MiniZincArrayLike miniZincArrayLike = (MiniZincArrayLike) elementType;
+		ArrayType arrayType = miniZincArrayLike.getArrayType();
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("array[");
+		sb.append(getArrayIndexSets(arrayType,inst));
+		sb.append(String.format("] of var %s: %s", encode(arrayType.getElementType(), inst), arrayIdent));
+		return sb.toString();
+	}
+
+	private String getArrayIndexSets(ArrayType arrayType, PVSInstance inst) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for(PrimitiveType pt :  arrayType.getIndexSets()) {
+			if(first)
+				first = false;
+			else 
+				sb.append(",");
+			sb.append(encode(pt,inst));
+		}
+		return sb.toString();
 	}
 
 	private StringBuilder getInstanceArguments(PVSType pvsType, PVSInstance inst) {

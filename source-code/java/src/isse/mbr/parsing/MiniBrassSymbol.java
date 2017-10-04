@@ -36,6 +36,7 @@ public enum MiniBrassSymbol {
 	GeneratedBySy,      // generatedBy
 	GeneratedSy,        // generated
 	SetSy,              // set 
+	MSetSy,             // mset (multiset)
 	ArraySy,            // array
 	OfSy,               // of
 	IntSy,              // int

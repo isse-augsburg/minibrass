@@ -7,7 +7,7 @@ import isse.mbr.model.MiniBrassAST;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.parsing.MiniBrassParser;
-
+ 
 public class MiniBrassTest {
 
 	public static void main(String[] args) throws FileNotFoundException, MiniBrassParseException {

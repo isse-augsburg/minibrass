@@ -25,7 +25,7 @@ public class SearchHeuristicTest {
 	// for the weighted conversion 
 	String minibrassWeightedModel = "test-models/testHeuristicWeighted.mbr";
 	String minizincWeightedModel = "test-models/testHeuristicWeighted.mzn";
-	
+	 
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
 	

@@ -1,5 +1,5 @@
 
-Drop View NativeDataComp;
+Drop View If Exists NativeDataComp;
 Create View If not Exists NativeDataComp as 
 SELECT problem, instance, SolverName, SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, solved FROM 
 JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 

@@ -276,7 +276,7 @@ class="ectt-1000">"</span>)&#x00A0;{&#x00A0;<br /><span class="label"><a
 class="ecbx-1000">soft</span><span 
 class="cmsy-10">-</span><span 
 class="ecbx-1000">constraint</span>&#x00A0;c1:&#x00A0;<span 
-class="ectt-1000">&#8217;</span><span 
+class="ectt-1000">'</span><span 
 class="ectt-1000">x</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">+</span><span 
@@ -286,12 +286,12 @@ class="ectt-1000">&#x00A0;</span><span
 class="ectt-1000">=</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">y</span><span 
-class="ectt-1000">&#8217;</span>;&#x00A0;<br /><span class="label"><a 
+class="ectt-1000">'</span>;&#x00A0;<br /><span class="label"><a 
  id="x1-1021r5"></a></span>&#x00A0;&#x00A0;&#x00A0;<span 
 class="ecbx-1000">soft</span><span 
 class="cmsy-10">-</span><span 
 class="ecbx-1000">constraint</span>&#x00A0;c2:&#x00A0;<span 
-class="ectt-1000">&#8217;</span><span 
+class="ectt-1000">'</span><span 
 class="ectt-1000">z</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">=</span><span 
@@ -301,12 +301,12 @@ class="ectt-1000">&#x00A0;</span><span
 class="ectt-1000">+</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">2</span><span 
-class="ectt-1000">&#8217;</span>;&#x00A0;<br /><span class="label"><a 
+class="ectt-1000">'</span>;&#x00A0;<br /><span class="label"><a 
  id="x1-1022r6"></a></span>&#x00A0;&#x00A0;&#x00A0;<span 
 class="ecbx-1000">soft</span><span 
 class="cmsy-10">-</span><span 
 class="ecbx-1000">constraint</span>&#x00A0;c3:&#x00A0;<span 
-class="ectt-1000">&#8217;</span><span 
+class="ectt-1000">'</span><span 
 class="ectt-1000">x</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">+</span><span 
@@ -316,10 +316,10 @@ class="ectt-1000">&#x00A0;</span><span
 class="ectt-1000">&#x003C;=</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">3</span><span 
-class="ectt-1000">&#8217;</span>;&#x00A0;<br /><span class="label"><a 
+class="ectt-1000">'</span>;&#x00A0;<br /><span class="label"><a 
  id="x1-1023r7"></a></span>&#x00A0;<br /><span class="label"><a 
  id="x1-1024r8"></a></span>&#x00A0;&#x00A0;&#x00A0;crEdges&#x00A0;:&#x00A0;<span 
-class="ectt-1000">&#8217;</span><span 
+class="ectt-1000">'</span><span 
 class="ectt-1000">[|</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">mbr</span><span 
@@ -343,11 +343,11 @@ class="ectt-1000">.</span><span
 class="ectt-1000">c1</span><span 
 class="ectt-1000">&#x00A0;</span><span 
 class="ectt-1000">|]</span><span 
-class="ectt-1000">&#8217;</span>;&#x00A0;<br /><span class="label"><a 
+class="ectt-1000">'</span>;&#x00A0;<br /><span class="label"><a 
  id="x1-1025r9"></a></span>&#x00A0;&#x00A0;&#x00A0;useSPD:&#x00A0;<span 
-class="ectt-1000">&#8217;</span><span 
+class="ectt-1000">'</span><span 
 class="ectt-1000">false</span><span 
-class="ectt-1000">&#8217;</span>&#x00A0;;&#x00A0;<br /><span class="label"><a 
+class="ectt-1000">'</span>&#x00A0;;&#x00A0;<br /><span class="label"><a 
  id="x1-1026r10"></a></span>};&#x00A0;<br /><span class="label"><a 
  id="x1-1027r11"></a></span>&#x00A0;<br /><span class="label"><a 
  id="x1-1028r12"></a></span><span 
@@ -361,8 +361,8 @@ class="ecbx-1000">solve</span>&#x00A0;cr1;
 Quickest start (only requires MiniBrass and MiniZinc):
 <ol>
 <li>Download and install the newest MiniZinc IDE version from <a href="http://www.minizinc.org/">http://www.minizinc.org/</a></li>
-<li>Download <a href="mbr2mzn.zip">mbr2mzn.jar</a></li>
-<li>Download <a href="soft_constraints.zip">soft_constraints.zip</a> and unpack it</li>
+<li>Download <a href="https://github.com/isse-augsburg/minibrass/raw/master/source-code/java/mbr2mzn.jar">mbr2mzn.jar</a></li>
+<li>Download <a href="https://github.com/isse-augsburg/minibrass/blob/master/source-code/minizinc/soft_constraints.zip?raw=true">soft-constraints.zip</a> and unpack it</li>
 <li>Locate the directory "./share/minizinc/std" of your MiniZinc installation</li>
 <li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
 <li>Download and extract the  <a href="codeexamples.zip">code examples</a>
@@ -380,8 +380,8 @@ Slightly slower start (requires MiniBrass, MiniZinc and MiniSearch):
 
 <ol>
 <li>Build MiniSearch according to the instructions at <a href="http://www.minizinc.org/minisearch/">MiniSearch</a></li>
-<li>Download <a href="mbr2mzn.zip">mbr2mzn.jar</a></li>
-<li>Download <a href="soft_constraints.zip">soft-constraints.zip</a> and unpack it</li>
+<li>Download <a href="https://github.com/isse-augsburg/minibrass/raw/master/source-code/java/mbr2mzn.jar">mbr2mzn.jar</a></li>
+<li>Download <a href="https://github.com/isse-augsburg/minibrass/blob/master/source-code/minizinc/soft_constraints.zip?raw=true">soft-constraints.zip</a> and unpack it</li>
 <li>Locate the directory "./share/minizinc/std" of your MiniSearch installation</li>
 <li>Copy the directory "soft_constraints" into "./share/minizinc/std"</li>
 <li>Download and extract the  <a href="codeexamples.zip">code examples</a>
