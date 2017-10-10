@@ -17,13 +17,13 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings",
   "-Xfuture",
   "-Xlint",
+  "-Xexperimental",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-unused-import",
   "-Ywarn-value-discard"
   )
-
 
 
 
