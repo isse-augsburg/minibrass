@@ -21,7 +21,7 @@ sealed case class ConstraintGraph(val constraintRelations: ConstraintRelation){
 
   /**
     * Checks whether the given Graph is acyclic.
-    * @return true if DAG is acyclic
+    * @return true if DAG is acyclic;
     */
   def ensureGraphIsAcyclic(g: ConstraintGraph) : Boolean = ???
 }
