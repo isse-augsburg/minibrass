@@ -21,9 +21,25 @@ sealed case class ConstraintGraph(val constraintRelations: ConstraintRelation){
 
   /**
     * Checks whether the given Graph is acyclic.
-    * @return true if DAG is acyclic;
+    * @return true if DAG is acyclic; uses DFS
     */
-  def ensureGraphIsAcyclic(g: ConstraintGraph) : Boolean = ???
+  def ensureGraphIsAcyclic(constrRels: ConstraintRelation) : Boolean = {
+    /**
+      * Checks whether the given key is not cyclic.
+      * @param constraint the given key
+      * @return true if acyclic
+      */
+    def checkKey(constraint: Constraint, keyToCheck: Constraint) : Boolean = {
+      val keysToCheck : Option[List[Constraint]] = constrRels.get(constraint)
+      if (keysToCheck.get.isEmpty) {true}
+      else if (keysToCheck.get.contains(keyToCheck)) {false}
+      else {
+        (for{key <- keysToCheck.get} yield checkKey(key, keyToCheck)).forall (x => x)
+      }
+    }
+
+    (for(key <- constrRels.keys) yield checkKey(key, key)).forall(x => x)
+  }
 }
 
 object ConstraintGraph {
