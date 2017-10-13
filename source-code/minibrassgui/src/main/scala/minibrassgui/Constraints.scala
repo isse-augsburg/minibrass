@@ -3,7 +3,7 @@ package minibrassgui
 import minibrassgui.ConstraintGraph.ConstraintRelation
 
 
-sealed case class Constraint(name: String)
+sealed case class Constraint(name: String, weight: Int = 0)
 
 /**
   * Class holding the Constraint Preferences structure.
