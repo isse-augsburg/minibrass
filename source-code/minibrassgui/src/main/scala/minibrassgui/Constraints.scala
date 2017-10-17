@@ -16,21 +16,25 @@ sealed case class ConstraintGraph(val constraintRelations: ConstraintRelation){
     * @param newCR data to add
     * @return new ConstraintGraph in case adding was successful, the old one otherwise
    */
-  def addCR(newCR: ConstraintRelation) : ConstraintGraph =
+  def addCR(newCR: ConstraintRelation) : ConstraintGraph = {
+    if(ensureGraphIsAcyclic(this.constraintRelations ++ newCR))
     ConstraintGraph(constraintRelations ++ newCR)
+    else
+      this
+  }
 
   /**
     * Checks whether the given Graph is acyclic.
     * @return true if DAG is acyclic; uses DFS
     */
-  def ensureGraphIsAcyclic() : Boolean = {
+  def ensureGraphIsAcyclic(crToCheck: ConstraintRelation) : Boolean = {
     /**
       * Checks whether the given key is not cyclic.
       * @param constraint the given key
       * @return true if acyclic
       */
     def checkKey(constraint: Constraint, keysToCheck: List[Constraint]) : Boolean = {
-      val values : Option[List[Constraint]] = this.constraintRelations.get(constraint).orElse(None)
+      val values : Option[List[Constraint]] = crToCheck.get(constraint).orElse(None)
       if (values == None) {true}
       else if (! (values.get.diff(keysToCheck) equals values.get)) false
       else {
@@ -38,7 +42,7 @@ sealed case class ConstraintGraph(val constraintRelations: ConstraintRelation){
       }
     }
 
-    (for(key <- this.constraintRelations.keys) yield checkKey(key, List(key))).forall(x => x)
+    (for(key <- crToCheck.keys) yield checkKey(key, List(key))).forall(x => x)
   }
 }
 
