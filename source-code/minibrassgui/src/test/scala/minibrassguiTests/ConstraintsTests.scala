@@ -10,21 +10,27 @@ class ConstraintsTests extends MinibrassguiSpec{
     Constraint("two")->List.empty,
     Constraint("three")->List.empty
   ))
+  val sharedConstraintGraph2 = ConstraintGraph(Map(
+    Constraint("one")->List(Constraint("two"), Constraint("three")),
+    Constraint("two")->List.empty,
+    Constraint("three")->List.empty,
+    Constraint("four")->List(Constraint("two"))
+  ))
 
   test("Constraints.ConstraintGraph.addCR"){
-    assertResult(ConstraintGraph(Map(
-      Constraint("one")->List(Constraint("two"), Constraint("three")),
-      Constraint("two")->List.empty,
-      Constraint("three")->List.empty,
-      Constraint("four")->List(Constraint("two"))
-    ))) {
+    assertResult(sharedConstraintGraph2) {
       sharedConstraintGraph.addCR(Map(Constraint("four")->List(Constraint("two"))))
+    }
+  }
+  test("Constraint.ConstraintGraph.addCR with ensureGraphIsAcyclic == false"){
+    assertResult(sharedConstraintGraph){
+      sharedConstraintGraph.addCR(Map(Constraint("three")->List(Constraint("one"))))
     }
   }
 
   test("Constraints.ConstraintGraph.ensureGraphIsAcyclic"){
     assertResult(true){
-      sharedConstraintGraph.ensureGraphIsAcyclic()
+      sharedConstraintGraph.ensureGraphIsAcyclic(sharedConstraintGraph.constraintRelations)
     }
   }
 
@@ -36,14 +42,14 @@ class ConstraintsTests extends MinibrassguiSpec{
       Constraint("four")->List(Constraint("two")),
     ))
     assertResult(false) {
-      badGraph.ensureGraphIsAcyclic()
+      badGraph.ensureGraphIsAcyclic(badGraph.constraintRelations)
     }
   }
 
   test("Constraints.ConstraintGraph.ensureGraphIsAcyclic test empty"){
     val emptyGraph = ConstraintGraph(Map.empty)
     assertResult(true) {
-      emptyGraph.ensureGraphIsAcyclic()
+      emptyGraph.ensureGraphIsAcyclic(emptyGraph.constraintRelations)
     }
   }
 }
