@@ -514,7 +514,7 @@ public class MiniBrassParser {
 	}
 
 	/**
-	 * "type" ident "=" "PVSType" "<" MiniZincType ( "," MiniZincType) ">" 
+	 * "type" ident "=" "PVSType" "<" MiniZincType ( "," MiniZincType) ">" [ "represents" ident] 
 	 * @throws MiniBrassParseException 
 	 */
 	private PVSType typeItem() throws MiniBrassParseException {
@@ -559,6 +559,17 @@ public class MiniBrassParser {
 		
 		expectSymbolAndNext(MiniBrassSymbol.RightAngleSy);		
 		
+		// here we can add a "represents" statement to the PVS type we embed into (e.g., Constraint Preferences represent the free PVS)
+		if(currSy == MiniBrassSymbol.RepresentsSy) {
+			getNextSy();
+			expectSymbol(MiniBrassSymbol.IdentSy);
+			String representationType = lexer.getLastIdent();
+			NamedRef<PVSType> typeRef = new NamedRef<>(representationType);
+			newType.setRepresentsType(typeRef);
+			semChecker.scheduleUpdate(typeRef, model.getPvsTypes());
+			getNextSy();
+		}
+			
 		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
 		if(currSy == MiniBrassSymbol.ParamsSy) { // we have a parameters part
 			getNextSy();
