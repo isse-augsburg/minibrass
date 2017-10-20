@@ -97,47 +97,50 @@ order by pd.problem, pd.instance, pd.solverName;
   AVG(AbsOverhead), AVG(RelOverhead),
   AVG(WeightsObjective), AVG(SmythObj)
 FROM PvsNativeSummary
-GROUP By Problem,SolverName</sql><sql name="query-mif-comp-solver.sql">SELECT SolverName, 
+GROUP By Problem,SolverName</sql><sql name="query-mif-comp-solver.sql">-- SELECT SolverName, 
 --AVG(MifElapsed), AVG(NormalElapsed), 
-AVG(diff), SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+-- AVG(diff), SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+-- FROM 
+-- MifSummary
+-- GROUP BY SolverName 
+
+
+SELECT MifSummary.SolverName, 
+AVG(MifElapsed) as &quot;MifElapsed&quot;, AVG((MifElapsed - Averages.MifElapsedMean) * (MifElapsed - Averages.MifElapsedMean)) as VarMif,
+AVG(NormalElapsed) as &quot;NormalElapsed&quot;,  AVG((NormalElapsed - Averages.NormalElapsedMean) * (NormalElapsed - Averages.NormalElapsedMean)) as VarNormal,
+AVG(diff), AVG(RelDiff),
+SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+FROM 
+MifSummary,
+( SELECT SolverName, 
+AVG(MifElapsed) as &quot;MifElapsedMean&quot;, AVG(NormalElapsed) as &quot;NormalElapsedMean&quot;
 FROM 
 MifSummary
 GROUP BY SolverName 
-</sql><sql name="query-mif-comp.sql">Drop View If Exists MifData; Drop View If Exists NoMifData; Drop View If Exists MifSummary ;
-
-Create View If not Exists MiFData as 
-SELECT problem, instance, SolverName, jr.SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, cf.SearchType FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 1 and timeout &gt; 10000 and PropRed = 0
-order by problem, instance, elapsedSecs, solverId ;
-
-Create View If not Exists NoMiFData as 
-SELECT problem, instance, SolverName, jr.SolverId, round(elapsedSecs,2) as elapsedSecs, Objective, Optimally, cf.ID as ConfigId, cf.SearchType FROM 
-JobResult jr INNER JOIN Config cf ON jr.ConfigId = cf.ID 
-INNER JOIN Solver sv ON jr.SolverId = sv.ID 
-where SPD = 1 and MIF = 0 and timeout &gt; 10000 and PropRed = 0
-order by problem, instance, elapsedSecs, solverId ;
-
---Select Avg(Diff) From (
---Select md.elapsedSecs - nmd.elapsedSecs as diff 
---From MifData as md, NoMifData as nmd
---Where md.problem = nmd.problem and md.instance = nmd.instance and md.SolverName = nmd.SolverName 
---)
-
-Create View If not Exists MifSummary as 
-Select md.Problem, md.Instance, md.SolverName, md.elapsedSecs as &quot;MIFelapsed&quot;, nmd.elapsedSecs as &quot;NormalElapsed&quot;, 
-md.elapsedSecs - nmd.elapsedSecs as diff,
-md.elapsedSecs &lt; nmd.elapsedSecs as &quot;MifWins&quot; 
---SELECT * 
-From MifData as md, NoMifData as nmd
-Where md.problem = nmd.problem and md.instance = nmd.instance and md.SolverId = nmd.SolverId and md.SearchType = nmd.SearchType;
-
-SELECT SolverName, 
+) AS Averages 
+WHERE Averages.SolverName = MifSummary.SolverName 
+GROUP BY MifSummary.SolverName; 
+</sql><sql name="query-mif-comp-solver.sql">-- SELECT SolverName, 
 --AVG(MifElapsed), AVG(NormalElapsed), 
-AVG(diff) as &quot;Diff&quot;, SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+-- AVG(diff), SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+-- FROM 
+-- MifSummary
+-- GROUP BY SolverName 
+
+
+SELECT MifSummary.SolverName, 
+AVG(MifElapsed) as &quot;MifElapsed&quot;, AVG((MifElapsed - Averages.MifElapsedMean) * (MifElapsed - Averages.MifElapsedMean)) as VarMif,
+AVG(NormalElapsed) as &quot;NormalElapsed&quot;,  AVG((NormalElapsed - Averages.NormalElapsedMean) * (NormalElapsed - Averages.NormalElapsedMean)) as VarNormal,
+AVG(diff), AVG(RelDiff), AVG(MifElapsed) / Avg(NormalElapsed) as &quot;RelAverages&quot;,
+SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as &quot;RatioMifWins&quot; 
+FROM 
+MifSummary,
+( SELECT SolverName, 
+AVG(MifElapsed) as &quot;MifElapsedMean&quot;, AVG(NormalElapsed) as &quot;NormalElapsedMean&quot;
 FROM 
 MifSummary
 GROUP BY SolverName 
-
+) AS Averages 
+WHERE Averages.SolverName = MifSummary.SolverName 
+GROUP BY MifSummary.SolverName; 
 </sql><current_tab id="6"/></tab_sql></sqlb_project>

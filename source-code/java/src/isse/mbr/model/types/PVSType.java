@@ -26,6 +26,8 @@ public class PVSType {
 	private Map<String, PVSParameter> paramMap;
 	private String implementationFile; 
 	private String orderingHeuristic;
+	private NamedRef<PVSType> representsType;
+	
 	private boolean isBounded; 
 	
 	public final static String N_SCS_LIT = "nScs";
@@ -140,5 +142,13 @@ public class PVSType {
 
 	public void setOrderingHeuristic(String orderingHeuristic) {
 		this.orderingHeuristic = orderingHeuristic;
+	}
+
+	public NamedRef<PVSType> getRepresentsType() {
+		return representsType;
+	}
+
+	public void setRepresentsType(NamedRef<PVSType> representsType) {
+		this.representsType = representsType;
 	}
 }
