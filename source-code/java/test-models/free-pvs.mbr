@@ -11,6 +11,18 @@ type FreePVS = PVSType<mset[maxOccurrences] of 1..maxP> =
     top -> {};
   };
     
+ type ConstraintPreferences = PVSType<bool, set of 1..nScs> represents FreePVS  = 
+  params { 
+    array[int, 1..2] of 1..nScs: crEdges;
+    bool: useSPD;
+  } in 
+  instantiates with "../mbr_types/cr_type.mzn" {
+    times -> link_invert_booleans;
+    is_worse -> is_worse_cr;
+    top -> {};
+    % bot -> 1..nScs;
+  };
+    
 
 PVS: fp = new FreePVS("fp") {
    soft-constraint c1: 'embed(x == 4, 3, 3)';
