@@ -35,6 +35,7 @@ public enum MiniBrassSymbol {
 	WrappedBySy,        // wrappedBy
 	GeneratedBySy,      // generatedBy
 	GeneratedSy,        // generated
+	RepresentsSy,       // represents
 	SetSy,              // set 
 	MSetSy,             // mset (multiset)
 	ArraySy,            // array

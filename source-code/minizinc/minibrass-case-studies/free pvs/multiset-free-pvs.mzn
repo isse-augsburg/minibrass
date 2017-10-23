@@ -37,8 +37,8 @@ constraint alldifferent_except_0([cantoredWitness[i,p] | i in OCCS, p in P]);
 %  witnessElem[l,p] = witnessElem[l1,p1] /\ witnessOcc[l,p] = witnessOcc[l1,p1] -> l = l1 /\ p = p1 
 %); 
 
-constraint T = [1, 0];
-constraint U = [2, 1]; 
+%constraint T = [1, 0];
+%constraint U = [2, 1]; 
 %predicate isWorse(array[int] of var int: T,
 %                  array[int] of var int: U) = let {
 
