@@ -31,7 +31,7 @@ public class CondorcetVoting implements VotingProcedure {
 		sb.append(")\n");
 		sb.append("> \n");
 		sb.append("\n(\n");
-		sb.append("0");
+		
 		first = true; 
 		for(AbstractPVSInstance voter : votingPvs) {
 			if(first)
@@ -40,7 +40,7 @@ public class CondorcetVoting implements VotingProcedure {
 				sb.append("+ ");
 			}
 			voter = codeGen.deref(voter);
-			sb.append(String.format("bool2int(%s)\n", voter.getGeneratedBetterPredicate()));
+			sb.append(String.format("bool2int(%s)\n", voter.getGeneratedNotWorsePredicate()));
 		}
 		sb.append(")\n");
 		return sb.toString();

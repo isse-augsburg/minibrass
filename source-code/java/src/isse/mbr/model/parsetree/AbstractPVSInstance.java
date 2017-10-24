@@ -10,8 +10,9 @@ import java.util.Collection;
  */
 public abstract class AbstractPVSInstance {
 	protected String name;
-	protected String generatedBetterPredicate;
-	protected String generatedNotWorsePredicate;
+	protected String generatedBetterPredicate;  // strict dominance improvement for BaB
+	protected String generatedNotWorsePredicate; // not worsening for BaB and the like but also for voting 
+	
 	protected Collection<AbstractPVSInstance> children;
 	
 	public String getName() {
@@ -42,5 +43,6 @@ public abstract class AbstractPVSInstance {
 
 	// this should basically be a read-only property
 	public abstract Collection<AbstractPVSInstance> getChildren();
+
 	
 }
