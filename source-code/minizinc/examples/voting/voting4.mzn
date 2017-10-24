@@ -2,19 +2,9 @@
 include "minisearch.mzn";
 
 function ann: postGetBetter() = 
-  let {
-    var 0..1: aLikes;
-    var 0..1: bLikes;
-    var 0..1: cLikes;
-    %array[1..3] of var bool: approvals;
 
-  } in
   post(
-      (
-      aLikes = bool2int(betterForA(choice, sol(choice))) /\
-      bLikes = bool2int(betterForB(choice, sol(choice))) /\
-      cLikes = bool2int(betterForC(choice, sol(choice)))
-      ) /\
+     
       ( % the number of agents that prefer the next solution over the current one 
       bool2int(betterForA(choice, sol(choice)))
       + bool2int(betterForB(choice, sol(choice)))

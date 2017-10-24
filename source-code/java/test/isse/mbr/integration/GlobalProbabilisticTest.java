@@ -32,6 +32,8 @@ public class GlobalProbabilisticTest {
 		compiler = new MiniBrassCompiler();
 		compiler.setMinizincOnly(true); // due to other complications with floats using minisearch
 		launcher = new MiniZincLauncher();
+		launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	@Test
