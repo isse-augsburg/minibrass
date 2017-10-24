@@ -19,6 +19,10 @@ function ann: pvs_BAB() =
            else break endif
        );
        
+% synonym for easier usage
+
+function ann: miniBrass() = pvs_BAB();
+
 % Derived branch-and-bound search based on PVS.
 % Requires every solution not to be *dominated* by any previous one       
 function ann: pvs_BAB_NonDom() =

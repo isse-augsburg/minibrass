@@ -92,6 +92,18 @@ type ProbCostFunctionNetwork = PVSType<float> =
     top -> k;
  };
   
+% just a simple explicit relation mostly for voting experiments  
+type PvsRel = PVSType<1..k> = 
+  params {
+    int: k :: default('1000'); % just some upper bound on integer values 
+    int: topVal :: default('1');
+    array [int,1..2] of 1..k: tuples;
+  } in  
+  instantiates with "soft_constraints/mbr_types/relation-type.mzn" {
+    times -> max;
+    is_worse -> is_worse_relation; 
+    top -> 0; % should be topVal
+ };
 % ========================================
 % MORPHISMS
 % ========================================

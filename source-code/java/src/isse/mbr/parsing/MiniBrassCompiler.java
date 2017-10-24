@@ -87,6 +87,11 @@ public class MiniBrassCompiler {
 		codegen.setOnlyMiniZinc(isMinizincOnly());
 		codegen.setGenHeuristics(isGenHeuristics());
 		
+		// make sure there is one solve item !
+		if(model.getSolveInstance() == null) {
+			throw new MiniBrassParseException("Model contains no solve item! Please add one");
+		}
+		
 		String generatedCode = codegen.generateCode(model);
 		System.out.println("MiniBrass code compiled successfully to "+ output +".");
 		// write code to file
