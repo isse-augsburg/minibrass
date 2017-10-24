@@ -204,6 +204,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.BoolSy;
 				case "float":
 					return MiniBrassSymbol.FloatSy;
+				case "vote":
+					return MiniBrassSymbol.VotingSy;
 				}
 				// otherwise it's an ident
 				lastIdent = s;

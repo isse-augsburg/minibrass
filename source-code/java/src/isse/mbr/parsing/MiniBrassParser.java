@@ -25,6 +25,7 @@ import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
+import isse.mbr.model.parsetree.VotingInstance;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
@@ -39,6 +40,8 @@ import isse.mbr.model.types.PVSParameter;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.model.types.SetType;
+import isse.mbr.model.voting.VotingFactory;
+import isse.mbr.model.voting.VotingProcedure;
 
 /**
  * 
@@ -61,7 +64,7 @@ public class MiniBrassParser {
 	private File mbrStdDir;
 	private MiniBrassAST model; 
 	private SemanticChecker semChecker;
-	private int lexCounter;
+	private int productCounter;
 	
 	public MiniBrassParser() {
 	}
@@ -75,7 +78,7 @@ public class MiniBrassParser {
 		worklist.add(file);
 		visited = new HashSet<>();
 		
-		lexCounter = 0;
+		productCounter = 0;
 		mbrStdDir = null;
 		
 		try{
@@ -243,7 +246,7 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.LEXICOGRAPHIC);
 			composite.setRightHandSide(next);
-			composite.setName("MBR_LEX_"+(++lexCounter));
+			composite.setName("MBR_LEX_"+(++productCounter));
 						
 			first = composite;
 		}
@@ -266,7 +269,7 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.DIRECT);
 			composite.setRightHandSide(next);
-			composite.setName("MBR_DIR_"+(++lexCounter));
+			composite.setName("MBR_DIR_"+(++productCounter));
 			
 			first = composite;
 		}
@@ -410,14 +413,53 @@ public class MiniBrassParser {
 	}
 
 	/**
-	 * solve ident ;
+	 * solve ( ident | VoteItem) ;
 	 * @throws MiniBrassParseException 
 	 */
 	private AbstractPVSInstance solveItem() throws MiniBrassParseException {
+		AbstractPVSInstance instToSolve = null;
+		if(currSy == MiniBrassSymbol.VotingSy) {
+			instToSolve = votingInst(model);
+		} else {
+			instToSolve = PVSInst(model);	
+		}
 		
-		AbstractPVSInstance instToSolve = PVSInst(model);
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		return instToSolve;
+	}
+
+	/**
+	 * vote([ident1,...,identn], voteType)
+	 * @param model
+	 * @return
+	 * @throws MiniBrassParseException 
+	 */
+	private AbstractPVSInstance votingInst(MiniBrassAST model) throws MiniBrassParseException {
+		expectSymbolAndNext(MiniBrassSymbol.VotingSy);
+		expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+		expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
+		
+		VotingInstance votingInst = new VotingInstance(); 
+		votingInst.setName("MBR_VOT_"+(++productCounter));
+		AbstractPVSInstance nextInst = PVSInst(model);
+		votingInst.addPvs(nextInst);
+		
+		while(currSy == MiniBrassSymbol.CommaSy) {
+			getNextSy();
+			nextInst = PVSInst(model);
+			votingInst.addPvs(nextInst);
+		}
+			
+		expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
+		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
+		
+		expectSymbol(MiniBrassSymbol.IdentSy);
+		String votingType = lexer.getLastIdent();
+		VotingProcedure vp = VotingFactory.getVotingProcedure(votingType);
+		votingInst.setVotingProcedure(vp);
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+		return votingInst;
 	}
 
 	/**

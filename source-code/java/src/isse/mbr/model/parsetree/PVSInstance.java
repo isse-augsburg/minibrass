@@ -1,6 +1,8 @@
 package isse.mbr.model.parsetree;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,6 +82,16 @@ public class PVSInstance extends AbstractPVSInstance {
 
 	public void setGeneratedCodeParameters(Map<String, String> generatedCodeParameters) {
 		this.generatedCodeParameters = generatedCodeParameters;
+	}
+
+	@Override
+	public boolean isComplex() {
+		return false;
+	}
+
+	@Override
+	public Collection<AbstractPVSInstance> getChildren() {
+		return new ArrayList<>(); // for now this is really an empty list, we should make sure that this is basically not called
 	}
 
 }

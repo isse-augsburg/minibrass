@@ -1,5 +1,7 @@
 package isse.mbr.model.parsetree;
 
+import java.util.Collection;
+
 import isse.mbr.model.types.NamedRef;
 
 public class ReferencedPVSInstance extends AbstractPVSInstance {
@@ -20,7 +22,16 @@ public class ReferencedPVSInstance extends AbstractPVSInstance {
 	}
 	
 	@Override
+	public boolean isComplex() {
+		return referencedInstance.instance.isComplex();
+	}
+	
+	@Override
 	public String toString() {
 		return "(ref) -> "+reference;
+	}
+	@Override
+	public Collection<AbstractPVSInstance> getChildren() {
+		return referencedInstance.instance.getChildren();
 	}
 }

@@ -53,7 +53,8 @@ public enum MiniBrassSymbol {
 	InstantiatesSy,     // "instantiates"
 	WithSy,             // "with"
 	MorphismSy,         // "morph"
-	NewSy, 				// "new"
+	NewSy, 				// "new
+	VotingSy,           // "vote"
 	NoSy,
 	EofSy     
 }

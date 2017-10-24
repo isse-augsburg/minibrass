@@ -54,6 +54,8 @@ set of int: OPTIONS = 1..3;
 
 var OPTIONS: choice;
 
-solve search pvs_Condorcet_BAB();
+solve
+:: int_search([choice], input_order, indomain_max, complete)
+ search pvs_Condorcet_BAB();
 
 output["choice = \(choice)"];
