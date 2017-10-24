@@ -1,0 +1,15 @@
+include "defs.mbr";
+
+PVS: agent1 = new PvsRel("agent") {
+  soft-constraint c1: 'a';
+  tuples: '[| 1, 3 | 2, 3 | 2, 1 |]';
+  k : '3';
+};
+
+PVS: agent2 = new PvsRel("agent2") {
+  soft-constraint c1: 'a';
+  tuples: '[| 3, 1 | 3, 2 | 1, 2 |]';
+  k : '3';
+};
+
+solve agent1 pareto agent2;
