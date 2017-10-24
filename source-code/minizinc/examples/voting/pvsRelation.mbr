@@ -1,17 +1,9 @@
-type PvsRel = PVSType<1..k> = 
-  params {
-    int: k :: default('1000'); % just some upper bound on integer values 
-    int: topVal :: default('1');
-    array [int,1..2] of 1..k: tuples;
-  } in  
-  instantiates with "relation_type.mzn" {
-    times -> max;
-    is_worse -> is_worse_relation; 
-    top -> 0; % should be topVal
- };
- 
+include "defs.mbr";
+
 PVS: agent1 = new PvsRel("agent") {
   soft-constraint c1: 'a';
   tuples: '[| 3, 1 | 3, 2 | 1, 2 |]';
   k : '3';
 };
+
+solve agent1;
