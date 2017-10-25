@@ -7,7 +7,7 @@ type PvsRel = PVSType<1..k> =
   instantiates with "relation-type.mzn" {
     times -> max;
     is_worse -> is_worse_relation; 
-    top -> 0; % should be topVal
+    top -> mbr.topVal; % should be topVal
  };
  
 PVS: agent1 = new PvsRel("agent") {

@@ -48,6 +48,7 @@ public class CodeGenerator {
 	private final static Logger LOGGER = Logger.getGlobal();
 
 	private static final String OVERALL_KEY = "overall";
+	private static final String TOP_KEY = "top";
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
@@ -168,14 +169,31 @@ public class CodeGenerator {
 					pvsNotWorse));
 		}
 
-		if (!(topLevelInstance.isComplex())) {
-			String topLevelOverall = getOverallValuation(topLevelInstance);
-			PVSInstance pvsInst = (PVSInstance) topLevelInstance;
-			MiniZincParType elementType = pvsInst.getType().instance.getElementType();
-			appendOverall(sb, elementType, pvsInst, MiniZincKeywords.TOP_LEVEL_OBJECTIVE);
-			sb.append(String.format("constraint %s = %s;\n", MiniZincKeywords.TOP_LEVEL_OBJECTIVE, topLevelOverall));
+		// there could be a numeric objective in a voting-PVS
+		String topLevelOverall = null;
+		MiniZincParType elementType = null;
+		
+		if(topLevelInstance instanceof VotingInstance) {
+			VotingInstance vi = (VotingInstance) topLevelInstance;
+			if(vi.getVotingProcedure().hasNumericObjective()) {
+				topLevelOverall = getOverallValuation(topLevelInstance);
+				elementType = vi.getVotingProcedure().getObjectiveType(this, vi.getChildren());
+			
+			}
 		}
-
+			
+		if (!(topLevelInstance.isComplex())) {
+			topLevelOverall = getOverallValuation(topLevelInstance);
+			PVSInstance pvsInst = (PVSInstance) topLevelInstance;
+			elementType = pvsInst.getType().instance.getElementType();
+		}
+		
+		if(topLevelOverall != null) { // either case fits
+			appendOverall(sb, elementType, topLevelInstance, MiniZincKeywords.TOP_LEVEL_OBJECTIVE);
+			sb.append(String.format("constraint %s = %s;\n", MiniZincKeywords.TOP_LEVEL_OBJECTIVE, topLevelOverall));		
+		}
+	
+			
 		if (genHeuristics)
 			sb.append("ann: " + MiniZincKeywords.PVS_SEARCH_HEURISTIC + " = "
 					+ CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
@@ -253,6 +271,12 @@ public class CodeGenerator {
 				vi.setGeneratedBetterPredicate(getBetterPredicate);
 				// TODO implement more reasonably 
 				vi.setGeneratedNotWorsePredicate("true");
+				
+				if(vi.getVotingProcedure().hasNumericObjective()) {
+					String overallIdent = getOverallValuation(vi);
+					appendOverall(sb, vi.getVotingProcedure().getObjectiveType(this, vi.getChildren()), vi, overallIdent);
+					sb.append(String.format("constraint %s = %s ;\n", overallIdent, vi.getVotingProcedure().getNumericObjective(this, vi.getChildren())));
+				}
 			}
 
 		} else {
@@ -375,12 +399,11 @@ public class CodeGenerator {
 			sb.append(String.format("array[%s,%s] of var %s: %s;\n", sCSet.toMzn(inst),
 					getArrayIndexSets(arrayType, inst), encode(arrayType.getElementType(), inst), valuationsArray));
 		}
-		String topIdent = CodeGenerator.encodeString("top", inst);
+		String topIdent = CodeGenerator.encodeString(TOP_KEY, inst);
 		// String topElement = CodeGenerator.encodeString( pvsType.getTop(), inst);
 		String topElement = CodeGenerator.processSubstitutions(pvsType.getTop(), subs);
-		// TODO check if "top" can be used for something useful, got troublesome
-		// due to array handling for now
-		sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, topElement));
+		
+		sb.append(String.format("%s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, topElement));
 
 		// -------------------------------------------------------------
 
@@ -470,7 +493,7 @@ public class CodeGenerator {
 		return sbBuilder.toString();
 	}
 
-	private void appendOverall(StringBuilder sb, MiniZincParType elementType, PVSInstance inst, String overallIdent) {
+	private void appendOverall(StringBuilder sb, MiniZincParType elementType, AbstractPVSInstance inst, String overallIdent) {
 		if (elementType instanceof MiniZincVarType) {
 			sb.append(String.format("var %s: %s;\n", encode(elementType, inst), overallIdent));
 		} else { // must be MiniZincArrayLike then
@@ -479,7 +502,7 @@ public class CodeGenerator {
 		}
 	}
 
-	private String getArrayDecisionVariable(MiniZincParType elementType, PVSInstance inst, String arrayIdent) {
+	private String getArrayDecisionVariable(MiniZincParType elementType, AbstractPVSInstance inst, String arrayIdent) {
 		MiniZincArrayLike miniZincArrayLike = (MiniZincArrayLike) elementType;
 		ArrayType arrayType = miniZincArrayLike.getArrayType();
 		StringBuilder sb = new StringBuilder();
@@ -490,7 +513,7 @@ public class CodeGenerator {
 		return sb.toString();
 	}
 
-	private String getArrayIndexSets(ArrayType arrayType, PVSInstance inst) {
+	private String getArrayIndexSets(ArrayType arrayType, AbstractPVSInstance inst) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
 		for (PrimitiveType pt : arrayType.getIndexSets()) {
@@ -558,10 +581,14 @@ public class CodeGenerator {
 		return expression;
 	}
 
-	private String getOverallValuation(AbstractPVSInstance inst) {
+	public String getOverallValuation(AbstractPVSInstance inst) {
 		return encodeString(OVERALL_KEY, inst);
 	}
 
+	public String getTopValue(AbstractPVSInstance inst) {
+		return encodeString(TOP_KEY, inst);
+	}
+	
 	public AbstractPVSInstance deref(AbstractPVSInstance pvsInstance) {
 		if (pvsInstance instanceof ReferencedPVSInstance) {
 			ReferencedPVSInstance refPvs = (ReferencedPVSInstance) pvsInstance;
@@ -578,11 +605,11 @@ public class CodeGenerator {
 		return encodeString(string, inst.getName());
 	}
 
-	private String encode(MiniZincParType type, PVSInstance concreteInstance) {
+	private String encode(MiniZincParType type, AbstractPVSInstance concreteInstance) {
 		return type.toMzn(concreteInstance);
 	}
 
-	public static String encodeIdent(PVSFormalParameter par, PVSInstance instance) {
+	public static String encodeIdent(PVSFormalParameter par, AbstractPVSInstance instance) {
 		return encodeString(par.getName(), instance);
 	}
 

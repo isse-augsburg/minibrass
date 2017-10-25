@@ -1,0 +1,36 @@
+
+type PvsRel = PVSType<1..k> = 
+  params {
+    int: k :: default('1000'); % just some upper bound on integer values 
+    int: topVal :: default('1');
+    array [int,1..2] of 1..k: tuples;
+  } in  
+  instantiates with "soft_constraints/mbr_types/relation-type.mzn" {
+    times -> max;
+    is_worse -> is_worse_relation; 
+    top -> mbr.topVal; 
+ };
+ 
+PVS: agent1 = new PvsRel("agent1") {
+  soft-constraint c1: 'a';
+  tuples: '[| 1, 3 | 2, 3 | 2, 1 |]';
+  k : '3';
+  topVal: '3';
+};
+
+PVS: agent2 = new PvsRel("agent2") {
+  soft-constraint c1: 'a';
+  tuples: '[| 3, 1 | 3, 2 | 1, 2 |]';
+  k : '3';
+  topVal: '2';
+};
+
+PVS: agent3 = new PvsRel("agent3") {
+  soft-constraint c1: 'a';
+  tuples: '[| 2, 3 | 1, 3 | 1, 2 |]';
+  k : '3';
+  topVal: '2'; % this is technically incorrect but let's us distinguish from condorcet
+};
+
+
+solve vote([agent1,agent2,agent3], condorcet);
