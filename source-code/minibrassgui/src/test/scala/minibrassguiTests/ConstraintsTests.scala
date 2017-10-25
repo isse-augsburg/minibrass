@@ -39,7 +39,7 @@ class ConstraintsTests extends MinibrassguiSpec{
       Constraint("one")->List(Constraint("two"), Constraint("three")),
       Constraint("two")->List(Constraint("three")),
       Constraint("three")->List(Constraint("four")),
-      Constraint("four")->List(Constraint("two")),
+      Constraint("four")->List(Constraint("one")),
     ))
     assertResult(false) {
       badGraph.ensureGraphIsAcyclic(badGraph.constraintRelations)
