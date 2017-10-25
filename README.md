@@ -1,4 +1,3 @@
-# MiniBrass
 ![MiniBrass Logo -- Specifying goals the declarative way](https://github.com/isse-augsburg/minibrass/raw/master/design/logo.png)
 
 MiniBrass is a language and library that adds support for soft constraints to MiniZinc/MiniSearch to model weak/soft constraints and preferences systematically. 
