@@ -1,0 +1,7 @@
+* Minibrassgui
+
+** TODO model and implement visualisation of model entities
+
+** TODO build visual prototype
+
+** TODO implement code generation

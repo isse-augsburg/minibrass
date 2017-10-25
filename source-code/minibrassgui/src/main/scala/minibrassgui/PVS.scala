@@ -20,6 +20,7 @@ class CostFunctionNetwork(val name: String, val k: Int, val optType: Optimisatio
 
 /**
   * Some case classes for controlling the parameters of PVSLeafs.
+  * Especially: CFN
   */
 abstract sealed class OptimisationType
 case class Maximize() extends OptimisationType
