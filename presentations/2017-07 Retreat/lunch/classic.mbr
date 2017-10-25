@@ -1,0 +1,8 @@
+    
+include "defs.mbr";
+
+PVS: cr1 = new CostFunctionNetwork("beers") {
+   soft-constraint c1: 'pow(2, abs(4 - (monbeer+tuesbeer))) ';
+}; 
+
+solve cr1;

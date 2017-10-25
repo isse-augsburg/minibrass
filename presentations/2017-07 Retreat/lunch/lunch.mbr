@@ -1,0 +1,12 @@
+include "defs.mbr";
+
+PVS: first = new ConstraintPreferences("foodPvs") {
+   soft-constraint burger: 'dinnerSelected[burger]';
+   soft-constraint grillen: 'dinnerSelected[grillen]';
+   soft-constraint schweinebraten: 'dinnerSelected[schweinebraten]';
+
+   crEdges : '[| mbr.burger, mbr.grillen | mbr.schweinebraten, mbr.grillen |]';
+   useSPD: 'true' ;
+};
+
+solve first ;

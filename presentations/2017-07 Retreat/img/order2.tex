@@ -1,0 +1,66 @@
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,
+  thick,main node/.style={circle,inner sep=1.5pt,fill=black!15,draw,font=\sffamily}, scale=1.15,
+   pvs/.style={shape=rectangle, rounded corners,draw=issegrey!50,align=center}]
+%%%%%%%%%%%%%%%%%% Orderings and embeddings
+
+\node (t) at (0.3,6.5) {{$\top$}};
+\node [text width=2.4cm](labelR) at ($(t)+(1,.7)$) {$\mathsf{R}$};
+
+\node (r2) at ($(t)-(0.5,1)$) {{$\RN{2}$}};
+\node (a2) at ($(t)-(-0.5,1)$) {{$2$}};
+
+\node (r1) at ($(r2)-(0,1)$) {{$\RN{1}$}};
+\node (a1) at ($(a2)-(0,1)$) {{$1$}};
+
+
+\path[-,thin]
+(r1) edge (r2)
+     edge (a2)
+(a1) edge (r2)
+     edge (a2)
+(a2) edge (t)
+(r2) edge (t)
+;      
+
+\draw [thin,dashed,-] ($(t)+(1.2,.5)$) -- ($(t)+(1.2,-5.5)$);
+  
+ % PVS<R>
+
+\node [anchor=west,text width=5cm](labelPV) at ($(t)+(2.7,0.7)$) {$\PVSfree{\mathsf{R}}$};
+
+\node (peps) at ($(t)+(3.25,0)$) {\color{isseorange} $\lbag \rbag$};
+\node (pt) at ($(peps)-(0,1)$) {{$\lbag \top \rbag$}};
+\node (pr2) at ($(pt)-(0.5,1)$) {{$\lbag \RN{2} \rbag$}};
+\node (pa2) at ($(pt)-(-0.5,1)$) {{$\lbag 2 \rbag$}};
+
+\node (pr1) at ($(pr2)-(0,1)$) {{$\lbag \RN{1} \rbag$}};
+\node (pa1) at ($(pa2)-(0,1)$) {{$\lbag 1 \rbag$}};
+
+\node (pr11) at ($(pr1)-(0,1)$) {\color{isseorange} $\lbag 1, \RN{1} \rbag$};
+\node (pa11) at ($(pa1)-(0,1)$) {\color{isseorange} $\lbag 1, \RN{2} \rbag$};
+
+\node (leftdots) at ($(pr1)-(1,1)$) {{\ldots}};
+\node (rightdots) at ($(pa1)-(-1,1)$) {{\ldots}};
+
+\node (downdots1) at ($(pr11)-(0,.75)$) {{\ldots}};
+\node (downdots2) at ($(pa11)-(0,.75)$) {{\ldots}};
+
+\path[-,thin]
+(pr1) edge (pr2)
+     edge (pa2)
+(pa1) edge (pr2)
+     edge (pa2)
+(pa2) edge (pt)
+(pr2) edge (pt)
+(pt) edge (peps)
+(pa11) edge (pa1)
+(pr11) edge (pa1)
+(pr11) edge (pr1)
+(leftdots) edge (pr1)
+(rightdots) edge (pa1)
+(downdots1) edge (pr11)
+(downdots2) edge (pa11)
+;    
+   
+\end{tikzpicture}

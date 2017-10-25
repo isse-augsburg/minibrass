@@ -1,0 +1,45 @@
+Constantin Wanninger, 08.08.2017, 15:30
+---------------------------------------
+
+Benedikt: Semantic Port und Process Port ähnlich wie bei Services?
+Consti: Hängen mehr zusammen - Servicebeschreibungen hängen mehr zusammen.
+BE: Es is ja aber nicht zentral.
+
+Alex Knapp: Warum nehm ich nicht die URI?
+Consti: Ja, genau das mach ich ja. Subjekt steht drinnen zu der Linked Open Data Komponente
+ 
+Andi Schierl: Ein Blueprint ist eine zusammengesetzte semantische Komposition, eigenes Konzept?
+Consti: Es is auch Komposition, da kommt schon noch was dazu. Oder man sieht das Ganze als Composite Pattern. 
+
+
+Reif: Folie 38: Warum ist jetzt das Problem weg, wenn der Halbkreis kommt?
+Constantin: Problem ist nicht weg. 
+Reif: Aber da steckt doch Hardware dahinter.
+Consti: Schade, dass Sie fragen. .... Fuzzy Noise
+RPI Netze, asynchron, Zykluszeit, Fragment, Werte zu schnell ankommen.
+
+Reif kontert mit Folie 36: Geht konkretes Beispiel durch und will wissen, was da passiert. Die sind unterschiedlich schnell, was passiert?
+Consti: Wenn Differenzen nicht verhinderbar sind, müssen wir schauen, was wir mit Komponenten tun.
+Tokenstrategie beim langsameren Sensor Fly: "Nimm genau den Wert oder letzten Wert."
+Reif: Fly muss fliegen. 
+Consti: Alles hängt am Hardwaremodul
+Consti: Selbst die einfache Strategie muss in der sem. Komp. stehen 
+
+Reif: Antworten Sie jetzt einfach und stellen nicht nur Gegenfragen. Ab und zu noch Heartbeat.
+Consti: <Gibt eine konkrete Antwort>
+<Blödes Gerede über konkrete Zahlen>
+
+Reif: Was is jetzt ROS/RAPI?
+Consti antwortet
+
+Reif: ROS is asynchron, RAPI könnte auch synchron, wenn sie lustig is 
+
+BE: Man kann doch beides ausführen, könnte man ja testen?
+Consi: Klingt doch gut, probieren wir aus.
+
+Knapp: Ontologien spielen zur Laufzeit auch eine Rolle? Blueprint konsistent, dann Matching, dann fertig.
+Consit: Man muss wieder auf die Blueprint-Ebene
+Knapp: Unterscheidet man zwischen Welten - Bindung auf konkrete Komponente vermeiden
+Knapp: Ontologie ergibt, dass durch Reasoning und Adapter - Rolle Ports : Instanzebene synthetisiert Adapter
+Consti: Ja hier noch Instanziierungsschritt
+Knapp: Qualität einer Komponente ändert sich derart, dass sie in einen anderen Ontologiebereich rutscht -- Model @ runtime hätte man vl. gerne dabei
