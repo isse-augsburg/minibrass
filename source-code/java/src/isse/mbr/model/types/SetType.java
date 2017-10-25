@@ -1,6 +1,6 @@
 package isse.mbr.model.types;
 
-import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
 
 /**
  * Represents a set of x in MiniZinc
@@ -21,7 +21,7 @@ public class SetType implements MiniZincVarType {
 	}
 
 	@Override
-	public String toMzn(PVSInstance instance) {
+	public String toMzn(AbstractPVSInstance instance) {
 		return "set of "+ decoratedType.toMzn(instance);
 	}
 }

@@ -3,7 +3,7 @@ package isse.mbr.model.types;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
 
 public class IntervalType implements PrimitiveType {
 	private NumericValue lower;
@@ -29,6 +29,7 @@ public class IntervalType implements PrimitiveType {
 		this.upper = upper;
 	}	
 
+	@Override
 	public String toString() {
 		return "int" + "("+lower+" .. "+upper + ")";
 	}
@@ -70,7 +71,7 @@ public class IntervalType implements PrimitiveType {
 		return lower.isFloat() || upper.isFloat();
 	}
 	@Override
-	public String toMzn(PVSInstance instance) {
+	public String toMzn(AbstractPVSInstance instance) {
 		return lower.toMiniZinc(instance) + ".." + upper.toMiniZinc(instance);
 	}
 }

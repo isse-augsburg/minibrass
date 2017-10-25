@@ -1,6 +1,6 @@
 package isse.mbr.model.types;
 
-import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
 
 public class BoolType implements PrimitiveType {
 
@@ -15,7 +15,7 @@ public class BoolType implements PrimitiveType {
 	}
 
 	@Override
-	public String toMzn(PVSInstance instance) {
+	public String toMzn(AbstractPVSInstance instance) {
 		return "bool";
 	}
 }

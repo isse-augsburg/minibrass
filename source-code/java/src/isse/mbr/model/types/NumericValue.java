@@ -1,6 +1,6 @@
 package isse.mbr.model.types;
 
-import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.parsing.CodeGenerator;
 
 /**
@@ -86,7 +86,7 @@ public class NumericValue {
 			return referencedParameter.toString();
 	}
 
-	public String toMiniZinc(PVSInstance instance) {
+	public String toMiniZinc(AbstractPVSInstance instance) {
 		if(floatValue != null)
 			return Double.toString(floatValue); 
 		else if(getIntValue() != null) {

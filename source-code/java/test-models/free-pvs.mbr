@@ -8,7 +8,7 @@ type FreePVS = PVSType<mset[maxOccurrences] of 1..maxP> =
   instantiates with "../mbr_types/free-pvs-type.mzn" {
     times -> multiset_union;
     is_worse -> isSmythWorse;
-    top -> {};
+    top -> [0 | i in 1..mbr.maxP];
   };
     
  type ConstraintPreferences = PVSType<bool, set of 1..nScs> represents FreePVS  = 

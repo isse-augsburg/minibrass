@@ -3,7 +3,7 @@ package isse.mbr.model.types;
 import java.util.LinkedList;
 import java.util.List;
 
-import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
 
 public class MultiSetType implements MiniZincArrayLike {
 	private PrimitiveType elementType;
@@ -23,7 +23,7 @@ public class MultiSetType implements MiniZincArrayLike {
 	}
 
 	@Override
-	public String toMzn(PVSInstance instance) {
+	public String toMzn(AbstractPVSInstance instance) {
 		return "array["+ elementType.toMzn(instance)+"] of var 0.."+maxMultiplicity.toMiniZinc(instance);
 	}
 

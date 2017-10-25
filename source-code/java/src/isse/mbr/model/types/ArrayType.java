@@ -3,7 +3,7 @@ package isse.mbr.model.types;
 import java.util.LinkedList;
 import java.util.List;
 
-import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.AbstractPVSInstance;
 
 /**
  * Represents an array[index_set] of MiniZincVarType
@@ -39,7 +39,7 @@ public class ArrayType implements MiniZincArrayLike {
 	}
 
 	@Override
-	public String toMzn(PVSInstance instance) {
+	public String toMzn(AbstractPVSInstance instance) {
 		StringBuilder arrayBuilder = new StringBuilder("array[");
 		boolean first = true;
 		for(PrimitiveType indexType : indexSets) {

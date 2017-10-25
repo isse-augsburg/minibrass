@@ -10,9 +10,15 @@ import isse.mbr.parsing.MiniBrassParseException;
  */
 public class VotingFactory {
 	public static VotingProcedure getVotingProcedure(String keyword) throws MiniBrassParseException {
-		if("condorcet".equals(keyword))
+		switch(keyword) {
+		case "condorcet":
 			return new CondorcetVoting();
-		else 
-			throw new MiniBrassParseException("Voting procedure ["+keyword+"] unknown.");
+		case "majorityTops":
+			return new MajorityTopsVoting();
+		default:
+				throw new MiniBrassParseException("Voting procedure ["+keyword+"] unknown.");
+		}
+	
+			
 	}
 }
