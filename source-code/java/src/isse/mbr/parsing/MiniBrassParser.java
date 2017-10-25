@@ -36,7 +36,7 @@ import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.MultiSetType;
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.NumericValue;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.model.types.SetType;
@@ -364,7 +364,7 @@ public class MiniBrassParser {
 					
 					getNextSy();
 					expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
-					instance.getParameterValues().put(paramName, mznExpression);					
+					instance.getActualParameterValues().put(paramName, mznExpression);					
 				}				
 			}
 			expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
@@ -373,7 +373,7 @@ public class MiniBrassParser {
 			instance.setType(typeRef);
 			instance.setNumberSoftConstraints(nScs);
 			
-			instance.getParameterValues().put(PVSType.N_SCS_LIT, Integer.toString(nScs));
+			instance.getActualParameterValues().put(PVSType.N_SCS_LIT, Integer.toString(nScs));
 			model.getPvsInstances().put(instance.getName(), instance);
 			return instance;
 		} else if (currSy == MiniBrassSymbol.IdentSy) {
@@ -618,7 +618,7 @@ public class MiniBrassParser {
 			expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 			
 			while(currSy != MiniBrassSymbol.RightCurlSy) {
-				PVSParameter par = parameterDecl(newType);
+				PVSFormalParameter par = parameterDecl(newType);
 				
 				newType.addPvsParameter(par);
 			}
@@ -673,8 +673,8 @@ public class MiniBrassParser {
 	 * @return 
 	 * @throws MiniBrassParseException 
 	 */
-	private PVSParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
-		PVSParameter returnParameter;
+	private PVSFormalParameter parameterDecl(PVSType scopeType) throws MiniBrassParseException {
+		PVSFormalParameter returnParameter;
 		String defaultVal = null;
 		WrapInformation wrapInformation = null;
 		
@@ -711,7 +711,7 @@ public class MiniBrassParser {
 				semChecker.scheduleTypeDependencyCheck(scopeType, name, pendingVarType);
 			}
 			
-			returnParameter = new PVSParameter(name, arrayType);
+			returnParameter = new PVSFormalParameter(name, arrayType);
 			
 		} else {
 			MiniZincVarType varType = MiniZincVarType(scopeType); // could be int
@@ -739,7 +739,7 @@ public class MiniBrassParser {
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 			semChecker.scheduleTypeDependencyCheck(scopeType, ident, varType);
-			returnParameter = new PVSParameter(ident, varType);
+			returnParameter = new PVSFormalParameter(ident, varType);
 		}
 		if(defaultVal != null) {
 			returnParameter.setDefaultValue(defaultVal);

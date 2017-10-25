@@ -8,7 +8,7 @@ import java.util.Map;
 import isse.mbr.model.parsetree.Morphism.ParamMapping;
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.PVSParamInst;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.model.types.PVSType;
 
 /**
@@ -22,7 +22,7 @@ public class MorphedPVSInstance extends PVSInstance {
 	private AbstractPVSInstance input;
 	private NamedRef<Morphism> morphism;
 	private PVSInstance concreteInstance;
-	private List<PVSParameter> joinedPars;
+	private List<PVSFormalParameter> joinedPars;
 	
 	public void deref() {
 		AbstractPVSInstance inst = input;
@@ -39,10 +39,10 @@ public class MorphedPVSInstance extends PVSInstance {
 	}
 	
 	@Override
-	public Map<String, String> getParameterValues() {
+	public Map<String, String> getActualParameterValues() {
 		// for now just the decorated instance's parameter values;
 		// the dependent ones added by the morphism are added in the codegenerator
-		return concreteInstance.getParameterValues();
+		return concreteInstance.getActualParameterValues();
 	}
 	
 	@Override
@@ -56,8 +56,8 @@ public class MorphedPVSInstance extends PVSInstance {
 	}
 	
 	@Override
-	public Map<String, PVSParamInst> getParametersInstantiated() {
-		return this.parametersInstantiated;
+	public Map<String, PVSParamInst> getCheckedParameters() {
+		return this.checkedParameters;
 	}
 	
 	public AbstractPVSInstance getInput() {
@@ -84,7 +84,7 @@ public class MorphedPVSInstance extends PVSInstance {
 	 * For a morphed PVS instance, this includes the "from" and "to" parameters!
 	 */
 	@Override
-	public List<PVSParameter> getInstanceParameters() {
+	public List<PVSFormalParameter> getInstanceParameters() {
 		return joinedPars;
 	}
 	
@@ -94,14 +94,14 @@ public class MorphedPVSInstance extends PVSInstance {
 	 */
 	public void update(StringBuilder fromArguments) {
 		Map<String, PVSParamInst> parInst = new LinkedHashMap<>();
-		parInst.putAll(concreteInstance.getParametersInstantiated());
+		parInst.putAll(concreteInstance.getCheckedParameters());
 		
 		// now put instantiations for all the morphed result parameters (those of type "to")
 		PVSType toType = morphism.instance.getTo().instance;
 		
 		
 		for(ParamMapping parMapping : morphism.instance.getParamMappings().values()) {
-			PVSParameter par = toType.getParamMap().get(parMapping.getParam());
+			PVSFormalParameter par = toType.getParamMap().get(parMapping.getParam());
 			PVSParamInst pi = new PVSParamInst();
 			pi.parameter = par; 
 			if(parMapping.isGenerated()) {
@@ -116,15 +116,15 @@ public class MorphedPVSInstance extends PVSInstance {
 			}
 			parInst.put(par.getName(), pi);
 		}
-		this.parametersInstantiated = parInst;
+		this.checkedParameters = parInst;
 		
 
-		List<PVSParameter> fromPars = morphism.instance.getFrom().instance.getPvsParameters();
-		List<PVSParameter> toPars = morphism.instance.getTo().instance.getPvsParameters();
+		List<PVSFormalParameter> fromPars = morphism.instance.getFrom().instance.getPvsParameters();
+		List<PVSFormalParameter> toPars = morphism.instance.getTo().instance.getPvsParameters();
 		
 		joinedPars = new ArrayList<>(fromPars.size()+toPars.size());
 		joinedPars.addAll(fromPars);
-		for(PVSParameter toPar : toPars) {
+		for(PVSFormalParameter toPar : toPars) {
 			if(! toPar.getName().equals(PVSType.N_SCS_LIT)) {
 				joinedPars.add(toPar);
 			}

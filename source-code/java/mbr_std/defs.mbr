@@ -102,7 +102,7 @@ type PvsRel = PVSType<1..k> =
   instantiates with "soft_constraints/mbr_types/relation-type.mzn" {
     times -> max;
     is_worse -> is_worse_relation; 
-    top -> 0; % should be topVal
+    top -> mbr.topVal;
  };
 % ========================================
 % MORPHISMS

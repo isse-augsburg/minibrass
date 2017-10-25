@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import isse.mbr.model.parsetree.PVSInstance;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 
 /**
  * This interface defines methods that external morphism objects
@@ -36,7 +36,7 @@ public abstract class ExternalMorphism {
 	 * @param key
 	 * @return
 	 */
-	public synchronized String getParameterString(PVSParameter key) {
+	public synchronized String getParameterString(PVSFormalParameter key) {
 		if(!updated)
 			process(pvsInst);
 		return calculatedParameters.get(key.getName());

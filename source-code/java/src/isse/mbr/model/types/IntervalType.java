@@ -54,11 +54,11 @@ public class IntervalType implements PrimitiveType {
 		if(referencedParameters == null) {
 			referencedParameters = new ArrayList<>(2);
 			if(upper.getReferencedParameter() != null) {
-				NamedRef<PVSParameter> referencedPar = upper.getReferencedParameter();
+				NamedRef<PVSFormalParameter> referencedPar = upper.getReferencedParameter();
 				referencedParameters.add(referencedPar.name);
 			}
 			if(lower.getReferencedParameter() != null) {
-				NamedRef<PVSParameter> referencedPar = lower.getReferencedParameter();
+				NamedRef<PVSFormalParameter> referencedPar = lower.getReferencedParameter();
 				referencedParameters.add(referencedPar.name);
 			}
 		}

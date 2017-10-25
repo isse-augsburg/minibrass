@@ -25,8 +25,8 @@ import isse.mbr.model.types.IntType;
 import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NamedRef;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.model.types.PVSParamInst;
-import isse.mbr.model.types.PVSParameter;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
 
@@ -194,22 +194,22 @@ public class SemanticChecker {
 				PVSInstance pvsInst = (PVSInstance) entry.getValue();
 				PVSType pvsType = pvsInst.getType().instance;
 				
-				List<String> actualParameters = new ArrayList<>(pvsInst.getParameterValues().size()+1);
+				List<String> actualParameters = new ArrayList<>(pvsInst.getActualParameterValues().size()+1);
 				// number of soft constraints as one built-in parameter of type int
 				actualParameters.add(Integer.toString(pvsInst.getNumberSoftConstraints()));
 				//actualParameters.addAll(pvsInst.getParameterValues());
 				
-				List<PVSParameter> formalParameters =  pvsType.getPvsParameters();
-				HashMap<String, PVSParameter> lookupMap = new HashMap<>(formalParameters.size());
+				List<PVSFormalParameter> formalParameters =  pvsType.getPvsParameters();
+				HashMap<String, PVSFormalParameter> formalParameterLookup = new HashMap<>(formalParameters.size());
 				
-				for(PVSParameter formalPar : formalParameters){
-					lookupMap.put(formalPar.getName(), formalPar);
+				for(PVSFormalParameter formalPar : formalParameters){
+					formalParameterLookup.put(formalPar.getName(), formalPar);
 				}
-				Map<String, PVSParamInst> parInst = new HashMap<>(formalParameters.size());
+				Map<String, PVSParamInst> parameterInsts = new HashMap<>(formalParameters.size());
 				
-				for(Entry<String, String> parameterValuePair : pvsInst.getParameterValues().entrySet()) {
+				for(Entry<String, String> parameterValuePair : pvsInst.getActualParameterValues().entrySet()) {
 					PVSParamInst pi = new PVSParamInst();
-					PVSParameter formalParameter = lookupMap.get(parameterValuePair.getKey());
+					PVSFormalParameter formalParameter = formalParameterLookup.get(parameterValuePair.getKey());
 					if (formalParameter == null) {
 						throw new MiniBrassParseException("Undefined parameter initialisation "+parameterValuePair.getKey());
 					} 
@@ -217,16 +217,23 @@ public class SemanticChecker {
 					pi.parameter = formalParameter;
 					pi.expression = parameterValuePair.getValue();
 					
-					parInst.put(formalParameter.getName(), pi);
+					parameterInsts.put(formalParameter.getName(), pi);
 				}
 				// make sure that, likewise, we do have an actual parameter for every formal parameter
 				
-				for(PVSParameter formalPar : formalParameters) {
+				for(PVSFormalParameter formalPar : formalParameters) {
 
-					if(formalPar.getDefaultValue() != null)
+					if(formalPar.getDefaultValue() != null) { // could be that the parameter is not added to the instance since it has a default 
+						if(! parameterInsts.containsKey(formalPar.getName())) {
+							PVSParamInst pi = new PVSParamInst();
+							pi.parameter = formalPar;
+							pi.expression = formalPar.getDefaultValue();
+							parameterInsts.put(formalPar.getName(), pi);
+						}
 						continue;
+					}
 					
-					PVSParamInst pi = parInst.get(formalPar.getName());
+					PVSParamInst pi = parameterInsts.get(formalPar.getName());
 					if(pi != null)
 						continue;
 					
@@ -245,7 +252,7 @@ public class SemanticChecker {
 				}
 				
 				// inject this back into instance:
-				pvsInst.setParametersInstantiated(parInst);	
+				pvsInst.setCheckedParameters(parameterInsts);	
 								
 			} 
 		
@@ -262,7 +269,7 @@ public class SemanticChecker {
 			// we need to have a parameter mapping for every parameter of the *to* type
 			PVSType toType = m.getTo().instance;
 			
-			for(PVSParameter pvsParam : toType.getPvsParameters()) {
+			for(PVSFormalParameter pvsParam : toType.getPvsParameters()) {
 				if(PVSType.N_SCS_LIT.equals(pvsParam.getName()))
 					continue;
 				if(!m.getParamMappings().containsKey(pvsParam.getName())){

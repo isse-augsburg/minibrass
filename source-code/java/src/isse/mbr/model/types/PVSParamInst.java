@@ -1,7 +1,7 @@
 package isse.mbr.model.types;
 
 public class PVSParamInst {
-	public PVSParameter parameter;
+	public PVSFormalParameter parameter;
 	public String expression;
 	public boolean generated = false;
 	public boolean isGenerated() {
