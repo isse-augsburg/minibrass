@@ -95,7 +95,7 @@ public class PVSType {
 		this.specType = specType;
 	}
 
-	public List<PVSFormalParameter> getPvsParameters() {
+	public List<PVSFormalParameter> getFormalParameters() {
 		return pvsParameters;
 	}
 

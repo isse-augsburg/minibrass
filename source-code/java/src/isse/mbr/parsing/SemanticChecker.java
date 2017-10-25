@@ -199,7 +199,7 @@ public class SemanticChecker {
 				actualParameters.add(Integer.toString(pvsInst.getNumberSoftConstraints()));
 				//actualParameters.addAll(pvsInst.getParameterValues());
 				
-				List<PVSFormalParameter> formalParameters =  pvsType.getPvsParameters();
+				List<PVSFormalParameter> formalParameters =  pvsType.getFormalParameters();
 				HashMap<String, PVSFormalParameter> formalParameterLookup = new HashMap<>(formalParameters.size());
 				
 				for(PVSFormalParameter formalPar : formalParameters){
@@ -224,12 +224,6 @@ public class SemanticChecker {
 				for(PVSFormalParameter formalPar : formalParameters) {
 
 					if(formalPar.getDefaultValue() != null) { // could be that the parameter is not added to the instance since it has a default 
-						if(! parameterInsts.containsKey(formalPar.getName())) {
-							PVSParamInst pi = new PVSParamInst();
-							pi.parameter = formalPar;
-							pi.expression = formalPar.getDefaultValue();
-							parameterInsts.put(formalPar.getName(), pi);
-						}
 						continue;
 					}
 					
@@ -269,7 +263,7 @@ public class SemanticChecker {
 			// we need to have a parameter mapping for every parameter of the *to* type
 			PVSType toType = m.getTo().instance;
 			
-			for(PVSFormalParameter pvsParam : toType.getPvsParameters()) {
+			for(PVSFormalParameter pvsParam : toType.getFormalParameters()) {
 				if(PVSType.N_SCS_LIT.equals(pvsParam.getName()))
 					continue;
 				if(!m.getParamMappings().containsKey(pvsParam.getName())){
