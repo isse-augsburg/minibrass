@@ -22,8 +22,8 @@ public class PVSType {
 	private String combination;
 	private String order;
 	private String top;
-	private List<PVSParameter> pvsParameters;
-	private Map<String, PVSParameter> paramMap;
+	private List<PVSFormalParameter> pvsParameters;
+	private Map<String, PVSFormalParameter> paramMap;
 	private String implementationFile; 
 	private String orderingHeuristic;
 	private NamedRef<PVSType> representsType;
@@ -34,10 +34,10 @@ public class PVSType {
 
 	// empty constructor to be filled by parser
 	public PVSType() {
-		this.pvsParameters = new LinkedList<PVSParameter>();
+		this.pvsParameters = new LinkedList<PVSFormalParameter>();
 		this.paramMap = new HashMap<>();
 
-		PVSParameter nScsParam = new PVSParameter(N_SCS_LIT, new IntType());
+		PVSFormalParameter nScsParam = new PVSFormalParameter(N_SCS_LIT, new IntType());
 		this.pvsParameters.add(nScsParam);		
 		paramMap.put(N_SCS_LIT, nScsParam);
 	}
@@ -95,11 +95,11 @@ public class PVSType {
 		this.specType = specType;
 	}
 
-	public List<PVSParameter> getPvsParameters() {
+	public List<PVSFormalParameter> getPvsParameters() {
 		return pvsParameters;
 	}
 
-	public void setPvsParameters(List<PVSParameter> pvsParameters) {
+	public void setPvsParameters(List<PVSFormalParameter> pvsParameters) {
 		this.pvsParameters = pvsParameters;
 	}
 
@@ -119,15 +119,15 @@ public class PVSType {
 		this.isBounded = isBounded;
 	}
 
-	public Map<String, PVSParameter> getParamMap() {
+	public Map<String, PVSFormalParameter> getParamMap() {
 		return paramMap;
 	}
 
-	public void setParamMap(Map<String, PVSParameter> paramMap) {
+	public void setParamMap(Map<String, PVSFormalParameter> paramMap) {
 		this.paramMap = paramMap;
 	}
 
-	public void addPvsParameter(PVSParameter par) throws MiniBrassParseException {
+	public void addPvsParameter(PVSFormalParameter par) throws MiniBrassParseException {
 		if(paramMap.containsKey(par.getName()) )
 			throw new MiniBrassParseException("Type "+name + " already contains a parameter: "+par.getName());
 		else {

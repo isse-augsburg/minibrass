@@ -32,7 +32,7 @@ import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PVSParamInst;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
 
@@ -289,8 +289,8 @@ public class CodeGenerator {
 		// I actually want to go through every PVSParam and look for the proper
 		// inst
 
-		for (PVSParameter pvsParam : inst.getInstanceParameters()) {
-			PVSParamInst pi = inst.getParametersInstantiated().get(pvsParam.getName());
+		for (PVSFormalParameter pvsParam : inst.getInstanceParameters()) {
+			PVSParamInst pi = inst.getCheckedParameters().get(pvsParam.getName());
 
 			// is it an array type (important for annotations) or not?
 			String paramExpression = null;
@@ -360,7 +360,7 @@ public class CodeGenerator {
 
 		appendOverall(sb, pvsType.getElementType(), inst, overallIdent);
 
-		PVSParameter nScs = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
+		PVSFormalParameter nScs = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
 		IntervalType sCSet = new IntervalType(new NumericValue(1), new NumericValue(nScs));
 
 		String valuationsArray = CodeGenerator.encodeString("valuations", inst);
@@ -376,10 +376,11 @@ public class CodeGenerator {
 					getArrayIndexSets(arrayType, inst), encode(arrayType.getElementType(), inst), valuationsArray));
 		}
 		String topIdent = CodeGenerator.encodeString("top", inst);
+		// String topElement = CodeGenerator.encodeString( pvsType.getTop(), inst);
+		String topElement = CodeGenerator.processSubstitutions(pvsType.getTop(), subs);
 		// TODO check if "top" can be used for something useful, got troublesome
 		// due to array handling for now
-		// sb.append(String.format("par %s: %s = %s;\n",
-		// encode(pvsType.getElementType(), inst), topIdent, pvsType.getTop()));
+		sb.append(String.format("par %s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, topElement));
 
 		// -------------------------------------------------------------
 
@@ -506,7 +507,7 @@ public class CodeGenerator {
 		StringBuilder instanceArguments = new StringBuilder();
 		boolean first = true;
 
-		for (PVSParameter pvsParam : pvsType.getPvsParameters()) {
+		for (PVSFormalParameter pvsParam : pvsType.getPvsParameters()) {
 			if (!first)
 				instanceArguments.append(", ");
 			else
@@ -528,8 +529,8 @@ public class CodeGenerator {
 		}
 
 		// all parameters to their encoded id
-		for (PVSParamInst parInst : inst.getParametersInstantiated().values()) {
-			PVSParameter parameter = parInst.parameter;
+		for (PVSParamInst parInst : inst.getCheckedParameters().values()) {
+			PVSFormalParameter parameter = parInst.parameter;
 			String encodedIdent = CodeGenerator.encodeIdent(parameter, inst);
 			substitutions.put(MBR_PREFIX + parameter.getName(), encodedIdent);
 			keys.add(parameter.getName());
@@ -583,7 +584,7 @@ public class CodeGenerator {
 		return type.toMzn(concreteInstance);
 	}
 
-	public static String encodeIdent(PVSParameter par, PVSInstance instance) {
+	public static String encodeIdent(PVSFormalParameter par, PVSInstance instance) {
 		return encodeString(par.getName(), instance);
 	}
 

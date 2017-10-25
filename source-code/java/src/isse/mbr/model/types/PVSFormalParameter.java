@@ -3,7 +3,7 @@ package isse.mbr.model.types;
 import isse.mbr.parsing.WrapInformation;
 
 /**
- * Represents a single parameter that can be added to a PVSType; 
+ * Represents a single (formal) parameter that can be added to a PVSType; 
  * amounts to the *formal* parameter that includes a default value;
  * If the parameter is of an ArrayType, defaultValue denotes the default value
  * for every single item 
@@ -11,13 +11,13 @@ import isse.mbr.parsing.WrapInformation;
  * @author Alexander Schiendorfer
  *
  */
-public class PVSParameter {
+public class PVSFormalParameter {
 	private String name;
 	private MiniZincParType type;
 	private String defaultValue;
 	private WrapInformation wrappedBy;
 	
-	public PVSParameter(String name, MiniZincParType type) {
+	public PVSFormalParameter(String name, MiniZincParType type) {
 		super();
 		this.name = name;
 		this.type = type;
@@ -30,9 +30,9 @@ public class PVSParameter {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj == null || !(obj instanceof PVSParameter))
+		if(obj == null || !(obj instanceof PVSFormalParameter))
 			return false;
-		PVSParameter other = (PVSParameter) obj;
+		PVSFormalParameter other = (PVSFormalParameter) obj;
 		
 		return name.equals(other.name) && type.equals(other.type) && ( (defaultValue == null && other.defaultValue == null) || (defaultValue != null && defaultValue.equals(other.defaultValue)));
 	}

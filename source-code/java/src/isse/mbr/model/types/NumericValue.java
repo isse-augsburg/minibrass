@@ -11,7 +11,7 @@ import isse.mbr.parsing.CodeGenerator;
 public class NumericValue {
 	private Integer intValue;
 	private Double floatValue;
-	private NamedRef<PVSParameter> referencedParameter;
+	private NamedRef<PVSFormalParameter> referencedParameter;
 	
 	public NumericValue(int intVal) {
 		this.intValue = intVal;
@@ -31,7 +31,7 @@ public class NumericValue {
 		this.referencedParameter = new NamedRef<>(paramName);
 	}
 	
-	public NumericValue(PVSParameter param) {
+	public NumericValue(PVSFormalParameter param) {
 		this.intValue = null;
 		this.floatValue = null;
 		this.referencedParameter = new NamedRef<>(param);
@@ -54,11 +54,11 @@ public class NumericValue {
 		this.floatValue = floatValue;
 	}
 	
-	public NamedRef<PVSParameter> getReferencedParameter() {
+	public NamedRef<PVSFormalParameter> getReferencedParameter() {
 		return referencedParameter;
 	}
 	
-	public void setReferencedParameter(NamedRef<PVSParameter> referencedParameter) {
+	public void setReferencedParameter(NamedRef<PVSFormalParameter> referencedParameter) {
 		this.referencedParameter = referencedParameter;
 	}
 
@@ -68,7 +68,7 @@ public class NumericValue {
 		else if(getIntValue() != null) {
 			return false;
 		} else {
-			PVSParameter par = referencedParameter.instance;
+			PVSFormalParameter par = referencedParameter.instance;
 			PrimitiveType  pt = (PrimitiveType) par.getType();
 			return pt.isFloat();
 
@@ -92,7 +92,7 @@ public class NumericValue {
 		else if(getIntValue() != null) {
 			return Integer.toString(intValue); 
 		} else {
-			PVSParameter par = referencedParameter.instance;			
+			PVSFormalParameter par = referencedParameter.instance;			
 			return CodeGenerator.encodeIdent(par, instance);
 
 		}

@@ -6,13 +6,13 @@ import org.jgrapht.graph.DefaultEdge;
 import isse.mbr.extensions.ExternalParameterWrap;
 import isse.mbr.extensions.domain.DirectedGraph;
 import isse.mbr.model.parsetree.PVSInstance;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.parsing.MiniBrassParseException;
 
 public class TransitiveClosure extends ExternalParameterWrap {
 
 	@Override
-	public String process(PVSInstance pvsInst, PVSParameter pvsParam, String parameter) throws MiniBrassParseException {
+	public String process(PVSInstance pvsInst, PVSFormalParameter pvsParam, String parameter) throws MiniBrassParseException {
 	
 		DirectedGraph digraph = new DirectedGraph(pvsInst.getNumberSoftConstraints());
 		digraph.parse(parameter);

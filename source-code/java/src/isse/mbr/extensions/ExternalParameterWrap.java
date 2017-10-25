@@ -1,7 +1,7 @@
 package isse.mbr.extensions;
 
 import isse.mbr.model.parsetree.PVSInstance;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.parsing.MiniBrassParseException;
 
 /**
@@ -11,5 +11,5 @@ import isse.mbr.parsing.MiniBrassParseException;
  *
  */
 public abstract class ExternalParameterWrap {
-	public abstract String process(PVSInstance inst, PVSParameter pvsParam, String parameter) throws MiniBrassParseException;
+	public abstract String process(PVSInstance inst, PVSFormalParameter pvsParam, String parameter) throws MiniBrassParseException;
 }

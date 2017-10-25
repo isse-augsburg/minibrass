@@ -10,21 +10,30 @@ import java.util.Map;
 
 import isse.mbr.model.types.NamedRef;
 import isse.mbr.model.types.PVSParamInst;
-import isse.mbr.model.types.PVSParameter;
+import isse.mbr.model.types.PVSFormalParameter;
 import isse.mbr.model.types.PVSType;
 
+/**
+ * This class represents one specific instance of a PVS type that 
+ * is used in a MiniBrass model; The parameter values refer to the 
+ * actual parameters supplied during instantiation for the formally
+ * defined parameters of a PVS type 
+ * 
+ * @author Alexander Schiendorfer
+ *
+ */
 public class PVSInstance extends AbstractPVSInstance {
 	private NamedRef<PVSType> type;
-	private Map<String, String> parameterValues;
+	private Map<String, String> actualParameterValues;
 	private Map<String, Map<String,String>> parameterArrayValues; // there is one map for every array-typed parameter
 	private Map<String, SoftConstraint> softConstraints;
-	protected Map<String, PVSParamInst> parametersInstantiated; // gets done by semantic checker
+	protected Map<String, PVSParamInst> checkedParameters; // gets done by semantic checker
 	protected Map<String, String> generatedCodeParameters; // for external morphisms
 	
 	private int numberScs;
 	
 	public PVSInstance() {
-		parameterValues = new HashMap<>();
+		actualParameterValues = new HashMap<>();
 		softConstraints = new LinkedHashMap<>(); 
 		parameterArrayValues = new HashMap<>();
 		generatedCodeParameters = new HashMap<>();
@@ -38,8 +47,8 @@ public class PVSInstance extends AbstractPVSInstance {
 		this.type = type;
 	}
 
-	public Map<String,String> getParameterValues() {
-		return parameterValues;
+	public Map<String,String> getActualParameterValues() {
+		return actualParameterValues;
 	}
 	
 
@@ -53,15 +62,15 @@ public class PVSInstance extends AbstractPVSInstance {
 	
 	@Override
 	public String toString() {
-		return name + ": "+type + ", nScs: "+numberScs+ ", params: "+Arrays.toString(parameterValues.entrySet().toArray()); 
+		return name + ": "+type + ", nScs: "+numberScs+ ", params: "+Arrays.toString(actualParameterValues.entrySet().toArray()); 
 	}
 
-	public Map<String, PVSParamInst> getParametersInstantiated() {
-		return parametersInstantiated;
+	public Map<String, PVSParamInst> getCheckedParameters() {
+		return checkedParameters;
 	}
 
-	public void setParametersInstantiated(Map<String, PVSParamInst> parametersLinked) {
-		this.parametersInstantiated = parametersLinked;
+	public void setCheckedParameters(Map<String, PVSParamInst> checkedParameters) {
+		this.checkedParameters = checkedParameters;
 	}
 
 	public Map<String, SoftConstraint> getSoftConstraints() {
@@ -72,7 +81,7 @@ public class PVSInstance extends AbstractPVSInstance {
 		return parameterArrayValues;
 	}
 
-	public List<PVSParameter> getInstanceParameters() {
+	public List<PVSFormalParameter> getInstanceParameters() {
 		return type.instance.getPvsParameters();
 	}
 
