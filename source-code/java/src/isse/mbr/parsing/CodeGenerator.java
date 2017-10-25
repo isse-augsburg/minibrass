@@ -31,8 +31,8 @@ import isse.mbr.model.types.MiniZincArrayLike;
 import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.MiniZincVarType;
 import isse.mbr.model.types.NumericValue;
-import isse.mbr.model.types.PVSParamInst;
 import isse.mbr.model.types.PVSFormalParameter;
+import isse.mbr.model.types.PVSParamInst;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.model.types.PrimitiveType;
 
@@ -507,7 +507,7 @@ public class CodeGenerator {
 		StringBuilder instanceArguments = new StringBuilder();
 		boolean first = true;
 
-		for (PVSFormalParameter pvsParam : pvsType.getPvsParameters()) {
+		for (PVSFormalParameter pvsParam : pvsType.getFormalParameters()) {
 			if (!first)
 				instanceArguments.append(", ");
 			else
@@ -529,13 +529,11 @@ public class CodeGenerator {
 		}
 
 		// all parameters to their encoded id
-		for (PVSParamInst parInst : inst.getCheckedParameters().values()) {
-			PVSFormalParameter parameter = parInst.parameter;
+		for(PVSFormalParameter parameter : inst.getType().instance.getFormalParameters()) {
 			String encodedIdent = CodeGenerator.encodeIdent(parameter, inst);
 			substitutions.put(MBR_PREFIX + parameter.getName(), encodedIdent);
 			keys.add(parameter.getName());
 		}
-
 		LinkedHashMap<String, String> subs = new LinkedHashMap<>();
 		Collections.sort(keys, new Comparator<String>() {
 

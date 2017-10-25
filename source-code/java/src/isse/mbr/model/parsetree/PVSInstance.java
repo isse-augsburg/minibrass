@@ -82,7 +82,7 @@ public class PVSInstance extends AbstractPVSInstance {
 	}
 
 	public List<PVSFormalParameter> getInstanceParameters() {
-		return type.instance.getPvsParameters();
+		return type.instance.getFormalParameters();
 	}
 
 	public Map<String, String> getGeneratedCodeParameters() {

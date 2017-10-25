@@ -4,21 +4,21 @@ PVS: agent1 = new PvsRel("agent1") {
   soft-constraint c1: 'a';
   tuples: '[| 1, 3 | 2, 3 | 2, 1 |]';
   k : '3';
-  topVal: '1';
+  topVal: '3';
 };
 
 PVS: agent2 = new PvsRel("agent2") {
   soft-constraint c1: 'a';
   tuples: '[| 3, 1 | 3, 2 | 1, 2 |]';
   k : '3';
-  topVal: '1';
+  topVal: '2';
 };
 
 PVS: agent3 = new PvsRel("agent3") {
   soft-constraint c1: 'a';
   tuples: '[| 2, 3 | 1, 3 | 1, 2 |]';
   k : '3';
-  %topVal: '1';
+  topVal: '3';
 };
 
 

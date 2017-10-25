@@ -119,8 +119,8 @@ public class MorphedPVSInstance extends PVSInstance {
 		this.checkedParameters = parInst;
 		
 
-		List<PVSFormalParameter> fromPars = morphism.instance.getFrom().instance.getPvsParameters();
-		List<PVSFormalParameter> toPars = morphism.instance.getTo().instance.getPvsParameters();
+		List<PVSFormalParameter> fromPars = morphism.instance.getFrom().instance.getFormalParameters();
+		List<PVSFormalParameter> toPars = morphism.instance.getTo().instance.getFormalParameters();
 		
 		joinedPars = new ArrayList<>(fromPars.size()+toPars.size());
 		joinedPars.addAll(fromPars);
