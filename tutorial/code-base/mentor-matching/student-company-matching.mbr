@@ -1,0 +1,17 @@
+include "defs.mbr";
+
+PVS: students = new ConstraintRelationships("students") {
+   
+   crEdges : '[|  |]';
+   useSPD: 'true' ;
+}; 
+
+PVS: companies = new ConstraintRelationships("companies") {
+   
+   crEdges : '[| |]';
+   useSPD: 'true' ;
+}; 
+
+
+% solve ToWeighted(students) lex ToWeighted(companies);
+% solve ToWeighted(companies) lex ToWeighted(students);
