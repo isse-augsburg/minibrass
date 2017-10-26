@@ -5,6 +5,7 @@ import java.util.Collection;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.parsing.CodeGenerator;
+import isse.mbr.parsing.MiniBrassParseException;
 
 /**
  * A voting procedure is responsible for generating 
@@ -42,4 +43,11 @@ public interface VotingProcedure {
 	 * @return
 	 */
 	public PrimitiveType getObjectiveType(CodeGenerator codeGen, Collection<AbstractPVSInstance> votingPvs);
+	
+	/**
+	 * Do some type checks and the like 
+	 * @param codeGen
+	 * @param votingPvs
+	 */
+	public void sanityCheck(Collection<AbstractPVSInstance> votingPvs) throws MiniBrassParseException;
 }

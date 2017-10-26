@@ -3,18 +3,22 @@ package isse.mbr.model.voting;
 import java.util.Collection;
 
 import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.ReferencedPVSInstance;
+import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.IntervalType;
+import isse.mbr.model.types.MiniZincParType;
 import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassParseException;
 
 /**
- * Tries to have a majority of voters get their top priority 
+ * Implements approval voting (which is only feasible if the supplied PVS are boolean)
  * @author Alexander Schiendorfer
  *
  */
-public class MajorityTopsVoting implements VotingProcedure {
+public class ApprovalVoting implements VotingProcedure {
 
 	@Override
 	public String getVotingPredicate(CodeGenerator codeGen, Collection<AbstractPVSInstance> votingPvs) {
@@ -28,7 +32,7 @@ public class MajorityTopsVoting implements VotingProcedure {
 				sb.append("+ ");
 			}
 			voter = codeGen.deref(voter);
-			sb.append(String.format("bool2int(%s = %s)\n", 
+			sb.append(String.format("bool2int(%s)\n", 
 					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
 					));
 
@@ -45,7 +49,7 @@ public class MajorityTopsVoting implements VotingProcedure {
 				sb.append("+ ");
 			}
 			voter = codeGen.deref(voter);
-			sb.append(String.format("bool2int(sol(%s) = %s)\n", 
+			sb.append(String.format("bool2int(sol(%s))\n", 
 					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
 					));
 		}
@@ -70,9 +74,8 @@ public class MajorityTopsVoting implements VotingProcedure {
 				sb.append("+ ");
 			}
 			voter = codeGen.deref(voter);
-			sb.append(String.format("bool2int(%s = %s)\n", 
-					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
-					));
+			sb.append(String.format("bool2int(%s)\n", 
+					codeGen.getOverallValuation(voter)));
 
 		}
 		sb.append(")\n");
@@ -87,7 +90,19 @@ public class MajorityTopsVoting implements VotingProcedure {
 	@Override
 	public void sanityCheck(Collection<AbstractPVSInstance> votingPvs)
 			throws MiniBrassParseException {
-		// nothing to do, majority tops is applicable for any PVS 
+		for(AbstractPVSInstance avps : votingPvs) {
+			avps = ReferencedPVSInstance.deref(avps);
+			if(avps instanceof PVSInstance) {
+				PVSInstance pvs = (PVSInstance) avps;
+				MiniZincParType elementType = pvs.getType().instance.getElementType();
+				if (!(elementType instanceof BoolType)) {
+					throw new MiniBrassParseException("Only boolean atomic PVS supported in an approval voting setting");					
+				}
+			} else 
+				throw new MiniBrassParseException("Only boolean atomic PVS supported in an approval voting setting");
+			
+		}
+		
 	}
 
 }

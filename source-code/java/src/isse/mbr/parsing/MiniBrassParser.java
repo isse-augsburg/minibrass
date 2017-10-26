@@ -425,6 +425,7 @@ public class MiniBrassParser {
 		}
 		
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+		model.getPvsInstances().put(instToSolve.getName(), instToSolve);
 		return instToSolve;
 	}
 

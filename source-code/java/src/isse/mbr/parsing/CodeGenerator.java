@@ -590,11 +590,7 @@ public class CodeGenerator {
 	}
 	
 	public AbstractPVSInstance deref(AbstractPVSInstance pvsInstance) {
-		if (pvsInstance instanceof ReferencedPVSInstance) {
-			ReferencedPVSInstance refPvs = (ReferencedPVSInstance) pvsInstance;
-			return deref(refPvs.getReferencedInstance().instance);
-		} else
-			return pvsInstance;
+		return ReferencedPVSInstance.deref(pvsInstance);
 	}
 
 	public static String encodeString(String string, String instName) {

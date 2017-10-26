@@ -15,6 +15,9 @@ public class VotingFactory {
 			return new CondorcetVoting();
 		case "majorityTops":
 			return new MajorityTopsVoting();
+		case "approval":
+			return new ApprovalVoting();
+			
 		default:
 				throw new MiniBrassParseException("Voting procedure ["+keyword+"] unknown.");
 		}

@@ -34,4 +34,12 @@ public class ReferencedPVSInstance extends AbstractPVSInstance {
 	public Collection<AbstractPVSInstance> getChildren() {
 		return referencedInstance.instance.getChildren();
 	}
+	
+	public static AbstractPVSInstance deref(AbstractPVSInstance pvsInstance) {
+		if (pvsInstance instanceof ReferencedPVSInstance) {
+			ReferencedPVSInstance refPvs = (ReferencedPVSInstance) pvsInstance;
+			return ReferencedPVSInstance.deref(refPvs.getReferencedInstance().instance);
+		} else
+			return pvsInstance;
+	}
 }

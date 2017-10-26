@@ -5,6 +5,7 @@ import java.util.Collection;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.parsing.CodeGenerator;
+import isse.mbr.parsing.MiniBrassParseException;
 
 /**
  * Implements condorcet voting, i.e., a pairwise majority comparison 
@@ -60,6 +61,13 @@ public class CondorcetVoting implements VotingProcedure {
 	@Override
 	public PrimitiveType getObjectiveType(CodeGenerator codeGen, Collection<AbstractPVSInstance> votingPvs) {
 		return null;
+	}
+
+	@Override
+	public void sanityCheck(Collection<AbstractPVSInstance> votingPvs)
+			throws MiniBrassParseException {
+		// nothing to do for condorcet - it is applicable to any PVS 
+		
 	}
 
 }

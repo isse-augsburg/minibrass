@@ -19,6 +19,7 @@ import isse.mbr.model.parsetree.MorphedPVSInstance;
 import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
+import isse.mbr.model.parsetree.VotingInstance;
 import isse.mbr.model.types.ArrayType;
 import isse.mbr.model.types.FloatType;
 import isse.mbr.model.types.IntType;
@@ -189,6 +190,10 @@ public class SemanticChecker {
 						throw new MiniBrassParseException("Invalid argument for morphism "+m.getName() + "(" +mi.getConcreteInstance() + ") must be a concrete instance of type "+m.getFrom().instance);						
 					}
 				}
+				
+			} else if(entry.getValue() instanceof VotingInstance) {
+				VotingInstance vi = (VotingInstance) entry.getValue();
+				vi.getVotingProcedure().sanityCheck(vi.getChildren());
 				
 			} else if(entry.getValue() instanceof PVSInstance) {
 				PVSInstance pvsInst = (PVSInstance) entry.getValue();
