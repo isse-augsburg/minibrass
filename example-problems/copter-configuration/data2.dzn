@@ -1,0 +1,47 @@
+% This one has a lower payload threshold
+% so switching to the lighter temp. sensor is necessary
+
+% First simplistic data
+maxSoftwareSlots = 2;
+maxHardwareSlots = 2;
+
+maxHwIdent = 3; % Temperature, Pressure, Light Temperature
+maxSwIdent = 2; % Logger, Database
+
+maxCapabilities = 2; % temperature and pressure 
+capabilities = [{1}, {2}, {1}];
+payload = [20, 20, 15];
+
+% Current configuration
+hardwareAtSlot = [1, 0]; % first slot holds (heavy) temp sensor, second is empty
+softwareAtSlot = [1, 0]; % first slot holds logger, second not installed
+
+% Task spec:
+requiredCapabilities = {1,2}; % temperature, pressure
+payloadThreshold = 35;
+
+% Constraint relationships (changing hardware 1 is *more severe* than changing hardware 2)
+crEdges = [| 1, 4 | 2, 4 | 1, 3 | 1, 4 | 4, 3 |];
+
+
+% Expected output -----------------
+% This model+data will return 
+/*
+  Software (current): 
+    s[1]: 1
+    s[2]: 0
+  Hardware (current) 
+    h[1]: 1
+    h[2]: 0
+  -----------  
+  Software (target): 
+    s[1]: 1
+    s[2]: 0
+  Hardware (target) 
+    h[1]: 2
+    h[2]: 3
+which means that sensor 2 is installed at slot 1 and sensor 3 at slot 2;
+this has become necessary since only plugging  in sensor 2 at slot 2 would 
+be too expensive (payload 40 > 35)
+but with this configuration, the joint payload is 20+15 <= 35
+*/

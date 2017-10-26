@@ -2,3 +2,6 @@
 /bin/
 /eval/
 /results/
+experimentrunner.jar
+log
+run.sh

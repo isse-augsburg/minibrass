@@ -1,0 +1,26 @@
+% This one offers only one hardware slot, cannot work at all 
+% First simplistic data
+maxSoftwareSlots = 2;
+maxHardwareSlots = 1;
+
+maxHwIdent = 3; % Temperature, Pressure, Light Temperature
+maxSwIdent = 2; % Logger, Database
+
+maxCapabilities = 2; % temperature and pressure 
+capabilities = [{1}, {2}, {1}];
+payload = [20, 20, 15];
+
+% Current configuration
+hardwareAtSlot = [1]; % first slot holds (heavy) temp sensor, second is empty
+softwareAtSlot = [1, 0]; % first slot holds logger, second not installed
+
+% Task spec:
+requiredCapabilities = {1,2}; % temperature, pressure
+payloadThreshold = 40;
+
+% Constraint relationships (changing software 1 and 2 is more severe than changing hardware 1)
+crEdges = [| 1, 3 | 2, 3 |];
+
+% Expected output -----------------
+% This model+data will return "=====UNSATISFIABLE====="
+% as there can be *no* solution due to the lack of slots 
