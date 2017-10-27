@@ -1,0 +1,30 @@
+% ==============================================
+%
+% Exam-Scheduling based on Approval Voting
+% ----------------------------------------
+% We schedule exam dates for s students with 
+% restrictions on how many students can take
+% the exam at a single date d
+%
+% Students can give boolean preferences whether
+% they accept a schedule or not. We aim to 
+% maximize the number of accepting students
+% by means of approval voting 
+% ==============================================
+
+include "defs.mbr";
+
+PVS: marc = new BooleanPvs("marc") {
+  soft-constraint c1: 'scheduled[marc] = tueMorning';
+};
+
+PVS: andre = new BooleanPvs("andre") {
+  soft-constraint c1: 'scheduled[andre] = monMorning';
+};
+
+PVS: kynesin = new BooleanPvs("kynesi") {
+  soft-constraint c1: 'scheduled[kynesi] in {monEvening, tueMorning}';
+};
+
+%solve vote([marc,andre,kynesin], approval);
+solve kynesin lex (marc pareto andre);

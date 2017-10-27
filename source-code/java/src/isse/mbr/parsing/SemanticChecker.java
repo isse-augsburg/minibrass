@@ -2,11 +2,13 @@ package isse.mbr.parsing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.jgrapht.DirectedGraph;
@@ -45,12 +47,14 @@ public class SemanticChecker {
 	private Queue<ArrayJob> arrayJobs;
 	private Map<String, DirectedGraph<String, DefaultEdge>> parameterDependencies;
 	private Queue<Morphism> morphisms;
+	private Set<String> pvsInstanceNames;
 	
 	public SemanticChecker() {
 		referenceJobs = new LinkedList<>();
 		arrayJobs = new LinkedList<>();
 		parameterDependencies = new HashMap<String, DirectedGraph<String,DefaultEdge>>();
 		morphisms = new LinkedList<>();
+		pvsInstanceNames = new HashSet<>();
 	}
 
 	private static class ReferenceJob {
@@ -277,5 +281,12 @@ public class SemanticChecker {
 			}
 		}
 		
+	}
+	
+	public void checkPvsInstanceName(String name) throws MiniBrassParseException {
+		if(pvsInstanceNames.contains(name))
+			throw new MiniBrassParseException("PVS instance name '" +name+ "' already defined");
+		else
+			pvsInstanceNames.add(name);
 	}
 }

@@ -1,0 +1,23 @@
+% ==============================================
+%
+% Lunch-Deselection with voting 
+% ----------------------------------------
+% 
+% ==============================================
+
+include "defs.mbr";
+
+PVS: a = new ConstraintPreferences("a") {
+   soft-constraint c1: 'gulasch in selected';
+   soft-constraint c2: 'braten in selected';
+   soft-constraint c3: 'grillen in selected';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+PVS: b = new MaxCsp("b") {
+  soft-constraint c1: 'deselected = bolognese';
+};
+
+solve vote([a,b], condorcet);

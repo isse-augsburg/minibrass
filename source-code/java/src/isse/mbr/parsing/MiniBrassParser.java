@@ -296,6 +296,7 @@ public class MiniBrassParser {
 			expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
 			expectSymbol(MiniBrassSymbol.StringLitSy);
 			String name = lexer.getLastIdent();
+			semChecker.checkPvsInstanceName(name);
 			getNextSy();
 
 			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);

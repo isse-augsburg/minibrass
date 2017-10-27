@@ -1,5 +1,6 @@
 package isse.mbr.parsing;
 
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,6 +58,7 @@ public class CodeGenerator {
 
 	private boolean onlyMiniZinc;
 	private boolean genHeuristics;
+	private String generatedOutput; // for minisearch
 
 	private List<PVSInstance> leafInstances;
 
@@ -72,6 +74,16 @@ public class CodeGenerator {
 
 		// only final output here
 		String fileContents = sb.toString();
+		// TODO put this somewhere more useful or have it set by flag
+		
+		try {
+			FileWriter fw = new FileWriter("genOutput.mzn");
+			fw.write(generatedOutput);
+			fw.close();
+			
+		} catch(Exception e) {
+			System.out.println("Failed to write generated output "+ e.getMessage());
+		}
 		return fileContents;
 
 	}
@@ -141,17 +153,22 @@ public class CodeGenerator {
 
 		// add output line for valuation-carrying variables
 		sb.append("\n% Add this line to your output to make use of minisearch\n");
-		sb.append("% [ \"\\n" + VALUATTIONS_PREFIX + " ");
+		
+		StringBuilder outputBuilder = new StringBuilder();
+		
+		outputBuilder.append("[ \"\\n" + VALUATTIONS_PREFIX + " ");
 		boolean first = true;
 		for (PVSInstance leafInstance : leafInstances) {
 			String val = getOverallValuation(leafInstance);
 			if (!first)
-				sb.append("; ");
+				outputBuilder.append("; ");
 			else
 				first = false;
-			sb.append(String.format("%s = \\(%s)", val, val));
+			outputBuilder.append(String.format("%s = \\(%s)", val, val));
 		}
-		sb.append("\\n\"]\n");
+		outputBuilder.append("\\n\"]\n");
+		generatedOutput = "output "+ outputBuilder.toString() + ";";
+		sb.append("% "+outputBuilder.toString()+"\n");
 	}
 
 	private void addExportedOverallMiniZincHooks(StringBuilder sb, MiniBrassAST model,

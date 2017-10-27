@@ -1,0 +1,18 @@
+include "defs.mbr";
+
+PVS: G = new ConstraintPreferences("G") {
+  soft-constraint gGulasch: 'gulasch in selected';
+  soft-constraint gGrillen: 'grillen in selected';
+  soft-constraint gBurger: 'burger in selected';
+  soft-constraint gBolo: 'bolognese in selected';
+  soft-constraint gBraten: 'braten in selected';
+  soft-constraint gWurst: 'wurstsalat in selected';
+  
+  crEdges : '[| mbr.gGulasch, mbr.gGrillen | mbr.gGulasch, mbr.gBolo | mbr.gBurger |
+                mbr.gGulasch, mbr.gBraten | mbr.gGrillen, mbr.gWurst |  mbr.gBolo, mbr.gWurst | 
+                mbr.gBraten, mbr.gWurst | mbr.gBurger, mbr.gWurst |]';
+  useSPD: 'false' ;
+ 
+};
+
+solve G;

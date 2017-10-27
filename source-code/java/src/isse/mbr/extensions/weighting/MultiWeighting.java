@@ -4,6 +4,7 @@ import isse.mbr.extensions.ExternalMorphism;
 import isse.mbr.extensions.domain.DirectedGraph;
 import isse.mbr.extensions.domain.UtilityStructure;
 import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.parsing.MiniBrassParseException;
 
 /**
  * This hook is intended to take a MiniZinc-encoded graph,
@@ -13,13 +14,13 @@ import isse.mbr.model.parsetree.PVSInstance;
  */
 public class MultiWeighting extends ExternalMorphism {
 	@Override
-	public void process(PVSInstance fromInstance) {
+	public void process(PVSInstance fromInstance) throws MiniBrassParseException {
 		String generatedCrEdges = fromInstance.getGeneratedCodeParameters().get("crEdges");
 		int nScs = fromInstance.getNumberSoftConstraints();
 		processMiniZincString(generatedCrEdges, nScs);
 	}
 
-	public DirectedGraph processMiniZincString(String generatedCrEdges, int nScs) {
+	public DirectedGraph processMiniZincString(String generatedCrEdges, int nScs) throws MiniBrassParseException {
 
 		// TODO for now, we expect a literal graph in the form "[| 2, 1 | 1, 0 |]"
 		// assumes strictly that soft constraints are labeled from 1 to nScs

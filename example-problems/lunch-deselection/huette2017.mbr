@@ -1,0 +1,75 @@
+% ==============================================
+%
+% Lunch-Deselection with voting 
+% ----------------------------------------
+% 
+% ==============================================
+
+include "defs.mbr";
+
+PVS: A = new ConstraintPreferences("A") {
+   soft-constraint aGrillen: 'grillen in selected';
+   soft-constraint aBurger: 'burger in selected';
+   soft-constraint aBraten: 'braten in selected';
+   soft-constraint aBolo: 'bolognese in selected';
+   soft-constraint aGulasch: 'gulasch in selected';
+   
+   crEdges : '[| mbr.aGrillen, mbr.aBurger | mbr.aBurger, mbr.aBraten | mbr.aBurger, mbr.aBolo | mbr.aBraten, mbr.aGulasch | mbr.aBolo, mbr.aGulasch |]';
+   useSPD: 'false' ;
+}; 
+
+PVS: B = new MaxCsp("B") {
+  soft-constraint c1: 'deselected = bolognese';
+};
+
+PVS: C = new ConstraintPreferences("C") {
+  soft-constraint cBurger: 'burger in selected';
+  soft-constraint cWurst: 'wurstsalat in selected';
+  soft-constraint cGrillen: 'grillen in selected';
+  soft-constraint cBraten: 'braten in selected';
+  soft-constraint cGulasch: 'gulasch in selected';
+  soft-constraint cBolo: 'bolognese in selected';
+  
+  crEdges : '[| mbr.cWurst, mbr.cBolo | mbr.cWurst, mbr.cGulasch | mbr.cBraten, mbr.cWurst | mbr.cBraten, mbr.cBolo | mbr.cGrillen, mbr.cBolo |
+                mbr.cBurger, mbr.cWurst |  mbr.cBraten, mbr.cBurger |  mbr.cGrillen, mbr.cBurger | mbr.cGrillen, mbr.cGulasch | mbr.cGrillen, mbr.cWurst |
+                mbr.cBraten, mbr.cGulasch            
+   |]';
+ useSPD: 'false' ;
+};
+
+PVS: D = new MaxCsp("D") {
+  soft-constraint cd: 'deselected = burger';
+};
+
+PVS: E = new WeightedCsp("E") {
+  soft-constraint eWurst: 'wurstsalat in selected' :: weights('3') ;
+  soft-constraint eBraten: 'braten in selected' :: weights('2') ;
+  soft-constraint eBolo: 'bolognese in selected' :: weights('1') ;
+  soft-constraint eGulasch: 'gulasch in selected' :: weights('1') ;
+};
+
+PVS: F = new ConstraintPreferences("F") {
+  soft-constraint fLevelOne: 'deselected in {burger,gulasch,wurstsalat}';
+  soft-constraint fLevelTwo: 'deselected in {grillen,bolognese,braten}';
+  
+  crEdges : '[| mbr.fLevelTwo, mbr.fLevelOne  |]';
+  useSPD: 'false' ;
+ 
+};
+
+PVS: G = new ConstraintPreferences("G") {
+  soft-constraint gGulasch: 'gulasch in selected';
+  soft-constraint gGrillen: 'grillen in selected';
+  soft-constraint gBurger: 'burger in selected';
+  soft-constraint gBolo: 'bolognese in selected';
+  soft-constraint gBraten: 'braten in selected';
+  soft-constraint gWurst: 'wurstsalat in selected';
+  
+  crEdges : '[| mbr.gGulasch, mbr.gGrillen | mbr.gGulasch, mbr.gBolo | mbr.gGulasch, mbr.gBurger |
+                mbr.gGulasch, mbr.gBraten | mbr.gGrillen, mbr.gWurst |  mbr.gBolo, mbr.gWurst | 
+                mbr.gBraten, mbr.gWurst | mbr.gBurger, mbr.gWurst |]';
+  useSPD: 'false' ;
+ 
+};
+
+solve vote([A,B,C,D,E,F,G], condorcet);

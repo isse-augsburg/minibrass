@@ -5,6 +5,7 @@ import java.util.Map;
 
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.types.PVSFormalParameter;
+import isse.mbr.parsing.MiniBrassParseException;
 
 /**
  * This interface defines methods that external morphism objects
@@ -27,16 +28,18 @@ public abstract class ExternalMorphism {
 	 * Called when a morphism is applied, intended to build up data 
 	 * structures that are then queried by "getParameterString()"
 	 * @param fromInstance
+	 * @throws MiniBrassParseException 
 	 */
-	public abstract void process(PVSInstance fromInstance);
+	public abstract void process(PVSInstance fromInstance) throws MiniBrassParseException;
 	
 	/**
 	 * Called during code generation when a parameter for the "to" PVS 
 	 * is instantiated
 	 * @param key
 	 * @return
+	 * @throws MiniBrassParseException 
 	 */
-	public synchronized String getParameterString(PVSFormalParameter key) {
+	public synchronized String getParameterString(PVSFormalParameter key) throws MiniBrassParseException {
 		if(!updated)
 			process(pvsInst);
 		return calculatedParameters.get(key.getName());

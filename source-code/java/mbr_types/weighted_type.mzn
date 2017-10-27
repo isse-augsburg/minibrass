@@ -24,6 +24,19 @@ let {
 } in 
 int_search(mifSatisfied, input_order, indomain_max, complete);
 
+% Max Constraint Type 
+predicate is_worse_max(var int: x, var int: y, 
+  par int: nScs, par int: k) = 
+  x > y;
+  
+function var int: bool_sum(array[int] of var bool: b, 
+                               par int: nScs, par int: k) =
+  sum(i in index_set(b)) ( (1 - bool2int(b[i])));
+
+function ann: getSearchHeuristicMax(array[int] of var bool: degs, var int: overall,  par int: nSoftConstraints,
+                                         int: k) = 
+int_search(degs, input_order, indomain_max, complete);
+
 % Multiweighted Constraint Type 
 function array[int] of var int: weighted_multi_sum(array[int] of var bool: lineSat,
                                                    par int: nScs, par int: k, par int: d,

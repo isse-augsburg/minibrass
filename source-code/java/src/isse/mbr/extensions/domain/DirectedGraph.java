@@ -25,7 +25,7 @@ public class DirectedGraph {
 		return adjacencyMatrix;
 	}
 
-	public void parse(String input) {
+	public void parse(String input) throws MiniBrassParseException {
 		// TODO for now, we expect a literal graph in the form "[| 2, 1 | 1, 0
 		// |]"
 		// assumes strictly that soft constraints are labeled from 1 to nScs
@@ -39,7 +39,11 @@ public class DirectedGraph {
 
 		while (tok.hasMoreTokens()) {
 			String nextEdge = tok.nextToken().trim();
+
 			String[] splitted = nextEdge.split(",");
+			if(splitted.length != 2) {
+				throw new MiniBrassParseException("Error: An edge must contain of precisely two nodes.");
+			}
 			int fromId = Integer.parseInt(splitted[0].trim()) - 1;
 			int toId = Integer.parseInt(splitted[1].trim()) - 1;
 			markEdge(fromId, toId);
