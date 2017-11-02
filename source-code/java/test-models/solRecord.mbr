@@ -1,0 +1,13 @@
+include "defs.mbr";
+
+PVS: a = new CostFunctionNetwork("a") {
+  soft-constraint a: 'value'; 
+};
+
+PVS: b = new MaxCostFunctionNetwork("b") {
+  soft-constraint b: 'value'; 
+};
+
+solve a pareto b;
+
+output '["Intermediate solution: value = \(value);"]' ;

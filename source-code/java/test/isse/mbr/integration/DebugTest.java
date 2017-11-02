@@ -23,10 +23,10 @@ public class DebugTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 	}
 
-	@Test
+	@Test(expected = MiniBrassParseException.class)
 	public void test() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);

@@ -1,4 +1,4 @@
-package isse.mbr.integration;
+package isse.mbr.tools;
 
 import java.io.File;
 import java.io.IOException;

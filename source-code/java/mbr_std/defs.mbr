@@ -38,6 +38,16 @@ type CostFunctionNetwork = PVSType<0..k> =
     is_worse -> is_worse_weighted; 
     top -> 0;
  };
+
+type MaxCostFunctionNetwork = PVSType<0..k> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "soft_constraints/mbr_types/cfn_type.mzn" {
+    times -> sum;
+    is_worse -> is_greater_weighted; 
+    top -> 0;
+ };
   
 type MultiWeightedCsp = PVSType<bool, array[1..d] of 0..k> = 
   params {

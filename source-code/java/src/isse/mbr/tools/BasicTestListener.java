@@ -1,4 +1,4 @@
-package isse.mbr.integration;
+package isse.mbr.tools;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,6 +24,8 @@ public class BasicTestListener implements MiniZincResultListener {
 	private Map<String, String> objectives;
 	private Map<String, List<String>> objectiveSequences;
 	private Map<String, String> lastSolution;
+	private boolean wasSolutionLine;
+	private boolean wasObjLine;
 	
 	public BasicTestListener() {
 		this.solved = false;
@@ -43,13 +45,13 @@ public class BasicTestListener implements MiniZincResultListener {
 
 	@Override
 	public void notifyLine(String line) {
-		boolean solutionLine = line.startsWith("Intermediate solution:" );
-		boolean objLine = line.startsWith(CodeGenerator.VALUATTIONS_PREFIX);
+		wasSolutionLine = line.startsWith(CodeGenerator.INTERMEDIATE_SOLUTIONS_PREFIX);
+		wasObjLine = line.startsWith(CodeGenerator.VALUATTIONS_PREFIX);
 		boolean customLine = line.startsWith("Custom:");
 		
 		cyclic = cyclic || line.contains("cycl");
 		
-		if(solutionLine || objLine) {
+		if(wasSolutionLine || wasObjLine) {
 			String valuations = line.substring(line.lastIndexOf(':')+1, line.length());
 
 			StringTokenizer tokenizer = new StringTokenizer(valuations, ";");
@@ -61,7 +63,7 @@ public class BasicTestListener implements MiniZincResultListener {
 				sc.next(); // "="
 				String val = sc.nextLine().trim();
 				
-				if(solutionLine)
+				if(wasSolutionLine)
 					lastSolution.put(id, val);
 				else {
 					
@@ -130,4 +132,15 @@ public class BasicTestListener implements MiniZincResultListener {
 	public void setObjectiveSequences(Map<String, List<String>> objectiveSequences) {
 		this.objectiveSequences = objectiveSequences;
 	}
+
+
+	public boolean isWasSolutionLine() {
+		return wasSolutionLine;
+	}
+
+
+	public boolean wasObjLine() {
+		return wasObjLine;
+	}
+
 }

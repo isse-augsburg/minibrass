@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.BasicTestListener;
+import isse.mbr.tools.MiniZincLauncher;
 
 public class ExternalMorphismTest {
 
@@ -20,7 +22,7 @@ public class ExternalMorphismTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
 	}
 

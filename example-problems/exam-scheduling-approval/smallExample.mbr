@@ -22,9 +22,9 @@ PVS: andre = new BooleanPvs("andre") {
   soft-constraint c1: 'scheduled[andre] = monMorning';
 };
 
-PVS: kynesin = new BooleanPvs("kynesi") {
-  soft-constraint c1: 'scheduled[kynesi] in {monEvening, tueMorning}';
+PVS: tom = new BooleanPvs("tom") {
+  soft-constraint c1: 'scheduled[tom] in {monEvening, tueMorning}';
 };
 
-%solve vote([marc,andre,kynesin], approval);
-solve kynesin lex (marc pareto andre);
+solve vote([marc,andre,tom], approval);
+%solve kynesin lex (marc pareto andre);

@@ -25,7 +25,7 @@ set of int: STUDENT = 1..s;
 int: marc = 1;
 int: andre = 2;
 int: frank = 3; 
-int: kynesi = 4; 
+int: tom = 4; 
 
 int: monMorning = 1;
 int: monEvening = 2;
@@ -49,4 +49,4 @@ constraint scheduledDates >= lowerBound;
 % solve satisfy;
 solve search miniBrass();
 
-output ["Scheduled = \(scheduled)"] ++ [ "\nValuations: mbr_overall_marc = \(mbr_overall_marc); mbr_overall_andre = \(mbr_overall_andre); mbr_overall_kynesi = \(mbr_overall_kynesi)\n"]
+output ["Scheduled = \(scheduled)"] ++ [ "\nValuations: mbr_overall_marc = \(mbr_overall_marc); mbr_overall_andre = \(mbr_overall_andre); mbr_overall_tom = \(mbr_overall_tom)\n"]

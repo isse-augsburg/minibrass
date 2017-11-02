@@ -10,6 +10,8 @@ import org.junit.Test;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.BasicTestListener;
+import isse.mbr.tools.MiniZincLauncher;
 
 /**
  * Executes the classical use case with weighted constraints for soft constraints to make 
@@ -28,7 +30,7 @@ public class LexProductTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
 	}
 

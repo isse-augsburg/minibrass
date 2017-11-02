@@ -9,10 +9,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import isse.mbr.integration.BasicTestListener;
-import isse.mbr.integration.MiniZincLauncher;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.BasicTestListener;
+import isse.mbr.tools.MiniZincLauncher;
 
 /**
  * This test case investigates if we reliably detect incorrect parameter settings 
@@ -129,7 +129,7 @@ public class ParameterSettings {
 		String combined = typeWithWrap + instantiation;
 		writeSilent(tempFile, combined);
 		
-		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		MiniBrassCompiler compiler = new MiniBrassCompiler(true);
 		compiler.compile(tempFile, tempOutput);
  
 		Assert.assertTrue(tempOutput.exists());
@@ -161,7 +161,7 @@ public class ParameterSettings {
 		String combined = typeWithWrap + instantiation;
 		writeSilent(tempFile, combined);
 		
-		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		MiniBrassCompiler compiler = new MiniBrassCompiler(true);
 		compiler.compile(tempFile, tempOutput);
  
 		Assert.assertTrue(tempOutput.exists());
@@ -217,7 +217,7 @@ public class ParameterSettings {
 		String combined = typeWithWrapJava + instantiation;
 		writeSilent(tempFile, combined);
 		
-		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		MiniBrassCompiler compiler = new MiniBrassCompiler(true);
 		compiler.compile(tempFile, tempOutput);
  
 		Assert.assertTrue(tempOutput.exists());

@@ -60,7 +60,7 @@ public class Instantiations {
 		String combined = typeWithDef + instantiation;
 		writeSilent(tempFile, combined);
 		
-		MiniBrassCompiler compiler = new MiniBrassCompiler();
+		MiniBrassCompiler compiler = new MiniBrassCompiler(true);
 		compiler.compile(tempFile, tempOutput);
  
 		Assert.assertTrue(tempOutput.exists());

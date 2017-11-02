@@ -1,6 +1,5 @@
 package isse.mbr.parsing;
 
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,14 +51,17 @@ public class CodeGenerator {
 	private static final String TOP_KEY = "top";
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
+	public static final String INTERMEDIATE_SOLUTIONS_PREFIX = "Intermediate solution:";
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
 	public static final String ITER_VARIABLE_PREFIX = "mbr_iter_var_";
 	public static final String AUX_VARIABLE_PREFIX = "mbr_aux_var_";
 
 	private boolean onlyMiniZinc;
 	private boolean genHeuristics;
+	private boolean suppressOutputGeneration = false; // this should not be accessible from outside, better use the new MiniBrass output item 
 	private String generatedOutput; // for minisearch
 
+	
 	private List<PVSInstance> leafInstances;
 
 	public String generateCode(MiniBrassAST model) throws MiniBrassParseException {
@@ -74,16 +76,7 @@ public class CodeGenerator {
 
 		// only final output here
 		String fileContents = sb.toString();
-		// TODO put this somewhere more useful or have it set by flag
-		
-		try {
-			FileWriter fw = new FileWriter("genOutput.mzn");
-			fw.write(generatedOutput);
-			fw.close();
-			
-		} catch(Exception e) {
-			System.out.println("Failed to write generated output "+ e.getMessage());
-		}
+	
 		return fileContents;
 
 	}
@@ -152,9 +145,10 @@ public class CodeGenerator {
 		}
 
 		// add output line for valuation-carrying variables
-		sb.append("\n% Add this line to your output to make use of minisearch\n");
 		
 		StringBuilder outputBuilder = new StringBuilder();
+		if(model.getProblemOutput() != null)
+			outputBuilder.append(model.getProblemOutput() + " ++ ");
 		
 		outputBuilder.append("[ \"\\n" + VALUATTIONS_PREFIX + " ");
 		boolean first = true;
@@ -166,9 +160,10 @@ public class CodeGenerator {
 				first = false;
 			outputBuilder.append(String.format("%s = \\(%s)", val, val));
 		}
-		outputBuilder.append("\\n\"]\n");
-		generatedOutput = "output "+ outputBuilder.toString() + ";";
-		sb.append("% "+outputBuilder.toString()+"\n");
+		outputBuilder.append("\\n\"]");
+		generatedOutput = "output "+ outputBuilder.toString() + ";\n";
+		if(!suppressOutputGeneration)
+			sb.append(generatedOutput+"\n");
 	}
 
 	private void addExportedOverallMiniZincHooks(StringBuilder sb, MiniBrassAST model,
@@ -640,5 +635,13 @@ public class CodeGenerator {
 
 	public void setGenHeuristics(boolean genHeuristics) {
 		this.genHeuristics = genHeuristics;
+	}
+
+	public boolean isSuppressOutputGeneration() {
+		return suppressOutputGeneration;
+	}
+
+	public void setSuppressOutputGeneration(boolean suppressOutputGeneration) {
+		this.suppressOutputGeneration = suppressOutputGeneration;
 	}
 }

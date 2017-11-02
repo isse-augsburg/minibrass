@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.BasicTestListener;
+import isse.mbr.tools.MiniZincLauncher;
 
 /**
  * Makes sure that we allow non-dominated BAB and other searches 
@@ -25,7 +27,7 @@ public class FreePVSMultiSetTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
