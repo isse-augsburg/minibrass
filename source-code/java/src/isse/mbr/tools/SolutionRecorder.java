@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.parsing.MiniBrassParser;
 
 /**
  * The solution recorder takes a constraint satisfaction model along with a MiniBrass
@@ -92,6 +93,7 @@ public class SolutionRecorder {
 	protected MiniZincLauncher launcher;
 	protected List<Solution> recordedSolutions;
 	protected boolean modelSolved;
+	protected MiniBrassParser parser;
 	
 	
 	public SolutionRecorder() {
@@ -112,8 +114,16 @@ public class SolutionRecorder {
 		compiler.setMinizincOnly(true);
 		compiler.compile(miniBrassFile);
 		
+		parser = compiler.getUnderlyingParser();
+		
+		File dataFile = null;
+		// TODO for now just one data file 
+		for(File f:dataFiles) {
+			dataFile = f;
+			break;
+		}
 		launcher.addMiniZincResultListener(new SolutionRecorderListener());		
-		launcher.runMiniZincModel(miniZincFile, null, 100);
+		launcher.runMiniZincModel(miniZincFile, dataFile, 100);
 	}
 	
 	public void recordSolutions(File miniZincFile, File miniBrassFile) throws MiniBrassParseException, IOException {
@@ -129,9 +139,18 @@ public class SolutionRecorder {
 		
 		PairwiseComparator pc = new PairwiseComparator();
 		pc.performPairwiseComparison(sr);
+		System.out.println(pc.getHtml());
 	}
 
 	public List<Solution> getRecordedSolutions() {
 		return recordedSolutions;
+	}
+
+	public MiniBrassParser getParser() {
+		return parser;
+	}
+
+	public void setParser(MiniBrassParser parser) {
+		this.parser = parser;
 	}
 }

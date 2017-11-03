@@ -53,6 +53,9 @@ public class MiniBrassCompiler {
 	// MiniBrass file
 	private boolean suppressOutput = false;
 
+	private MiniBrassParser underlyingParser; // required for further post-processing as in, e.g., pairwise comparison
+	
+	
 	public MiniBrassCompiler() {
 	}
 
@@ -100,8 +103,9 @@ public class MiniBrassCompiler {
 	}
 
 	public void compile(File input, File output) throws IOException, MiniBrassParseException {
-		MiniBrassParser parser = new MiniBrassParser();
-		MiniBrassAST model = parser.parse(input);
+		underlyingParser = new MiniBrassParser();
+		MiniBrassAST model = underlyingParser.parse(input);
+	
 		CodeGenerator codegen = new CodeGenerator();
 		codegen.setOnlyMiniZinc(isMinizincOnly());
 		codegen.setGenHeuristics(isGenHeuristics());
@@ -181,6 +185,14 @@ public class MiniBrassCompiler {
 
 	public void setGenHeuristics(boolean genHeuristics) {
 		this.genHeuristics = genHeuristics;
+	}
+
+	public MiniBrassParser getUnderlyingParser() {
+		return underlyingParser;
+	}
+
+	public void setUnderlyingParser(MiniBrassParser underlyingParser) {
+		this.underlyingParser = underlyingParser;
 	}
 
 }

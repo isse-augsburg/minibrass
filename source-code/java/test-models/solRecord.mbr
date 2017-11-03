@@ -8,6 +8,10 @@ PVS: b = new MaxCostFunctionNetwork("b") {
   soft-constraint b: 'value'; 
 };
 
-solve a pareto b;
+PVS: c = new MaxCostFunctionNetwork("c") {
+  soft-constraint c: 'value'; 
+};
+
+solve vote([a,b,c], condorcet);
 
 output '["Intermediate solution: value = \(value);"]' ;

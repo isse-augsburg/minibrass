@@ -1,6 +1,6 @@
 %include "smallExample_o.mzn";
 include "huette2017_o.mzn";
-include "soft_constraints/minibrass.mzn"; 
+%include "soft_constraints/minibrass.mzn"; 
 include "link_set_to_booleans.mzn";
 % ==============================================
 %
@@ -32,8 +32,7 @@ constraint sum(s in FOOD)(bool2int(selectedBool[s])) == f-1;
 
 solve 
 %:: int_search([deselected], input_order, indomain_max, complete) 
-%satisfy;
-search miniBrass();
+satisfy;
+%search miniBrass();
 
-include "genOutput.mzn";
 

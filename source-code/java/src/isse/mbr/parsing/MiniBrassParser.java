@@ -1037,5 +1037,9 @@ public class MiniBrassParser {
 		//System.out.println("Returning symbol: "+currSy);
 	}
 
+	public MiniBrassAST getLastModel() {
+		return model;
+	}
+
 
 }

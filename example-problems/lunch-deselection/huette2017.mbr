@@ -73,3 +73,5 @@ PVS: G = new ConstraintPreferences("G") {
 };
 
 solve vote([A,B,C,D,E,F,G], condorcet);
+
+output '["Intermediate solution: deselected = \(foodNames[deselected]);"]' ;
