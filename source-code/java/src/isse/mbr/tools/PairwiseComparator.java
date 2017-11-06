@@ -224,7 +224,7 @@ public class PairwiseComparator {
 					styleShading =String.format("style =\" background-color: "+colColor +"\"", df.format(ratio));
 				}
 				
-				sb.append(String.format("<td><span class=\"%s\" %s>%d / %d / %d</span></td>", color, styleShading, leftLikes[i][j], indifferents[i][j], rightLikes[i][j]));
+				sb.append(String.format("<td><span class=\"%s\" %s><span class=\"absoluteVals\">%d / %d / %d</span><span class=\"relativeVals\">%s %% / %s %% / %s %%  </span></span></td>", color, styleShading, leftLikes[i][j], indifferents[i][j], rightLikes[i][j], roundPerc(leftLikes[i][j],total), roundPerc(indifferents[i][j],total), roundPerc(rightLikes[i][j],total)));
 			}
 			sb.append("</tr>\n");
 		}		
@@ -233,6 +233,11 @@ public class PairwiseComparator {
 		return sb.toString();
 	}
 	
+	private String roundPerc(int i, int total) {
+		double ratio = (double)i / total;
+		return Long.toString(Math.round(ratio * 100.0));
+	}
+
 	public static void main(String[] args) throws MiniBrassParseException, IOException {
 		SolutionRecorder sr = new SolutionRecorder();
 		File miniZincFile = new File(args[0]);

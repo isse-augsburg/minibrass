@@ -1,9 +1,14 @@
 th, td {
     padding: 0px;
     margin:0px;
+    height:70px;
+    vertical-align: middle;
 }
 
 th {
+   padding: 0px;
+}
+tr {
    padding: 0px;
 }
 
@@ -13,14 +18,17 @@ th {
     margin:0px;
     display:block;
     padding:15px;
+    height:100%;
+    overflow:auto;
+    vertical-align: middle;
+}
+.absoluteVals, .relativeVals {
+    display:block;
 }
 
-.shaded {
-    color:#fff;
-    display:block;
-    
-    margin:0px;
-}
+.relativeVals {
+   font-size: 11pt;
+}  
 
 #logo {
     width:450px;
@@ -31,6 +39,9 @@ th {
     margin:0px;
     display:block;
     padding:15px;
+    height:100%;
+    vertical-align: middle;
+    overflow:auto;
 }
 
 .neutral {
@@ -39,6 +50,9 @@ th {
     margin:0px;
     display:block;
     padding:15px;
+    height:100%;
+    
+    overflow:auto;
 }
 
 .solStyle {
