@@ -223,8 +223,11 @@ public class PairwiseComparator {
 					double ratio = (double) rightLikes[i][j]	/ total;
 					styleShading =String.format("style =\" background-color: "+colColor +"\"", df.format(ratio));
 				}
-				
-				sb.append(String.format("<td><span class=\"%s\" %s><span class=\"absoluteVals\">%d / %d / %d</span><span class=\"relativeVals\">%s %% / %s %% / %s %%  </span></span></td>", color, styleShading, leftLikes[i][j], indifferents[i][j], rightLikes[i][j], roundPerc(leftLikes[i][j],total), roundPerc(indifferents[i][j],total), roundPerc(rightLikes[i][j],total)));
+				if(i == j) {
+					sb.append(String.format("<td><span class=\"%s\">  </span></td>", neutralStyle));
+				} else {
+					sb.append(String.format("<td><span class=\"%s\" %s><span class=\"absoluteVals\">%d / %d / %d</span><span class=\"relativeVals\">%s %% / %s %% / %s %%  </span></span></td>", color, styleShading, leftLikes[i][j], indifferents[i][j], rightLikes[i][j], roundPerc(leftLikes[i][j],total), roundPerc(indifferents[i][j],total), roundPerc(rightLikes[i][j],total)));
+				}
 			}
 			sb.append("</tr>\n");
 		}		
