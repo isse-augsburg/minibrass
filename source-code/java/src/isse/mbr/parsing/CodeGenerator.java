@@ -321,6 +321,13 @@ public class CodeGenerator {
 				AbstractPVSInstance left = deref(comp.getLeftHandSide());
 				AbstractPVSInstance right = deref(comp.getRightHandSide());
 
+				String equalsLeft = left.getGeneratedEqualsPredicate();
+				String equalsRight = right.getGeneratedEqualsPredicate();
+
+				// equals
+				String generatedEqualsPredicate = String.format("(%s) /\\ (%s)", equalsLeft, equalsRight);
+				comp.setGeneratedEqualsPredicate(generatedEqualsPredicate);
+				
 				if (comp.getProductType() == ProductType.DIRECT) {
 					String leftBetter = left.getGeneratedBetterPredicate();
 					String rightBetter = right.getGeneratedBetterPredicate();
@@ -329,20 +336,11 @@ public class CodeGenerator {
 				} else { // lexicographic
 					String leftBetter = left.getGeneratedBetterPredicate();
 					String rightBetter = right.getGeneratedBetterPredicate();
-
-					// get left objective variable
-					String leftOverall = getOverallValuation(left);
-					String rightOverall = getOverallValuation(right);
-
-					comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ (sol(%s) = %s /\\ %s) )", leftBetter,
-							leftOverall, leftOverall, rightBetter));
-					comp.setGeneratedNotWorsePredicate(String.format("( (%s) \\/ (sol(%s) = %s /\\ %s) )", rightBetter,
-							rightOverall, rightOverall, leftBetter));
-
-					// sb.append(String.format("predicate %s() = (%s() ) \\/ (
-					// sol(%s) = %s /\\ %s() );\n", pvsPred, leftBetter,
-					// leftOverall, leftOverall, rightBetter));
+					
+					comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ ( (%s) /\\ %s) )", leftBetter, equalsLeft, rightBetter));
+					comp.setGeneratedNotWorsePredicate(String.format("( (%s) \\/ ( (%s) /\\ %s) )", rightBetter, equalsRight, leftBetter));
 				}
+				
 			} else { // has to be vote instance
 				VotingInstance vi = (VotingInstance) pvsInstance;
 				String getBetterPredicate = vi.getVotingProcedure().getVotingPredicate(this, vi.getChildren());
@@ -499,9 +497,11 @@ public class CodeGenerator {
 				instanceArguments.toString());
 		String notGetWorseString = String.format("%s(%s, %s, %s)", pvsType.getOrder(), overallIdent, lastSolutionDegree,
 				instanceArguments.toString());
+		String equalityString = String.format("sol(%s) = %s", overallIdent, overallIdent);
 
 		inst.setGeneratedBetterPredicate(getBetterString);
 		inst.setGeneratedNotWorsePredicate(notGetWorseString);
+		inst.setGeneratedEqualsPredicate(equalityString);
 	}
 
 	/**

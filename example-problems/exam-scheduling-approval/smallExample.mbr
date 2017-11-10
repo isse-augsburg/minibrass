@@ -26,5 +26,8 @@ PVS: tom = new BooleanPvs("tom") {
   soft-constraint c1: 'scheduled[tom] in {monEvening, tueMorning}';
 };
 
-solve vote([marc,andre,tom], approval);
-%solve kynesin lex (marc pareto andre);
+% solve vote([marc,andre,tom], approval);
+
+solve marc lex (andre pareto tom);
+
+output '["Scheduled = \(scheduled)"]';

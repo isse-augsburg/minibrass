@@ -48,3 +48,12 @@ constraint scheduledDates >= lowerBound;
 
 % solve satisfy;
 solve search miniBrass();
+
+s = 4; % four students to be scheduled 
+d = 3; % three available dates 
+
+studentNames = ["Marc", "Andre", "Frank", "Tom"];
+dateNames = ["MonMorning", "MonEvening", "TueMorning"];
+
+minPerDate = 0;
+maxPerDate = 2;
