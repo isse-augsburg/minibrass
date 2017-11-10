@@ -9,4 +9,6 @@ PVS: cr1 = new ConstraintPreferences("cr1") {
    useSPD: 'false' ;
 }; 
 
+output '["x = \(x); y = \(y); z = \(z)"]';
+
 solve cr1;

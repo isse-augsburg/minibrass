@@ -11,4 +11,4 @@ solve
 :: int_search([x,y,z], input_order, indomain_min, complete)
 search pvs_BAB();
 
-output ["x = \(x); y = \(y); z = \(z)"] ++ [ "\nValuations:  mbr_overall_cr1 = \(mbr_overall_cr1)\n"];
+

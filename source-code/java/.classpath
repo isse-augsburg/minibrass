@@ -4,7 +4,8 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jgrapht-core-0.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/args4j-2.33.jar" sourcepath="lib/args4j-2.33-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -12,11 +13,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-import org.kohsuke.args4j.OptionHandlerFilter;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import isse.mbr.model.MiniBrassAST;
 
@@ -24,7 +26,7 @@ import isse.mbr.model.MiniBrassAST;
  * The main entry point for the MiniBrass compiler that converts MiniBrass
  * source code files into MiniZinc
  * 
- * usage: mbr2mzn [-o output] file.mbr
+ * usage: mbr2mzn [-o output] [-m] [-s] file.mbr
  * 
  * Default output is "file_o.mzn"
  * 
@@ -35,27 +37,25 @@ public class MiniBrassCompiler {
 
 	private final static Logger LOGGER = Logger.getGlobal();
 
-	@Option(name = "-m", usage = "only MiniZinc code (top level PVS must be int)")
 	private boolean minizincOnly; // does not generate anything that is related
 									// to MiniSearch (i.e. annotations for
 									// getBetter-predicates)
-
-	@Option(name = "-h", usage = "generate heuristics for search (can lead to long flatzinc compilation)")
 	private boolean genHeuristics;
-
-	@Option(name = "-o", usage = "output compiled MiniZinc to this file", metaVar = "MZN-OUTPUT")
 	private File out = null;
-
-	@Argument(required = true, metaVar = "MBR-FILE")
 	private String minibrassFile;
 
 	// this should not be set by flag - rather move the output from MiniZinc to
 	// MiniBrass file
 	private boolean suppressOutput = false;
 
-	private MiniBrassParser underlyingParser; // required for further post-processing as in, e.g., pairwise comparison
-	
-	
+	private MiniBrassParser underlyingParser; // required for further
+												// post-processing as in, e.g.,
+												// pairwise comparison
+
+	// CLI business
+	private Options options;
+	private HelpFormatter formatter;
+
 	public MiniBrassCompiler() {
 	}
 
@@ -105,7 +105,7 @@ public class MiniBrassCompiler {
 	public void compile(File input, File output) throws IOException, MiniBrassParseException {
 		underlyingParser = new MiniBrassParser();
 		MiniBrassAST model = underlyingParser.parse(input);
-	
+
 		CodeGenerator codegen = new CodeGenerator();
 		codegen.setOnlyMiniZinc(isMinizincOnly());
 		codegen.setGenHeuristics(isGenHeuristics());
@@ -124,41 +124,71 @@ public class MiniBrassCompiler {
 		fw.close();
 	}
 
+	private void printUsage() {
+		formatter.printHelp("mbr2mzn [Options] minibrass-file\n\nOptions:\n", options);
+	}
+
 	public void doMain(String[] args) {
-		CmdLineParser cmdLineParser = new CmdLineParser(this);
+
+		// create the command line parser
+		CommandLineParser parser = new DefaultParser();
+
+		options = new Options();
+		options.addOption("h", "help", false, "print this message");
+		options.addOption("s", "generate-heuristics", false,
+				"generate heuristics for search (can lead to long flatzinc compilation)");
+		options.addOption("m", "only-minizinc", false,
+				"do not generate MiniSearch predicates but only MiniZinc code (top level PVS must be int)");
+		options.addOption("o", "output", true, "output compiled MiniZinc to this file");
+
+		formatter = new HelpFormatter();
+
 		try {
-			cmdLineParser.parseArgument(args);
-			if (!minibrassFile.endsWith("mbr")) {
-				System.out.println("Warning: MiniBrass file ending on .mbr expected!");
+			// parse the command line arguments
+			CommandLine line = parser.parse(options, args);
+
+			List<String> argList = line.getArgList();
+
+			if(line.hasOption('h')) {
+				printUsage();
+				System.exit(0);
 			}
-			if (out == null) {
+			
+			if (argList.size() != 1) {
+				System.out.println("mbr2mzn expects exactly one MiniBrass file as input.");
+				printUsage();
+				System.exit(1);
+			} else {
+				minibrassFile = argList.get(0);
+				if (!minibrassFile.endsWith("mbr")) {
+					System.out.println("Warning: MiniBrass file ending on .mbr expected!");
+				}
+			}
+
+			if (line.hasOption("output")) {
+				out = new File(line.getOptionValue("output"));
+			} else {
 				String mbrFilePrefix = minibrassFile.substring(0, minibrassFile.lastIndexOf('.'));
 				out = new File(mbrFilePrefix + "_o.mzn");
 			}
-			if (minizincOnly) {
+
+			if (line.hasOption("only-minizinc")) {
 				LOGGER.info("Only generating MiniZinc (not MiniSearch) code");
+				minizincOnly = true;
 			}
-			if (genHeuristics) {
+
+			if (line.hasOption("generate-heuristics")) {
 				LOGGER.info("Generate search heuristics as well");
+				genHeuristics = true;
 			}
+
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
 
 			compile(mbrFile, out);
-		} catch (CmdLineException e) {
-			// if there's a problem in the command line,
-			// you'll get this exception. this will report
-			// an error message.
-			LOGGER.severe(e.getMessage());
-			LOGGER.severe("mbr2mzn [options...] MBR-FILE");
-			// print the list of available options
-			cmdLineParser.printUsage(System.err);
-			LOGGER.severe("\n");
-
-			// print option sample. This is useful some time
-			LOGGER.severe("  Example: mbr2mzn" + cmdLineParser.printExample(OptionHandlerFilter.ALL) + " MBR-FILE");
-
-			return;
+		} catch (ParseException exp) {
+			LOGGER.severe("Unexpected exception:" + exp.getMessage());
+			printUsage();
 		} catch (FileNotFoundException e) {
 			LOGGER.severe("File " + minibrassFile + " was not found");
 			e.printStackTrace();
