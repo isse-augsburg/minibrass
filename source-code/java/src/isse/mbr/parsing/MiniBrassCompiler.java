@@ -125,7 +125,7 @@ public class MiniBrassCompiler {
 	}
 
 	private void printUsage() {
-		formatter.printHelp("mbr2mzn [Options] minibrass-file\n\nOptions:\n", options);
+		formatter.printHelp("mbr2mzn [<options>] <minibrass-model>.mbr\n\nOptions:\n", options);
 	}
 
 	public void doMain(String[] args) {
@@ -140,6 +140,7 @@ public class MiniBrassCompiler {
 		options.addOption("m", "only-minizinc", false,
 				"do not generate MiniSearch predicates but only MiniZinc code (top level PVS must be int)");
 		options.addOption("o", "output", true, "output compiled MiniZinc to this file");
+		//options.addOption("", "input-from-stdin", false, "Read input from standard input");
 
 		formatter = new HelpFormatter();
 
@@ -181,6 +182,8 @@ public class MiniBrassCompiler {
 				LOGGER.info("Generate search heuristics as well");
 				genHeuristics = true;
 			}
+			
+			
 
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
