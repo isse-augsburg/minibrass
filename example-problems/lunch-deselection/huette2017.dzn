@@ -1,0 +1,4 @@
+f = 6;
+foodNames = ["Gulasch", "Braten", "Bolognese", "Grillen", "Wurstsalat", "Burger"];
+%int: gulasch = 1; int: braten = 2; int: bolognese = 3; int: grillen = 4;
+%int: wurstsalat = 5; int: burger = 6;

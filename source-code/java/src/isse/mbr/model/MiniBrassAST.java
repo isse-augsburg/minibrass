@@ -29,6 +29,8 @@ public class MiniBrassAST {
 	private Collection<String> additionalMinizincIncludes;
 
 	private AbstractPVSInstance solveInstance;
+
+	private String problemOutput; 
 	
 	public MiniBrassAST() {
 		pvsTypes = new HashMap<String, PVSType>();
@@ -85,6 +87,14 @@ public class MiniBrassAST {
 
 	public Collection<String> getAdditionalMinizincIncludes() {
 		return additionalMinizincIncludes;
+	}
+
+	public String getProblemOutput() {
+		return problemOutput;
+	}
+
+	public void setProblemOutput(String problemOutput) {
+		this.problemOutput = problemOutput;
 	}
 }
 

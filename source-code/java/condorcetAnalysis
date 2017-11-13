@@ -1,0 +1,3 @@
+#!/bin/sh
+SCRIPT_DIR="$(dirname "$0")/condorcetAnalysis.jar"
+java -jar $SCRIPT_DIR "$@"

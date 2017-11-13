@@ -1,8 +1,10 @@
-package isse.mbr.integration;
+package isse.mbr.tools;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -23,6 +25,8 @@ public class MiniZincLauncher {
 	private String minizincGlobals = "gecode";  
 	private boolean useDefault = false; // passing no arguments to minizinc/minisearch
 	private boolean debug = false;
+	private boolean deleteAfterRun = false;
+	private File lastModel;
 	
 	private final static Logger LOGGER = Logger.getGlobal();
 	
@@ -50,6 +54,7 @@ public class MiniZincLauncher {
 		
 		if(data != null)
 			pb.command().add(dataPath);
+		lastModel = model;
 		
 		runProcess(pb, timeoutInMillisecs);
 		cleanup();
@@ -69,8 +74,10 @@ public class MiniZincLauncher {
 		}
 		if(data != null)
 			pb.command().add(dataPath);
+		lastModel = model;
 		
 		runProcess(pb, timeoutInMillisecs);
+		
 		cleanup();
 	}
 
@@ -116,17 +123,43 @@ public class MiniZincLauncher {
 	}
 	
 	private void cleanup() {
-		// need to make sure fzn-gecode is truly killed
-		ProcessBuilder killBuilder = new ProcessBuilder("./killscript.sh");
-		killBuilder.redirectErrorStream(true);
 		try {
-			Process killProcess = killBuilder.start();
-			killProcess.waitFor();
+			// need to make sure fzn-gecode is truly killed
+			
+			ProcessBuilder killBuilder = null;
+			File killScript = new File("./killscript.sh");
+			
+			if(killScript.exists()) {
+				killBuilder = new ProcessBuilder("./killscript.sh");
+			} else {
+				LOGGER.warning("Killscript not found locally. Trying in jar location");
+				URL jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation();	
+				File classPathDir = new File(jarLocation.toURI());
+				killScript = new File(classPathDir.getParent(), "killscript.sh");
+				if(killScript.exists()) {
+					killBuilder = new ProcessBuilder(killScript.getAbsolutePath());
+				} else {
+					LOGGER.severe("No killscript found at " +killScript.getAbsolutePath()+ ". Do not attempt further cleanup.");
+				}
+			}
+			
+			if(killBuilder != null) {
+				killBuilder.redirectErrorStream(true);
+				
+				Process killProcess = killBuilder.start();
+				killProcess.waitFor();
+				}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		if(deleteAfterRun)
+			lastModel.delete();
 	}
 
 	private void processResult(File log) {
@@ -225,6 +258,14 @@ public class MiniZincLauncher {
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	public boolean isDeleteAfterRun() {
+		return deleteAfterRun;
+	}
+
+	public void setDeleteAfterRun(boolean deleteAfterRun) {
+		this.deleteAfterRun = deleteAfterRun;
 	}
 
 }

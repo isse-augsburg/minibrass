@@ -151,6 +151,11 @@ public class MiniBrassParser {
 		}
 	}
 
+	/**
+	 * The main method for all kinds of items 
+	 * @param model
+	 * @throws MiniBrassParseException
+	 */
 	private void item(MiniBrassAST model) throws MiniBrassParseException {
 		if(currSy == MiniBrassSymbol.IncludeSy) {
 			getNextSy();
@@ -175,6 +180,9 @@ public class MiniBrassParser {
 		} else if(currSy == MiniBrassSymbol.PvsSy) { 
 			getNextSy();
 			pvsInstItem(model);
+		} else if(currSy == MiniBrassSymbol.OutputSy) {
+			getNextSy();
+			outputItem(model);
 		}
 		else {
 			throw new MiniBrassParseException("Unexpected symbol when looking for item: "+currSy + " (last ident -> " +lexer.getLastIdent() +")");
@@ -226,6 +234,19 @@ public class MiniBrassParser {
 			model.getPvsReferences().put(newPvsRef, pvsInstance);
 		}
  	}	
+
+	/**
+	 * OutputItem -> "output" StringLit ";"
+	 * @param model
+	 * @throws MiniBrassParseException 
+	 */
+	private void outputItem(MiniBrassAST model) throws MiniBrassParseException {
+		expectSymbol(MiniBrassSymbol.StringLitSy);
+		String problemOutput = lexer.getLastIdent();
+		model.setProblemOutput(problemOutput);
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+	}
 
 	/**
 	 * PVSInst   ->  PVSDiProd ( "lex" PVSDiProd )
@@ -296,6 +317,7 @@ public class MiniBrassParser {
 			expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
 			expectSymbol(MiniBrassSymbol.StringLitSy);
 			String name = lexer.getLastIdent();
+			semChecker.checkPvsInstanceName(name);
 			getNextSy();
 
 			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
@@ -1013,6 +1035,10 @@ public class MiniBrassParser {
 	private void getNextSy() {
 		currSy = lexer.getNextSymbol();
 		//System.out.println("Returning symbol: "+currSy);
+	}
+
+	public MiniBrassAST getLastModel() {
+		return model;
 	}
 
 

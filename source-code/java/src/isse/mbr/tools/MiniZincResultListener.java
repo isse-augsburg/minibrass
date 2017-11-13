@@ -1,4 +1,4 @@
-package isse.mbr.integration;
+package isse.mbr.tools;
 
 /**
  * Generic listener interface to facilitate parsing MiniZinc files

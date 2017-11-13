@@ -10,6 +10,8 @@ import org.junit.Test;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.BasicTestListener;
+import isse.mbr.tools.MiniZincLauncher;
 
 public class SoftGlobalsTest {
 	String minibrassModel = "test-models/testSoftGlobals.mbr";
@@ -20,7 +22,7 @@ public class SoftGlobalsTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
 	} 
 

@@ -31,21 +31,37 @@ import isse.mbr.model.MiniBrassAST;
  * @author Alexander Schiendorfer
  *
  */
-public class MiniBrassCompiler { 
+public class MiniBrassCompiler {
 
 	private final static Logger LOGGER = Logger.getGlobal();
 
 	@Option(name = "-m", usage = "only MiniZinc code (top level PVS must be int)")
-	private boolean minizincOnly; // does not generate anything that is related to MiniSearch (i.e. annotations for getBetter-predicates)
-	
+	private boolean minizincOnly; // does not generate anything that is related
+									// to MiniSearch (i.e. annotations for
+									// getBetter-predicates)
+
 	@Option(name = "-h", usage = "generate heuristics for search (can lead to long flatzinc compilation)")
 	private boolean genHeuristics;
-	
+
 	@Option(name = "-o", usage = "output compiled MiniZinc to this file", metaVar = "MZN-OUTPUT")
 	private File out = null;
 
 	@Argument(required = true, metaVar = "MBR-FILE")
 	private String minibrassFile;
+
+	// this should not be set by flag - rather move the output from MiniZinc to
+	// MiniBrass file
+	private boolean suppressOutput = false;
+
+	private MiniBrassParser underlyingParser; // required for further post-processing as in, e.g., pairwise comparison
+	
+	
+	public MiniBrassCompiler() {
+	}
+
+	public MiniBrassCompiler(boolean suppressOutput) {
+		this.suppressOutput = suppressOutput;
+	}
 
 	public static class StdoutConsoleHandler extends ConsoleHandler {
 		@Override
@@ -57,9 +73,8 @@ public class MiniBrassCompiler {
 	public static void main(String[] args) throws SecurityException, IOException {
 		Logger logger = Logger.getGlobal();
 		logger.setLevel(Level.FINER);
-		System.setProperty("java.util.logging.SimpleFormatter.format", 
-	            "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
-		
+		System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
+
 		SimpleFormatter formatterTxt = new SimpleFormatter();
 		FileHandler logFile = new FileHandler("log.txt");
 		logFile.setLevel(Level.FINER);
@@ -80,26 +95,35 @@ public class MiniBrassCompiler {
 		new MiniBrassCompiler().doMain(args);
 	}
 
+	public void compile(File input) throws IOException, MiniBrassParseException {
+		String inputPath = input.getAbsolutePath();
+		String mbrFilePrefix = inputPath.substring(0, inputPath.lastIndexOf('.'));
+		File defaultOutput = new File(mbrFilePrefix + "_o.mzn");
+		compile(input, defaultOutput);
+	}
+
 	public void compile(File input, File output) throws IOException, MiniBrassParseException {
-		MiniBrassParser parser = new MiniBrassParser();
-		MiniBrassAST model = parser.parse(input);
+		underlyingParser = new MiniBrassParser();
+		MiniBrassAST model = underlyingParser.parse(input);
+	
 		CodeGenerator codegen = new CodeGenerator();
 		codegen.setOnlyMiniZinc(isMinizincOnly());
 		codegen.setGenHeuristics(isGenHeuristics());
-		
+		codegen.setSuppressOutputGeneration(suppressOutput);
+
 		// make sure there is one solve item !
-		if(model.getSolveInstance() == null) {
+		if (model.getSolveInstance() == null) {
 			throw new MiniBrassParseException("Model contains no solve item! Please add one");
 		}
-		
+
 		String generatedCode = codegen.generateCode(model);
-		System.out.println("MiniBrass code compiled successfully to "+ output +".");
+		System.out.println("MiniBrass code compiled successfully to " + output + ".");
 		// write code to file
 		FileWriter fw = new FileWriter(output);
 		fw.write(generatedCode);
 		fw.close();
 	}
-	
+
 	public void doMain(String[] args) {
 		CmdLineParser cmdLineParser = new CmdLineParser(this);
 		try {
@@ -111,16 +135,16 @@ public class MiniBrassCompiler {
 				String mbrFilePrefix = minibrassFile.substring(0, minibrassFile.lastIndexOf('.'));
 				out = new File(mbrFilePrefix + "_o.mzn");
 			}
-			if(minizincOnly) {
-				LOGGER.info("Only generating MiniZinc (not MiniSearch) code"); 
+			if (minizincOnly) {
+				LOGGER.info("Only generating MiniZinc (not MiniSearch) code");
 			}
-			if(genHeuristics) {
-				LOGGER.info("Generate search heuristics as well"); 
+			if (genHeuristics) {
+				LOGGER.info("Generate search heuristics as well");
 			}
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
 
-			compile(mbrFile, out);		
+			compile(mbrFile, out);
 		} catch (CmdLineException e) {
 			// if there's a problem in the command line,
 			// you'll get this exception. this will report
@@ -161,6 +185,14 @@ public class MiniBrassCompiler {
 
 	public void setGenHeuristics(boolean genHeuristics) {
 		this.genHeuristics = genHeuristics;
+	}
+
+	public MiniBrassParser getUnderlyingParser() {
+		return underlyingParser;
+	}
+
+	public void setUnderlyingParser(MiniBrassParser underlyingParser) {
+		this.underlyingParser = underlyingParser;
 	}
 
 }

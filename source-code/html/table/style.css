@@ -1,0 +1,101 @@
+th, td {
+    padding: 0px;
+    margin:0px;
+    height:70px;
+    vertical-align: middle;
+}
+
+th {
+   padding: 0px;
+}
+tr {
+   padding: 0px;
+}
+
+.leftBetter {
+    background-color: rgba(81, 86, 83, 0.5);
+    color:#fff;
+    margin:0px;
+    display:block;
+    padding:15px;
+    height:100%;
+    overflow:auto;
+    vertical-align: middle;
+}
+.absoluteVals, .relativeVals {
+    display:block;
+}
+
+.relativeVals {
+   font-size: 11pt;
+}  
+
+#logo {
+    width:450px;
+}
+
+.rightBetter {
+    background-color: #f07f16;
+    margin:0px;
+    display:block;
+    padding:15px;
+    height:100%;
+    vertical-align: middle;
+    overflow:auto;
+}
+
+.neutral {
+    background-color: #fff;
+    color:#000;
+    margin:0px;
+    display:block;
+    padding:15px;
+    height:100%;
+    
+    overflow:auto;
+}
+
+.solStyle {
+    font-weight: bold;
+    background-color: rgba(81, 86, 83, 1.0);
+}
+
+.condorcetTable th {
+  text-align: center;
+}
+.condorcetTable td {
+  text-align: center;
+  background-color: #fff;
+
+}
+
+body {
+  padding: 0 2em;
+  font-family: Montserrat, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: #444;
+  background: #eee;
+}
+
+h1 {
+  font-weight: normal;
+  letter-spacing: -1px;
+  color: #34495E;
+}
+
+.condorcetTable {
+  background-color: #515653;
+  /* color: #fff; */
+  border-radius: .4em;
+  overflow: hidden;
+  border: none;
+  
+  border-spacing: 0px;
+  border-collapse: separate;
+}
+.condorcetTable tr {
+  border-color: #46637f;
+  border: none;
+  /* background-color: #fff; */
+}

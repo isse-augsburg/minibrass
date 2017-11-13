@@ -38,6 +38,16 @@ type CostFunctionNetwork = PVSType<0..k> =
     is_worse -> is_worse_weighted; 
     top -> 0;
  };
+
+type MaxCostFunctionNetwork = PVSType<0..k> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "soft_constraints/mbr_types/cfn_type.mzn" {
+    times -> sum;
+    is_worse -> is_greater_weighted; 
+    top -> 0;
+ };
   
 type MultiWeightedCsp = PVSType<bool, array[1..d] of 0..k> = 
   params {
@@ -65,6 +75,19 @@ type WeightedCsp = PVSType<bool, int> =
     heuristics -> getSearchHeuristicWeighted;
  };
   
+type MaxCsp = PVSType<bool, int> = 
+  params {
+    int: k :: default('1000'); 
+  } in  
+  instantiates with "soft_constraints/mbr_types/weighted_type.mzn" {
+    times -> bool_sum;
+    is_worse -> is_worse_max;
+    top -> 0;
+ }
+ offers {
+    heuristics -> getSearchHeuristicMax;
+ };
+ 
 type FuzzyConstraints = PVSType<0.0 .. 1.0> = 
   instantiates with "soft_constraints/mbr_types/fuzzy_type.mzn" {
     times -> min;
@@ -91,7 +114,20 @@ type ProbCostFunctionNetwork = PVSType<float> =
     is_worse -> is_worse_prob_cost; 
     top -> k;
  };
-  
+
+% very useful for approval voting, we give a soft acceptance or not
+% similar to weighted CSP, we can have parameter defining whether 
+% to conjunctively or disjunctively combine soft constraint gradings
+type BooleanPvs = PVSType<bool> = 
+  params { 
+    bool: conjunction :: default('true');
+  } in  
+  instantiates with "soft_constraints/mbr_types/bool-type.mzn" {
+    times -> combine_boolean;
+    is_worse -> is_worse_boolean; 
+    top -> true; 
+ };
+   
 % just a simple explicit relation mostly for voting experiments  
 type PvsRel = PVSType<1..k> = 
   params {
@@ -103,6 +139,18 @@ type PvsRel = PVSType<1..k> =
     times -> max;
     is_worse -> is_worse_relation; 
     top -> mbr.topVal;
+ };
+
+% Similar to PvsRel but with an explicit approval set  
+type PvsApprov = PVSType<bool> = 
+  params {
+    int: k :: default('1000'); % just some upper bound on integer values 
+    set of 1..k: approvedSet;
+  } in  
+  instantiates with "soft_constraints/mbr_types/relation-type.mzn" {
+    times -> and;
+    is_worse -> is_worse_boolean; 
+    top -> true; 
  };
 % ========================================
 % MORPHISMS

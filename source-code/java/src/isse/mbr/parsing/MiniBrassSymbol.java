@@ -55,6 +55,7 @@ public enum MiniBrassSymbol {
 	MorphismSy,         // "morph"
 	NewSy, 				// "new
 	VotingSy,           // "vote"
+	OutputSy,           // "output"
 	NoSy,
 	EofSy     
 }

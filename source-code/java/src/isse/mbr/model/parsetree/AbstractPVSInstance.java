@@ -12,6 +12,7 @@ public abstract class AbstractPVSInstance {
 	protected String name;
 	protected String generatedBetterPredicate;  // strict dominance improvement for BaB
 	protected String generatedNotWorsePredicate; // not worsening for BaB and the like but also for voting 
+	protected String generatedEqualsPredicate;   // sol(%overall) = %overall, needed for the lex product 
 	
 	protected Collection<AbstractPVSInstance> children;
 	
@@ -43,6 +44,14 @@ public abstract class AbstractPVSInstance {
 
 	// this should basically be a read-only property
 	public abstract Collection<AbstractPVSInstance> getChildren();
+
+	public String getGeneratedEqualsPredicate() {
+		return generatedEqualsPredicate;
+	}
+
+	public void setGeneratedEqualsPredicate(String generatedEqualsPredicate) {
+		this.generatedEqualsPredicate = generatedEqualsPredicate;
+	}
 
 	
 }

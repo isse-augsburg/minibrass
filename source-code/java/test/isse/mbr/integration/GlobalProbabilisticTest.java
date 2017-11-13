@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.BasicTestListener;
+import isse.mbr.tools.MiniZincLauncher;
 
 /**
  * This tests invokes MiniZinc for a probabilistic CSP
@@ -29,7 +31,7 @@ public class GlobalProbabilisticTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 		compiler.setMinizincOnly(true); // due to other complications with floats using minisearch
 		launcher = new MiniZincLauncher();
 		launcher.setMinizincGlobals("jacop");

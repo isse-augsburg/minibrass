@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.MiniZincLauncher;
 
 /**
  * This test case uses probabilistic cost function networks 
@@ -26,7 +27,7 @@ public class ProbabilisticCostFunctionNetwork {
 	
 	@Before
 	public void setUp() throws Exception {
-		compiler = new MiniBrassCompiler();
+		compiler = new MiniBrassCompiler(true);
 		compiler.setMinizincOnly(true);
 		launcher = new MiniZincLauncher();
 	}
