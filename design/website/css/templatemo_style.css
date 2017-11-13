@@ -59,8 +59,9 @@ h1, h2, h3, h4, h5, h6, span, p { font-family: 'Open Sans', Arial, Helvetice Neu
 /* ------ Carousel ----- */
 
 #templatemo-carousel {
-    background: url('../images/templatemo_carousel_bg.jpg') no-repeat center center fixed; 
-    -webkit-background-size: cover;
+   /* background: url('../images/templatemo_carousel_bg.jpg') no-repeat center center fixed; */
+    background: url('../images/bgneu.png') no-repeat center center fixed;
+	-webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
