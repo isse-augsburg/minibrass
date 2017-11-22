@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.CodeGenerator.AtomicPvsInformation;
@@ -63,6 +70,12 @@ public class PairwiseComparator {
 				++indifferents[i][j];
 				++indifferents[j][i];
 			}
+		}
+
+		@Override
+		public void notifyOutput(String output) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 
@@ -241,13 +254,24 @@ public class PairwiseComparator {
 		return Long.toString(Math.round(ratio * 100.0));
 	}
 
-	public static void main(String[] args) throws MiniBrassParseException, IOException {
+	public static void main(String[] args) throws MiniBrassParseException, IOException, ParseException {
+		CommandLineParser parser = new DefaultParser();
+		HelpFormatter formatter = new HelpFormatter();
+		Options options = new Options();
+		options.addOption("h", "help", false, "print this message");
+		CommandLine line = parser.parse(options, args);
+		
+		if(args.length != 3 || line.hasOption("help")) {
+			formatter.printHelp("condorcetAnalysis <minizinc-model>.mzn <minibrass-model>.mbr [dataFiles.dzn]", options);
+			System.exit(0);
+		}
+		
 		SolutionRecorder sr = new SolutionRecorder();
-		File miniZincFile = new File(args[0]);
-		File miniBrassFile = new File(args[1]);
-		Collection<File> dataFiles = new ArrayList<>(args.length-2);
-		for(int i = 2; i < args.length; ++i) { 
-			dataFiles.add(new File(args[i]));
+		File miniZincFile = new File(line.getArgList().get(0));
+		File miniBrassFile = new File(line.getArgList().get(1));
+		Collection<File> dataFiles = new ArrayList<>(line.getArgList().size()-2);
+		for(int i = 2; i < line.getArgList().size(); ++i) { 
+			dataFiles.add(new File(line.getArgList().get(i)));
 		}
 		
 		sr.recordSolutions(miniZincFile, miniBrassFile, dataFiles);

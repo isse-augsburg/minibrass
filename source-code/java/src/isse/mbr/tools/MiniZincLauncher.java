@@ -166,6 +166,7 @@ public class MiniZincLauncher {
 		Scanner sc = null;
 		final String optimalitySep = "==========";
 		final String solutionSep = "----------";
+		StringBuilder outputBuilder = new StringBuilder();
 		boolean error = false;
 		try {
 			sc = new Scanner(log);
@@ -174,6 +175,9 @@ public class MiniZincLauncher {
 									// during optimization
 			while (sc.hasNextLine()) {
 				String line = sc.nextLine();
+				outputBuilder.append(line);
+				outputBuilder.append("\n");
+				
 				boolean broadcast = true;	
 				if(debug)
 					System.out.println(line);
@@ -206,6 +210,10 @@ public class MiniZincLauncher {
 					}
 				}
 				
+			}
+			String output = outputBuilder.toString();
+			for(MiniZincResultListener listener : listeners) {
+				listener.notifyOutput(output);
 			}
 	
 			LOGGER.fine("All in all, we saw "+noSolutions + " solutions.");
