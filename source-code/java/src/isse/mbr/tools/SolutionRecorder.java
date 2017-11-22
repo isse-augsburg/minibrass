@@ -88,6 +88,12 @@ public class SolutionRecorder {
 			modelSolved = true;
 		}
 
+		@Override
+		public void notifyOutput(String output) {
+			// TODO Auto-generated method stub
+			
+		}
+
 	}
 
 	protected MiniZincLauncher launcher;

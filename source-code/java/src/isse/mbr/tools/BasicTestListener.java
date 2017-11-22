@@ -143,4 +143,8 @@ public class BasicTestListener implements MiniZincResultListener {
 		return wasObjLine;
 	}
 
+
+	@Override
+	public void notifyOutput(String output) {	}
+
 }

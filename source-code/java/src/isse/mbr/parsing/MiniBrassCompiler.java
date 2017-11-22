@@ -1,9 +1,11 @@
 package isse.mbr.parsing;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
@@ -103,6 +105,17 @@ public class MiniBrassCompiler {
 	}
 
 	public void compile(File input, File output) throws IOException, MiniBrassParseException {
+		FileInputStream fileInputStream = new FileInputStream(input);
+
+		String generatedCode = compile(fileInputStream);
+		System.out.println("MiniBrass code compiled successfully to " + output + ".");
+		// write code to file
+		FileWriter fw = new FileWriter(output);
+		fw.write(generatedCode);
+		fw.close();
+	}
+	
+	public String compile(InputStream input) throws MiniBrassParseException {
 		underlyingParser = new MiniBrassParser();
 		MiniBrassAST model = underlyingParser.parse(input);
 
@@ -117,11 +130,7 @@ public class MiniBrassCompiler {
 		}
 
 		String generatedCode = codegen.generateCode(model);
-		System.out.println("MiniBrass code compiled successfully to " + output + ".");
-		// write code to file
-		FileWriter fw = new FileWriter(output);
-		fw.write(generatedCode);
-		fw.close();
+		return generatedCode;
 	}
 
 	private void printUsage() {

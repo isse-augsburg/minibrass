@@ -2,6 +2,7 @@ package isse.mbr.parsing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
@@ -59,7 +60,9 @@ public class MiniBrassParser {
 	private MiniBrassSymbol currSy;
 	private MiniBrassLexer lexer;
 	private Set<File> visited;
+	private Set<InputStream> visitedStreams;
 	private Set<File> worklist;
+	private Set<InputStream> worklistOfStreams;
 	private File currDir;
 	private File mbrStdDir;
 	private MiniBrassAST model; 
@@ -69,12 +72,83 @@ public class MiniBrassParser {
 	public MiniBrassParser() {
 	}
 	
+	public MiniBrassAST parse(InputStream input) throws MiniBrassParseException {
+		
+		model = new MiniBrassAST();
+		semChecker = new SemanticChecker();
+		
+		worklistOfStreams = new HashSet<>();
+		worklistOfStreams.add(input);
+		visited = new HashSet<>();
+		visitedStreams = new HashSet<>();
+		
+		productCounter = 0;
+		mbrStdDir = null;
+		
+		try{
+			URL jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation();	
+
+			try {
+				File classPathDir = new File(jarLocation.toURI());
+				File siblingStd = new File(classPathDir.getParentFile(), "mbr_std");
+				if(siblingStd.exists())
+					mbrStdDir = siblingStd;
+				else {
+					File cousinStd = new File(classPathDir.getParentFile().getParentFile(), "mbr_std");
+					if(cousinStd.exists())
+						mbrStdDir = cousinStd;
+				}
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			
+			while(!worklistOfStreams.isEmpty()) {
+				InputStream next = worklistOfStreams.iterator().next();
+				worklistOfStreams.remove(next);
+			
+				
+				if(!visitedStreams.contains(next)) {
+					scanner = new Scanner(next);
+					lexer = new MiniBrassLexer();
+					lexer.setScanner(scanner);
+					lexer.readNextChar(); // to initialize
+					
+					// top level non-terminal, initialize before
+					getNextSy();
+					miniBrassFile(model);
+				}
+				visitedStreams.add(next);
+				
+			}
+			
+			// now do a first consistency check of pending references 
+			semChecker.updateReferences();
+			semChecker.executeArrayJobs();
+			semChecker.checkPvsInstances(model);
+			semChecker.checkMorphisms();
+			
+			LOGGER.finer("I should optimize: "+model.getSolveInstance());
+			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
+				LOGGER.fine("Got instance: " + entry.getValue().toString());
+			}
+		} catch(MiniBrassParseException ex){
+			
+			LOGGER.severe("Error at line "+lexer.getLineNo()+" ("+lexer.getColPtr()+"): " + ex.getMessage());
+			throw ex;
+		}
+		finally {
+			if(scanner != null)
+				scanner.close();
+		}
+		return model;
+	}
+
 	public MiniBrassAST parse(File file) throws FileNotFoundException, MiniBrassParseException {
 		
 		model = new MiniBrassAST();
 		semChecker = new SemanticChecker();
 		
-		worklist = new HashSet<File>();
+		worklist = new HashSet<>();
 		worklist.add(file);
 		visited = new HashSet<>();
 		

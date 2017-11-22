@@ -8,5 +8,6 @@ package isse.mbr.tools;
 public interface MiniZincResultListener {
 	void notifyOptimality(); // called if a solution was optimal
 	void notifyLine(String line); // a result line 
+	void notifyOutput(String output); // the whole written and formatted output
 	void notifySolved();
 }
