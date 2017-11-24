@@ -1,0 +1,16 @@
+
+$brand-primary:         #f07f16;
+$font-size-base:  16px;
+$font-size-large: 18px;
+$font-size-h1:    floor(($font-size-base * 2)) !default; // ~36px
+$font-size-h2:    floor(($font-size-base * 1.8)) !default; // ~30px
+$font-size-h3:            ceil(($font-size-base * 1.5)) !default; // ~24px
+$font-size-h4:            ceil(($font-size-base * 1)) !default; // ~18px
+$font-size-h5:            $font-size-base !default;
+$font-size-h6:            ceil(($font-size-base * 0.85)) !default; // ~12px
+
+$blockquote-font-size:        ($font-size-base) !default;
+
+// === Jumbotron
+$jumbotron-font-size:            ceil(($font-size-base * 1.2)) !default;
+$jumbotron-heading-font-size:    ceil(($font-size-base * 3)) !default;

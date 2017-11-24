@@ -1,0 +1,19 @@
+- title: Getting Started
+  docs:
+  - home
+  - installation
+ # - helloworld
+  - troubleshooting
+  - citing
+
+#- title: Examples
+#  docs:
+#  - Lexiv
+
+#- title: Language Reference
+#  docs:
+#  - pvstypes
+#  - pvsinstances
+#  - morphisms
+#  - pvsproducts
+#  - sanitychecks

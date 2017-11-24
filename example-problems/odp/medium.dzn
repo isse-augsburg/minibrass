@@ -1,0 +1,10 @@
+% medium data example 
+
+% task specification
+task = [D, D, I, T, T];
+
+% agent specification
+noAgents = 3; % two robots 
+
+capabilities = [{D,I}, {I,T}, {}];
+isCart = [false, false, true];

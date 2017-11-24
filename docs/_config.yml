@@ -1,0 +1,57 @@
+# Site settings
+title: MiniBrass - Preferences for MiniZinc
+email: alexander.schiendorfer@informatik.uni-augsburg.de
+description: >
+  Jekyll Template for Project Websites
+  providing documentation and blog post pages.
+
+baseurl: "/minibrass" # the subpath of your site, e.g. /blog/
+url: https:https://alexander-schiendorfer.github.io/minibrass/ # the base hostname & protocol for your site
+git_address: https://alexander-schiendorfer.github.io/minibrass/
+git_edit_address: https://alexander-schiendorfer.github.io/minibrass/blob/gh-pages
+
+# theme options from https://bootswatch.com/
+# comment out this to use default Bootstrap
+#bootwatch: spacelab
+bootwatch: paper
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+gems:
+  - jekyll-feed
+  - jekyll-redirect-from
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - .idea/
+  - .gitignore
+  - README.md
+timezone: Europe/Berlin
+defaults:
+- scope:
+    path: _posts
+    type: posts
+  values:
+    layout: post
+    sectionid: blog
+
+- scope:
+    path: _docs
+    type: docs
+  values:
+    layout: docs
+    sectionid: docs
+    seo:
+      type: "WebPage"
+
+collections:
+  docs:
+    permalink: /:collection/:path/
+    output: true
+  posts:
+    permalink: /blog/:year/:month/:day/:title/
+    output: true

@@ -1,0 +1,125 @@
+---
+layout: default
+---
+
+<div class="header-container jumbotron">
+    <div class="container">
+        <h1>MiniBrass - Softer than MiniZinc!</h1>
+        <p>Modeling preferences and soft constraints -- Specifying goals the declarative way</p>
+        <p><a class="btn btn-primary btn-lg" href="{{ "/docs/home/" | prepend: site.baseurl }}" role="button">Learn more</a>
+        <a class="btn btn-primary btn-lg" href="{{ "/docs/installation/" | prepend: site.baseurl }}" role="button">Install</a></p>
+    </div>
+</div>
+
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="header-light regular-pad">Welcome to MiniBrass</h2>
+            <blockquote>
+            
+<p>Many real-life decision problems under constraints are conveniently expressed using a <b>constraint-based</b> modeling language: Meeting or activity scheduling, production plans, matching problems, etc. <br/>
+They are then solved by powerful constraint programming or mathematical programming solvers. Usually not all constraints can be satisfied -- especially if there are <b>multiple users</b> with individual goals: John wants Fridays off but Mary does not want to stay longer than 2pm on a Friday - still one of them has to work next Friday.</p>
+
+<p>We provide support for over-constrained problems or problems where desirable properties can be modeled as optional (soft) constraints. Our library extensions are built on top of <a href="http://www.minizinc.org/">MiniZinc</a> that facilitates modeling constraint optimization problems for various solvers. </p>
+<a href="{{ "/docs/home/" | prepend: site.baseurl }}">Find out more</a>
+
+
+
+            </blockquote>
+        </div>
+<!-- 
+<ul>
+<li>Convenient expression of soft constraint problems using constraint relationships</li>
+<li>Automatic translation to weighted CSP</li>
+<li>Generic search heuristics</li>
+<li>Consistency checks of the specified relationships</li>
+</ul>
+-->
+        <div class="col-md-6 text-center">
+          
+            
+            <!-- A Carousel -->
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="10000">
+              <!-- Indicators -->
+              <ol class="carousel-indicators">
+                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                <li data-target="#carousel-example-generic" data-slide-to="3"></li>
+              </ol>
+
+              <!-- Wrapper for slides -->
+              <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <a href="{{ "/docs/home/" | prepend: site.baseurl }}"> <img src="img/codeHelloWorld.png" alt="" class="img-responsive"> </a>
+                  <div class="carousel-caption  d-none d-md-block" >
+                    <h3>Bring your goals to order!</h3>
+                    <p>State desirable properties and their importance - without having to rank or prioritize them numerically!</p>
+                  </div>
+                </div>
+                <div class="item">
+                   <img src="img/lexProd.png" alt="" class="img-responsive">
+                  <div class="carousel-caption  d-none d-md-block">
+                    <h3>Combine several goals</h3>
+                    <p>Aggregate and prioritze using lexicographic and pareto orders</p>
+                  </div>
+                </div>
+                <div class="item">
+                    <img src="img/code.png" alt="" class="img-responsive">
+                  <div class="carousel-caption  d-none d-md-block">
+                    <h3>Make <i>social</i> choices</h3>
+                    <p>Apply democratic voting rules to make fair choices.</p>
+                  </div>
+                </div>
+                <div class="item">
+                    <img src="img/condorcet.png" alt="" class="img-responsive">
+                  <div class="carousel-caption  d-none d-md-block" >
+                    <h3>Analyze and visualize your group decisions</h3>
+                    <p>Use data science to make better group decisions</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                <span class="icon-prev" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                <span class="icon-next" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-sm-4">
+            <h1 class="text-center"><i class="fa fa-pencil" aria-hidden="true"></i></h1>
+            <h3 class="text-center">Easy to model</h3>
+            <p>MiniBrass supports various types and flavours of preferences (better-than relations, penalty points or costs, satisfaction percentages ...)
+            </p>
+        </div>
+        <div class="col-sm-4">
+            <h1 class="text-center"><i class="fa fa-cogs" aria-hidden="true"></i></h1>
+            <h3 class="text-center">Modular Preference Specifications</h3>
+            <p>You can use several preference specifications for different users and combine them.</p>
+        </div>
+        <div class="col-sm-4">
+            <h1 class="text-center"><i class="fa fa-code-fork" aria-hidden="true"></i></h1>
+            <h3 class="text-center">Voting-based Agreements</h3>
+            <p>Make <i>social</i> choices</p>
+        </div>
+    </div>
+    
+    <hr>
+    
+    
+
+
+</div>

@@ -1,0 +1,10 @@
+% small data example 
+
+% task specification
+task = [D,I,T];
+
+% agent specification
+noAgents = 4;
+
+capabilities = [{D,I}, {I,T}, {}, {}];
+isCart = [false, false, true, true];
