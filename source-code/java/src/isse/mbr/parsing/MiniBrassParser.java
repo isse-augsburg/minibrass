@@ -1094,6 +1094,7 @@ public class MiniBrassParser {
 				}
 			}
 			
+			// TODO untangle this worklist mess
 			if(!visited.contains(referred)) {
 				try {
 					worklistOfStreams.add(new FileInputStream(referred));
