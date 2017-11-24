@@ -1,3 +1,0 @@
-solve 
-:: finalAnn
-minimize penSum;
