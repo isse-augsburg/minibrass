@@ -1,6 +1,7 @@
 package isse.mbr.parsing;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -79,6 +80,7 @@ public class MiniBrassParser {
 		
 		worklistOfStreams = new HashSet<>();
 		worklistOfStreams.add(input);
+		
 		visited = new HashSet<>();
 		visitedStreams = new HashSet<>();
 		
@@ -1093,7 +1095,12 @@ public class MiniBrassParser {
 			}
 			
 			if(!visited.contains(referred)) {
-				worklist.add(referred);
+				try {
+					worklistOfStreams.add(new FileInputStream(referred));
+					visited.add(referred);
+				} catch (FileNotFoundException e) {
+					throw new MiniBrassParseException(e);
+				}
 			}
 		}
 		getNextSy();
