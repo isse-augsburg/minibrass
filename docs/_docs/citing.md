@@ -11,7 +11,7 @@ If you use MiniBrass in your academic research, please consider citing
             Alexander Knapp and
             Florian Nafz and
             Wolfgang Reif},
-  title = {{Constraint Relationships for Soft Constraints}},
+  title = {Constraint Relationships for Soft Constraints},
   editor = {Max Bramer and
             Miltos Petridis},
   booktitle = {Proc. 33\textsuperscript{rd} SGAI Int. Conf.

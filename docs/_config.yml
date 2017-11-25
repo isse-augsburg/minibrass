@@ -7,7 +7,7 @@ description: >
 
 baseurl: "/minibrass" # the subpath of your site, e.g. /blog/
 url: http://isse-augsburg.github.io/minibrass/ # the base hostname & protocol for your site
-git_address: http://isse-augsburg.github.io/minibrass/
+git_address: https://github.com/isse-augsburg/minibrass/
 git_edit_address: https://isse-augsburg.github.io/minibrass/blob/gh-pages
 
 # theme options from https://bootswatch.com/
