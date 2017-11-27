@@ -12,7 +12,7 @@ MiniBrass targets **over-constrained problems** or problems where desirable prop
 It is a *language* and third-party *MiniZinc library* that adds support for MiniZinc/MiniSearch to model **weak/soft constraints** and preferences systematically. 
 Depending on the problem at hand, importance is expressed in different types.
 
-Consider this figure to get a quick idea:
+Consider this figure to get a quick idea (explained in more detail in our [hello world example]({{site.baseurl}}/docs/helloworld)):
 
 ![alt text]({{site.baseurl}}/img/codeHelloWorld.png "A first example")
 
