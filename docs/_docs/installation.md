@@ -43,3 +43,6 @@ Valuations:  overall = 2..2
 ----------
 ==========
 ```
+
+## Follow-up set-up and available options
+To get easier access to MiniBrass, add the directory you unpacked `mbr2mzn.zip` to your path variable (e.g., in `.bashrc` on Linux). 
