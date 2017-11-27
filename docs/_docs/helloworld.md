@@ -84,6 +84,8 @@ mbr2mzn nurseHelloWorld.mbr
 This command will output (by default) to `nurseHelloWorld_o.mzn`, the file which is included by the above constraint model. You can change this by setting the `-o` option of `mbr2mzn`
  
 ### Inspecting the results
+The selected search strategy `solve search miniBrass();` leads to branch-and-bound search where each found solution triggers a new constraint that asks the subsequent solution to be better.
+We investigate a possible stream of solutions:
 
 ```
 Intermediate solution:roster = [2, 1, 1];
@@ -97,6 +99,19 @@ Valuations: mbr_overall_cp1 = 3..3
 ----------
 ==========
 ```
+The first solution, `[2, 1, 1]`, is interpreted as nurse one taking the night shift and nurse two and three having the day shift. That only satisfies the second soft-constraint, `noNight`. This 
+results in the violation set `{1,3}`, meaning that the first and third soft constraint are violated.
+
+The next solution, `[2, 2, 1]`, is better than `[2, 1, 1]` since it "trades" the violation of soft constraint `equality` (number 1) present in `[2, 1, 1]` for a violation of the second soft constraint (nurse two has to take the night shift).
+However, now we have two nurses on night shift which satisfies the `equality` soft constraint.
+
+Finally, `[2, 1, 2]` puts nurses one and three on night shift, leaving nurse two to her day off. Compared to `[2, 2, 1]`, we violate one less constraint. We cannot get rid of violating constraint `off` without any expenses, 
+so we accept `[2, 1, 2]` as an optimal solution.
+
+However, this clearly is only one optimal solution. Had we found `[2, 2, 3]` before, nurse two would have to swallow the bitter pill and take the night shift to make nurse three happy. 
+Both `[2, 1, 2]` and `[2, 2, 3]` are incomparably optimal but instances of frequently occurring real-life decision situations. 
+
+MiniBrass aims at making such situations more transparent than a plain utility value, a single number.
 
 ## Source code
 

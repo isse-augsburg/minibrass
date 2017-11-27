@@ -52,8 +52,22 @@ To get easier access to MiniBrass, add `MBR_DIR` to your path variable (e.g., in
 export PATH="$PATH:MBR_DIR"
 ```
 
-By means of the included `mbr2mzn` script, you can compile MiniBrass models as:
+By means of the included `mbr2mzn` script (or `mbr2mznw.cmd` on Windows), you can compile MiniBrass models as:
 
 ```
 mbr2mzn smallexample_minisearch.mbr
+```
+
+To see all available options, run `mbr2mzn -h`:
+```
+mbr2mzn -h
+usage: mbr2mzn [<options>] <minibrass-model>.mbr
+
+Options:
+ -h,--help                  print this message
+ -m,--only-minizinc         do not generate MiniSearch predicates but only
+                            MiniZinc code (top level PVS must be int)
+ -o,--output <arg>          output compiled MiniZinc to this file
+ -s,--generate-heuristics   generate heuristics for search (can lead to
+                            long flatzinc compilation)
 ```
