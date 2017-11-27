@@ -2,7 +2,7 @@
   docs:
   - home
   - installation
- # - helloworld
+  - helloworld
   - troubleshooting
   - citing
 
