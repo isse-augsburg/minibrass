@@ -298,7 +298,7 @@ public class CodeGenerator {
 				// pvsInstance) + String.format(" = seq_search( [%s,
 				// %s]);",leftHeur,rightHeur);
 				String annDecl = "ann: " + CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, pvsInstance)
-						+ (" = seq_search( [");
+						+ ( " = seq_search( [" );
 
 				sb.append(annDecl);
 				sb.append('\n');
@@ -347,6 +347,19 @@ public class CodeGenerator {
 				vi.setGeneratedBetterPredicate(getBetterPredicate);
 				// TODO implement more reasonably 
 				vi.setGeneratedNotWorsePredicate("true");
+				StringBuilder equalityBuilder = new StringBuilder("(");
+				boolean f = true;
+				for(AbstractPVSInstance voter : vi.getChildren()) {
+					voter = ReferencedPVSInstance.deref(voter);
+					if (f)
+						f = false;
+					else 
+						equalityBuilder.append(" /\\ ");
+					
+					equalityBuilder.append(String.format("(%s)", voter.getGeneratedEqualsPredicate()));
+				}
+				equalityBuilder.append(")");
+				vi.setGeneratedEqualsPredicate(equalityBuilder.toString());
 				
 				if(vi.getVotingProcedure().hasNumericObjective()) {
 					String overallIdent = getOverallValuation(vi);

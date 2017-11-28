@@ -1,0 +1,20 @@
+include "defs.mbr";
+ 
+PVS: agent1 = new CostFunctionNetwork("agent1") {
+  soft-constraint c1: 'a';
+  k : '3';
+};
+
+PVS: agent2 = new CostFunctionNetwork("agent2") {
+  soft-constraint c1: '2*a';
+  k : '6';
+};
+
+PVS: agent3 = new CostFunctionNetwork("agent3") {
+  soft-constraint c1: '3*a';
+  k : '9';
+};
+
+output '["a = \(a)"]';
+
+solve vote([agent1,agent2], sumMax) lex agent3;

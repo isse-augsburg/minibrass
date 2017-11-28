@@ -499,7 +499,10 @@ public class MiniBrassParser {
 				
 				return referencedPVSInstance;
 			}
-		} else if(currSy == MiniBrassSymbol.LeftParenSy) {
+		} else  if (currSy == MiniBrassSymbol.VotingSy) {
+			 return votingInst(model);
+		}
+		else if(currSy == MiniBrassSymbol.LeftParenSy) {
 			getNextSy();
 			AbstractPVSInstance inst = PVSInst(model);
 			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
@@ -516,12 +519,7 @@ public class MiniBrassParser {
 	 */
 	private AbstractPVSInstance solveItem() throws MiniBrassParseException {
 		AbstractPVSInstance instToSolve = null;
-		if(currSy == MiniBrassSymbol.VotingSy) {
-			instToSolve = votingInst(model);
-		} else {
-			instToSolve = PVSInst(model);	
-		}
-		
+		instToSolve = PVSInst(model);			
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		model.getPvsInstances().put(instToSolve.getName(), instToSolve);
 		return instToSolve;
