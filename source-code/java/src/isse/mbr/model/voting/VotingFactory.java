@@ -17,7 +17,12 @@ public class VotingFactory {
 			return new MajorityTopsVoting();
 		case "approval":
 			return new ApprovalVoting();
-			
+		case "sum":	
+			return new SumVoting();
+		case "sumMin":	
+			return new SumVoting(false);
+		case "sumMax":	
+			return new SumVoting(true);
 		default:
 				throw new MiniBrassParseException("Voting procedure ["+keyword+"] unknown.");
 		}
