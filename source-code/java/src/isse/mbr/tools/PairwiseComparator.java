@@ -261,7 +261,7 @@ public class PairwiseComparator {
 		options.addOption("h", "help", false, "print this message");
 		CommandLine line = parser.parse(options, args);
 		
-		if(args.length != 3 || line.hasOption("help")) {
+		if(args.length != 2 || line.hasOption("help")) {
 			formatter.printHelp("condorcetAnalysis <minizinc-model>.mzn <minibrass-model>.mbr [dataFiles.dzn]", options);
 			System.exit(0);
 		}
