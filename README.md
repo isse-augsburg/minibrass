@@ -1,4 +1,4 @@
-![MiniBrass Logo -- Specifying goals the declarative way](https://github.com/isse-augsburg/minibrass/raw/master/design/logo.png)
+![MiniBrass Logo -- Specifying goals the declarative way](https://github.com/isse-augsburg/minibrass/blob/master/docs/img/logonav.png)
 
 MiniBrass is a language and library that adds support for soft constraints to MiniZinc/MiniSearch to model weak/soft constraints and preferences systematically. 
 MiniBrass pays tribute to the tradition of naming NICTA's G12 software after elements in the 12th group of the periodic table. Brass is firstly an alloy that contains zinc and, according to the [German Wikipedia](https://de.wikipedia.org/wiki/Messing), 
