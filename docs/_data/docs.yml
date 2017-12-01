@@ -10,9 +10,9 @@
 #  docs:
 #  - Lexiv
 
-#- title: Language Reference
-#  docs:
-#  - pvstypes
+- title: Language Reference
+  docs:
+  - pvstypes
 #  - pvsinstances
 #  - morphisms
 #  - pvsproducts

@@ -16,7 +16,9 @@ git_edit_address: https://isse-augsburg.github.io/minibrass/blob/gh-pages
 bootwatch: paper
 
 # Build settings
+#
 markdown: kramdown
+
 highlighter: rouge
 gems:
   - jekyll-feed

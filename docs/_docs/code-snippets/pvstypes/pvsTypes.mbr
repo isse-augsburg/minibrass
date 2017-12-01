@@ -1,0 +1,11 @@
+include "defs.mbr";
+
+PVS: user1Prefs = new WeightedCsp("user1Prefs") {
+  soft-constraint c1: 'x > y' :: weights('3');
+  soft-constraint c2: 'x = y + 2' :: weights('1');
+};
+
+output '["x = \(x), y = \(y)"]';
+
+solve user1Prefs;
+
