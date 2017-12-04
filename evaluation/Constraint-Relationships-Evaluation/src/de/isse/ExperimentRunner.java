@@ -1,4 +1,4 @@
-package de.isse;
+package de.isse; 
 
 import java.io.File;
 import java.io.FileFilter;
@@ -62,7 +62,7 @@ public class ExperimentRunner {
 	private static final boolean ONLY_ONE_CONFIG = false;
 
 	public static void main(String[] args) throws IOException {
-		String propertiesFile = "experiments/experiment3.properties";
+		String propertiesFile = "experiments/experiment.properties";
 		if (args.length > 0) {
 			propertiesFile = args[0];
 		}
