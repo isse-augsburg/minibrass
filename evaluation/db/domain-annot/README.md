@@ -3,17 +3,17 @@ These scripts verify that no intended tuning took place for the MiniBrass evalua
 Background
 ========== 
 In the originally submitted benchmark files for soft-queens, there was a line stating
-"
+```
 % Chuffed (with --free) seems to perform better without :: domain
 % on the first constraint.
 constraint all_different(queens); % :: domain;
-"
+```
 
 This line was actually added by the original author of the (hard constraint) model, Hakan Kjellerstrand. Understandably, this led to confusion in the initial reviews (why are we pushing Chuffed?)
 
 First of all, we never used the solver "Chuffed" in any of our evaluations.
 
-Second, to provide evidence that these settings did not influence the solvers' performance at all, with the ":: domain" annotation being activated (it was commented out before). 
+Second, to provide evidence that these settings did not influence the solvers' performance at all, with the `:: domain` annotation being activated (it was commented out before). 
 
 We observed negligible changes in the performance and document the results in this folder: 
 
