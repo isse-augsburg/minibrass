@@ -6,6 +6,7 @@
 % 
 % This MiniZinc model was created by Hakan Kjellerstrand, hakank@bonetmail.com
 % See also my MiniZinc page: http://www.hakank.org/minizinc
+% Modified by Alexander Schiendorfer for the MiniBrass evaluation, 2017
 %
 include "globals.mzn";
 include "evaluation-config.mzn";

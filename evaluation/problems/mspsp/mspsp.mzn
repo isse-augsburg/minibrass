@@ -13,7 +13,7 @@
 % perform the activity, and
 % 3) workers availibility, i.e., a worker can perform only one activity in
 % each time period.
-% 
+% % Modified by Alexander Schiendorfer for the MiniBrass evaluation, 2017
 %-----------------------------------------------------------------------------%
 
 include "globals.mzn";

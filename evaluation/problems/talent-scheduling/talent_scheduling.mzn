@@ -1,6 +1,7 @@
 % Talent Scheduling problem
 % Peter J. Stuckey
 % 14/12/2008
+% Modified by Alexander Schiendorfer for the MiniBrass evaluation, 2017
 
 include "globals.mzn";
 
