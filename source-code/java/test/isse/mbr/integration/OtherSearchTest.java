@@ -31,7 +31,9 @@ public class OtherSearchTest {
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
-		launcher.setUseDefault(true);
+	//	launcher.setUseDefault(true);
+		launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 	
 	@Test
