@@ -4,6 +4,10 @@
   <artifactId>MiniBrass</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>mbr2mzn</name>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
