@@ -36,6 +36,7 @@ public class GlobalProbabilisticTest {
 		launcher = new MiniZincLauncher();
 		launcher.setMinizincGlobals("jacop");
 		launcher.setFlatzincExecutable("fzn-jacop");
+		launcher.setDebug(true);
 	}
 
 	@Test
