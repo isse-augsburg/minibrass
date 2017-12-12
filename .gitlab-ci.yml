@@ -1,0 +1,3 @@
+testandci:
+  script:
+    - mvn test
