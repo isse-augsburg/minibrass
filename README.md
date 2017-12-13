@@ -1,6 +1,6 @@
 ![MiniBrass Logo -- Specifying goals the declarative way](https://github.com/isse-augsburg/minibrass/blob/master/docs/img/logonav.png)
 
-MiniBrass is a language and library that adds support for soft constraints to MiniZinc/MiniSearch to model weak/soft constraints and preferences systematically. 
+MiniBrass is a language and library that adds support for soft constraints to MiniZinc/MiniSearch to model weak/soft constraints, wishes and preferences systematically. 
 MiniBrass pays tribute to the tradition of naming NICTA's G12 software after elements in the 12th group of the periodic table. Brass is firstly an alloy that contains zinc and, according to the [German Wikipedia](https://de.wikipedia.org/wiki/Messing), 
 > Cold forming is possible with brass alloys containing up to 37% zinc. At higher zinc rates, only warm forming at temperatures > 600 °C is possible.
 
