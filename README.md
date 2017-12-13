@@ -81,7 +81,7 @@ To be able to run the test cases from Eclipse, make sure to start it in interact
 bash -ic ./eclipse
 ```
 
-### Todos
+
 
 
    [MiniZinc]: <http://www.minizinc.org/>
