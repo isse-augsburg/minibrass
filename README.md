@@ -61,6 +61,11 @@ solve cr1;
 
 For a *user-centered* perspective, please refer to our [main page](http://isse-augsburg.github.io/minibrass/).
 
+### Dev Setup
+
+MiniBrass is mirrored on gitlab to access their CI/CD features. To setup your local repository appropriately,
+please consult [the wiki setup page](https://github.com/isse-augsburg/minibrass/wiki/Setting-up-a-new-git-repo-with-two-remotes).
+
 ### Tech
 
 MiniBrass is based on these open source projects:
