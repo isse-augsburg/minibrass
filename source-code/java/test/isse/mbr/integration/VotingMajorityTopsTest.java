@@ -30,6 +30,7 @@ public class VotingMajorityTopsTest {
 		
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
+		launcher.setDebug(true);
 	}
 
 	@Test 

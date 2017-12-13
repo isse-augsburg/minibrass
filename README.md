@@ -33,7 +33,7 @@ output ["n = \(n)"] ++
        [ "\nValuations:  topLevelObjective = \(topLevelObjective)\n"];
 ```
 
-that is accompanied by this MiniBrass model
+that is accompanied by the following MiniBrass model
 ```c++
 type ConstraintPreferences = PVSType<bool, set of 1..nScs> = 
   params { 
