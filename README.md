@@ -76,7 +76,7 @@ MiniBrass is based on these open source projects:
 
 ### Test cases
 
-To be able to run the test cases from Eclipse, make sure to start it in interactive mode 
+To be able to run the test cases from Eclipse, make sure to start it in interactive mode (or link the solvers/minizinc binaries in /usr/bin)
 ```
 bash -ic ./eclipse
 ```
