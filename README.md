@@ -5,7 +5,7 @@ MiniBrass pays tribute to the tradition of naming NICTA's G12 software after ele
 > Cold forming is possible with brass alloys containing up to 37% zinc. At higher zinc rates, only warm forming at temperatures > 600 °C is possible.
 
 More specifically, we aim to provide
-- Convenient expression of soft constraint problems using constraint relationships
+- Convenient expression of various types of soft constraint problems
 - Automatic translation to weighted CSP
 - Generic search heuristics
 - Consistency checks of the specified relationships
