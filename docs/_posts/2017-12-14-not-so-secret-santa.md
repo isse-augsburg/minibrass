@@ -6,6 +6,7 @@ author: Alexander Schiendorfer
 Since holiday season is reaching its peak (so of course also in Augsburg :) ), we thought it would be a nice opportunity to show MiniBrass calculating a "not-so-secret" Santa. We can have preferences regarding our assigned secret santa (we want somebody who'll give us food or something handmade ...) and the person we want to give something, too.
 
 ![augsburg]({{ "/img/christkindl.jpg" | prepend: site.baseurl }} "Augsburger Christkindlesmarkt") 
+<https://www.flickr.com/photos/augschburger/72455954/>
 
 Our constraint model
 ```c++
