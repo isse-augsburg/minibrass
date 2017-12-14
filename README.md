@@ -81,12 +81,10 @@ MiniBrass is based on these open source projects:
 
 ### Test cases
 
-To be able to run the test cases from Eclipse, make sure to start it in interactive mode (or link the solvers/minizinc binaries in /usr/bin)
+To be able to run the test cases from Eclipse, make sure to start it in interactive mode (or link the solvers/minizinc binaries in /usr/bin or some other binaries directory)
 ```
 bash -ic ./eclipse
 ```
-
-
 
 
    [MiniZinc]: <http://www.minizinc.org/>
