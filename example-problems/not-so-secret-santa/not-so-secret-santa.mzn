@@ -28,4 +28,6 @@ constraint inverse(givesTo, getsFrom);
 /* people do not give to themselves */
 constraint forall(p in PEOPLE) (givesTo[p] != p);
 
-solve search miniBrass();
+solve 
+%:: int_search(givesTo, input_order, indomain_random, complete)
+search miniBrass();
