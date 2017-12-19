@@ -26,6 +26,9 @@ public class VotingApprovalTest {
 		
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
+
+        launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	// TODO test case for wrong typing 

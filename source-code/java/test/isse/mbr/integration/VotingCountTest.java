@@ -30,6 +30,9 @@ public class VotingCountTest {
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
+
+        launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	// TODO test case for wrong typing 

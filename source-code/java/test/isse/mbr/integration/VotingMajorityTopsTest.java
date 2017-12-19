@@ -31,6 +31,9 @@ public class VotingMajorityTopsTest {
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
+
+        launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	@Test 
