@@ -26,6 +26,8 @@ public class FuzzyTest {
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
+        launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	@Test
