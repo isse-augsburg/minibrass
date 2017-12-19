@@ -19,6 +19,7 @@ import isse.mbr.extensions.ExternalParameterWrap;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.MiniZincBinding;
 import isse.mbr.model.parsetree.MorphedPVSInstance;
 import isse.mbr.model.parsetree.PVSInstance;
 import isse.mbr.model.parsetree.ProductType;
@@ -57,7 +58,7 @@ public class CodeGenerator {
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
 	public static final String ITER_VARIABLE_PREFIX = "mbr_iter_var_";
 	public static final String AUX_VARIABLE_PREFIX = "mbr_aux_var_";
-
+	
 	private boolean onlyMiniZinc;
 	private boolean genHeuristics;
 	private boolean suppressOutputGeneration = false; // this should not be accessible from outside, better use the new MiniBrass output item 
@@ -68,6 +69,7 @@ public class CodeGenerator {
 	
 	private List<PVSInstance> leafInstances;
 	private Collection<CodegenAtomicPVSHandler> handlers;
+	private Collection<AbstractPVSInstance> addedInstances;
 	
 	public static class AtomicPvsInformation {
 		protected PVSInstance instance;
@@ -84,6 +86,7 @@ public class CodeGenerator {
 			this.valuationsArray = valuationsArray;
 			this.substitutions = substitutions;
 			this.instanceArguments = instanceArguments;
+
 		}
 
 		public PVSInstance getInstance() {
@@ -111,6 +114,7 @@ public class CodeGenerator {
 
 	public CodeGenerator() {
 		this.handlers = new ArrayList<>();
+		this.addedInstances = new ArrayList<>();
 	}
 	
 	public String generateCode(MiniBrassAST model) throws MiniBrassParseException {
@@ -281,6 +285,10 @@ public class CodeGenerator {
 
 	private void addPvs(AbstractPVSInstance pvsInstance, StringBuilder sb, MiniBrassAST model)
 			throws MiniBrassParseException {
+
+		if(addedInstances.contains(pvsInstance))
+			return;
+		
 		if (pvsInstance.isComplex()) {
 
 			Collection<AbstractPVSInstance> children = pvsInstance.getChildren();
@@ -345,6 +353,7 @@ public class CodeGenerator {
 				VotingInstance vi = (VotingInstance) pvsInstance;
 				String getBetterPredicate = vi.getVotingProcedure().getVotingPredicate(this, vi.getChildren());
 				vi.setGeneratedBetterPredicate(getBetterPredicate);
+				
 				// TODO implement more reasonably 
 				vi.setGeneratedNotWorsePredicate("true");
 				StringBuilder equalityBuilder = new StringBuilder("(");
@@ -366,12 +375,45 @@ public class CodeGenerator {
 					appendOverall(sb, vi.getVotingProcedure().getObjectiveType(this, vi.getChildren()), vi, overallIdent);
 					sb.append(String.format("constraint %s = %s ;\n", overallIdent, vi.getVotingProcedure().getNumericObjective(this, vi.getChildren())));
 				}
+				
+				// write count of voters 
+				String votersCountGenerated = MiniBrassVotingKeywords.VOTER_COUNT+vi.getName();
+				sb.append(String.format("int: %s = %d;\n", votersCountGenerated, vi.getChildren().size()));
+				// write identifiers and enums of voters
+				StringBuilder namesGenerator = new StringBuilder();
+				namesGenerator.append(String.format("array[1..%s] of string: %s = [", votersCountGenerated, MiniBrassVotingKeywords.VOTER_STRING_NAMES+vi.getName()));
+				boolean first = true;
+				int enumCounter = 0;
+				for(AbstractPVSInstance child : vi.getChildren()) {
+					AbstractPVSInstance childDerefed = deref(child);
+					String nameStr = String.format("\"%s\"", childDerefed.getName());
+					if(first) 
+						first = false;
+					else 
+						namesGenerator.append(", ");
+					namesGenerator.append(nameStr);	
+					
+					// TODO revise
+					sb.append(String.format("int: %s = %d;\n", childDerefed.getName(), (++enumCounter)));
+				}
+				namesGenerator.append("];\n");
+				
+				sb.append(namesGenerator.toString());
+				// take care of optional bindings
+				MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
+				for(MiniZincBinding binding : model.getBindings()) {
+					// binding.minizincVariable = VOTER_COUNT ... 
+					String encodedMetaVar = kw.lookup(binding.getMetaVariable()) + vi.getName();
+					String mznVar = binding.getMinizincVariable();
+					String genBinding = String.format("%s = %s;\n", mznVar, encodedMetaVar);
+					sb.append(genBinding);
+				}
 			}
 
 		} else {
 			addAtomicPvs(pvsInstance, sb, model);
 		}
-
+		addedInstances.add(pvsInstance);
 	}
 
 	/**

@@ -56,6 +56,8 @@ public enum MiniBrassSymbol {
 	NewSy, 				// "new
 	VotingSy,           // "vote"
 	OutputSy,           // "output"
+	BindSy,             // "bind"
+	ToSy,               // "to"
 	NoSy,
 	EofSy     
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.parsetree.MiniZincBinding;
 import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.types.PVSType;
 
@@ -27,7 +28,8 @@ public class MiniBrassAST {
 	private Map<String, AbstractPVSInstance> pvsInstances; // here by identifier
 	private Map<String, AbstractPVSInstance> pvsReferences; // here by reference
 	private Collection<String> additionalMinizincIncludes;
-
+	private Collection<MiniZincBinding> bindings; // to map voting meta-variables to MiniZinc variables
+	
 	private AbstractPVSInstance solveInstance;
 
 	private String problemOutput; 
@@ -38,8 +40,12 @@ public class MiniBrassAST {
 		pvsReferences =  new HashMap<>();
 		morphisms = new HashMap<>();
 		additionalMinizincIncludes = new LinkedList<>();
+		bindings = new LinkedList<>();
 	}
 	
+	public void registerBinding(MiniZincBinding binding	) {
+		bindings.add(binding);
+	}
 	public void registerPVSType(String reference, PVSType type) {
 		LOGGER.fine("Registering PVS type ... "+ type);
 		pvsTypes.put(reference, type);
@@ -95,6 +101,10 @@ public class MiniBrassAST {
 
 	public void setProblemOutput(String problemOutput) {
 		this.problemOutput = problemOutput;
+	}
+
+	public Collection<MiniZincBinding> getBindings() {
+		return bindings;
 	}
 }
 

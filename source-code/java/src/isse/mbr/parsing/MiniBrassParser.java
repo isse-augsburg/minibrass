@@ -20,6 +20,7 @@ import isse.mbr.extensions.ExternalParameterWrap;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
+import isse.mbr.model.parsetree.MiniZincBinding;
 import isse.mbr.model.parsetree.MorphedPVSInstance;
 import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.parsetree.Morphism.ParamMapping;
@@ -69,6 +70,7 @@ public class MiniBrassParser {
 	private MiniBrassAST model; 
 	private SemanticChecker semChecker;
 	private int productCounter;
+	public static final String VOTING_PREFIX = "MBR_VOT_";
 	
 	public MiniBrassParser() {
 	}
@@ -259,9 +261,37 @@ public class MiniBrassParser {
 		} else if(currSy == MiniBrassSymbol.OutputSy) {
 			getNextSy();
 			outputItem(model);
+		} else if (currSy == MiniBrassSymbol.BindSy) {
+			getNextSy();
+			bindItem();
 		}
 		else {
 			throw new MiniBrassParseException("Unexpected symbol when looking for item: "+currSy + " (last ident -> " +lexer.getLastIdent() +")");
+		}
+	}
+
+	/**
+	 * "bind" ident "to" ident ";"
+	 * 
+	 * Ex. usage "bind voterCount to s;"
+	 * @throws MiniBrassParseException 
+	 */
+	private void bindItem() throws MiniBrassParseException {
+		expectSymbol(MiniBrassSymbol.IdentSy);
+		String metaVariable = lexer.getLastIdent();
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.ToSy);
+		expectSymbol(MiniBrassSymbol.IdentSy);
+		String mznVariable = lexer.getLastIdent();
+		getNextSy();
+		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
+		
+		MiniZincBinding binding = new MiniZincBinding(metaVariable, mznVariable);
+		model.registerBinding(binding);		
+		// TODO move to semantic check
+		MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
+		if(!kw.contains(metaVariable)) {
+			throw new MiniBrassParseException("Unknown meta-variable for binding: "+metaVariable);
 		}
 	}
 
@@ -343,7 +373,9 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.LEXICOGRAPHIC);
 			composite.setRightHandSide(next);
-			composite.setName("MBR_LEX_"+(++productCounter));
+			// TODO deref would be better
+			String genName = first.getName() + "_MBR_LEX_" +(++productCounter) + next.getName();
+			composite.setName(genName);
 						
 			first = composite;
 		}
@@ -366,7 +398,9 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.DIRECT);
 			composite.setRightHandSide(next);
-			composite.setName("MBR_DIR_"+(++productCounter));
+			//TODO deref would be better
+			String genName = first.getName() + "_MBR_DIR_" +(++productCounter) + next.getName();
+			composite.setName(genName);
 			
 			first = composite;
 		}
@@ -537,7 +571,7 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
 		
 		VotingInstance votingInst = new VotingInstance(); 
-		votingInst.setName("MBR_VOT_"+(++productCounter));
+		votingInst.setName(VOTING_PREFIX+(++productCounter));
 		AbstractPVSInstance nextInst = PVSInst(model);
 		votingInst.addPvs(nextInst);
 		

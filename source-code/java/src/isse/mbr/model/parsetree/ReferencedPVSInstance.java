@@ -28,7 +28,7 @@ public class ReferencedPVSInstance extends AbstractPVSInstance {
 	
 	@Override
 	public String toString() {
-		return "(ref) -> "+reference;
+		return "ref_to_"+reference;
 	}
 	@Override
 	public Collection<AbstractPVSInstance> getChildren() {

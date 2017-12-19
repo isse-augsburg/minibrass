@@ -180,6 +180,10 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.LexSy;
 				case "represents":
 					return MiniBrassSymbol.RepresentsSy;
+				case "bind":
+					return MiniBrassSymbol.BindSy;
+				case "to":
+					return MiniBrassSymbol.ToSy;
 				case "pareto":
 					return MiniBrassSymbol.ParetoSy;
 				case "morph":
