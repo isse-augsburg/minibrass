@@ -70,6 +70,8 @@ public class MiniBrassParser {
 	private SemanticChecker semChecker;
 	private int productCounter;
 	public static final String VOTING_PREFIX = "MBR_VOT_";
+	public static final String DIR_PROD = "_MBR_DIR_" ;
+	public static final String LEX_PROD = "_MBR_LEX_" ;
 	public static final String TOP_LEVEL_PVS_REF = "topLevelPvsRef";	
 	
 	public MiniBrassParser() {
@@ -131,6 +133,10 @@ public class MiniBrassParser {
 			semChecker.checkPvsInstances(model);
 			semChecker.checkMorphisms();
 			
+			// after the references are refreshed, update all complex PVS (starting from the solve item)
+			productCounter = 0;
+			updateCompositeNames(model.getSolveInstance());
+			
 			LOGGER.finer("I should optimize: "+model.getSolveInstance());
 			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
 				LOGGER.fine("Got instance: " + entry.getValue().toString());
@@ -145,6 +151,34 @@ public class MiniBrassParser {
 				scanner.close();
 		}
 		return model;
+	}
+
+	private void updateCompositeNames(AbstractPVSInstance inst) {
+		if(inst instanceof CompositePVSInstance) {
+			CompositePVSInstance comp = (CompositePVSInstance) inst;
+			for(AbstractPVSInstance child : comp.getChildren()) {
+				updateCompositeNames(child);
+			}
+			// now my children's names are updated, I may update next
+			AbstractPVSInstance left = ReferencedPVSInstance.deref(comp.getLeftHandSide());
+			AbstractPVSInstance right = ReferencedPVSInstance.deref(comp.getRightHandSide());
+			
+			String combinator = comp.getProductType() == ProductType.DIRECT ? DIR_PROD : LEX_PROD;
+			
+			String genName = left.getName() + combinator +(++productCounter) + right.getName();
+			comp.setName(genName);
+		}
+		
+		if(inst instanceof VotingInstance) {
+			VotingInstance vi = (VotingInstance) inst;
+			for (AbstractPVSInstance child : vi.getChildren()) {
+				updateCompositeNames(child);
+			}
+			
+			StringBuilder nameBuilder = new StringBuilder(VOTING_PREFIX);
+			nameBuilder.append(++productCounter);
+			vi.setName(nameBuilder.toString());
+		}
 	}
 
 	public MiniBrassAST parse(File file) throws FileNotFoundException, MiniBrassParseException {
@@ -308,8 +342,6 @@ public class MiniBrassParser {
 		
 		MiniZincBinding binding = new MiniZincBinding(metaVariable, mznVariable, scopeInstRef);
 		model.registerBinding(binding);	
-		
-	
 	}
 
 	/**
@@ -390,6 +422,7 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.LEXICOGRAPHIC);
 			composite.setRightHandSide(next);
+			
 			// TODO deref would be better
 			String genName = first.getName() + "_MBR_LEX_" +(++productCounter) + next.getName();
 			composite.setName(genName);
@@ -415,6 +448,7 @@ public class MiniBrassParser {
 			composite.setLeftHandSide(first);
 			composite.setProductType(ProductType.DIRECT);
 			composite.setRightHandSide(next);
+			
 			//TODO deref would be better
 			String genName = first.getName() + "_MBR_DIR_" +(++productCounter) + next.getName();
 			composite.setName(genName);

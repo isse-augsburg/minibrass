@@ -45,18 +45,19 @@ public class VotingCountTest {
 		Assert.assertTrue(output.exists());
 
 		String outputString = TestUtils.readFile(output);
-		String expectedString =String.format("int: %s = 4;", MiniBrassVotingKeywords.VOTER_COUNT+MiniBrassParser.VOTING_PREFIX+"1");
+		// we suffix 2 since it is the second product to be used (first is the smaller, lex prod) 
+		String expectedString =String.format("int: %s = 4;", MiniBrassVotingKeywords.VOTER_COUNT+MiniBrassParser.VOTING_PREFIX+"2");
 		
 		Assert.assertTrue(outputString.contains(expectedString));
 		
 		// check our binding 
-		expectedString = String.format("s = %s;", MiniBrassVotingKeywords.VOTER_COUNT+MiniBrassParser.VOTING_PREFIX+"1");
+		expectedString = String.format("s = %s;", MiniBrassVotingKeywords.VOTER_COUNT+MiniBrassParser.VOTING_PREFIX+"2");
 		Assert.assertTrue(outputString.contains(expectedString));		
 		
-		expectedString = String.format("names = %s;", MiniBrassVotingKeywords.VOTER_STRING_NAMES+MiniBrassParser.VOTING_PREFIX+"1");
+		expectedString = String.format("names = %s;", MiniBrassVotingKeywords.VOTER_STRING_NAMES+MiniBrassParser.VOTING_PREFIX+"2");
 		Assert.assertTrue(outputString.contains(expectedString));
 		
-		expectedString = "array[1..mbr_voter_count_MBR_VOT_1] of string: mbr_voter_string_names_MBR_VOT_1 = [\"agent1\", \"agent2\", \"agent3\", \"RefTo_agent3_MBR_LEX_2RefTo_agent1\"];";
+		expectedString = "array[1..mbr_voter_count_MBR_VOT_2] of string: mbr_voter_string_names_MBR_VOT_2 = [\"agent1\", \"agent2\", \"agent3\", \"agent3_MBR_LEX_1agent1\"];";
 		Assert.assertTrue(outputString.contains(expectedString));
 		
 		// 2. execute minisearch
