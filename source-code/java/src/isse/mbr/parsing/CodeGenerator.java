@@ -124,6 +124,7 @@ public class CodeGenerator {
 
 		addIncludes(sb, model);
 		addPvsInstances(sb, model);
+		addBindings(sb, model);
 
 		// only final output here
 		String fileContents = sb.toString();
@@ -132,6 +133,23 @@ public class CodeGenerator {
 
 	}
 	
+	private void addBindings(StringBuilder sb, MiniBrassAST model) {
+		// take care of optional bindings
+		MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
+		for(MiniZincBinding binding : model.getBindings()) {
+			AbstractPVSInstance scopeInst = ReferencedPVSInstance.deref(binding.getScopeInstRef().instance);
+			// we made sure of typing in semantic check
+			VotingInstance vi = (VotingInstance) scopeInst;
+			
+			// binding.minizincVariable = VOTER_COUNT ... 
+			String encodedMetaVar = kw.lookup(binding.getMetaVariable()) + vi.getName();
+			String mznVar = binding.getMinizincVariable();
+			String genBinding = String.format("%s = %s;\n", mznVar, encodedMetaVar);
+			sb.append(genBinding);
+		}
+		
+	}
+
 	public String generateComparisonCode(MiniBrassAST model, Solution left, Solution right) throws MiniBrassParseException {
 		LOGGER.fine("Starting comparison code generation");
 		StringBuilder sb = new StringBuilder("% ===============================================\n");
@@ -399,15 +417,6 @@ public class CodeGenerator {
 				namesGenerator.append("];\n");
 				
 				sb.append(namesGenerator.toString());
-				// take care of optional bindings
-				MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
-				for(MiniZincBinding binding : model.getBindings()) {
-					// binding.minizincVariable = VOTER_COUNT ... 
-					String encodedMetaVar = kw.lookup(binding.getMetaVariable()) + vi.getName();
-					String mznVar = binding.getMinizincVariable();
-					String genBinding = String.format("%s = %s;\n", mznVar, encodedMetaVar);
-					sb.append(genBinding);
-				}
 			}
 
 		} else {

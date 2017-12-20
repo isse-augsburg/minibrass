@@ -58,6 +58,7 @@ public class MiniBrassAST {
 
 	public void setSolveInstance(AbstractPVSInstance solveInstance) {
 		this.solveInstance = solveInstance;
+		LOGGER.fine("Registering PVS instance ... " + MiniBrassParser.TOP_LEVEL_PVS_REF + " -> "+ solveInstance.getName());
 		this.pvsReferences.put(MiniBrassParser.TOP_LEVEL_PVS_REF, solveInstance);
 	}
 
