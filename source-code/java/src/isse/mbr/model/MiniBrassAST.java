@@ -10,6 +10,7 @@ import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.MiniZincBinding;
 import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.types.PVSType;
+import isse.mbr.parsing.MiniBrassParser;
 
 /**
  * A full soft constraint model in MiniBrass
@@ -57,6 +58,7 @@ public class MiniBrassAST {
 
 	public void setSolveInstance(AbstractPVSInstance solveInstance) {
 		this.solveInstance = solveInstance;
+		this.pvsReferences.put(MiniBrassParser.TOP_LEVEL_PVS_REF, solveInstance);
 	}
 
 	public Map<String, AbstractPVSInstance> getPvsInstances() {

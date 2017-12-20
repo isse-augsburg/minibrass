@@ -55,7 +55,6 @@ import isse.mbr.model.voting.VotingProcedure;
  */
 public class MiniBrassParser {
 
-
 	private final static Logger LOGGER = Logger.getGlobal();
 	
 	private Scanner scanner;
@@ -71,6 +70,7 @@ public class MiniBrassParser {
 	private SemanticChecker semChecker;
 	private int productCounter;
 	public static final String VOTING_PREFIX = "MBR_VOT_";
+	public static final String TOP_LEVEL_PVS_REF = "topLevelPvsRef";	
 	
 	public MiniBrassParser() {
 	}
@@ -200,6 +200,7 @@ public class MiniBrassParser {
 			semChecker.executeArrayJobs();
 			semChecker.checkPvsInstances(model);
 			semChecker.checkMorphisms();
+			semChecker.checkBindings(model);
 			
 			LOGGER.finer("I should optimize: "+model.getSolveInstance());
 			for(Entry<String, AbstractPVSInstance> entry: model.getPvsInstances().entrySet()){
@@ -263,7 +264,7 @@ public class MiniBrassParser {
 			outputItem(model);
 		} else if (currSy == MiniBrassSymbol.BindSy) {
 			getNextSy();
-			bindItem();
+			bindItem(model);
 		}
 		else {
 			throw new MiniBrassParseException("Unexpected symbol when looking for item: "+currSy + " (last ident -> " +lexer.getLastIdent() +")");
@@ -274,25 +275,41 @@ public class MiniBrassParser {
 	 * "bind" ident "to" ident ";"
 	 * 
 	 * Ex. usage "bind voterCount to s;"
+	 * or bind vi1.voterCount to s;  if we have multiple vote items 
+	 * @param model2 
 	 * @throws MiniBrassParseException 
 	 */
-	private void bindItem() throws MiniBrassParseException {
+	private void bindItem(MiniBrassAST model) throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.IdentSy);
-		String metaVariable = lexer.getLastIdent();
+		String firstIdent = lexer.getLastIdent();
+		String scope = TOP_LEVEL_PVS_REF;
+		
 		getNextSy();
+		
+		String metaVariable = null;
+		if(currSy == MiniBrassSymbol.DotSy) {
+			scope = firstIdent;
+			getNextSy();
+			expectSymbol(MiniBrassSymbol.IdentSy);
+			metaVariable = lexer.getLastIdent();
+			getNextSy();
+		} else {
+			metaVariable = firstIdent;			
+		}
+		
+		NamedRef<AbstractPVSInstance> scopeInstRef = new NamedRef<>(scope);
+		semChecker.scheduleUpdate(scopeInstRef, model.getPvsReferences());
+		
 		expectSymbolAndNext(MiniBrassSymbol.ToSy);
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		String mznVariable = lexer.getLastIdent();
 		getNextSy();
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 		
-		MiniZincBinding binding = new MiniZincBinding(metaVariable, mznVariable);
-		model.registerBinding(binding);		
-		// TODO move to semantic check
-		MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
-		if(!kw.contains(metaVariable)) {
-			throw new MiniBrassParseException("Unknown meta-variable for binding: "+metaVariable);
-		}
+		MiniZincBinding binding = new MiniZincBinding(metaVariable, mznVariable, scopeInstRef);
+		model.registerBinding(binding);	
+		
+	
 	}
 
 	/**

@@ -17,9 +17,11 @@ import org.jgrapht.graph.DefaultEdge;
 
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
+import isse.mbr.model.parsetree.MiniZincBinding;
 import isse.mbr.model.parsetree.MorphedPVSInstance;
 import isse.mbr.model.parsetree.Morphism;
 import isse.mbr.model.parsetree.PVSInstance;
+import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.parsetree.VotingInstance;
 import isse.mbr.model.types.ArrayType;
@@ -288,5 +290,23 @@ public class SemanticChecker {
 			throw new MiniBrassParseException("PVS instance name '" +name+ "' already defined");
 		else
 			pvsInstanceNames.add(name);
+	}
+
+	public void checkBindings(MiniBrassAST model) throws MiniBrassParseException {
+		MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
+		
+		for(MiniZincBinding binding : model.getBindings()) {
+			if(!kw.contains(binding.getMetaVariable())) {
+				throw new MiniBrassParseException("Unknown meta-variable for binding: "+binding.getMetaVariable());
+			}
+			
+			AbstractPVSInstance scope = binding.getScopeInstRef().instance;
+			AbstractPVSInstance scopeDerefed = ReferencedPVSInstance.deref(scope);
+
+			// currently, this *must* be a voting instance
+			if (!(scopeDerefed instanceof VotingInstance)) {
+				throw new MiniBrassParseException("Binding must take a voting instance item as scope. You referenced "+scope.getName() + " with class "+scopeDerefed.getClass().toString());
+			}
+		}
 	}
 }

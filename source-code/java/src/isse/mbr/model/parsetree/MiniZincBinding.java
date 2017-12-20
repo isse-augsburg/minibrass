@@ -1,11 +1,22 @@
 package isse.mbr.model.parsetree;
 
+import isse.mbr.model.types.NamedRef;
+
 public class MiniZincBinding {
 	private String metaVariable;
 	private String minizincVariable;
+	private NamedRef<AbstractPVSInstance> scopeInstRef; // the enclosing vote inst 
+	
 	public String getMetaVariable() {
 		return metaVariable;
 	}
+	public MiniZincBinding(String metaVariable, String minizincVariable, NamedRef<AbstractPVSInstance> scopeInstRef) {
+		super();
+		this.metaVariable = metaVariable;
+		this.minizincVariable = minizincVariable;
+		this.scopeInstRef = scopeInstRef;
+	}
+	
 	public void setMetaVariable(String metaVariable) {
 		this.metaVariable = metaVariable;
 	}
@@ -15,9 +26,11 @@ public class MiniZincBinding {
 	public void setMinizincVariable(String minizincVariable) {
 		this.minizincVariable = minizincVariable;
 	}
-	public MiniZincBinding(String metaVariable, String minizincVariable) {
-		super();
-		this.metaVariable = metaVariable;
-		this.minizincVariable = minizincVariable;
+
+	public NamedRef<AbstractPVSInstance> getScopeInstRef() {
+		return scopeInstRef;
+	}
+	public void setScopeInstRef(NamedRef<AbstractPVSInstance> scopeInstRef) {
+		this.scopeInstRef = scopeInstRef;
 	}
 }

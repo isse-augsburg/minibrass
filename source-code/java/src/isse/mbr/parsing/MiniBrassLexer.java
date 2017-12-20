@@ -49,6 +49,12 @@ public class MiniBrassLexer {
 				return mv(MiniBrassSymbol.AsteriskSy);
 			case ';':
 				return mv(MiniBrassSymbol.SemicolonSy);
+			case '.':
+				if( peekNextChar() == '.') {
+					readNextChar();
+					return mv(MiniBrassSymbol.DotsSy);
+				} else 
+				return mv(MiniBrassSymbol.DotSy);
 			case ':':
 				if( peekNextChar() == ':') {
 					readNextChar();
@@ -84,13 +90,7 @@ public class MiniBrassLexer {
 					}
 			} 
 
-			if(currentChar == '.') {
-				if(readNextChar() && currentChar == '.') {
-					return mv(MiniBrassSymbol.DotsSy);
-				} else 
-					return MiniBrassSymbol.NoSy;
-				
-			}  else if (Character.isDigit(currentChar)) {
+			if (Character.isDigit(currentChar)) {
 				boolean isFloatValue = false;
 				
 				StringBuilder sb = new StringBuilder();

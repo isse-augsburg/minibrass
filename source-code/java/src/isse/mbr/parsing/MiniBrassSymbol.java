@@ -45,7 +45,8 @@ public enum MiniBrassSymbol {
 	FloatSy,            // float
 	IntLitSy,           // any integer
 	FloatLitSy,         // any float
-	DotsSy,             // .. 
+	DotsSy,             // ..
+	DotSy,              // .
 	ParamsSy,           // "params"
 	OffersSy,           // "offers"
 	HeuristicsSy,       // "heuristics"
@@ -59,5 +60,5 @@ public enum MiniBrassSymbol {
 	BindSy,             // "bind"
 	ToSy,               // "to"
 	NoSy,
-	EofSy     
+	EofSy      
 }
