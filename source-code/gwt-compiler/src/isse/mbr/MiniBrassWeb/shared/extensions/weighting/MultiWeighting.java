@@ -1,0 +1,52 @@
+package isse.mbr.MiniBrassWeb.shared.extensions.weighting;
+
+import isse.mbr.MiniBrassWeb.shared.extensions.ExternalMorphism;
+import isse.mbr.MiniBrassWeb.shared.extensions.domain.DirectedGraph;
+import isse.mbr.MiniBrassWeb.shared.extensions.domain.UtilityStructure;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.PVSInstance;
+import isse.mbr.MiniBrassWeb.shared.parsing.MiniBrassParseException;
+
+/**
+ * This hook is intended to take a MiniZinc-encoded graph,
+ * perform multiweighting and export a MiniZinc-2d array with weights
+ * @author Alexander Schiendorfer
+ *
+ */
+public class MultiWeighting extends ExternalMorphism {
+	@Override
+	public void process(PVSInstance fromInstance) throws MiniBrassParseException {
+		String generatedCrEdges = fromInstance.getGeneratedCodeParameters().get("crEdges");
+		int nScs = fromInstance.getNumberSoftConstraints();
+		processMiniZincString(generatedCrEdges, nScs);
+	}
+
+	public DirectedGraph processMiniZincString(String generatedCrEdges, int nScs) throws MiniBrassParseException {
+
+		// TODO for now, we expect a literal graph in the form "[| 2, 1 | 1, 0 |]"
+		// assumes strictly that soft constraints are labeled from 1 to nScs
+	
+		DirectedGraph dag = new DirectedGraph(nScs);
+		dag.parse(generatedCrEdges);
+
+		MultipleUtilities mu = new MultipleUtilities();
+		UtilityStructure us = mu.findUtilities(dag);
+		
+		StringBuilder mzGraphBuilder = new StringBuilder("[|");
+		for(int i = 0; i < us.getWeights().length; ++i) {
+			if(i > 0)
+				mzGraphBuilder.append(" | ");
+			for(int j = 0; j < us.getSize(); ++j) {
+				if(j > 0)
+					mzGraphBuilder.append(", ");
+				mzGraphBuilder.append(us.getWeights()[i][j]);
+			}
+			
+		}
+		mzGraphBuilder.append("|]");
+		// 
+		calculatedParameters.put("weights", mzGraphBuilder.toString());
+		calculatedParameters.put("d", Integer.toString(us.getSize()));
+		return dag;
+	}
+
+}

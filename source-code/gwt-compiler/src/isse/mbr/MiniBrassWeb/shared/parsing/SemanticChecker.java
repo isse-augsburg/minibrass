@@ -1,0 +1,306 @@
+package isse.mbr.MiniBrassWeb.shared.parsing;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import isse.mbr.MiniBrassWeb.shared.graph.DGraph;
+import isse.mbr.MiniBrassWeb.shared.model.MiniBrassAST;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.AbstractPVSInstance;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.MorphedPVSInstance;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.Morphism;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.PVSInstance;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.SoftConstraint;
+import isse.mbr.MiniBrassWeb.shared.model.parsetree.VotingInstance;
+import isse.mbr.MiniBrassWeb.shared.model.types.ArrayType;
+import isse.mbr.MiniBrassWeb.shared.model.types.FloatType;
+import isse.mbr.MiniBrassWeb.shared.model.types.IntType;
+import isse.mbr.MiniBrassWeb.shared.model.types.IntervalType;
+import isse.mbr.MiniBrassWeb.shared.model.types.MiniZincVarType;
+import isse.mbr.MiniBrassWeb.shared.model.types.NamedRef;
+import isse.mbr.MiniBrassWeb.shared.model.types.PVSFormalParameter;
+import isse.mbr.MiniBrassWeb.shared.model.types.PVSParamInst;
+import isse.mbr.MiniBrassWeb.shared.model.types.PVSType;
+import isse.mbr.MiniBrassWeb.shared.model.types.PrimitiveType;
+
+/**
+ * For deferred reference updates
+ * 
+ * @author Alexander Schiendorfer
+ *
+ */
+public class SemanticChecker {
+
+	private final static Logger LOGGER = Logger.getGlobal();
+
+	private Queue<ReferenceJob> referenceJobs;
+	private Queue<ArrayJob> arrayJobs;
+	private Map<String, DGraph<String>> parameterDependencies;
+	private Queue<Morphism> morphisms;
+	private Set<String> pvsInstanceNames;
+
+	public SemanticChecker() {
+		referenceJobs = new LinkedList<>();
+		arrayJobs = new LinkedList<>();
+		parameterDependencies = new HashMap<String, DGraph<String>>();
+		morphisms = new LinkedList<>();
+		pvsInstanceNames = new HashSet<>();
+	}
+
+	private static class ReferenceJob {
+		public NamedRef<?> reference;
+		public Map<String, ?> map;
+
+		public ReferenceJob(NamedRef<?> reference, Map<String, ?> map) {
+			super();
+			this.reference = reference;
+			this.map = map;
+		}
+
+	}
+
+	private static class ArrayJob {
+		public ArrayType arrayType;
+		public List<MiniZincVarType> pendingIndexTypes;
+		public String name;
+
+		public ArrayJob(ArrayType arrayType, List<MiniZincVarType> pendingIndexTypes, String name) {
+			super();
+			this.arrayType = arrayType;
+			this.pendingIndexTypes = pendingIndexTypes;
+			this.name = name;
+		}
+
+		public void execute() throws MiniBrassParseException {
+			for (MiniZincVarType pendingIndexType : pendingIndexTypes) {
+				if (pendingIndexType instanceof IntType) {
+					arrayType.getIndexSets().add((PrimitiveType) pendingIndexType);
+				} else if (pendingIndexType instanceof FloatType) {
+					throw new MiniBrassParseException("Index type of array " + name + " must not be float!");
+				} else if (pendingIndexType instanceof IntervalType) {
+					IntervalType it = (IntervalType) pendingIndexType;
+					PrimitiveType superType = it.getSuperSort();
+					if (superType instanceof FloatType) {
+						throw new MiniBrassParseException("Index type of array " + name + " must not be float!");
+					}
+					arrayType.getIndexSets().add(it);
+				}
+			}
+		}
+
+	}
+
+	public <T> void scheduleUpdate(NamedRef<T> reference, Map<String, T> map) {
+		ReferenceJob newJob = new ReferenceJob(reference, map);
+		referenceJobs.add(newJob);
+
+	}
+
+	public void updateReferences() throws MiniBrassParseException {
+		for (ReferenceJob job : referenceJobs) {
+			if (job.reference.name != null) {
+				if (!job.map.containsKey(job.reference.name)) {
+					throw new MiniBrassParseException("Unresolved reference: " + job.reference.name);
+				} else {
+					job.reference.update(job.map.get(job.reference.name));
+				}
+			}
+		}
+	}
+
+	public void executeArrayJobs() throws MiniBrassParseException {
+		for (ArrayJob aj : arrayJobs) {
+			aj.execute();
+		}
+	}
+
+	public void scheduleParameterReference(NamedRef<?> lRef, PVSType scopeType) {
+		if (lRef != null) {
+			ReferenceJob refJob = new ReferenceJob(lRef, scopeType.getParamMap());
+			referenceJobs.add(refJob);
+		}
+	}
+
+	/**
+	 * Make sure all types are int types now (after references to parameters have
+	 * been resolved)
+	 * 
+	 * @param arrayType
+	 * @param pendingIndexTypes
+	 * @param name
+	 */
+	public void scheduleArrayTypeCheck(ArrayType arrayType, List<MiniZincVarType> pendingIndexTypes, String name) {
+		ArrayJob aj = new ArrayJob(arrayType, pendingIndexTypes, name);
+		arrayJobs.add(aj);
+	}
+
+	/**
+	 * array[a..b] of c..d: e:
+	 * 
+	 * {a,b, c,d} would be "to", e would be "from"
+	 * 
+	 * @param scopeType
+	 * @param from
+	 * @param toType
+	 * @throws MiniBrassParseException
+	 */
+	public void scheduleTypeDependencyCheck(PVSType scopeType, String from, MiniZincVarType toType)
+			throws MiniBrassParseException {
+		DGraph<String> parameterGraph = null;
+		if (!parameterDependencies.containsKey(scopeType.getName())) {
+			parameterGraph = new DGraph<>();
+
+			parameterDependencies.put(scopeType.getName(), parameterGraph);
+		} else {
+			parameterGraph = parameterDependencies.get(scopeType.getName());
+		}
+		if (toType instanceof IntervalType) {
+			IntervalType safeTo = (IntervalType) toType;
+			for (String to : safeTo.getReferencedParameters()) {
+				try {
+					if (!parameterGraph.containsVertex(from))
+						parameterGraph.addVertex(from);
+
+					if (!parameterGraph.containsVertex(to))
+						parameterGraph.addVertex(to);
+
+					parameterGraph.addEdge(from, to);
+				} catch (IllegalArgumentException ce) {
+					throw new MiniBrassParseException(
+							"Detected cyclic dependency when adding parameter dependency: " + from + " -> " + to);
+				}
+			}
+		}
+	}
+
+	public void checkPvsInstances(MiniBrassAST model) throws MiniBrassParseException {
+		LOGGER.fine("Checking PVS instances");
+		for (Entry<String, AbstractPVSInstance> entry : model.getPvsInstances().entrySet()) {
+			if (entry.getValue() instanceof MorphedPVSInstance) {
+				MorphedPVSInstance mi = (MorphedPVSInstance) entry.getValue();
+				mi.deref();
+				Morphism m = mi.getMorphism().instance;
+				if (!(mi.getConcreteInstance() instanceof PVSInstance)) {
+					throw new MiniBrassParseException(
+							"Invalid argument for morphism " + m.getName() + "(" + mi.getConcreteInstance()
+									+ ") must be a concrete instance of type " + m.getFrom().instance);
+				} else {
+					PVSInstance decoratedPi = mi.getConcreteInstance();
+					if (!decoratedPi.getType().instance.getName().equals(m.getFrom().instance.getName())) {
+						throw new MiniBrassParseException(
+								"Invalid argument for morphism " + m.getName() + "(" + mi.getConcreteInstance()
+										+ ") must be a concrete instance of type " + m.getFrom().instance);
+					}
+				}
+
+			} else if (entry.getValue() instanceof VotingInstance) {
+				VotingInstance vi = (VotingInstance) entry.getValue();
+				vi.getVotingProcedure().sanityCheck(vi.getChildren());
+
+			} else if (entry.getValue() instanceof PVSInstance) {
+				PVSInstance pvsInst = (PVSInstance) entry.getValue();
+				PVSType pvsType = pvsInst.getType().instance;
+
+				List<String> actualParameters = new ArrayList<>(pvsInst.getActualParameterValues().size() + 1);
+				// number of soft constraints as one built-in parameter of type int
+				actualParameters.add(Integer.toString(pvsInst.getNumberSoftConstraints()));
+				// actualParameters.addAll(pvsInst.getParameterValues());
+
+				List<PVSFormalParameter> formalParameters = pvsType.getFormalParameters();
+				HashMap<String, PVSFormalParameter> formalParameterLookup = new HashMap<>(formalParameters.size());
+
+				for (PVSFormalParameter formalPar : formalParameters) {
+					formalParameterLookup.put(formalPar.getName(), formalPar);
+				}
+				Map<String, PVSParamInst> parameterInsts = new HashMap<>(formalParameters.size());
+
+				for (Entry<String, String> parameterValuePair : pvsInst.getActualParameterValues().entrySet()) {
+					PVSParamInst pi = new PVSParamInst();
+					PVSFormalParameter formalParameter = formalParameterLookup.get(parameterValuePair.getKey());
+					if (formalParameter == null) {
+						throw new MiniBrassParseException(
+								"Undefined parameter initialisation " + parameterValuePair.getKey());
+					}
+
+					pi.parameter = formalParameter;
+					pi.expression = parameterValuePair.getValue();
+
+					parameterInsts.put(formalParameter.getName(), pi);
+				}
+				// make sure that, likewise, we do have an actual parameter for every formal
+				// parameter
+
+				for (PVSFormalParameter formalPar : formalParameters) {
+
+					if (formalPar.getDefaultValue() != null) { // could be that the parameter is not added to the
+																// instance since it has a default
+						continue;
+					}
+
+					PVSParamInst pi = parameterInsts.get(formalPar.getName());
+					if (pi != null)
+						continue;
+
+					if (formalPar.getType() instanceof ArrayType) {
+						// we need to make sure that there is an annotation present for *every* soft
+						// constraint now
+						// in this case there is no default - otherwise we would have jumped out of the
+						// loop already
+						// maybe issue a warning, though, if one annotation was forgotten
+						for (SoftConstraint sc : pvsInst.getSoftConstraints().values()) {
+							if (!sc.getAnnotations().containsKey(formalPar.getName())) {
+								throw new MiniBrassParseException("Missing annotation (" + formalPar.getName()
+										+ ") for soft constraint " + sc.getId() + "(" + sc.getName()
+										+ ") and no default set in instance " + pvsInst.getName() + "!");
+							}
+						}
+					} else {
+						throw new MiniBrassParseException(
+								"Undefined parameter " + formalPar.getName() + " in instance " + pvsInst.getName());
+					}
+				}
+
+				// inject this back into instance:
+				pvsInst.setCheckedParameters(parameterInsts);
+
+			}
+
+		}
+
+	}
+
+	public void validateMorphism(Morphism m) {
+		morphisms.add(m);
+	}
+
+	public void checkMorphisms() throws MiniBrassParseException {
+		for (Morphism m : morphisms) {
+			// we need to have a parameter mapping for every parameter of the *to* type
+			PVSType toType = m.getTo().instance;
+
+			for (PVSFormalParameter pvsParam : toType.getFormalParameters()) {
+				if (PVSType.N_SCS_LIT.equals(pvsParam.getName()))
+					continue;
+				if (!m.getParamMappings().containsKey(pvsParam.getName())) {
+					throw new MiniBrassParseException("Missing parameter definition for \"" + pvsParam.getName()
+							+ "\" in morphism \"" + m.getName() + "\"");
+				}
+			}
+		}
+
+	}
+
+	public void checkPvsInstanceName(String name) throws MiniBrassParseException {
+		if (pvsInstanceNames.contains(name))
+			throw new MiniBrassParseException("PVS instance name '" + name + "' already defined");
+		else
+			pvsInstanceNames.add(name);
+	}
+}
