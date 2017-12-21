@@ -44,7 +44,7 @@ public class SumVoting implements VotingProcedure {
 			}
 			voter = codeGen.deref(voter);
 			sb.append(String.format("%s", 
-					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
+					codeGen.getOverallValuation(voter)
 					));
 
 		}
@@ -66,7 +66,7 @@ public class SumVoting implements VotingProcedure {
 			}
 			voter = codeGen.deref(voter);
 			sb.append(String.format("sol(%s)", 
-					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
+					codeGen.getOverallValuation(voter)
 					));
 		}
 		sb.append("])\n");

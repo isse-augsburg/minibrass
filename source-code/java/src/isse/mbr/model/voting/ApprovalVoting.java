@@ -33,7 +33,7 @@ public class ApprovalVoting implements VotingProcedure {
 			}
 			voter = codeGen.deref(voter);
 			sb.append(String.format("bool2int(%s)\n", 
-					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
+					codeGen.getOverallValuation(voter)
 					));
 
 		}
@@ -50,7 +50,7 @@ public class ApprovalVoting implements VotingProcedure {
 			}
 			voter = codeGen.deref(voter);
 			sb.append(String.format("bool2int(sol(%s))\n", 
-					codeGen.getOverallValuation(voter), codeGen.getTopValue(voter)
+					codeGen.getOverallValuation(voter)
 					));
 		}
 		sb.append(")\n");
