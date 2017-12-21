@@ -34,4 +34,8 @@ public class VotingInstance extends AbstractPVSInstance {
 	public Collection<AbstractPVSInstance> getChildren() {
 		return votingPvs;
 	}
+
+	public void addAllPvs(ArrayList<AbstractPVSInstance> votingPvs2) {
+		this.votingPvs.addAll(votingPvs2);
+	}
 }

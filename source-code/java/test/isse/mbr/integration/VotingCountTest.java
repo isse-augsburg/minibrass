@@ -65,7 +65,6 @@ public class VotingCountTest {
 		launcher.addMiniZincResultListener(listener);
 		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
 
-		
 		// 3. check solution
 		Assert.assertTrue(listener.isSolved());
 	}

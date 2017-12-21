@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -165,7 +166,7 @@ public class MiniBrassParser {
 			
 			String combinator = comp.getProductType() == ProductType.DIRECT ? DIR_PROD : LEX_PROD;
 			
-			String genName = left.getName() + combinator +(++productCounter) + right.getName();
+			String genName = left.getName() + combinator + (++productCounter) + right.getName();
 			comp.setName(genName);
 		}
 		
@@ -621,27 +622,56 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
 		expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
 		
-		VotingInstance votingInst = new VotingInstance(); 
-		votingInst.setName(VOTING_PREFIX+(++productCounter));
+		
+		ArrayList<AbstractPVSInstance> votingPvs = new ArrayList<>();
 		AbstractPVSInstance nextInst = PVSInst(model);
-		votingInst.addPvs(nextInst);
+		
+		votingPvs.add(nextInst);
 		
 		while(currSy == MiniBrassSymbol.CommaSy) {
 			getNextSy();
 			nextInst = PVSInst(model);
-			votingInst.addPvs(nextInst);
+			votingPvs.add(nextInst);
 		}
 			
 		expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
 		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 		
+		if(currSy == MiniBrassSymbol.ParetoSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			AbstractPVSInstance paretos = recursiveProd(votingPvs,0,ProductType.DIRECT);
+			
+			return paretos;
+		} else if(currSy == MiniBrassSymbol.LexSy) {
+			getNextSy();
+			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+			
+			return recursiveProd(votingPvs,0,ProductType.LEXICOGRAPHIC);
+		} 
+		
 		expectSymbol(MiniBrassSymbol.IdentSy);
 		String votingType = lexer.getLastIdent();
+		
 		VotingProcedure vp = VotingFactory.getVotingProcedure(votingType);
+		VotingInstance votingInst = new VotingInstance(); 
+		votingInst.setName(VOTING_PREFIX+(++productCounter));		
 		votingInst.setVotingProcedure(vp);
-		getNextSy();
-		expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+		votingInst.addAllPvs(votingPvs);
 		return votingInst;
+	}
+
+	private AbstractPVSInstance recursiveProd(ArrayList<AbstractPVSInstance> votingPvs, int i, ProductType productType) {
+		if(i == votingPvs.size()-1)
+			return votingPvs.get(i);
+		else {
+			AbstractPVSInstance rightSide = recursiveProd(votingPvs, i+1, productType);
+			CompositePVSInstance comp = new CompositePVSInstance();
+			comp.setLeftHandSide(votingPvs.get(i));
+			comp.setRightHandSide(rightSide);
+			comp.setProductType(productType);
+			return comp;
+		}
 	}
 
 	/**
