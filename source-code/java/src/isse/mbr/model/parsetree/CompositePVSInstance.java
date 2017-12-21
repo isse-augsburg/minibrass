@@ -34,7 +34,7 @@ public class CompositePVSInstance extends AbstractPVSInstance {
 	
 	@Override
 	public String toString() {
-		return "( " + leftHandSide.toString() + " " + (productType == ProductType.LEXICOGRAPHIC ? "lex" : "*") + " " + rightHandSide.toString() + " )";
+		return "( " + leftHandSide.toString() + " " + (productType == ProductType.LEXICOGRAPHIC ? "lex" : "pareto") + " " + rightHandSide.toString() + " )";
 	}
 
 	@Override
