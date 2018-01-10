@@ -2,7 +2,7 @@
 
 Select problem, solverId, SolverName, round(AVG(elapsedSecs),2) as "ElapsedSecs", 
                                       round(MAX(elapsedSecs)-MIN(elapsedSecs),2) as "ElapsedSecsSpan",
-									  round(AVG(RelElapsed),2) as "RelElapsed",
+									  round(GeomMean(RelElapsed),2) as "RelElapsed",
                                       round(AVG(Objective),2) as "Objective", 
 									  round(AVG(WeightOverhead),2) as "WeightOverhead", 
 									  round(SUM(Winner),0) as "Wins",

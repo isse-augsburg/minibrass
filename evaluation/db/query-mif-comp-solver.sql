@@ -9,7 +9,7 @@
 SELECT MifSummary.SolverName, 
 AVG(MifElapsed) as "MifElapsed", AVG((MifElapsed - Averages.MifElapsedMean) * (MifElapsed - Averages.MifElapsedMean)) as VarMif,
 AVG(NormalElapsed) as "NormalElapsed",  AVG((NormalElapsed - Averages.NormalElapsedMean) * (NormalElapsed - Averages.NormalElapsedMean)) as VarNormal,
-AVG(diff), AVG(RelDiff), SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as "RatioMifWins" 
+AVG(diff), GeomMean(RelDiff), SUM(MifWins), COUNT(*), 1.0* SUM(MifWins) / COUNT(*) as "RatioMifWins" 
 FROM 
 MifSummary,
 ( SELECT SolverName, 
