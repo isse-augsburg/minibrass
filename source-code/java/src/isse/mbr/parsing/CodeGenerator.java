@@ -409,10 +409,13 @@ public class CodeGenerator {
 						first = false;
 					else 
 						namesGenerator.append(", ");
+					
 					namesGenerator.append(nameStr);	
 					
 					// TODO revise
-					sb.append(String.format("int: %s = %d;\n", childDerefed.getName(), (++enumCounter)));
+					// enumName should be a valid MiniZinc string
+					String enumName = toValidMznIdent(childDerefed.getName());
+					sb.append(String.format("int: %s = %d;\n", enumName, (++enumCounter)));
 				}
 				namesGenerator.append("];\n");
 				
@@ -423,6 +426,37 @@ public class CodeGenerator {
 			addAtomicPvs(pvsInstance, sb, model);
 		}
 		addedInstances.add(pvsInstance);
+	}
+
+	/**
+	 * Removes umlauts, eszetts and the like from a given MZN Ident
+	 * @param name
+	 * @return
+	 */
+	public static String toValidMznIdent(String name) {
+		   //replace all lower Umlauts
+	     String cleanedOutput =
+	    		 name
+	             .replaceAll("ü", "ue")
+	             .replaceAll("ö", "oe")
+	             .replaceAll("ä", "ae")
+	             .replaceAll("ß", "ss");
+	 
+	     //first replace all capital umlaute in a non-capitalized context (e.g. Übung)
+	     cleanedOutput =
+	             cleanedOutput
+	             .replaceAll("Ü(?=[a-zäöüß ])", "Ue")
+	             .replaceAll("Ö(?=[a-zäöüß ])", "Oe")
+	             .replaceAll("Ä(?=[a-zäöüß ])", "Ae");
+	 
+	     //now replace all the other capital umlaute
+	     cleanedOutput =
+	             cleanedOutput
+	             .replaceAll("Ü", "UE")
+	             .replaceAll("Ö", "OE")
+	             .replaceAll("Ä", "AE");
+	 
+	     return cleanedOutput;
 	}
 
 	/**
@@ -832,7 +866,7 @@ public class CodeGenerator {
 	}
 
 	public static String encodeString(String string, String instName) {
-		return "mbr_" + string + "_" + instName;
+		return "mbr_" + string + "_" + toValidMznIdent(instName);
 	}
 
 	public static String encodeString(String string, AbstractPVSInstance inst) {
