@@ -940,15 +940,20 @@ public class MiniBrassParser {
 			// optional default value 
 			if(currSy == MiniBrassSymbol.DoubleColonSy) {
 				getNextSy();
-				if(currSy == MiniBrassSymbol.DefaultSy) {
-					getNextSy();
-					expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
-					expectSymbol(MiniBrassSymbol.StringLitSy);
-					defaultVal = lexer.getLastIdent();
-					getNextSy();
-					expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
-				} else {
-					wrapInformation = wrappedByAnnotation(scopeType);
+				
+				while(currSy != MiniBrassSymbol.SemicolonSy) {
+					if(currSy == MiniBrassSymbol.DefaultSy) {
+						getNextSy();
+						expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
+						expectSymbol(MiniBrassSymbol.StringLitSy);
+						defaultVal = lexer.getLastIdent();
+						getNextSy();
+						expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
+					} else {
+						wrapInformation = wrappedByAnnotation(scopeType);
+					}
+					if(currSy == MiniBrassSymbol.CommaSy)
+						getNextSy();
 				}
 			}
 			expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);

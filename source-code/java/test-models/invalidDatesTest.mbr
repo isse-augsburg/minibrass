@@ -1,0 +1,34 @@
+type ApprovalPvs = PVSType<bool> = 
+  params { 
+    bool: conjunction :: default('true');
+    set of int: impossibleDates :: default('{}'), wrappedBy('java', 'isse.mbr.extensions.preprocessing.InvalidDatesWrap');
+  } in  
+  instantiates with "bool-type-approval.mzn" {
+    times -> combine_boolean;
+    is_worse -> is_worse_boolean; 
+    top -> true; 
+ };
+
+% Mögliche Daten: (Montag 26.02. - Freitag 02.03.)
+% "Morning" bedeutet 09:30 - 12:30
+% "Evening" bedeutet 13:30 - 17:00
+
+% monMorning, monEvening
+% tueMorning, tueEvening
+% wedMorning, wedEvening
+% thuMorning, thuEvening
+% friMorning, friEvening
+
+PVS: meier = new ApprovalPvs("Meier") {
+  conjunction : 'false';
+  soft-constraint c1: 'scheduled[Meier] = tueMorning';
+  soft-constraint c2: 'scheduled[Meier] = monMorning';
+  soft-constraint c3: 'scheduled[Meier] = friEvening';
+  impossibleDates : '{monMorning}';
+};
+
+solve vote([meier], approval);
+bind voterStringNames to studentNames;
+bind voterCount to s;
+
+output '["x = \(scheduled[Meier])"]';
