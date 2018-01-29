@@ -19,16 +19,16 @@ type ApprovalPvs = PVSType<bool> =
 % thuMorning, thuEvening
 % friMorning, friEvening
 
-PVS: meier = new ApprovalPvs("Meier") {
+PVS: Roessmeier = new ApprovalPvs("Rößmeier") {
   conjunction : 'false';
-  soft-constraint c1: 'scheduled[Meier] = tueMorning';
-  soft-constraint c2: 'scheduled[Meier] = monMorning';
-  soft-constraint c3: 'scheduled[Meier] = friEvening';
+  soft-constraint c1: 'scheduled[Roessmeier] = tueMorning';
+  soft-constraint c2: 'scheduled[Roessmeier] = monMorning';
+  soft-constraint c3: 'scheduled[Roessmeier] = friEvening';
   impossibleDates : '{monMorning}';
 };
 
-solve vote([meier], approval);
+solve vote([Roessmeier], approval);
 bind voterStringNames to studentNames;
 bind voterCount to s;
 
-output '["x = \(scheduled[Meier])"]';
+output '["x = \(scheduled[Roessmeier])"]';
