@@ -1,7 +1,10 @@
 package isse.mbr.tools;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -88,12 +91,26 @@ public class MiniZincLauncher {
 		if (log.exists())
 			log.delete();
 
+		pb.inheritIO();
 		pb.redirectErrorStream(true);
-		pb.redirectOutput(Redirect.to(log));
-
+		pb.redirectOutput(Redirect.PIPE);
+		
 		final Process p;
 		try {
 			p = pb.start();
+			// these lines manage to write both to stdout and the log file 
+			FileWriter fw = new FileWriter(log);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			StringBuilder builder = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				builder.append(line);
+				System.out.println(line);
+				fw.write(line);
+				fw.write(System.getProperty("line.separator"));
+			}
+			fw.close();
+			
 			Timer timer = new Timer();
 			timer.schedule(new TimerTask() {
 
@@ -106,10 +123,6 @@ public class MiniZincLauncher {
 
 			p.waitFor();
 			timer.cancel();
-
-			assert pb.redirectInput() == Redirect.PIPE;
-			assert pb.redirectOutput().file() == log;
-			assert p.getInputStream().read() == -1;
 
 						
 		} catch (IOException e) {
