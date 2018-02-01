@@ -1,4 +1,14 @@
 
+% This model represents a simple instance of majority tops voting
+% where we just aim at maximizing the number of agents that 
+% get their top value
+
+% For instance, the profile
+% 3 | 2 | 2
+% 1 | 1 | 3
+% 2 | 3 | 1
+% leads to 2 being chosen as two agents like it best
+ 
 type PvsRel = PVSType<1..k> = 
   params {
     int: k :: default('1000'); % just some upper bound on integer values 
@@ -27,9 +37,9 @@ PVS: agent2 = new PvsRel("agent2") {
 
 PVS: agent3 = new PvsRel("agent3") {
   soft-constraint c1: 'a';
-  tuples: '[| 2, 3 | 1, 3 | 1, 2 |]';
+  tuples: '[| 3, 2 | 1, 3 | 1, 2 |]';
   k : '3';
-  topVal: '2'; % this is technically incorrect but let's us distinguish from condorcet
+  topVal: '2'; 
 };
 
 

@@ -12,10 +12,23 @@ import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
 import isse.mbr.tools.MiniZincLauncher;
 
+/**
+ * This model represents a simple instance of majority tops voting
+ * where we just aim at maximizing the number of agents that 
+ * get their top value
+
+ * For instance, the profile
+ * 3 | 2 | 2
+ * 1 | 1 | 3
+ * 2 | 3 | 1
+ * leads to 2 being chosen as two agents like it best
+ * @author Alexander Schiendorfer
+ *
+ */
 public class VotingMajorityTopsTest {
 
-	String minibrassModel = "test-models/voteMajorityTop.mbr";
-	String minibrassModifiedModel = "test-models/voteMajorityTopTest.mbr";
+	String minibrassMajorityTopsModel = "test-models/voteMajorityTop.mbr";
+	String minibrassCondorcetModel = "test-models/voteMajorityTopTest.mbr";
 
 	String minibrassCompiled = "test-models/voteMajorityTop_o.mzn";
 	String minizincModel = "test-models/voteMajorityTop.mzn";
@@ -29,18 +42,18 @@ public class VotingMajorityTopsTest {
 		compiler = new MiniBrassCompiler(true);
 		
 		launcher = new MiniZincLauncher();
-		launcher.setUseDefault(true);
+		launcher.setUseDefault(false);
 		launcher.setDebug(true);
 
-        launcher.setMinizincGlobals("jacop");
-		launcher.setFlatzincExecutable("fzn-jacop");
+        launcher.setMinizincGlobals("g12_fd");
+		launcher.setFlatzincExecutable("flatzinc");
 	}
 
 	@Test 
 	public void testPvsRelation() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
-		compiler.compile(new File(minibrassModel), output);
+		compiler.compile(new File(minibrassMajorityTopsModel), output);
 		Assert.assertTrue(output.exists());
 		
 		// 2. execute minisearch
@@ -60,7 +73,7 @@ public class VotingMajorityTopsTest {
 	public void testPvsRelationCondorcetComparison() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
-		compiler.compile(new File(minibrassModifiedModel), output);
+		compiler.compile(new File(minibrassCondorcetModel), output);
 		Assert.assertTrue(output.exists());
 		
 		// 2. execute minisearch
@@ -81,7 +94,7 @@ public class VotingMajorityTopsTest {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setMinizincOnly(true);
-		compiler.compile(new File(minibrassModel), output);
+		compiler.compile(new File(minibrassMajorityTopsModel), output);
 		Assert.assertTrue(output.exists());
 		
 		// 2. execute minisearch

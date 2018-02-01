@@ -29,9 +29,11 @@ public class FreePVSMultiSetTest {
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
-		launcher.setUseDefault(true);
+		launcher.setUseDefault(false);
 		launcher.setDebug(true);
 		
+	    launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 	
 	@Test

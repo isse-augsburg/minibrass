@@ -25,10 +25,10 @@ public class VotingCondorcetTest {
 		compiler = new MiniBrassCompiler(true);
 		
 		launcher = new MiniZincLauncher();
-		launcher.setUseDefault(true);
+		launcher.setUseDefault(false);
 
-        launcher.setMinizincGlobals("jacop");
-		launcher.setFlatzincExecutable("fzn-jacop");
+        launcher.setMinizincGlobals("g12_fd");
+		launcher.setFlatzincExecutable("flatzinc");
 	}
 
 	@Test 
