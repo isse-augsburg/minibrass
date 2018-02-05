@@ -27,9 +27,9 @@ PVS: agent2 = new PvsRel("agent2") {
 
 PVS: agent3 = new PvsRel("agent3") {
   soft-constraint c1: 'a';
-  tuples: '[| 2, 3 | 1, 3 | 1, 2 |]';
+  tuples: '[| 3, 2 | 1, 3 | 1, 2 |]';
   k : '3';
-  topVal: '2'; % this is technically incorrect but let's us distinguish from condorcet
+  topVal: '2';
 };
 
 

@@ -29,6 +29,9 @@ public class VotingMajorityTopsTest {
 
 	String minibrassMajorityTopsModel = "test-models/voteMajorityTop.mbr";
 	String minibrassCondorcetModel = "test-models/voteMajorityTopTest.mbr";
+	// we use two enhanced models in order to show different results for majority tops and condorcet
+	String minibrassMajorityTopsEnhModel = "test-models/voteMajorityTop_enhanced.mbr";
+	String minibrassCondorcetEnhModel = "test-models/voteCondorcet_enhanced.mbr";
 
 	String minibrassCompiled = "test-models/voteMajorityTop_o.mzn";
 	String minizincModel = "test-models/voteMajorityTop.mzn";
@@ -47,6 +50,46 @@ public class VotingMajorityTopsTest {
 
         launcher.setMinizincGlobals("jacop");
 		launcher.setFlatzincExecutable("fzn-jacop");
+	}
+	
+	@Test 
+	public void testPvsRelationMajorityTopEnhComparison() throws IOException, MiniBrassParseException {
+		// 1. compile minibrass file
+		File output = new File(minibrassCompiled);
+		compiler.compile(new File(minibrassMajorityTopsEnhModel), output);
+		Assert.assertTrue(output.exists());
+		
+		// 2. execute minisearch
+		BasicTestListener listener = new BasicTestListener();
+		launcher.addMiniZincResultListener(listener);
+		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
+		
+		// 3. check solution
+		Assert.assertTrue(listener.isSolved());
+		Assert.assertTrue(listener.isOptimal());
+		
+		//Assert.assertEquals(4, listener.getSolutionCounter());
+		Assert.assertEquals("3", listener.getLastSolution().get("a"));
+	}
+	
+	@Test 
+	public void testPvsRelationCondorcetEnhComparison() throws IOException, MiniBrassParseException {
+		// 1. compile minibrass file
+		File output = new File(minibrassCompiled);
+		compiler.compile(new File(minibrassCondorcetEnhModel), output);
+		Assert.assertTrue(output.exists());
+		
+		// 2. execute minisearch
+		BasicTestListener listener = new BasicTestListener();
+		launcher.addMiniZincResultListener(listener);
+		launcher.runMiniSearchModel(new File(minizincModel), null, 60);
+		
+		// 3. check solution
+		Assert.assertTrue(listener.isSolved());
+		Assert.assertTrue(listener.isOptimal());
+		
+		//Assert.assertEquals(4, listener.getSolutionCounter());
+		Assert.assertEquals("2", listener.getLastSolution().get("a"));
 	}
 
 	@Test 
@@ -85,8 +128,8 @@ public class VotingMajorityTopsTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals(4, listener.getSolutionCounter());
-		Assert.assertEquals("3", listener.getLastSolution().get("a"));
+		//Assert.assertEquals(4, listener.getSolutionCounter());
+		Assert.assertEquals("2", listener.getLastSolution().get("a"));
 	}
 	
 	@Test 
