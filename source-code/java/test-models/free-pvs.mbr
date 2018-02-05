@@ -35,4 +35,6 @@ PVS: fp = new FreePVS("fp") {
    maxPerSc : '2';
 }; 
 
+%output '["x = \(x);"]'; 
+
 solve fp;

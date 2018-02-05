@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import isse.mbr.parsing.MiniBrassCompiler;
@@ -32,11 +33,12 @@ public class FreePVSMultiSetTest {
 		launcher.setUseDefault(false);
 		launcher.setDebug(true);
 		
-	    launcher.setMinizincGlobals("jacop");
-		launcher.setFlatzincExecutable("fzn-jacop");
+	    launcher.setMinizincGlobals("gecode");
+		launcher.setFlatzincExecutable("fzn-gecode");
 	}
 	
 	@Test
+	@Ignore
 	public void testFreePvs() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);

@@ -23,6 +23,7 @@ public abstract class ExternalMorphism {
 	
 	public ExternalMorphism() {
 		calculatedParameters = new HashMap<>();
+		
 	}
 	/**
 	 * Called when a morphism is applied, intended to build up data 

@@ -27,8 +27,8 @@ public class VotingCondorcetTest {
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(false);
 
-        launcher.setMinizincGlobals("g12_fd");
-		launcher.setFlatzincExecutable("flatzinc");
+        launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	@Test 

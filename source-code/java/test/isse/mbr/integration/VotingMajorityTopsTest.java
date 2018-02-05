@@ -45,8 +45,8 @@ public class VotingMajorityTopsTest {
 		launcher.setUseDefault(false);
 		launcher.setDebug(true);
 
-        launcher.setMinizincGlobals("g12_fd");
-		launcher.setFlatzincExecutable("flatzinc");
+        launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	@Test 

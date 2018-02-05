@@ -1,4 +1,14 @@
-include "defs.mbr";
+type PvsRel = PVSType<1..k> = 
+  params {
+    int: k :: default('1000'); % just some upper bound on integer values 
+    int: topVal :: default('1');
+    array [int,1..2] of 1..k: tuples;
+  } in  
+  instantiates with "relation-type.mzn" {
+    times -> max;
+    is_worse -> is_worse_relation; 
+    top -> mbr.topVal; 
+ };
  
 PVS: agent1 = new PvsRel("agent1") {
   soft-constraint c1: 'a';

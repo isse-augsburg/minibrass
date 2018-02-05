@@ -20,4 +20,5 @@ solve
 :: int_search([x], input_order, indomain_min, complete)
 search pvs_BAB();
 
-output ["x = \(x);"] ++ [ "\nValuations:  topLevelObjective = \(topLevelObjective)\n"];
+output ["x = \(x);"] ++ [ "\nValuations:  topLevelObjective = \(topLevelObjective):  \( [ sol(topLevelObjective[i]) | i in index_set(topLevelObjective)]))\n"] ++
+  [ show(sol(mbr_overall_fp[mbr_iter_var_0])) | mbr_iter_var_0 in 1..mbr_maxP_fp] ;
