@@ -13,7 +13,7 @@ type PvsRel = PVSType<1..k> =
     int: topVal :: default('1');
     array [int,1..2] of 1..k: tuples;
   } in  
-  instantiates with "soft_constraints/mbr_types/relation-type.mzn" {
+  instantiates with "relation-type.mzn" {
     times -> max;
     is_worse -> is_worse_relation; 
     top -> mbr.topVal; 
