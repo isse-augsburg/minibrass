@@ -4,6 +4,10 @@
   <artifactId>Constraint-Relationships-Evaluation</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>ExperimentRunner</name>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
@@ -38,5 +42,6 @@
   		<artifactId>jgrapht-core</artifactId>
   		<version>0.9.1</version>
   	</dependency>
+  	
   </dependencies>
 </project>
