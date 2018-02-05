@@ -15,6 +15,8 @@ import isse.mbr.tools.MiniZincLauncher;
 public class VotingCondorcetTest {
 
 	String minibrassModel = "test-models/voteCondorcet.mbr";
+	String minibrassModelNoWinner = "test-models/voteCondorcet_nowinner.mbr";
+	
 	String minibrassCompiled = "test-models/voteCondorcet_o.mzn";
 	String minizincModel = "test-models/voteCondorcet.mzn";
 	private MiniBrassCompiler compiler;
