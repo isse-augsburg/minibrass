@@ -1,0 +1,15 @@
+include "defs.mbr";
+
+% all should be not fulfilable
+
+PVS: cr1 = new ConstraintPreferences("cr1") {
+   soft-constraint c1: 'x > 3';
+   soft-constraint c2: 'y > 3';
+   soft-constraint c3: 'z > 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+solve ToWeightedExt(cr1);
+%solve mcr1;

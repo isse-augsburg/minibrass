@@ -2,11 +2,18 @@ package isse.mbr.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 
+import isse.mbr.integration.VotingCondorcetTest.Type;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
@@ -19,6 +26,7 @@ import isse.mbr.tools.MiniZincLauncher;
  * @author Alexander Schiendorfer
  *
  */
+@RunWith(Parameterized.class)
 public class DirectProductTest { 
 
 	String minibrassModel = "test-models/testMin.mbr";
@@ -29,14 +37,42 @@ public class DirectProductTest {
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
 	
+	// parameterized test stuff
+	enum Type {ONE, TWO};
+	@Parameters
+	public static Collection<Object[]> data(){
+		return Arrays.asList(new Object[][] {
+				{Type.ONE, "jacop", "fzn-jacop", "true", "false", "0"},
+				{Type.TWO, "jacop", "fzn-jacop", "false", "false", "0"},
+				{Type.ONE, "gecode", "fzn-gecode", "true", "false", "0"},
+				{Type.TWO, "gecode", "fzn-gecode", "false", "false", "0"},
+				{Type.ONE, "g12_fd", "flatzinc", "true", "false", "0"},
+				{Type.TWO, "g12_fd", "flatzinc", "false", "false", "0"},
+				{Type.ONE, "chuffed", "fzn-chuffed", "true", "false", "0"},
+				{Type.TWO, "chuffed", "fzn-chuffed", "false", "false", "0"}
+		});
+	}
+
+	private Type type;
+	private String a, b, expected, expected2, expected3;
+
+	public DirectProductTest(Type type, String a, String b, String expected,String expected2,String expected3){
+		this.type = type;
+		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;this.expected3=expected3;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
+		
+		launcher.setMinizincGlobals(a);
+		launcher.setFlatzincExecutable(b);
 	}
 
 	@Test
 	public void testSinglePVS() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.ONE);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -52,17 +88,18 @@ public class DirectProductTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals("true", listener.getLastSolution().get("x"));
-		Assert.assertEquals("false", listener.getLastSolution().get("y"));
+		Assert.assertEquals(expected, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expected2, listener.getLastSolution().get("y"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","cr1");
-		Assert.assertEquals("0", listener.getObjectives().get(obj));
+		Assert.assertEquals(expected3, listener.getObjectives().get(obj));
 	}
 	
 	@Test
 	public void testTwoPVS() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TWO);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassTwoPVSModel), output);
@@ -78,12 +115,12 @@ public class DirectProductTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals("false", listener.getLastSolution().get("x"));
-		Assert.assertEquals("false", listener.getLastSolution().get("y"));
+		Assert.assertEquals(expected, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expected2, listener.getLastSolution().get("y"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","cr1");
-		Assert.assertEquals("0", listener.getObjectives().get(obj));
+		Assert.assertEquals(expected3, listener.getObjectives().get(obj));
 	}
 }
