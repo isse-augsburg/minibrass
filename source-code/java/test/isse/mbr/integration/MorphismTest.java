@@ -2,17 +2,24 @@ package isse.mbr.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
 import isse.mbr.tools.MiniZincLauncher;
 
+@RunWith(Parameterized.class)
 public class MorphismTest {
 
 	String minibrassModel = "test-models/classicMorphed.mbr";
@@ -21,10 +28,34 @@ public class MorphismTest {
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
 	
+	// parameterized test stuff
+	enum Type {ONE, TWO, THREE};
+	@Parameters
+	public static Collection<Object[]> data(){
+		return Arrays.asList(new Object[][] {
+				{Type.ONE, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.ONE, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.ONE, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+				{Type.ONE, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
+		});
+	}
+
+	private Type type;
+	private String a, b, expected, expected2, expected3, expected4;
+
+	public MorphismTest(Type type, String a, String b, String expected,String expected2,String expected3,
+			String expected4){
+		this.type = type;
+		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;this.expected3=expected3;
+		this.expected4=expected4;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
+		launcher.setMinizincGlobals(a);
+		launcher.setFlatzincExecutable(b);
 	}
 
 	@Test 
@@ -44,15 +75,15 @@ public class MorphismTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals("1", listener.getLastSolution().get("x"));
-		Assert.assertEquals("2", listener.getLastSolution().get("y"));
-		Assert.assertEquals("1", listener.getLastSolution().get("z"));
+		Assert.assertEquals(expected, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expected2, listener.getLastSolution().get("y"));
+		Assert.assertEquals(expected3, listener.getLastSolution().get("z"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","ToWeighted_RefTo_cr1_");
 		// we expect a violation (in weights) of 1
-		Assert.assertEquals("1", listener.getObjectives().get(obj));
+		Assert.assertEquals(expected4, listener.getObjectives().get(obj));
 	}
 
 }

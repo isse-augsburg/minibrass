@@ -2,11 +2,18 @@ package isse.mbr.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 
+import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
@@ -18,6 +25,7 @@ import isse.mbr.tools.MiniZincLauncher;
  * @author Alexander Schiendorfer
  *
  */
+@RunWith(Parameterized.class)
 public class GlobalProbabilisticTest {
 
 	String minibrassModel = "test-models/testProb.mbr";
@@ -29,18 +37,47 @@ public class GlobalProbabilisticTest {
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
 	
+	// parameterized test stuff
+	enum Type {ONE, TWO, THREE};
+	@Parameters
+	public static Collection<Object[]> data(){
+		return Arrays.asList(new Object[][] {
+				{Type.ONE, "jacop", "fzn-jacop", "1.0"},
+				{Type.ONE, "gecode", "fzn-gecode", "1.0"},
+				{Type.ONE, "g12_fd", "flatzinc", "1.0"},
+				{Type.ONE, "chuffed", "fzn-chuffed", "1.0"},
+				{Type.TWO, "jacop", "fzn-jacop", "0"},
+				{Type.TWO, "gecode", "fzn-gecode", "0"},
+				{Type.TWO, "g12_fd", "flatzinc", "0"},
+				{Type.TWO, "chuffed", "fzn-chuffed", "0"},
+				{Type.THREE, "jacop", "fzn-jacop", "0"},
+				{Type.THREE, "gecode", "fzn-gecode", "0"},
+				{Type.THREE, "g12_fd", "flatzinc", "0"},
+				{Type.THREE, "chuffed", "fzn-chuffed", "0"}
+		});
+	}
+
+	private Type type;
+	private String a, b, expected;
+
+	public GlobalProbabilisticTest(Type type, String a, String b, String expected){
+		this.type = type;
+		this.a=a; this.b=b; this.expected=expected;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		compiler.setMinizincOnly(true); // due to other complications with floats using minisearch
 		launcher = new MiniZincLauncher();
-		launcher.setMinizincGlobals("jacop");
-		launcher.setFlatzincExecutable("fzn-jacop");
+		launcher.setMinizincGlobals(a);
+		launcher.setFlatzincExecutable(b);
 		launcher.setDebug(true);
 	}
 
 	@Test
 	public void testProbabilistic() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.ONE);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -58,11 +95,12 @@ public class GlobalProbabilisticTest {
 		
 	
 		// for the objective, we need to find out the variable name 
-		Assert.assertEquals("1.0", listener.getObjectives().get("topLevelObjective"));
+		Assert.assertEquals(expected, listener.getObjectives().get("topLevelObjective"));
 	}
 	
 	@Test
 	public void testProbabilisticMorphed() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TWO);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassMorphedModel), output);
@@ -80,11 +118,12 @@ public class GlobalProbabilisticTest {
 		
 	
 		// for the objective, we need to find out the variable name 
-		Assert.assertEquals("0", listener.getObjectives().get("topLevelObjective"));
+		Assert.assertEquals(expected, listener.getObjectives().get("topLevelObjective"));
 	}
 	
 	@Test
 	public void testProbabilisticMorphedMinisearch() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.THREE);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setMinizincOnly(false);
@@ -103,6 +142,6 @@ public class GlobalProbabilisticTest {
 		
 	
 		// for the objective, we need to find out the variable name 
-		Assert.assertEquals("0", listener.getObjectives().get("topLevelObjective"));
+		Assert.assertEquals(expected, listener.getObjectives().get("topLevelObjective"));
 	}
 }
