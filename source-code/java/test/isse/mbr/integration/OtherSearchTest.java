@@ -36,16 +36,16 @@ public class OtherSearchTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTDOM, TESTNONDOM};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "3..3", 2},
-				{Type.ONE, "gecode", "fzn-gecode", "3..3", 2},
-				{Type.ONE, "g12_fd", "flatzinc", "3..3", 2},
-				{Type.TWO, "jacop", "fzn-jacop", "2..2", 3},
-				{Type.TWO, "gecode", "fzn-gecode", "2..2", 3},
-				{Type.TWO, "g12_fd", "flatzinc", "2..2", 3}
+				{Type.TESTDOM, "jacop", "fzn-jacop", "3..3", 2},
+				{Type.TESTDOM, "gecode", "fzn-gecode", "3..3", 2},
+				{Type.TESTDOM, "g12_fd", "flatzinc", "3..3", 2},
+				{Type.TESTNONDOM, "jacop", "fzn-jacop", "2..2", 3},
+				{Type.TESTNONDOM, "gecode", "fzn-gecode", "2..2", 3},
+				{Type.TESTNONDOM, "g12_fd", "flatzinc", "2..2", 3}
 		});
 	}
 
@@ -69,7 +69,7 @@ public class OtherSearchTest {
 	
 	@Test
 	public void testDom() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTDOM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -94,7 +94,7 @@ public class OtherSearchTest {
 
 	@Test
 	public void testNonDom() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTNONDOM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);

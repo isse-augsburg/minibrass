@@ -32,22 +32,22 @@ public class ExternalMorphismTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTMORPHISMNONE, TESTMORPHISMALL, TESTMORPHISM};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.ONE, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.ONE, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
-				{Type.TWO, "jacop", "fzn-jacop", "3", "2", "1", "0"},
-				{Type.TWO, "gecode", "fzn-gecode", "3", "2", "1", "0"},
-				{Type.TWO, "g12_fd", "flatzinc", "3", "2", "1", "0"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "3", "2", "1", "0"},
-				{Type.THREE, "jacop", "fzn-jacop", "1", "1", "1", "4"},
-				{Type.THREE, "gecode", "fzn-gecode", "1", "1", "1", "4"},
-				{Type.THREE, "g12_fd", "flatzinc", "1", "1", "1", "4"},
-				{Type.THREE, "chuffed", "fzn-chuffed", "1", "1", "1", "4"}
+				{Type.TESTMORPHISMNONE, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TESTMORPHISMNONE, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TESTMORPHISMNONE, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+				{Type.TESTMORPHISMNONE, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
+				{Type.TESTMORPHISMALL, "jacop", "fzn-jacop", "3", "2", "1", "0"},
+				{Type.TESTMORPHISMALL, "gecode", "fzn-gecode", "3", "2", "1", "0"},
+				{Type.TESTMORPHISMALL, "g12_fd", "flatzinc", "3", "2", "1", "0"},
+				{Type.TESTMORPHISMALL, "chuffed", "fzn-chuffed", "3", "2", "1", "0"},
+				{Type.TESTMORPHISM, "jacop", "fzn-jacop", "1", "1", "1", "4"},
+				{Type.TESTMORPHISM, "gecode", "fzn-gecode", "1", "1", "1", "4"},
+				{Type.TESTMORPHISM, "g12_fd", "flatzinc", "1", "1", "1", "4"},
+				{Type.TESTMORPHISM, "chuffed", "fzn-chuffed", "1", "1", "1", "4"}
 		});
 	}
 
@@ -72,7 +72,7 @@ public class ExternalMorphismTest {
 	
 	@Test
 	public void testMorphismNone() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.THREE);
+		Assume.assumeTrue(type == Type.TESTMORPHISM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelNone), output);
@@ -101,7 +101,7 @@ public class ExternalMorphismTest {
 	
 	@Test
 	public void testMorphismAll() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTMORPHISMALL);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelAll), output);
@@ -130,7 +130,7 @@ public class ExternalMorphismTest {
 
 	@Test
 	public void testMorphism() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTMORPHISMNONE);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);

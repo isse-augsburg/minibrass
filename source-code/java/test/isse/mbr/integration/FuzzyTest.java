@@ -31,16 +31,16 @@ public class FuzzyTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTDIRECTTABLE, TESTWORKAROUND};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
-				{Type.ONE, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"},
-				{Type.TWO, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
-				{Type.TWO, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"}
+				{Type.TESTDIRECTTABLE, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
+				{Type.TESTDIRECTTABLE, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
+				{Type.TESTDIRECTTABLE, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"},
+				{Type.TESTWORKAROUND, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
+				{Type.TESTWORKAROUND, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
+				{Type.TESTWORKAROUND, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"}
 		});
 	}
 
@@ -64,7 +64,7 @@ public class FuzzyTest {
 
 	@Test
 	public void testDirectTable() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTDIRECTTABLE);
 		// This one currently only works with JaCoP
 		// cause other solvers do not properly support float_array_element
 		launcher.setMinizincGlobals("jacop");
@@ -97,7 +97,7 @@ public class FuzzyTest {
 
 	@Test
 	public void testWorkaround() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTWORKAROUND);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassWorkaroundModel), output);

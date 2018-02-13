@@ -29,14 +29,14 @@ public class MorphismTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTMORPHISM};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.ONE, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.ONE, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
+				{Type.TESTMORPHISM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TESTMORPHISM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TESTMORPHISM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+				{Type.TESTMORPHISM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
 		});
 	}
 

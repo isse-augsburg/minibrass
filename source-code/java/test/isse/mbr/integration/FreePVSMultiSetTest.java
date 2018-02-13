@@ -34,14 +34,14 @@ public class FreePVSMultiSetTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTFREEPVS};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
-				{Type.ONE, "gecode", "fzn-gecode", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
-				{Type.ONE, "g12_fd", "flatzinc", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"}
+				{Type.TESTFREEPVS, "jacop", "fzn-jacop", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
+				{Type.TESTFREEPVS, "gecode", "fzn-gecode", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
+				{Type.TESTFREEPVS, "g12_fd", "flatzinc", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
+				{Type.TESTFREEPVS, "chuffed", "fzn-chuffed", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"}
 		});
 	}
 

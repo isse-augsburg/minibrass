@@ -37,18 +37,18 @@ public class WeightedCspTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTWEIGHTEDASPARAM, TESTWEIGHTEDASANNOTATION};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.ONE, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.ONE, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
-				{Type.TWO, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.TWO, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.TWO, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
+				{Type.TESTWEIGHTEDASPARAM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASPARAM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASPARAM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASPARAM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASANNOTATION, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASANNOTATION, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASANNOTATION, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+				{Type.TESTWEIGHTEDASANNOTATION, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
 		});
 	}
 
@@ -73,7 +73,7 @@ public class WeightedCspTest {
 
 	@Test
 	public void testWeightedAsParam() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTWEIGHTEDASPARAM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelParam), output);
@@ -101,7 +101,7 @@ public class WeightedCspTest {
 
 	@Test
 	public void testWeightedAsAnnotation() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTWEIGHTEDASANNOTATION);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelAnnot), output);

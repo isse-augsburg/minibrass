@@ -35,22 +35,22 @@ public class VotingCondorcetTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {PRCD, PRCDNW, PR};
+	enum Type {TESTPVSRELATIONCONDORCETTEST, TESTPVSRELATIONCONDORCETNOWINNER, TESTPVSRELATION};
     @Parameters
     public static Collection<Object[]> data(){
         return Arrays.asList(new Object[][] {
-          {Type.PRCD, "jacop", "fzn-jacop", "2"},
-          {Type.PRCDNW, "jacop", "fzn-jacop", "2"},
-          {Type.PR, "jacop", "fzn-jacop", "3"},
-          {Type.PRCD, "gecode", "fzn-gecode", "2"},
-          {Type.PRCDNW, "gecode", "fzn-gecode", "2"},
-          {Type.PR, "gecode", "fzn-gecode", "3"},
-          {Type.PRCD, "g12_fd", "flatzinc", "2"},
-          {Type.PRCDNW, "g12_fd", "flatzinc", "2"},
-          {Type.PR, "g12_fd", "flatzinc", "3"},
-          {Type.PRCD, "chuffed", "fzn-chuffed", "2"},
-          {Type.PRCDNW, "chuffed", "fzn-chuffed", "2"},
-          {Type.PR, "chuffed", "fzn-chuffed", "3"}
+          {Type.TESTPVSRELATIONCONDORCETTEST, "jacop", "fzn-jacop", "2"},
+          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "jacop", "fzn-jacop", "2"},
+          {Type.TESTPVSRELATION, "jacop", "fzn-jacop", "3"},
+          {Type.TESTPVSRELATIONCONDORCETTEST, "gecode", "fzn-gecode", "2"},
+          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "gecode", "fzn-gecode", "2"},
+          {Type.TESTPVSRELATION, "gecode", "fzn-gecode", "3"},
+          {Type.TESTPVSRELATIONCONDORCETTEST, "g12_fd", "flatzinc", "2"},
+          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "g12_fd", "flatzinc", "2"},
+          {Type.TESTPVSRELATION, "g12_fd", "flatzinc", "3"},
+          {Type.TESTPVSRELATIONCONDORCETTEST, "chuffed", "fzn-chuffed", "2"},
+          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "chuffed", "fzn-chuffed", "2"},
+          {Type.TESTPVSRELATION, "chuffed", "fzn-chuffed", "3"}
         });
     }
 
@@ -77,7 +77,7 @@ public class VotingCondorcetTest {
 	
 	@Test
 	public void testPvsRelationCondercetTest() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.PRCD);
+		Assume.assumeTrue(type == Type.TESTPVSRELATIONCONDORCETTEST);
 		// solution has draws in local results. result is good.
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
@@ -99,7 +99,7 @@ public class VotingCondorcetTest {
 	
 	@Test
 	public void testPvsRelationCondercetNoWinner() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.PRCDNW);
+		Assume.assumeTrue(type == Type.TESTPVSRELATIONCONDORCETNOWINNER);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelNoWinner), output);
@@ -120,7 +120,7 @@ public class VotingCondorcetTest {
 
 	@Test 
 	public void testPvsRelation() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.PR);
+		Assume.assumeTrue(type == Type.TESTPVSRELATION);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);

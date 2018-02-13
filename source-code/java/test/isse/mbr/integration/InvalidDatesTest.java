@@ -34,14 +34,14 @@ public class InvalidDatesTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-		enum Type {ONE, TWO, THREE};
+		enum Type {TEST};
 		@Parameters
 		public static Collection<Object[]> data(){
 			return Arrays.asList(new Object[][] {
-					{Type.ONE, "jacop", "fzn-jacop", "1"},
-					{Type.ONE, "gecode", "fzn-gecode", "1"},
-					{Type.ONE, "g12_fd", "flatzinc", "1"},
-					{Type.ONE, "chuffed", "fzn-chuffed", "1"}
+					{Type.TEST, "jacop", "fzn-jacop", "1"},
+					{Type.TEST, "gecode", "fzn-gecode", "1"},
+					{Type.TEST, "g12_fd", "flatzinc", "1"},
+					{Type.TEST, "chuffed", "fzn-chuffed", "1"}
 			});
 		}
 

@@ -28,14 +28,14 @@ public class PvsRelationTest {
 	private MiniZincLauncher launcher;
 
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTPVSRELATION};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "3"},
-				{Type.ONE, "gecode", "fzn-gecode", "3"},
-				{Type.ONE, "g12_fd", "flatzinc", "3"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "3"}
+				{Type.TESTPVSRELATION, "jacop", "fzn-jacop", "3"},
+				{Type.TESTPVSRELATION, "gecode", "fzn-gecode", "3"},
+				{Type.TESTPVSRELATION, "g12_fd", "flatzinc", "3"},
+				{Type.TESTPVSRELATION, "chuffed", "fzn-chuffed", "3"}
 		});
 	}
 

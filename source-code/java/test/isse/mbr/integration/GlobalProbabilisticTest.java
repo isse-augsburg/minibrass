@@ -38,22 +38,19 @@ public class GlobalProbabilisticTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTPROBABILISTIC, TESTPROBABILISTICMORPHED, TESTPROBABILISTICMORPHEDMINISEARCH};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "1.0"},
-				{Type.ONE, "gecode", "fzn-gecode", "1.0"},
-				{Type.ONE, "g12_fd", "flatzinc", "1.0"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "1.0"},
-				{Type.TWO, "jacop", "fzn-jacop", "0"},
-				{Type.TWO, "gecode", "fzn-gecode", "0"},
-				{Type.TWO, "g12_fd", "flatzinc", "0"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "0"},
-				{Type.THREE, "jacop", "fzn-jacop", "0"},
-				{Type.THREE, "gecode", "fzn-gecode", "0"},
-				{Type.THREE, "g12_fd", "flatzinc", "0"},
-				{Type.THREE, "chuffed", "fzn-chuffed", "0"}
+				{Type.TESTPROBABILISTIC, "jacop", "fzn-jacop", "1.0"},
+				{Type.TESTPROBABILISTIC, "gecode", "fzn-gecode", "1.0"},
+				{Type.TESTPROBABILISTIC, "chuffed", "fzn-chuffed", "1.0"},
+				{Type.TESTPROBABILISTICMORPHED, "jacop", "fzn-jacop", "0"},
+				{Type.TESTPROBABILISTICMORPHED, "gecode", "fzn-gecode", "0"},
+				{Type.TESTPROBABILISTICMORPHED, "chuffed", "fzn-chuffed", "0"},
+				{Type.TESTPROBABILISTICMORPHEDMINISEARCH, "jacop", "fzn-jacop", "0"},
+				{Type.TESTPROBABILISTICMORPHEDMINISEARCH, "gecode", "fzn-gecode", "0"},
+				{Type.TESTPROBABILISTICMORPHEDMINISEARCH, "chuffed", "fzn-chuffed", "0"}
 		});
 	}
 
@@ -77,7 +74,7 @@ public class GlobalProbabilisticTest {
 
 	@Test
 	public void testProbabilistic() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTPROBABILISTIC);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -100,7 +97,7 @@ public class GlobalProbabilisticTest {
 	
 	@Test
 	public void testProbabilisticMorphed() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTPROBABILISTICMORPHED);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassMorphedModel), output);
@@ -123,7 +120,7 @@ public class GlobalProbabilisticTest {
 	
 	@Test
 	public void testProbabilisticMorphedMinisearch() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.THREE);
+		Assume.assumeTrue(type == Type.TESTPROBABILISTICMORPHEDMINISEARCH);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setMinizincOnly(false);

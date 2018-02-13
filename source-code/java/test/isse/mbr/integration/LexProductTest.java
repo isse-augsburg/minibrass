@@ -37,18 +37,18 @@ public class LexProductTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTTWOPVS, TESTTWOPVSINVERTED};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "1", "3", "1", "5"},
-				{Type.ONE, "gecode", "fzn-gecode", "1", "3", "1", "5"},
-				{Type.ONE, "g12_fd", "flatzinc", "1", "3", "1", "5"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "1", "3", "1", "5"},
-				{Type.TWO, "jacop", "fzn-jacop", "3", "1", "5", "1"},
-				{Type.TWO, "gecode", "fzn-gecode", "3", "1", "5", "1"},
-				{Type.TWO, "g12_fd", "flatzinc", "3", "1", "5", "1"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "3", "1", "5", "1"}
+				{Type.TESTTWOPVS, "jacop", "fzn-jacop", "1", "3", "1", "5"},
+				{Type.TESTTWOPVS, "gecode", "fzn-gecode", "1", "3", "1", "5"},
+				{Type.TESTTWOPVS, "g12_fd", "flatzinc", "1", "3", "1", "5"},
+				{Type.TESTTWOPVS, "chuffed", "fzn-chuffed", "1", "3", "1", "5"},
+				{Type.TESTTWOPVSINVERTED, "jacop", "fzn-jacop", "3", "1", "5", "1"},
+				{Type.TESTTWOPVSINVERTED, "gecode", "fzn-gecode", "3", "1", "5", "1"},
+				{Type.TESTTWOPVSINVERTED, "g12_fd", "flatzinc", "3", "1", "5", "1"},
+				{Type.TESTTWOPVSINVERTED, "chuffed", "fzn-chuffed", "3", "1", "5", "1"}
 		});
 	}
 
@@ -74,7 +74,7 @@ public class LexProductTest {
 	
 	@Test
 	public void testTwoPVS() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTTWOPVS);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassLexModel), output);
@@ -103,7 +103,7 @@ public class LexProductTest {
 	
 	@Test
 	public void testTwoPVSInverted() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTTWOPVSINVERTED);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassLexInvModel), output);

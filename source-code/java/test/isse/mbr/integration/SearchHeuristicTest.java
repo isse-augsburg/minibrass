@@ -40,22 +40,22 @@ public class SearchHeuristicTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO, THREE};
+	enum Type {TESTHEURISTICS, TESTACTIVATEDHEURISTICS, TESTWEIGHTEDHEURISTICS};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "3", "2", "2..3"},
-				{Type.ONE, "gecode", "fzn-gecode", "3", "2", "2..3"},
-				{Type.ONE, "g12_fd", "flatzinc", "3", "2", "2..3"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "3", "2", "2..3"},
-				{Type.TWO, "jacop", "fzn-jacop", "1", "3", "{1,3}"},
-				{Type.TWO, "gecode", "fzn-gecode", "1", "3", "{1,3}"},
-				{Type.TWO, "g12_fd", "flatzinc", "1", "3", "{1,3}"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "1", "3", "{1,3}"},
-				{Type.THREE, "jacop", "fzn-jacop", "1", "3", "3"},
-				{Type.THREE, "gecode", "fzn-gecode", "1", "3", "3"},
-				{Type.THREE, "g12_fd", "flatzinc", "1", "3", "3"},
-				{Type.THREE, "chuffed", "fzn-chuffed", "1", "3", "3"}
+				{Type.TESTHEURISTICS, "jacop", "fzn-jacop", "3", "2", "2..3"},
+				{Type.TESTHEURISTICS, "gecode", "fzn-gecode", "3", "2", "2..3"},
+				{Type.TESTHEURISTICS, "g12_fd", "flatzinc", "3", "2", "2..3"},
+				{Type.TESTHEURISTICS, "chuffed", "fzn-chuffed", "3", "2", "2..3"},
+				{Type.TESTACTIVATEDHEURISTICS, "jacop", "fzn-jacop", "1", "3", "{1,3}"},
+				{Type.TESTACTIVATEDHEURISTICS, "gecode", "fzn-gecode", "1", "3", "{1,3}"},
+				{Type.TESTACTIVATEDHEURISTICS, "g12_fd", "flatzinc", "1", "3", "{1,3}"},
+				{Type.TESTACTIVATEDHEURISTICS, "chuffed", "fzn-chuffed", "1", "3", "{1,3}"},
+				{Type.TESTWEIGHTEDHEURISTICS, "jacop", "fzn-jacop", "1", "3", "3"},
+				{Type.TESTWEIGHTEDHEURISTICS, "gecode", "fzn-gecode", "1", "3", "3"},
+				{Type.TESTWEIGHTEDHEURISTICS, "g12_fd", "flatzinc", "1", "3", "3"},
+				{Type.TESTWEIGHTEDHEURISTICS, "chuffed", "fzn-chuffed", "1", "3", "3"}
 		});
 	}
 
@@ -78,7 +78,7 @@ public class SearchHeuristicTest {
 
 	@Test
 	public void testHeuristics() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTHEURISTICS);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -106,7 +106,7 @@ public class SearchHeuristicTest {
 
 	@Test
 	public void testActivatedHeuristics() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTACTIVATEDHEURISTICS);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setGenHeuristics(true);
@@ -134,7 +134,7 @@ public class SearchHeuristicTest {
 	
 	@Test
 	public void testWeightedHeuristics() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.THREE);
+		Assume.assumeTrue(type == Type.TESTWEIGHTEDHEURISTICS);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setGenHeuristics(true);

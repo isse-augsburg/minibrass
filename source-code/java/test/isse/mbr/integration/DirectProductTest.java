@@ -38,18 +38,18 @@ public class DirectProductTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {ONE, TWO};
+	enum Type {TESTSINGLEPVS, TESTTWOPVS};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.ONE, "jacop", "fzn-jacop", "true", "false", "0"},
-				{Type.TWO, "jacop", "fzn-jacop", "false", "false", "0"},
-				{Type.ONE, "gecode", "fzn-gecode", "true", "false", "0"},
-				{Type.TWO, "gecode", "fzn-gecode", "false", "false", "0"},
-				{Type.ONE, "g12_fd", "flatzinc", "true", "false", "0"},
-				{Type.TWO, "g12_fd", "flatzinc", "false", "false", "0"},
-				{Type.ONE, "chuffed", "fzn-chuffed", "true", "false", "0"},
-				{Type.TWO, "chuffed", "fzn-chuffed", "false", "false", "0"}
+				{Type.TESTSINGLEPVS, "jacop", "fzn-jacop", "true", "false", "0"},
+				{Type.TESTTWOPVS, "jacop", "fzn-jacop", "false", "false", "0"},
+				{Type.TESTSINGLEPVS, "gecode", "fzn-gecode", "true", "false", "0"},
+				{Type.TESTTWOPVS, "gecode", "fzn-gecode", "false", "false", "0"},
+				{Type.TESTSINGLEPVS, "g12_fd", "flatzinc", "true", "false", "0"},
+				{Type.TESTTWOPVS, "g12_fd", "flatzinc", "false", "false", "0"},
+				{Type.TESTSINGLEPVS, "chuffed", "fzn-chuffed", "true", "false", "0"},
+				{Type.TESTTWOPVS, "chuffed", "fzn-chuffed", "false", "false", "0"}
 		});
 	}
 
@@ -72,7 +72,7 @@ public class DirectProductTest {
 
 	@Test
 	public void testSinglePVS() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.ONE);
+		Assume.assumeTrue(type == Type.TESTSINGLEPVS);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -99,7 +99,7 @@ public class DirectProductTest {
 	
 	@Test
 	public void testTwoPVS() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TWO);
+		Assume.assumeTrue(type == Type.TESTTWOPVS);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassTwoPVSModel), output);
