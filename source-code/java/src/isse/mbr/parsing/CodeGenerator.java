@@ -430,6 +430,11 @@ public class CodeGenerator {
 
 	/**
 	 * Removes umlauts, eszetts and the like from a given MZN Ident
+	 * Be aware: ÄHRE, Ähre, ÄhrÄ, und XÄhre results in the expected 
+	 * AEHRE, Aehre, AehrAE and XAehre.
+	 * BUT: ÄlÄr results in AelAer
+	 * Conventions: use real world names and präfixes followed by nouns; for these the
+	 * conversation will be right
 	 * @param name
 	 * @return
 	 */
