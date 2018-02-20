@@ -1,0 +1,33 @@
+
+type PvsApprov2 = PVSType<bool> = 
+  params {
+    int: k :: default('1000'); % just some upper bound on integer values 
+    set of 1..k: approvedSet;
+  } in  
+  instantiates with "soft_constraints/mbr_types/relation-type.mzn" {
+    times -> and;
+    is_worse -> is_worse_boolean; 
+    top -> true; % should be topVal
+ };
+ 
+include "defs.mbr";
+ 
+PVS: agent1 = new PvsApprov2("agent1") {
+  soft-constraint c1: 'a in mbr.approvedSet';
+  approvedSet: '{1,2}';
+  k : '3';
+};
+
+PVS: agent2 = new PvsApprov2("agent2") {
+  soft-constraint c1: 'a in mbr.approvedSet';
+  approvedSet: '{3}';
+  k : '3';
+};
+
+PVS: agent3 = new WeightedCsp("agent3") {
+  soft-constraint c1: 'a in {2}';
+  k : '3';
+};
+
+
+solve vote([agent1,agent2,agent3], approval);

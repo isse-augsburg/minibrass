@@ -2,10 +2,16 @@ package isse.mbr.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
@@ -19,6 +25,7 @@ import isse.mbr.tools.MiniZincLauncher;
  * @author Alexander Schiendorfer
  *
  */
+@RunWith(Parameterized.class)
 public class WeightedCspTest {
 
 	String minibrassModelParam = "test-models/weightedParams.mbr";
@@ -28,15 +35,44 @@ public class WeightedCspTest {
 	private MiniBrassCompiler compiler; 
 	private MiniZincLauncher launcher;
 	
+	// parameterized test stuff
+	enum Type {TEST_WEIGHTED_AS_PARAM, TEST_WEIGHTED_AS_ANNOTATION};
+	@Parameters
+	public static Collection<Object[]> data(){
+		return Arrays.asList(new Object[][] {
+				{Type.TEST_WEIGHTED_AS_PARAM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_PARAM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_PARAM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+//				{Type.TEST_WEIGHTED_AS_PARAM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_ANNOTATION, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_ANNOTATION, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_ANNOTATION, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+//				{Type.TEST_WEIGHTED_AS_ANNOTATION, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
+		});
+	}
+
+	private Type type;
+	private String mznGlobals, fznExecutable, expectedX, expectedY, expectedZ, expectedCrObj;
+
+	public WeightedCspTest(Type type, String mznGlobals, String fznExecutable, String expectedX,String expectedY,String expectedZ,
+			String expectedCrObj){
+		this.type = type;
+		this.mznGlobals=mznGlobals; this.fznExecutable=fznExecutable; this.expectedX=expectedX;this.expectedY=expectedY;this.expectedZ=	expectedZ;
+		this.expectedCrObj=expectedCrObj;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 	
 		launcher = new MiniZincLauncher();
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExecutable);
 	}
 
 	@Test
 	public void testWeightedAsParam() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TEST_WEIGHTED_AS_PARAM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelParam), output);
@@ -52,18 +88,19 @@ public class WeightedCspTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals("1", listener.getLastSolution().get("x"));
-		Assert.assertEquals("2", listener.getLastSolution().get("y"));
-		Assert.assertEquals("1", listener.getLastSolution().get("z"));
+		Assert.assertEquals(expectedX, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expectedY, listener.getLastSolution().get("y"));
+		Assert.assertEquals(expectedZ, listener.getLastSolution().get("z"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","cr1");
-		Assert.assertEquals("1", listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedCrObj, listener.getObjectives().get(obj));
 	}
 
 	@Test
 	public void testWeightedAsAnnotation() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TEST_WEIGHTED_AS_ANNOTATION);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelAnnot), output);
@@ -79,13 +116,13 @@ public class WeightedCspTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals("1", listener.getLastSolution().get("x"));
-		Assert.assertEquals("2", listener.getLastSolution().get("y"));
-		Assert.assertEquals("1", listener.getLastSolution().get("z"));
+		Assert.assertEquals(expectedX, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expectedY, listener.getLastSolution().get("y"));
+		Assert.assertEquals(expectedZ, listener.getLastSolution().get("z"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","cr1");
-		Assert.assertEquals("1", listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedCrObj, listener.getObjectives().get(obj));
 	}
 }

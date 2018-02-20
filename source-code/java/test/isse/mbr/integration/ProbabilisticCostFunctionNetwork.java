@@ -30,9 +30,17 @@ public class ProbabilisticCostFunctionNetwork {
 		compiler = new MiniBrassCompiler(true);
 		compiler.setMinizincOnly(true);
 		launcher = new MiniZincLauncher();
+		launcher.setMinizincGlobals("jacop");
+		launcher.setFlatzincExecutable("fzn-jacop");
 	}
 
 	@Test
+	
+	/**
+	 * For, we only test correct MiniBrass compilation as the solvers do not work well with floats
+	 * @throws IOException
+	 * @throws MiniBrassParseException
+	 */
 	public void test() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
@@ -42,7 +50,7 @@ public class ProbabilisticCostFunctionNetwork {
 		
 		// 2. execute minisearch
 		// Does not work due to float stuff
-//		
+		
 //		BasicTestListener listener = new BasicTestListener();
 //		launcher.addMiniZincResultListener(listener);
 //		//launcher.runMiniSearchModel(new File(minizincModel), null, 60);

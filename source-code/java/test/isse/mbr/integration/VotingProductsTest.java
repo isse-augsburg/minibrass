@@ -2,11 +2,18 @@ package isse.mbr.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.model.MiniBrassAST;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.CompositePVSInstance;
@@ -18,6 +25,7 @@ import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
 import isse.mbr.tools.MiniZincLauncher;
 
+@RunWith(Parameterized.class)
 public class VotingProductsTest {
 
 	String minibrassModel = "test-models/votePareto.mbr";
@@ -26,6 +34,30 @@ public class VotingProductsTest {
 	String minizincModel = "test-models/votePareto.mzn";
 	private MiniBrassCompiler compiler;
 	private MiniZincLauncher launcher;
+
+	// parameterized test stuff
+	enum Type {TEST_VOTING_PARETO, TEST_VOTING_LEX};
+	@Parameters
+	public static Collection<Object[]> data(){
+		return Arrays.asList(new Object[][] {
+				{Type.TEST_VOTING_PARETO, "jacop", "fzn-jacop"},
+				{Type.TEST_VOTING_PARETO, "gecode", "fzn-gecode"},
+				{Type.TEST_VOTING_PARETO, "g12_fd", "flatzinc"},
+				{Type.TEST_VOTING_PARETO, "chuffed", "fzn-chuffed"},
+				{Type.TEST_VOTING_LEX, "jacop", "fzn-jacop"},
+				{Type.TEST_VOTING_LEX, "gecode", "fzn-gecode"},
+				{Type.TEST_VOTING_LEX, "g12_fd", "flatzinc"},
+				{Type.TEST_VOTING_LEX, "chuffed", "fzn-chuffed"}
+		});
+	}
+
+	private Type type;
+	private String mznGlobals, fznExec;
+
+	public VotingProductsTest(Type type, String a, String b){
+		this.type = type;
+		this.mznGlobals=a; this.fznExec=b; 
+	}
 	
 	@Before
 	public void setUp() throws Exception {
@@ -35,14 +67,15 @@ public class VotingProductsTest {
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
 
-        launcher.setMinizincGlobals("jacop");
-		launcher.setFlatzincExecutable("fzn-jacop");
+        launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
 	// TODO test case for wrong typing 
 	
 	@Test 
 	public void testVotingPareto() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TEST_VOTING_PARETO);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -90,6 +123,7 @@ public class VotingProductsTest {
 
 	@Test 
 	public void testVotingLex() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TEST_VOTING_LEX);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassLexModel), output);
