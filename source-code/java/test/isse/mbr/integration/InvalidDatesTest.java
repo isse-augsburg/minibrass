@@ -9,10 +9,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
@@ -34,23 +33,21 @@ public class InvalidDatesTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-		enum Type {TEST};
+
 		@Parameters
 		public static Collection<Object[]> data(){
 			return Arrays.asList(new Object[][] {
-					{Type.TEST, "jacop", "fzn-jacop", "1"},
-					{Type.TEST, "gecode", "fzn-gecode", "1"},
-					{Type.TEST, "g12_fd", "flatzinc", "1"},
-					{Type.TEST, "chuffed", "fzn-chuffed", "1"}
+					{"jacop", "fzn-jacop", "1"},
+					{"gecode", "fzn-gecode", "1"},
+					{ "g12_fd", "flatzinc", "1"},
+					{"chuffed", "fzn-chuffed", "1"}
 			});
 		}
+		private String mznGlobals, fznExec, expectedX;
 
-		private Type type;
-		private String a, b, expected;
-
-		public InvalidDatesTest(Type type, String a, String b, String expected){
-			this.type = type;
-			this.a=a; this.b=b; this.expected=expected;
+		public InvalidDatesTest(String a, String b, String expected){
+		
+			this.mznGlobals=a; this.fznExec=b; this.expectedX=expected;
 		}
 	
 	@Before
@@ -58,8 +55,8 @@ public class InvalidDatesTest {
 		compiler = new MiniBrassCompiler();
 		launcher = new MiniZincLauncher();
 		
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
 	@Test
@@ -77,7 +74,7 @@ public class InvalidDatesTest {
 		// 3. check solution
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
-		Assert.assertNotEquals(expected, listener.getLastSolution().get("x"));
+		Assert.assertNotEquals(expectedX, listener.getLastSolution().get("x"));
 	
 	}
 

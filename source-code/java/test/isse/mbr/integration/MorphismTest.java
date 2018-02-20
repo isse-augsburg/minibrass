@@ -29,33 +29,33 @@ public class MorphismTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTMORPHISM};
+	enum Type {TEST_MORPHISM};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTMORPHISM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.TESTMORPHISM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.TESTMORPHISM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.TESTMORPHISM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
+				{Type.TEST_MORPHISM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TEST_MORPHISM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TEST_MORPHISM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+				{Type.TEST_MORPHISM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
 		});
 	}
 
 	private Type type;
-	private String a, b, expected, expected2, expected3, expected4;
+	private String mznGlobals, fznExec, expectedX, expectedY, expectedZ, expectedToWeightedObj;
 
 	public MorphismTest(Type type, String a, String b, String expected,String expected2,String expected3,
 			String expected4){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;this.expected3=expected3;
-		this.expected4=expected4;
+		this.mznGlobals=a; this.fznExec=b; this.expectedX=expected;this.expectedY=expected2;this.expectedZ=expected3;
+		this.expectedToWeightedObj=expected4;
 	}
 	
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
 	@Test 
@@ -75,15 +75,15 @@ public class MorphismTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals(expected, listener.getLastSolution().get("x"));
-		Assert.assertEquals(expected2, listener.getLastSolution().get("y"));
-		Assert.assertEquals(expected3, listener.getLastSolution().get("z"));
+		Assert.assertEquals(expectedX, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expectedY, listener.getLastSolution().get("y"));
+		Assert.assertEquals(expectedZ, listener.getLastSolution().get("z"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","ToWeighted_RefTo_cr1_");
 		// we expect a violation (in weights) of 1
-		Assert.assertEquals(expected4, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedToWeightedObj, listener.getObjectives().get(obj));
 	}
 
 }

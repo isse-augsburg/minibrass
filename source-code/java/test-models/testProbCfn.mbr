@@ -7,7 +7,7 @@ type ProbCostFunctionNetwork = PVSType<float> =
   instantiates with "../mbr_types/probabilistic_type.mzn" {
     times -> prob_weighted_sum;
     is_worse -> is_worse_prob_cost; 
-    top -> k;
+    top -> 1.0;
  };
   
       

@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
@@ -31,40 +30,41 @@ public class FuzzyTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTDIRECTTABLE, TESTWORKAROUND};
+	enum Type {TEST_DIRECT_TABLE, TEST_WORKAROUND};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTDIRECTTABLE, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
-				{Type.TESTDIRECTTABLE, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
-				{Type.TESTDIRECTTABLE, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"},
-				{Type.TESTWORKAROUND, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
-				{Type.TESTWORKAROUND, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
-				{Type.TESTWORKAROUND, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"}
+				{Type.TEST_DIRECT_TABLE, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
+				{Type.TEST_DIRECT_TABLE, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
+				{Type.TEST_DIRECT_TABLE, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"},
+				{Type.TEST_WORKAROUND, "jacop", "fzn-jacop", "0", "0", "0", "1.0"},
+				{Type.TEST_WORKAROUND, "gecode", "fzn-gecode", "0", "0", "0", "1.0"},
+			//  Chuffed does not work with floats
+			//	{Type.TEST_WORKAROUND, "chuffed", "fzn-chuffed", "0", "0", "0", "1.0"} 
 		});
 	}
 
 	private Type type;
-	private String a, b, expected, expected2, expected3, expected4;
+	private String mznGlobals, fznExec, expectedMainCourse, expectedWine, expectedLunch, expectedObj;
 
 	public FuzzyTest(Type type, String a, String b, String expected,String expected2,String expected3,
 			String expected4){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;this.expected3=expected3;
-		this.expected4=expected4;
+		this.mznGlobals=a; this.fznExec=b; this.expectedMainCourse=expected;this.expectedWine=expected2;this.expectedLunch=expected3;
+		this.expectedObj=expected4;
 	}
 	 
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
 	@Test
 	public void testDirectTable() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTDIRECTTABLE);
+		Assume.assumeTrue(type == Type.TEST_DIRECT_TABLE);
 		// This one currently only works with JaCoP
 		// cause other solvers do not properly support float_array_element
 		launcher.setMinizincGlobals("jacop");
@@ -85,19 +85,19 @@ public class FuzzyTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals(expected, listener.getLastSolution().get("mainCourse"));
-		Assert.assertEquals(expected2, listener.getLastSolution().get("wine"));
-		Assert.assertEquals(expected3, listener.getLastSolution().get("lunch"));
+		Assert.assertEquals(expectedMainCourse, listener.getLastSolution().get("mainCourse"));
+		Assert.assertEquals(expectedWine, listener.getLastSolution().get("wine"));
+		Assert.assertEquals(expectedLunch, listener.getLastSolution().get("lunch"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","fz1");
-		Assert.assertEquals(expected4, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedObj, listener.getObjectives().get(obj));
 	}
 
 	@Test
 	public void testWorkaround() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTWORKAROUND);
+		Assume.assumeTrue(type == Type.TEST_WORKAROUND);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassWorkaroundModel), output);
@@ -113,13 +113,13 @@ public class FuzzyTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals(expected, listener.getLastSolution().get("mainCourse"));
-		Assert.assertEquals(expected2, listener.getLastSolution().get("wine"));
-		Assert.assertEquals(expected3, listener.getLastSolution().get("lunch"));
+		Assert.assertEquals(expectedMainCourse, listener.getLastSolution().get("mainCourse"));
+		Assert.assertEquals(expectedWine, listener.getLastSolution().get("wine"));
+		Assert.assertEquals(expectedLunch, listener.getLastSolution().get("lunch"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","fz1");
-		Assert.assertEquals(expected4, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedObj, listener.getObjectives().get(obj));
 	}
 }

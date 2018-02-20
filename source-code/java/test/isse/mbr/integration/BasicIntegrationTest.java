@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.VotingCondorcetTest.Type;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
@@ -41,7 +40,8 @@ public class BasicIntegrationTest {
           {"jacop", "fzn-jacop", "1", "2", "1", "2..2"},
           {"gecode", "fzn-gecode","1", "2", "1", "2..2"},
           {"g12_fd", "flatzinc","1", "2", "1", "2..2"},
-          {"chuffed", "fzn-chuffed","1", "2", "1", "2..2"}
+          // Chuffed does not support set variables
+  //        {"chuffed", "fzn-chuffed","1", "2", "1", "2..2"}
         });
     }
 

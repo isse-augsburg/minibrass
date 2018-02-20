@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
@@ -28,33 +27,33 @@ public class SoftGlobalsTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTMORPHISM};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTMORPHISM, "jacop", "fzn-jacop", "2"},
-				{Type.TESTMORPHISM, "gecode", "fzn-gecode", "2"},
-				{Type.TESTMORPHISM, "g12_fd", "flatzinc", "2"},
-				{Type.TESTMORPHISM, "chuffed", "fzn-chuffed", "2"}
+				{"jacop", "fzn-jacop", "2"},
+				{"gecode", "fzn-gecode", "2"},
+				{"g12_fd", "flatzinc", "2"},
+			//  Chuffed does not properly support the soft global decomposition
+//				{"chuffed", "fzn-chuffed", "2"}
 		});
 	}
 
-	private Type type;
-	private String a, b, expected;
+	private String mznGlobals, fznExec, expected;
 
-	public SoftGlobalsTest(Type type, String a, String b, String expected){
-		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;
+	public SoftGlobalsTest(String a, String b, String expected){
+		this.mznGlobals=a; this.fznExec=b; this.expected=expected;
 	}
 	
 	@Before
 	public void setUp() throws Exception {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	} 
 
 	@Test
-	public void testMorphism() throws IOException, MiniBrassParseException {
+	public void testSoftGlobals() throws IOException, MiniBrassParseException {
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);

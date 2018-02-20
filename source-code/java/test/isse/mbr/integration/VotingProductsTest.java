@@ -36,27 +36,27 @@ public class VotingProductsTest {
 	private MiniZincLauncher launcher;
 
 	// parameterized test stuff
-	enum Type {TESTVOTINGPARETO, TESTVOTINGLEX};
+	enum Type {TEST_VOTING_PARETO, TEST_VOTING_LEX};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTVOTINGPARETO, "jacop", "fzn-jacop"},
-				{Type.TESTVOTINGPARETO, "gecode", "fzn-gecode"},
-				{Type.TESTVOTINGPARETO, "g12_fd", "flatzinc"},
-				{Type.TESTVOTINGPARETO, "chuffed", "fzn-chuffed"},
-				{Type.TESTVOTINGLEX, "jacop", "fzn-jacop"},
-				{Type.TESTVOTINGLEX, "gecode", "fzn-gecode"},
-				{Type.TESTVOTINGLEX, "g12_fd", "flatzinc"},
-				{Type.TESTVOTINGLEX, "chuffed", "fzn-chuffed"}
+				{Type.TEST_VOTING_PARETO, "jacop", "fzn-jacop"},
+				{Type.TEST_VOTING_PARETO, "gecode", "fzn-gecode"},
+				{Type.TEST_VOTING_PARETO, "g12_fd", "flatzinc"},
+				{Type.TEST_VOTING_PARETO, "chuffed", "fzn-chuffed"},
+				{Type.TEST_VOTING_LEX, "jacop", "fzn-jacop"},
+				{Type.TEST_VOTING_LEX, "gecode", "fzn-gecode"},
+				{Type.TEST_VOTING_LEX, "g12_fd", "flatzinc"},
+				{Type.TEST_VOTING_LEX, "chuffed", "fzn-chuffed"}
 		});
 	}
 
 	private Type type;
-	private String a, b;
+	private String mznGlobals, fznExec;
 
 	public VotingProductsTest(Type type, String a, String b){
 		this.type = type;
-		this.a=a; this.b=b; 
+		this.mznGlobals=a; this.fznExec=b; 
 	}
 	
 	@Before
@@ -67,15 +67,15 @@ public class VotingProductsTest {
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
 
-        launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+        launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
 	// TODO test case for wrong typing 
 	
 	@Test 
 	public void testVotingPareto() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTVOTINGPARETO);
+		Assume.assumeTrue(type == Type.TEST_VOTING_PARETO);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -123,7 +123,7 @@ public class VotingProductsTest {
 
 	@Test 
 	public void testVotingLex() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTVOTINGLEX);
+		Assume.assumeTrue(type == Type.TEST_VOTING_LEX);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassLexModel), output);

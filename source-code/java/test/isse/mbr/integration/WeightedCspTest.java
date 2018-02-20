@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.CodeGenerator;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
@@ -37,29 +36,29 @@ public class WeightedCspTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTWEIGHTEDASPARAM, TESTWEIGHTEDASANNOTATION};
+	enum Type {TEST_WEIGHTED_AS_PARAM, TEST_WEIGHTED_AS_ANNOTATION};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTWEIGHTEDASPARAM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASPARAM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASPARAM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASPARAM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASANNOTATION, "jacop", "fzn-jacop", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASANNOTATION, "gecode", "fzn-gecode", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASANNOTATION, "g12_fd", "flatzinc", "1", "2", "1", "1"},
-				{Type.TESTWEIGHTEDASANNOTATION, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
+				{Type.TEST_WEIGHTED_AS_PARAM, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_PARAM, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_PARAM, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+//				{Type.TEST_WEIGHTED_AS_PARAM, "chuffed", "fzn-chuffed", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_ANNOTATION, "jacop", "fzn-jacop", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_ANNOTATION, "gecode", "fzn-gecode", "1", "2", "1", "1"},
+				{Type.TEST_WEIGHTED_AS_ANNOTATION, "g12_fd", "flatzinc", "1", "2", "1", "1"},
+//				{Type.TEST_WEIGHTED_AS_ANNOTATION, "chuffed", "fzn-chuffed", "1", "2", "1", "1"}
 		});
 	}
 
 	private Type type;
-	private String a, b, expected, expected2, expected3, expected4;
+	private String mznGlobals, fznExecutable, expectedX, expectedY, expectedZ, expectedCrObj;
 
-	public WeightedCspTest(Type type, String a, String b, String expected,String expected2,String expected3,
-			String expected4){
+	public WeightedCspTest(Type type, String mznGlobals, String fznExecutable, String expectedX,String expectedY,String expectedZ,
+			String expectedCrObj){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;this.expected3=expected3;
-		this.expected4=expected4;
+		this.mznGlobals=mznGlobals; this.fznExecutable=fznExecutable; this.expectedX=expectedX;this.expectedY=expectedY;this.expectedZ=	expectedZ;
+		this.expectedCrObj=expectedCrObj;
 	}
 	
 	@Before
@@ -67,13 +66,13 @@ public class WeightedCspTest {
 		compiler = new MiniBrassCompiler(true);
 	
 		launcher = new MiniZincLauncher();
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExecutable);
 	}
 
 	@Test
 	public void testWeightedAsParam() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTWEIGHTEDASPARAM);
+		Assume.assumeTrue(type == Type.TEST_WEIGHTED_AS_PARAM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelParam), output);
@@ -89,19 +88,19 @@ public class WeightedCspTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals(expected, listener.getLastSolution().get("x"));
-		Assert.assertEquals(expected2, listener.getLastSolution().get("y"));
-		Assert.assertEquals(expected3, listener.getLastSolution().get("z"));
+		Assert.assertEquals(expectedX, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expectedY, listener.getLastSolution().get("y"));
+		Assert.assertEquals(expectedZ, listener.getLastSolution().get("z"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","cr1");
-		Assert.assertEquals(expected4, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedCrObj, listener.getObjectives().get(obj));
 	}
 
 	@Test
 	public void testWeightedAsAnnotation() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTWEIGHTEDASANNOTATION);
+		Assume.assumeTrue(type == Type.TEST_WEIGHTED_AS_ANNOTATION);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelAnnot), output);
@@ -117,13 +116,13 @@ public class WeightedCspTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals(expected, listener.getLastSolution().get("x"));
-		Assert.assertEquals(expected2, listener.getLastSolution().get("y"));
-		Assert.assertEquals(expected3, listener.getLastSolution().get("z"));
+		Assert.assertEquals(expectedX, listener.getLastSolution().get("x"));
+		Assert.assertEquals(expectedY, listener.getLastSolution().get("y"));
+		Assert.assertEquals(expectedZ, listener.getLastSolution().get("z"));
 		
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = CodeGenerator.encodeString("overall","cr1");
-		Assert.assertEquals(expected4, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedCrObj, listener.getObjectives().get(obj));
 	}
 }

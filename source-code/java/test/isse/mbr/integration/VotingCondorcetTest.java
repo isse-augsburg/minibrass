@@ -8,7 +8,6 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,31 +34,28 @@ public class VotingCondorcetTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTPVSRELATIONCONDORCETTEST, TESTPVSRELATIONCONDORCETNOWINNER, TESTPVSRELATION};
+	enum Type {TEST_PVS_RELATION_CONDORCET_TEST, TEST_PVS_RELATION_CONDORCET_NOWINNER, TEST_PVS_RELATION};
     @Parameters
     public static Collection<Object[]> data(){
         return Arrays.asList(new Object[][] {
-          {Type.TESTPVSRELATIONCONDORCETTEST, "jacop", "fzn-jacop", "2"},
-          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "jacop", "fzn-jacop", "2"},
-          {Type.TESTPVSRELATION, "jacop", "fzn-jacop", "3"},
-          {Type.TESTPVSRELATIONCONDORCETTEST, "gecode", "fzn-gecode", "2"},
-          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "gecode", "fzn-gecode", "2"},
-          {Type.TESTPVSRELATION, "gecode", "fzn-gecode", "3"},
-          {Type.TESTPVSRELATIONCONDORCETTEST, "g12_fd", "flatzinc", "2"},
-          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "g12_fd", "flatzinc", "2"},
-          {Type.TESTPVSRELATION, "g12_fd", "flatzinc", "3"},
-          {Type.TESTPVSRELATIONCONDORCETTEST, "chuffed", "fzn-chuffed", "2"},
-          {Type.TESTPVSRELATIONCONDORCETNOWINNER, "chuffed", "fzn-chuffed", "2"},
-          {Type.TESTPVSRELATION, "chuffed", "fzn-chuffed", "3"}
+          {Type.TEST_PVS_RELATION_CONDORCET_TEST, "jacop", "fzn-jacop", "2"},
+          {Type.TEST_PVS_RELATION_CONDORCET_NOWINNER, "jacop", "fzn-jacop", "2"},
+          {Type.TEST_PVS_RELATION, "jacop", "fzn-jacop", "3"},
+          {Type.TEST_PVS_RELATION_CONDORCET_TEST, "gecode", "fzn-gecode", "2"},
+          {Type.TEST_PVS_RELATION_CONDORCET_NOWINNER, "gecode", "fzn-gecode", "2"},
+          {Type.TEST_PVS_RELATION, "gecode", "fzn-gecode", "3"},
+          {Type.TEST_PVS_RELATION_CONDORCET_TEST, "chuffed", "fzn-chuffed", "2"},
+          {Type.TEST_PVS_RELATION_CONDORCET_NOWINNER, "chuffed", "fzn-chuffed", "2"},
+          {Type.TEST_PVS_RELATION, "chuffed", "fzn-chuffed", "3"}
         });
     }
 
     private Type type;
-    private String a, b, expected;
+    private String mznGlobals, fznExec, expectedA;
 
     public VotingCondorcetTest(Type type, String a, String b, String expected){
         this.type = type;
-        this.a=a; this.b=b; this.expected=expected;
+        this.mznGlobals=a; this.fznExec=b; this.expectedA=expected;
     }
 	
 	@Before
@@ -71,13 +67,13 @@ public class VotingCondorcetTest {
 
         //launcher.setMinizincGlobals("jacop");
 		//launcher.setFlatzincExecutable("fzn-jacop");
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 	
 	@Test
-	public void testPvsRelationCondercetTest() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATIONCONDORCETTEST);
+	public void testPvsRelationCondorcetTest() throws IOException, MiniBrassParseException {
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION_CONDORCET_TEST);
 		// solution has draws in local results. result is good.
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
@@ -94,12 +90,12 @@ public class VotingCondorcetTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		//Assert.assertEquals(2, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 	
 	@Test
 	public void testPvsRelationCondercetNoWinner() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATIONCONDORCETNOWINNER);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION_CONDORCET_NOWINNER);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModelNoWinner), output);
@@ -115,12 +111,12 @@ public class VotingCondorcetTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		//Assert.assertEquals(2, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 
 	@Test 
 	public void testPvsRelation() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATION);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -136,7 +132,7 @@ public class VotingCondorcetTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		//Assert.assertEquals(4, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 
 }

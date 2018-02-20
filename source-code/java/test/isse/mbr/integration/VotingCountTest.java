@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.parsing.MiniBrassParser;
@@ -31,23 +30,23 @@ public class VotingCountTest {
 	private MiniZincLauncher launcher;
 
 	// parameterized test stuff
-	enum Type {TESTVOTINGCOUNT};
+	enum Type {TEST_VOTING_COUNT};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTVOTINGCOUNT, "jacop", "fzn-jacop"},
-				{Type.TESTVOTINGCOUNT, "gecode", "fzn-gecode"},
-				{Type.TESTVOTINGCOUNT, "g12_fd", "flatzinc"},
-				{Type.TESTVOTINGCOUNT, "chuffed", "fzn-chuffed"}
+				{Type.TEST_VOTING_COUNT, "jacop", "fzn-jacop"},
+				{Type.TEST_VOTING_COUNT, "gecode", "fzn-gecode"},
+				{Type.TEST_VOTING_COUNT, "g12_fd", "flatzinc"},
+				{Type.TEST_VOTING_COUNT, "chuffed", "fzn-chuffed"}
 		});
 	}
 
 	private Type type;
-	private String a, b;
+	private String mznGlobals, fznExec;
 
 	public VotingCountTest(Type type, String a, String b){
 		this.type = type;
-		this.a=a; this.b=b;
+		this.mznGlobals=a; this.fznExec=b;
 	}
 
 
@@ -59,11 +58,10 @@ public class VotingCountTest {
 		launcher.setUseDefault(true);
 		launcher.setDebug(true);
 
-        launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+        launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
-	// TODO test case for wrong typing 
 	
 	@Test 
 	public void testVotingCount() throws IOException, MiniBrassParseException {

@@ -10,10 +10,9 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
@@ -38,28 +37,32 @@ public class GlobalProbabilisticTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTPROBABILISTIC, TESTPROBABILISTICMORPHED, TESTPROBABILISTICMORPHEDMINISEARCH};
+	enum Type {TEST_PROBABILISTIC, TEST_PROBABILISTIC_MORPHED, TEST_PROBABILISTIC_MORPHED_MINISEARCH};
 	@Parameters
+	/**
+	 * Chuffed cannot handle float variables properly
+	 * @return
+	 */
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTPROBABILISTIC, "jacop", "fzn-jacop", "1.0"},
-				{Type.TESTPROBABILISTIC, "gecode", "fzn-gecode", "1.0"},
-				{Type.TESTPROBABILISTIC, "chuffed", "fzn-chuffed", "1.0"},
-				{Type.TESTPROBABILISTICMORPHED, "jacop", "fzn-jacop", "0"},
-				{Type.TESTPROBABILISTICMORPHED, "gecode", "fzn-gecode", "0"},
-				{Type.TESTPROBABILISTICMORPHED, "chuffed", "fzn-chuffed", "0"},
-				{Type.TESTPROBABILISTICMORPHEDMINISEARCH, "jacop", "fzn-jacop", "0"},
-				{Type.TESTPROBABILISTICMORPHEDMINISEARCH, "gecode", "fzn-gecode", "0"},
-				{Type.TESTPROBABILISTICMORPHEDMINISEARCH, "chuffed", "fzn-chuffed", "0"}
+				{Type.TEST_PROBABILISTIC, "jacop", "fzn-jacop", "1.0"},
+				{Type.TEST_PROBABILISTIC, "gecode", "fzn-gecode", "1.0"},
+			//	{Type.TEST_PROBABILISTIC, "chuffed", "fzn-chuffed", "1.0"},
+				{Type.TEST_PROBABILISTIC_MORPHED, "jacop", "fzn-jacop", "0"},
+				{Type.TEST_PROBABILISTIC_MORPHED, "gecode", "fzn-gecode", "0"},
+			//	{Type.TEST_PROBABILISTIC_MORPHED, "chuffed", "fzn-chuffed", "0"},
+				{Type.TEST_PROBABILISTIC_MORPHED_MINISEARCH, "jacop", "fzn-jacop", "0"},
+				{Type.TEST_PROBABILISTIC_MORPHED_MINISEARCH, "gecode", "fzn-gecode", "0"},
+			//	{Type.TEST_PROBABILISTIC_MORPHED_MINISEARCH, "chuffed", "fzn-chuffed", "0"}
 		});
 	}
 
 	private Type type;
-	private String a, b, expected;
+	private String mznGlobals, fznExec, expectedObjective;
 
 	public GlobalProbabilisticTest(Type type, String a, String b, String expected){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;
+		this.mznGlobals=a; this.fznExec=b; this.expectedObjective=expected;
 	}
 	
 	@Before
@@ -67,14 +70,14 @@ public class GlobalProbabilisticTest {
 		compiler = new MiniBrassCompiler(true);
 		compiler.setMinizincOnly(true); // due to other complications with floats using minisearch
 		launcher = new MiniZincLauncher();
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 		launcher.setDebug(true);
 	}
 
 	@Test
 	public void testProbabilistic() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPROBABILISTIC);
+		Assume.assumeTrue(type == Type.TEST_PROBABILISTIC);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -92,12 +95,12 @@ public class GlobalProbabilisticTest {
 		
 	
 		// for the objective, we need to find out the variable name 
-		Assert.assertEquals(expected, listener.getObjectives().get("topLevelObjective"));
+		Assert.assertEquals(expectedObjective, listener.getObjectives().get("topLevelObjective"));
 	}
 	
 	@Test
 	public void testProbabilisticMorphed() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPROBABILISTICMORPHED);
+		Assume.assumeTrue(type == Type.TEST_PROBABILISTIC_MORPHED);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassMorphedModel), output);
@@ -115,12 +118,12 @@ public class GlobalProbabilisticTest {
 		
 	
 		// for the objective, we need to find out the variable name 
-		Assert.assertEquals(expected, listener.getObjectives().get("topLevelObjective"));
+		Assert.assertEquals(expectedObjective, listener.getObjectives().get("topLevelObjective"));
 	}
 	
 	@Test
 	public void testProbabilisticMorphedMinisearch() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPROBABILISTICMORPHEDMINISEARCH);
+		Assume.assumeTrue(type == Type.TEST_PROBABILISTIC_MORPHED_MINISEARCH);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setMinizincOnly(false);
@@ -139,6 +142,6 @@ public class GlobalProbabilisticTest {
 		
 	
 		// for the objective, we need to find out the variable name 
-		Assert.assertEquals(expected, listener.getObjectives().get("topLevelObjective"));
+		Assert.assertEquals(expectedObjective, listener.getObjectives().get("topLevelObjective"));
 	}
 }

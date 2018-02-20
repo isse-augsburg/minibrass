@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
@@ -34,23 +33,23 @@ public class FreePVSMultiSetTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTFREEPVS};
+	enum Type {TEST_FREE_PVS};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTFREEPVS, "jacop", "fzn-jacop", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
-				{Type.TESTFREEPVS, "gecode", "fzn-gecode", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
-				{Type.TESTFREEPVS, "g12_fd", "flatzinc", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
-				{Type.TESTFREEPVS, "chuffed", "fzn-chuffed", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"}
+				{Type.TEST_FREE_PVS, "jacop", "fzn-jacop", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
+				{Type.TEST_FREE_PVS, "gecode", "fzn-gecode", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
+				{Type.TEST_FREE_PVS, "g12_fd", "flatzinc", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"},
+				{Type.TEST_FREE_PVS, "chuffed", "fzn-chuffed", "[0, 0, 2]", "[0, 0, 1]", "[1, 0, 0]"}
 		});
 	}
 
 	private Type type;
-	private String a, b, expected, expected2, expected3, expected4;
+	private String mznGlobals, fznExecutable, firstSeenObjective, secondSeenObjective, thirdSeenObjective, expected4;
 
 	public FreePVSMultiSetTest(Type type, String a, String b, String expected,String expected2,String expected3){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;this.expected3=expected3;
+		this.mznGlobals=a; this.fznExecutable=b; this.firstSeenObjective=expected;this.secondSeenObjective=expected2;this.thirdSeenObjective=expected3;
 	}
 
 
@@ -62,8 +61,8 @@ public class FreePVSMultiSetTest {
 		//launcher.setUseDefault(false);
 		//launcher.setDebug(true);
 		
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExecutable);
 	}
 	
 	@Test
@@ -87,20 +86,15 @@ public class FreePVSMultiSetTest {
 		
 		// for the objective, we observe the sequence {{3,3}}, {{3}}, {{1}}
 		String obj = "topLevelObjective";
-		String[] expecteds = new String[] {expected, expected2, expected3 };
+		String[] expectedObjectives = new String[] {firstSeenObjective, secondSeenObjective, thirdSeenObjective };
 
 		// 3 "actual" solutions and one optimality notification
 		Assert.assertEquals(4, listener.getSolutionCounter());
 		int index = 0;
-		for(String expected : expecteds) {
+		for(String expectedObjective : expectedObjectives) {
 			String actual =	 listener.getObjectiveSequences().get(obj).get(index);
-			Assert.assertEquals(expected, actual);
+			Assert.assertEquals(expectedObjective, actual);
 			++index;
-		}
-		System.out.println("WAAAAAAAAAAAAAAAAAAAAAAAAAH");
-
-		
+		}		
 	}
-
-
 }

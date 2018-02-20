@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
@@ -28,23 +27,23 @@ public class PvsRelationTest {
 	private MiniZincLauncher launcher;
 
 	// parameterized test stuff
-	enum Type {TESTPVSRELATION};
+	enum Type {TEST_PVS_RELATION};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTPVSRELATION, "jacop", "fzn-jacop", "3"},
-				{Type.TESTPVSRELATION, "gecode", "fzn-gecode", "3"},
-				{Type.TESTPVSRELATION, "g12_fd", "flatzinc", "3"},
-				{Type.TESTPVSRELATION, "chuffed", "fzn-chuffed", "3"}
+				{Type.TEST_PVS_RELATION, "jacop", "fzn-jacop", "3"},
+				{Type.TEST_PVS_RELATION, "gecode", "fzn-gecode", "3"},
+				{Type.TEST_PVS_RELATION, "g12_fd", "flatzinc", "3"},
+				{Type.TEST_PVS_RELATION, "chuffed", "fzn-chuffed", "3"}
 		});
 	}
 
 	private Type type;
-	private String a, b, expected;
+	private String mznGlobals, fznExec, expectedA;
 
 	public PvsRelationTest(Type type, String a, String b, String expected){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;
+		this.mznGlobals=a; this.fznExec=b; this.expectedA=expected;
 	}
 	
 	@Before
@@ -53,8 +52,8 @@ public class PvsRelationTest {
 		
 		launcher = new MiniZincLauncher();
 		launcher.setUseDefault(true);
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 
 	@Test 
@@ -73,7 +72,7 @@ public class PvsRelationTest {
 		Assert.assertTrue(listener.isSolved());
 		Assert.assertTrue(listener.isOptimal());
 		
-		Assert.assertEquals("3", listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 
 }

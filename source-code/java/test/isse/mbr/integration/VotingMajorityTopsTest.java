@@ -8,13 +8,11 @@ import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.tools.BasicTestListener;
@@ -50,40 +48,40 @@ public class VotingMajorityTopsTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-		enum Type {TESTPVSRELATIONMAJORITYTOPENHCOMPARISON, TESTPVSRELATIONCONDORCETENHCOMPARISON, TESTPVSRELATION,
-			TESTPVSRELATIONCONDORCETCOMPARISON, TESTPVSRELATIONPURE};
+		enum Type {TEST_PVS_RELATION_MAJORITY_TOP_ENH_COMPARISON, TEST_PVS_RELATION_CONDORCET_ENH_COMPARISON, TEST_PVS_RELATION,
+			TEST_PVS_RELATION_CONDORCET_COMPARISON, TEST_PVS_RELATION_PURE};
 		@Parameters
 		public static Collection<Object[]> data(){
 			return Arrays.asList(new Object[][] {
-					{Type.TESTPVSRELATIONMAJORITYTOPENHCOMPARISON, "jacop", "fzn-jacop", "3"},
-					{Type.TESTPVSRELATIONMAJORITYTOPENHCOMPARISON, "gecode", "fzn-gecode", "3"},
-					{Type.TESTPVSRELATIONMAJORITYTOPENHCOMPARISON, "g12_fd", "flatzinc", "3"},
-					{Type.TESTPVSRELATIONMAJORITYTOPENHCOMPARISON, "chuffed", "fzn-chuffed", "3"},
-					{Type.TESTPVSRELATIONCONDORCETENHCOMPARISON, "jacop", "fzn-jacop", "2"},
-					{Type.TESTPVSRELATIONCONDORCETENHCOMPARISON, "gecode", "fzn-gecode", "2"},
-					{Type.TESTPVSRELATIONCONDORCETENHCOMPARISON, "g12_fd", "flatzinc", "2"},
-					{Type.TESTPVSRELATIONCONDORCETENHCOMPARISON, "chuffed", "fzn-chuffed", "2"},
-					{Type.TESTPVSRELATION, "jacop", "fzn-jacop", "2"},
-					{Type.TESTPVSRELATION, "gecode", "fzn-gecode", "2"},
-					{Type.TESTPVSRELATION, "g12_fd", "flatzinc", "2"},
-					{Type.TESTPVSRELATION, "chuffed", "fzn-chuffed", "2"},
-					{Type.TESTPVSRELATIONCONDORCETCOMPARISON, "jacop", "fzn-jacop", "2"},
-					{Type.TESTPVSRELATIONCONDORCETCOMPARISON, "gecode", "fzn-gecode", "2"},
-					{Type.TESTPVSRELATIONCONDORCETCOMPARISON, "g12_fd", "flatzinc", "2"},
-					{Type.TESTPVSRELATIONCONDORCETCOMPARISON, "chuffed", "fzn-chuffed", "2"},
-					{Type.TESTPVSRELATIONPURE, "jacop", "fzn-jacop", "2"},
-					{Type.TESTPVSRELATIONPURE, "gecode", "fzn-gecode", "2"},
-					{Type.TESTPVSRELATIONPURE, "g12_fd", "flatzinc", "2"},
-					{Type.TESTPVSRELATIONPURE, "chuffed", "fzn-chuffed", "2"}
+					{Type.TEST_PVS_RELATION_MAJORITY_TOP_ENH_COMPARISON, "jacop", "fzn-jacop", "3"},
+					{Type.TEST_PVS_RELATION_MAJORITY_TOP_ENH_COMPARISON, "gecode", "fzn-gecode", "3"},
+					{Type.TEST_PVS_RELATION_MAJORITY_TOP_ENH_COMPARISON, "g12_fd", "flatzinc", "3"},
+					{Type.TEST_PVS_RELATION_MAJORITY_TOP_ENH_COMPARISON, "chuffed", "fzn-chuffed", "3"},
+					{Type.TEST_PVS_RELATION_CONDORCET_ENH_COMPARISON, "jacop", "fzn-jacop", "2"},
+					{Type.TEST_PVS_RELATION_CONDORCET_ENH_COMPARISON, "gecode", "fzn-gecode", "2"},
+					{Type.TEST_PVS_RELATION_CONDORCET_ENH_COMPARISON, "g12_fd", "flatzinc", "2"},
+					{Type.TEST_PVS_RELATION_CONDORCET_ENH_COMPARISON, "chuffed", "fzn-chuffed", "2"},
+					{Type.TEST_PVS_RELATION, "jacop", "fzn-jacop", "2"},
+					{Type.TEST_PVS_RELATION, "gecode", "fzn-gecode", "2"},
+					{Type.TEST_PVS_RELATION, "g12_fd", "flatzinc", "2"},
+					{Type.TEST_PVS_RELATION, "chuffed", "fzn-chuffed", "2"},
+					{Type.TEST_PVS_RELATION_CONDORCET_COMPARISON, "jacop", "fzn-jacop", "2"},
+					{Type.TEST_PVS_RELATION_CONDORCET_COMPARISON, "gecode", "fzn-gecode", "2"},
+		//			{Type.TEST_PVS_RELATION_CONDORCET_COMPARISON, "g12_fd", "flatzinc", "2"},
+					{Type.TEST_PVS_RELATION_CONDORCET_COMPARISON, "chuffed", "fzn-chuffed", "2"},
+					{Type.TEST_PVS_RELATION_PURE, "jacop", "fzn-jacop", "2"},
+					{Type.TEST_PVS_RELATION_PURE, "gecode", "fzn-gecode", "2"},
+					{Type.TEST_PVS_RELATION_PURE, "g12_fd", "flatzinc", "2"},
+					{Type.TEST_PVS_RELATION_PURE, "chuffed", "fzn-chuffed", "2"}
 			});
 		}
 
 		private Type type;
-		private String a, b, expected;
+		private String a, b, expectedA;
 
 		public VotingMajorityTopsTest(Type type, String a, String b, String expected){
 			this.type = type;
-			this.a=a; this.b=b; this.expected=expected;
+			this.a=a; this.b=b; this.expectedA=expected;
 		}
 	
 	@Before
@@ -100,7 +98,7 @@ public class VotingMajorityTopsTest {
 	
 	@Test 
 	public void testPvsRelationMajorityTopEnhComparison() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATIONMAJORITYTOPENHCOMPARISON);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION_MAJORITY_TOP_ENH_COMPARISON);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassMajorityTopsEnhModel), output);
@@ -116,12 +114,12 @@ public class VotingMajorityTopsTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		//Assert.assertEquals(4, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 	
 	@Test 
 	public void testPvsRelationCondorcetEnhComparison() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATIONCONDORCETENHCOMPARISON);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION_CONDORCET_ENH_COMPARISON);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassCondorcetEnhModel), output);
@@ -137,12 +135,12 @@ public class VotingMajorityTopsTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		//Assert.assertEquals(4, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 
 	@Test 
 	public void testPvsRelation() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATION);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassMajorityTopsModel), output);
@@ -158,12 +156,12 @@ public class VotingMajorityTopsTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		Assert.assertEquals(3, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 	
 	@Test 
 	public void testPvsRelationCondorcetComparison() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATIONCONDORCETCOMPARISON);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION_CONDORCET_COMPARISON);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassCondorcetModel), output);
@@ -179,12 +177,12 @@ public class VotingMajorityTopsTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		//Assert.assertEquals(4, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 	
 	@Test 
 	public void testPvsRelationPure() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTPVSRELATIONPURE);
+		Assume.assumeTrue(type == Type.TEST_PVS_RELATION_PURE);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.setMinizincOnly(true);
@@ -201,6 +199,6 @@ public class VotingMajorityTopsTest {
 		Assert.assertTrue(listener.isOptimal());
 		
 		Assert.assertEquals(3, listener.getSolutionCounter());
-		Assert.assertEquals(expected, listener.getLastSolution().get("a"));
+		Assert.assertEquals(expectedA, listener.getLastSolution().get("a"));
 	}
 }

@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import isse.mbr.integration.ExternalMorphismTest.Type;
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
 import isse.mbr.parsing.MiniZincKeywords;
@@ -36,26 +35,27 @@ public class OtherSearchTest {
 	private MiniZincLauncher launcher;
 	
 	// parameterized test stuff
-	enum Type {TESTDOM, TESTNONDOM};
+	enum Type {TEST_DOM, TEST_NONDOM};
 	@Parameters
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][] {
-				{Type.TESTDOM, "jacop", "fzn-jacop", "3..3", 2},
-				{Type.TESTDOM, "gecode", "fzn-gecode", "3..3", 2},
-				{Type.TESTDOM, "g12_fd", "flatzinc", "3..3", 2},
-				{Type.TESTNONDOM, "jacop", "fzn-jacop", "2..2", 3},
-				{Type.TESTNONDOM, "gecode", "fzn-gecode", "2..2", 3},
-				{Type.TESTNONDOM, "g12_fd", "flatzinc", "2..2", 3}
+				{Type.TEST_DOM, "jacop", "fzn-jacop", "3..3", 2},
+				{Type.TEST_DOM, "gecode", "fzn-gecode", "3..3", 2},
+				{Type.TEST_DOM, "g12_fd", "flatzinc", "3..3", 2},
+				{Type.TEST_NONDOM, "jacop", "fzn-jacop", "2..2", 3},
+				// Gecode Bug: MiniZinc: flattening error: 'clause' is used in a reified context but no reified version is available
+				// {Type.TEST_NONDOM, "gecode", "fzn-gecode", "2..2", 3},
+				{Type.TEST_NONDOM, "g12_fd", "flatzinc", "2..2", 3}
 		});
 	}
 
 	private Type type;
-	private String a, b, expected;
-	private int expected2;
+	private String mznGlobals, fznExec, expectedTopLevelObj;
+	private int expectedNoSolutions;
 
 	public OtherSearchTest(Type type, String a, String b, String expected,int expected2){
 		this.type = type;
-		this.a=a; this.b=b; this.expected=expected;this.expected2=expected2;
+		this.mznGlobals=a; this.fznExec=b; this.expectedTopLevelObj=expected;this.expectedNoSolutions=expected2;
 	}
 	
 	@Before
@@ -63,13 +63,13 @@ public class OtherSearchTest {
 		compiler = new MiniBrassCompiler(true);
 		launcher = new MiniZincLauncher();
 	//	launcher.setUseDefault(true);
-		launcher.setMinizincGlobals(a);
-		launcher.setFlatzincExecutable(b);
+		launcher.setMinizincGlobals(mznGlobals);
+		launcher.setFlatzincExecutable(fznExec);
 	}
 	
 	@Test
 	public void testDom() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTDOM);
+		Assume.assumeTrue(type == Type.TEST_DOM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -88,13 +88,13 @@ public class OtherSearchTest {
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = "topLevelObjective";
-		Assert.assertEquals(expected, listener.getObjectives().get(obj));
-		Assert.assertEquals(expected2, listener.getSolutionCounter());
+		Assert.assertEquals(expectedTopLevelObj, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedNoSolutions, listener.getSolutionCounter());
 	}
 
 	@Test
 	public void testNonDom() throws IOException, MiniBrassParseException {
-		Assume.assumeTrue(type == Type.TESTNONDOM);
+		Assume.assumeTrue(type == Type.TEST_NONDOM);
 		// 1. compile minibrass file
 		File output = new File(minibrassCompiled);
 		compiler.compile(new File(minibrassModel), output);
@@ -113,8 +113,8 @@ public class OtherSearchTest {
 		// for the objective, we need to find out the variable name 
 		// instance was "cr1"
 		String obj = MiniZincKeywords.TOP_LEVEL_OBJECTIVE; 
-		Assert.assertEquals(expected, listener.getObjectives().get(obj));
-		Assert.assertEquals(expected2, listener.getSolutionCounter());
+		Assert.assertEquals(expectedTopLevelObj, listener.getObjectives().get(obj));
+		Assert.assertEquals(expectedNoSolutions, listener.getSolutionCounter());
 	}
 
 }
