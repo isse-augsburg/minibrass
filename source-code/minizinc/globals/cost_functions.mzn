@@ -51,6 +51,14 @@ let {
 }
 in (cost_function_binary_safe(folded, costs, x, y, costVariable) );
 
+function var int: cost_function_binary_fn(var int: x, var int: y, array[int] of int: costs ) = 
+let {
+  var int: costVariable;
+  constraint cost_function_binary(x, y, costs, costVariable);
+}
+in costVariable;
+
+
 predicate cost_function_binary_safe(array[int] of int: folded, array[int] of int: costs, var int: x, var int: y, var int: costVariable) = 
 
 assert(max(index_set(folded)) == 2*max(index_set(costs)), "Dimensions of cost vector and flattened domains must agree, i.e., you should have \(max(index_set(folded)) div 2) cost entries.", 

@@ -66,8 +66,8 @@ public class ParameterSettings {
 				+ " bool: useSPD :: default('true');"
 				+ "} in  "
 				+ "instantiates with \"../mbr_types/cr_type.mzn\" {"
-				+ "  times -> link_invert_booleans;"
-				+ "  is_worse -> is_worse_cr;"
+				+ "  times -> union_violateds;"
+				+ "  is_worse -> is_worse_constraint_pref;"
 				+ "  top -> {};"
 				+ "};";
 		
@@ -77,8 +77,8 @@ public class ParameterSettings {
 				+ " bool: useSPD :: default('true');"
 				+ "} in  "
 				+ "instantiates with \"../mbr_types/cr_type.mzn\" {"
-				+ "  times -> link_invert_booleans;"
-				+ "  is_worse -> is_worse_cr;"
+				+ "  times -> union_violateds;"
+				+ "  is_worse -> is_worse_constraint_pref;"
 				+ "  top -> {};"
 				+ "};";
 		
@@ -88,8 +88,8 @@ public class ParameterSettings {
 				+ " bool: useSPD :: default('true');"
 				+ "} in  "
 				+ "instantiates with \"../mbr_types/cr_type.mzn\" {"
-				+ "  times -> link_invert_booleans;"
-				+ "  is_worse -> is_worse_cr;"
+				+ "  times -> union_violateds;"
+				+ "  is_worse -> is_worse_constraint_pref;"
 				+ "  top -> {};"
 				+ "};";
 		
@@ -99,8 +99,8 @@ public class ParameterSettings {
 				+ " bool: useSPD :: default('true');"
 				+ "} in  "
 				+ "instantiates with \"../mbr_types/cr_type.mzn\" {"
-				+ "  times -> link_invert_booleans;"
-				+ "  is_worse -> is_worse_cr;"
+				+ "  times -> union_violateds;"
+				+ "  is_worse -> is_worse_constraint_pref;"
 				+ "  top -> {};"
 				+ "};";
 				  

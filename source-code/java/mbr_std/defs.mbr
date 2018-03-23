@@ -3,7 +3,7 @@
 % ========================================
 type FreePVS = PVSType<mset[maxOccurrences] of 1..maxP> = 
   params { 
-    array[int, 1..2] of 1..nScs: partialOrdering  :: wrappedBy('java', 'isse.mbr.extensions.preprocessing.TransitiveClosure');
+    array[int, 1..2] of 1..maxP: partialOrdering  :: wrappedBy('java', 'isse.mbr.extensions.preprocessing.TransitiveClosure');
     int: maxP;
     int: maxPerSc;
     int: maxOccurrences :: default('mbr.nScs * mbr.maxPerSc');
@@ -20,8 +20,8 @@ type ConstraintPreferences = PVSType<bool, set of 1..nScs> =
     bool: useSPD :: default('true');
   } in 
   instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
-    times -> link_invert_booleans;
-    is_worse -> is_worse_cr;
+    times -> union_violateds;
+    is_worse -> is_worse_constraint_pref;
     top -> {};
   }
   offers {

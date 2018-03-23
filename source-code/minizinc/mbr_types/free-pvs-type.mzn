@@ -75,8 +75,6 @@ predicate isSmythWorse (
   true
 ); 
 
-% function array[int] of var int: multiset_union(array[1..nScs,1..maxP] of var 0..maxPerSc: scGradings,
-% Warning: Currently, no (static) type checks are possible, MiniZinc would fail if invalid assignments are enforced
 function array[int] of var int: multiset_union(array[int,int] of var int: scGradings,
               int: nScs,
               array[int, 1..2] of int: edges,
@@ -85,7 +83,7 @@ function array[int] of var int: multiset_union(array[int,int] of var int: scGrad
               int: maxOccurrences) =
 let {
   set of int: UP = 1..maxP;
-  set of int: MOCC = 0..maxOccurrences;
+  set of int: MOCC = 0..nScs*maxPerSc;
   array[UP] of var MOCC: unioned;
   constraint forall(p in UP) (unioned[p] = sum(i in 1..nScs)(scGradings[i,p]) );
 }
