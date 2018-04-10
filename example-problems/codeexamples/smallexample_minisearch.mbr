@@ -1,0 +1,14 @@
+include "defs.mbr";
+
+PVS: cr1 = new ConstraintPreferences("cr1") {
+   soft-constraint c1: 'x + 1 = y';
+   soft-constraint c2: 'z = y + 2';
+   soft-constraint c3: 'x + y <= 3';
+   
+   crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
+   useSPD: 'false' ;
+}; 
+
+output '["x = \(x); y = \(y); z = \(z)"]';
+
+solve cr1;
