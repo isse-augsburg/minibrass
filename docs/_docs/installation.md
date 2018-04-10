@@ -9,7 +9,7 @@ permalink: /docs/installation/
 3. Download [soft_constraints.zip](https://github.com/isse-augsburg/minibrass/raw/master/source-code/minizinc/soft_constraints.zip) and unpack it to some directory (called `MBR_SOFT_DIR`)
 4. Locate the directory "./share/minizinc/std" of your MiniZinc installation
 5. Copy the directory "soft_constraints" (in `MBR_SOFT_DIR`) into "./share/minizinc/std"
-6. Download and extract the code examples
+6. Download and extract the [code examples](https://github.com/isse-augsburg/minibrass/raw/master/example-problems/codeexamples/codeexamples.zip)
 7. Compile the preference model by using `java -jar MBR_DIR/mbr2mzn.jar -m smallexample_minizinc.mbr`
 8. Run `minizinc smallexample_minizinc.mzn` : Your output should state
 
@@ -27,7 +27,7 @@ Valuations:  overall = 1
 3. Download [soft_constraints.zip](https://github.com/isse-augsburg/minibrass/raw/master/source-code/minizinc/soft_constraints.zip) and unpack it to some directory (called `MBR_SOFT_DIR`)
 4. Locate the directory "./share/minizinc/std" of your MiniSearch installation
 5. Copy the directory "soft_constraints" (in `MBR_SOFT_DIR`) into "./share/minizinc/std"
-6. Download and extract the code examples
+6. Download and extract the [code examples](https://github.com/isse-augsburg/minibrass/raw/master/example-problems/codeexamples/codeexamples.zip)
 7. Compile the preference model by using `java -jar MBR_DIR/mbr2mzn.jar smallexample_minisearch.mbr`
 8. Run `minisearch smallexample_minisearch.mzn` : Your output should state
 
