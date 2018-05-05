@@ -58,6 +58,8 @@ public class MiniBrassCompiler {
 	private Options options;
 	private HelpFormatter formatter;
 
+	private CodeGenerator underlyingCodegen;
+
 	public MiniBrassCompiler() {
 	}
 
@@ -119,17 +121,17 @@ public class MiniBrassCompiler {
 		underlyingParser = new MiniBrassParser();
 		MiniBrassAST model = underlyingParser.parse(input);
 
-		CodeGenerator codegen = new CodeGenerator();
-		codegen.setOnlyMiniZinc(isMinizincOnly());
-		codegen.setGenHeuristics(isGenHeuristics());
-		codegen.setSuppressOutputGeneration(suppressOutput);
+		underlyingCodegen = new CodeGenerator();
+		underlyingCodegen.setOnlyMiniZinc(isMinizincOnly());
+		underlyingCodegen.setGenHeuristics(isGenHeuristics());
+		underlyingCodegen.setSuppressOutputGeneration(suppressOutput);
 
 		// make sure there is one solve item !
 		if (model.getSolveInstance() == null) {
 			throw new MiniBrassParseException("Model contains no solve item! Please add one");
 		}
 
-		String generatedCode = codegen.generateCode(model);
+		String generatedCode = underlyingCodegen.generateCode(model);
 		return generatedCode;
 	}
 
@@ -235,6 +237,14 @@ public class MiniBrassCompiler {
 
 	public void setUnderlyingParser(MiniBrassParser underlyingParser) {
 		this.underlyingParser = underlyingParser;
+	}
+
+	public CodeGenerator getUnderlyingCodegen() {
+		return underlyingCodegen;
+	}
+
+	public void setUnderlyingCodegen(CodeGenerator underlyingCodegen) {
+		this.underlyingCodegen = underlyingCodegen;
 	}
 
 }

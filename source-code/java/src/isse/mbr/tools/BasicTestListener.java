@@ -16,16 +16,16 @@ import isse.mbr.parsing.CodeGenerator;
  */
 public class BasicTestListener implements MiniZincResultListener {
 
-	private boolean solved;
-	private int solutionCounter;
-	private boolean optimally;
-	private String customString;
-	private boolean cyclic;
-	private Map<String, String> objectives;
-	private Map<String, List<String>> objectiveSequences;
-	private Map<String, String> lastSolution;
-	private boolean wasSolutionLine;
-	private boolean wasObjLine;
+	protected boolean solved;
+	protected int solutionCounter;
+	protected boolean optimally;
+	protected String customString;
+	protected  boolean cyclic;
+	protected  Map<String, String> objectives;
+	protected  Map<String, List<String>> objectiveSequences;
+	protected  Map<String, String> lastSolution;
+	protected  boolean wasSolutionLine;
+	protected  boolean wasObjLine;
 	
 	public BasicTestListener() {
 		this.solved = false;

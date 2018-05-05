@@ -8,8 +8,10 @@ import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,13 +43,11 @@ public class MiniZincLauncher {
 		listeners.add(listener);
 	}
 	
-
-	public void runMiniZincModel(File model, File data, int timeout) {
+	public void runMiniZincModel(File model, List<File> dataFiles, int timeout) {
 		// for now, just use Gecode
 		
 		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
 	
-		String dataPath = data != null ? data.getPath() : "";
 		ProcessBuilder pb;
 		if(useDefault) {
 			pb = new ProcessBuilder("minizinc", "-a", model.getPath());
@@ -55,12 +55,21 @@ public class MiniZincLauncher {
 			pb = new ProcessBuilder("minizinc", "-a","-f",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
 		}
 		
-		if(data != null)
-			pb.command().add(dataPath);
+		if(dataFiles != null) {
+			for(File dataFile : dataFiles) {
+				String dataPath = dataFile != null ? dataFile.getPath() : "";
+				pb.command().add(dataPath);
+			}
+		}
+			
 		lastModel = model;
 		
 		runProcess(pb, timeoutInMillisecs);
 		cleanup();
+	}
+	
+	public void runMiniZincModel(File model, File data, int timeout) {
+		runMiniZincModel(model, Arrays.asList(data), timeout);
 	}
 	
 	public void runMiniSearchModel(File model, File data, int timeout) {

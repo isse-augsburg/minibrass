@@ -2,6 +2,7 @@ package isse.mbr.integration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,7 +47,7 @@ public class PureMiniZincTest {
 		BasicTestListener listener = new BasicTestListener();
 		launcher.addMiniZincResultListener(listener);
 		//launcher.runMiniSearchModel(new File(minizincModel), null, 60);
-		launcher.runMiniZincModel(new File(minizincModel), null, 60);
+		launcher.runMiniZincModel(new File(minizincModel), Collections.EMPTY_LIST, 60);
 		
 		// 3. check solution
 		Assert.assertTrue(listener.isSolved());

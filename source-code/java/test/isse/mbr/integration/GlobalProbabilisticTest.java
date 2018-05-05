@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -87,7 +88,7 @@ public class GlobalProbabilisticTest {
 		
 		BasicTestListener listener = new BasicTestListener();
 		launcher.addMiniZincResultListener(listener);
-		launcher.runMiniZincModel(new File(minizincModel), null, 60);
+		launcher.runMiniZincModel(new File(minizincModel), Collections.EMPTY_LIST, 60);
 		
 		// 3. check solution
 		Assert.assertTrue(listener.isSolved());
@@ -110,7 +111,7 @@ public class GlobalProbabilisticTest {
 		
 		BasicTestListener listener = new BasicTestListener();
 		launcher.addMiniZincResultListener(listener);
-		launcher.runMiniZincModel(new File(minizincMorphedModel), null, 60);
+		launcher.runMiniZincModel(new File(minizincMorphedModel), Collections.EMPTY_LIST, 60);
 		
 		// 3. check solution
 		Assert.assertTrue(listener.isSolved());

@@ -186,7 +186,7 @@ public class CodeGenerator {
 		AbstractPVSInstance topLevelInstance = deref(model.getSolveInstance());
 		addExportedOverallMiniZincHooks(sb, model, topLevelInstance);
 
-		leafInstances = new LinkedList<PVSInstance>();
+		leafInstances = new LinkedList<>();
 
 		// here the actual recursive code generation takes place
 		addPvs(topLevelInstance, sb, model);
@@ -478,7 +478,7 @@ public class CodeGenerator {
 		leafInstances.add(inst);
 		PVSType pvsType = inst.getType().instance;
 		String overallIdent = getOverallValuation(inst);
-		String valuationsArray = CodeGenerator.encodeString(VALUATIONS_KEY, inst);
+		String valuationsArray = getValuationsArray(inst);
 		
 		// first the parameters of the atomic PVS instance
 		Map<String, String> subs = addAtomicPvsParameters(inst, sb, model);
@@ -512,6 +512,10 @@ public class CodeGenerator {
 			handler.handleAtomicPvs(api, model, sb);
 		}
 
+	}
+
+	public String getValuationsArray(AbstractPVSInstance inst) {
+		return CodeGenerator.encodeString(VALUATIONS_KEY, inst);
 	}
 
 	/**

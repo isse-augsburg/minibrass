@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -192,7 +193,7 @@ public class VotingMajorityTopsTest {
 		// 2. execute minisearch
 		BasicTestListener listener = new BasicTestListener();
 		launcher.addMiniZincResultListener(listener);
-		launcher.runMiniZincModel(new File(minizincPureModel), null, 60);
+		launcher.runMiniZincModel(new File(minizincPureModel), Collections.EMPTY_LIST, 60);
 		
 		// 3. check solution
 		Assert.assertTrue(listener.isSolved());

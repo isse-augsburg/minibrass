@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -188,7 +189,7 @@ public class PairwiseComparator {
 				
 				MiniZincLauncher launcher = new MiniZincLauncher();
 				launcher.addMiniZincResultListener(new VoteResultsListener(leftLikes, rightLikes, indifferents, i,j));
-				launcher.runMiniZincModel(out, null, 1000);
+				launcher.runMiniZincModel(out, Collections.EMPTY_LIST, 1000);
 				
 			}
 		}
