@@ -5,20 +5,14 @@ permalink: /docs/citing/
 If you use MiniBrass in your academic research, please consider citing 
 
 ```
-@INPROCEEDINGS{Schiendorfer13,
-  author = {Alexander Schiendorfer and
-            Jan-Philipp Steghöfer and
-            Alexander Knapp and
-            Florian Nafz and
-            Wolfgang Reif},
-  title = {Constraint Relationships for Soft Constraints},
-  editor = {Max Bramer and
-            Miltos Petridis},
-  booktitle = {Proc. 33\textsuperscript{rd} SGAI Int. Conf.
-               Innovative Techniques and Applications of Artificial Intelligence (AI'13)},
-  publisher = {Springer},
-  year = {2013},
-  pages = {241-255},
-  nolanguage = {English}
+@article{Schiendorfer2018,
+  title={MiniBrass: Soft Constraints for MiniZinc},
+  author={Schiendorfer, Alexander and Knapp, Alexander and Anders, Gerrit and Reif, Wolfgang},
+  journal={Constraints},
+  pages={},
+  doi = {10.1007/s10601-018-9289-2},
+  year={2018},
+  note ={to appear},
+  publisher={Springer}
 }
 ```
