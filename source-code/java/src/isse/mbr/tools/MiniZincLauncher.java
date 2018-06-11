@@ -29,6 +29,11 @@ public class MiniZincLauncher {
 	private String flatzincExecutable = "fzn-gecode";
 	private String minizincGlobals = "gecode";  
 	private boolean useDefault = false; // passing no arguments to minizinc/minisearch
+	private boolean useAllSolutions = true;
+
+	private boolean doLog = true;
+
+
 	private boolean debug = false;
 	private boolean deleteAfterRun = false;
 	private File lastModel;
@@ -50,10 +55,15 @@ public class MiniZincLauncher {
 	
 		ProcessBuilder pb;
 		if(useDefault) {
-			pb = new ProcessBuilder("minizinc", "-a", model.getPath());
+			pb = new ProcessBuilder("minizinc" );
 		} else {
-			pb = new ProcessBuilder("minizinc", "-a","-f",flatzincExecutable, "-G"+minizincGlobals, model.getPath());
+			pb = new ProcessBuilder("minizinc",  "-f",flatzincExecutable, "-G"+minizincGlobals);
 		}
+
+		if(useAllSolutions)
+			pb.command().add("-a");
+		
+		pb.command().add(model.getPath());
 		
 		if(dataFiles != null) {
 			for(File dataFile : dataFiles) {
@@ -61,6 +71,7 @@ public class MiniZincLauncher {
 				pb.command().add(dataPath);
 			}
 		}
+		
 			
 		lastModel = model;
 		
@@ -144,6 +155,14 @@ public class MiniZincLauncher {
 		processResult(log);
 	}
 	
+	public boolean isDoLog() {
+		return doLog;
+	}
+
+	public void setDoLog(boolean doLog) {
+		this.doLog = doLog;
+	}
+	
 	private void cleanup() {
 		try {
 			// need to make sure fzn-gecode is truly killed
@@ -154,14 +173,16 @@ public class MiniZincLauncher {
 			if(killScript.exists()) {
 				killBuilder = new ProcessBuilder("./killscript.sh");
 			} else {
-				LOGGER.warning("Killscript not found locally. Trying in jar location");
+				if(doLog)
+					LOGGER.warning("Killscript not found locally. Trying in jar location");
 				URL jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation();	
 				File classPathDir = new File(jarLocation.toURI());
 				killScript = new File(classPathDir.getParent(), "killscript.sh");
 				if(killScript.exists()) {
 					killBuilder = new ProcessBuilder(killScript.getAbsolutePath());
 				} else {
-					LOGGER.severe("No killscript found at " +killScript.getAbsolutePath()+ ". Do not attempt further cleanup.");
+					if(doLog)
+						LOGGER.severe("No killscript found at " +killScript.getAbsolutePath()+ ". Do not attempt further cleanup.");
 				}
 			}
 			
@@ -296,6 +317,14 @@ public class MiniZincLauncher {
 
 	public void setDeleteAfterRun(boolean deleteAfterRun) {
 		this.deleteAfterRun = deleteAfterRun;
+	}
+	
+	public boolean isUseAllSolutions() {
+		return useAllSolutions;
+	}
+
+	public void setUseAllSolutions(boolean useAllSolutions) {
+		this.useAllSolutions = useAllSolutions;
 	}
 
 }
