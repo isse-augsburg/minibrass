@@ -17,6 +17,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import isse.mbr.tools.processsources.DefaultMiniZincSource;
+
 
 /**
  * This class allows easy access to MiniZinc/MiniSearch models and their solutions
@@ -26,11 +28,12 @@ import java.util.logging.Logger;
 public class MiniZincLauncher {
 	Collection<MiniZincResultListener> listeners;
 
+
+	private boolean useDefault = false; // passing no arguments to minizinc/minisearch 
+	private boolean useAllSolutions = true;
 	private String flatzincExecutable = "fzn-gecode";
 	private String minizincGlobals = "gecode";  
-	private boolean useDefault = false; // passing no arguments to minizinc/minisearch
-	private boolean useAllSolutions = true;
-
+	private MiniZincProcessSource processSource;
 	private boolean doLog = true;
 
 
@@ -42,6 +45,7 @@ public class MiniZincLauncher {
 	
 	public MiniZincLauncher() {
 		listeners = new LinkedList<>();
+		processSource = new DefaultMiniZincSource();
 	}
 	
 	public void addMiniZincResultListener(MiniZincResultListener listener){
@@ -51,18 +55,10 @@ public class MiniZincLauncher {
 	public void runMiniZincModel(File model, List<File> dataFiles, int timeout) {
 		// for now, just use Gecode
 		
-		int timeoutInMillisecs = timeout*1000; // wait for 30 seconds
+		int timeoutInMillisecs = timeout * 1000; // wait for 30 seconds
 	
-		ProcessBuilder pb;
-		if(useDefault) {
-			pb = new ProcessBuilder("minizinc" );
-		} else {
-			pb = new ProcessBuilder("minizinc",  "-f",flatzincExecutable, "-G"+minizincGlobals);
-		}
+		ProcessBuilder pb = processSource.getMiniZincProcessBuilder();
 
-		if(useAllSolutions)
-			pb.command().add("-a");
-		
 		pb.command().add(model.getPath());
 		
 		if(dataFiles != null) {
@@ -79,6 +75,13 @@ public class MiniZincLauncher {
 		cleanup();
 	}
 	
+	/**
+	 * Only call this method if data is not null (i.e., you have data)
+	 * If you do not want to pass any data, please call it with an empty list
+	 * @param model
+	 * @param data
+	 * @param timeout
+	 */
 	public void runMiniZincModel(File model, File data, int timeout) {
 		runMiniZincModel(model, Arrays.asList(data), timeout);
 	}
@@ -279,21 +282,6 @@ public class MiniZincLauncher {
 
 	}
 
-	public String getFlatzincExecutable() {
-		return flatzincExecutable;
-	}
-
-	public void setFlatzincExecutable(String flatzincExecutable) {
-		this.flatzincExecutable = flatzincExecutable;
-	}
-
-	public String getMinizincGlobals() {
-		return minizincGlobals;
-	}
-
-	public void setMinizincGlobals(String minizincGlobals) {
-		this.minizincGlobals = minizincGlobals;
-	}
 
 	public boolean isUseDefault() {
 		return useDefault;
@@ -325,6 +313,45 @@ public class MiniZincLauncher {
 
 	public void setUseAllSolutions(boolean useAllSolutions) {
 		this.useAllSolutions = useAllSolutions;
+		// TODO refactor, should not be done here
+		if(processSource instanceof DefaultMiniZincSource) {
+			MiniZincProcessSource dms = processSource;
+			dms.setUseAllSolutions(useAllSolutions);
+		}
 	}
 
+	public String getFlatzincExecutable() {
+		return flatzincExecutable;
+	}
+
+	public void setFlatzincExecutable(String flatzincExecutable) {
+		this.flatzincExecutable = flatzincExecutable;
+		// TODO refactor, should not be done here
+		if(processSource instanceof DefaultMiniZincSource) {
+			DefaultMiniZincSource dms = (DefaultMiniZincSource) processSource;
+			dms.setFlatzincExecutable(flatzincExecutable);
+		}
+	}
+
+	public String getMinizincGlobals() {
+		return minizincGlobals;
+	}
+
+	public void setMinizincGlobals(String minizincGlobals) {
+		// TODO refactor, should not be done here
+		if(processSource instanceof DefaultMiniZincSource) {
+			DefaultMiniZincSource dms = (DefaultMiniZincSource) processSource;
+			dms.setMinizincGlobals(minizincGlobals);
+		}
+		
+		this.minizincGlobals = minizincGlobals;
+	}
+
+	public MiniZincProcessSource getProcessSource() {
+		return processSource;
+	}
+
+	public void setProcessSource(MiniZincProcessSource processSource) {
+		this.processSource = processSource;
+	}
 }
