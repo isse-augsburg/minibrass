@@ -50,6 +50,7 @@ public class MiniBrassCompiler {
 	// MiniBrass file
 	private boolean suppressOutput = false;
 
+	private String externalMiniBrassStdDirPath;
 	private MiniBrassParser underlyingParser; // required for further
 												// post-processing as in, e.g.,
 												// pairwise comparison
@@ -116,9 +117,10 @@ public class MiniBrassCompiler {
 		fw.write(generatedCode);
 		fw.close();
 	}
-	
+
 	public String compile(InputStream input) throws MiniBrassParseException {
 		underlyingParser = new MiniBrassParser();
+		underlyingParser.setExternalMiniBrassStdDirPath(getExternalMiniBrassStdDirPath());
 		MiniBrassAST model = underlyingParser.parse(input);
 
 		underlyingCodegen = new CodeGenerator();
@@ -151,7 +153,8 @@ public class MiniBrassCompiler {
 		options.addOption("m", "only-minizinc", false,
 				"do not generate MiniSearch predicates but only MiniZinc code (top level PVS must be int)");
 		options.addOption("o", "output", true, "output compiled MiniZinc to this file");
-		//options.addOption("", "input-from-stdin", false, "Read input from standard input");
+		// options.addOption("", "input-from-stdin", false, "Read input from standard
+		// input");
 
 		formatter = new HelpFormatter();
 
@@ -161,11 +164,11 @@ public class MiniBrassCompiler {
 
 			List<String> argList = line.getArgList();
 
-			if(line.hasOption('h')) {
+			if (line.hasOption('h')) {
 				printUsage();
 				System.exit(0);
 			}
-			
+
 			if (argList.size() != 1) {
 				System.out.println("mbr2mzn expects exactly one MiniBrass file as input.");
 				printUsage();
@@ -193,8 +196,6 @@ public class MiniBrassCompiler {
 				LOGGER.info("Generate search heuristics as well");
 				genHeuristics = true;
 			}
-			
-			
 
 			LOGGER.info("Processing " + minibrassFile + " to file " + out);
 			File mbrFile = new File(minibrassFile);
@@ -245,6 +246,14 @@ public class MiniBrassCompiler {
 
 	public void setUnderlyingCodegen(CodeGenerator underlyingCodegen) {
 		this.underlyingCodegen = underlyingCodegen;
+	}
+
+	public String getExternalMiniBrassStdDirPath() {
+		return externalMiniBrassStdDirPath;
+	}
+
+	public void setExternalMiniBrassStdDirPath(String externalMiniBrassStdDirPath) {
+		this.externalMiniBrassStdDirPath = externalMiniBrassStdDirPath;
 	}
 
 }
