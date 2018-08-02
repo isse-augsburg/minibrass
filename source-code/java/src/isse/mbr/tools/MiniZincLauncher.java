@@ -208,7 +208,7 @@ public class MiniZincLauncher {
 			lastModel.delete();
 	}
 
-	private void processResult(File log) {
+	public void processResult(File log) {
 		Scanner sc = null;
 		final String optimalitySep = "==========";
 		final String solutionSep = "----------";

@@ -103,7 +103,7 @@ public class MiniBrassParser {
 				if (externalMiniBrassStdDirPath != null) {
 					mbrStdDir = new File(externalMiniBrassStdDirPath);
 				}
-				if (!mbrStdDir.exists()) {
+				if (mbrStdDir == null || !mbrStdDir.exists()) {
 					File classPathDir = new File(jarLocation.toURI());
 					File siblingStd = new File(classPathDir.getParentFile(), MBR_STD_DIR);
 					if (siblingStd.exists())
