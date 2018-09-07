@@ -57,6 +57,8 @@ import isse.mbr.model.voting.VotingProcedure;
  */
 public class MiniBrassParser {
 
+	private static final String MINIBRASS_STANDARD_DIR = "mbr_std";
+
 	private final static Logger LOGGER = Logger.getGlobal();
 
 	private Scanner scanner;
@@ -77,7 +79,7 @@ public class MiniBrassParser {
 	public static final String LEX_PROD = "_MBR_LEX_";
 	public static final String TOP_LEVEL_PVS_REF = "topLevelPvsRef";
 
-	public static final String MBR_STD_DIR = "mbr_std";
+	public static final String MBR_STD_DIR = MINIBRASS_STANDARD_DIR;
 
 	public MiniBrassParser() {
 	}
@@ -207,11 +209,11 @@ public class MiniBrassParser {
 
 			try {
 				File classPathDir = new File(jarLocation.toURI());
-				File siblingStd = new File(classPathDir.getParentFile(), "mbr_std");
+				File siblingStd = new File(classPathDir.getParentFile(), MINIBRASS_STANDARD_DIR);
 				if (siblingStd.exists())
 					mbrStdDir = siblingStd;
 				else {
-					File cousinStd = new File(classPathDir.getParentFile().getParentFile(), "mbr_std");
+					File cousinStd = new File(classPathDir.getParentFile().getParentFile(), MINIBRASS_STANDARD_DIR);
 					if (cousinStd.exists())
 						mbrStdDir = cousinStd;
 				}
@@ -1234,9 +1236,12 @@ public class MiniBrassParser {
 			model.getAdditionalMinizincIncludes().add(fileName);
 		} else {
 			File referred = new File(currDir, fileName);
+			System.out.println("I requested to include "+fileName.toString() + " (looking in directory: "+referred.getAbsolutePath()+")");
 			if (!referred.exists()) {
+				System.out.println("Not found ... what about the mbrStdDir? "+mbrStdDir);
 				if (mbrStdDir != null) {
 					referred = new File(mbrStdDir, fileName);
+					System.out.println("Within the std dir, I requested to include "+fileName.toString() + " (looking in directory: "+referred.getAbsolutePath()+")");
 					if (!referred.exists())
 						throw new MiniBrassParseException("Could not find file " + fileName
 								+ " in either working directory or MiniBrass standard lib");
