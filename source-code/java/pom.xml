@@ -5,8 +5,12 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>mbr2mzn</name>
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+	<!-- Sets java version for the complete project: -->
+	<maven.compiler.source>1.8</maven.compiler.source>
+	<maven.compiler.target>1.8</maven.compiler.target>
+	<!-- Important for platform-independent file encoding: -->
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <build>
     <sourceDirectory>src</sourceDirectory>
