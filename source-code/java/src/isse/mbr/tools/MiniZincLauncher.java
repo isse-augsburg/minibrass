@@ -17,6 +17,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import isse.mbr.tools.processsources.DefaultMiniZincSource;
 
 
@@ -169,18 +171,24 @@ public class MiniZincLauncher {
 	private void cleanup() {
 		try {
 			// need to make sure fzn-gecode is truly killed
+			// have to implement that also for windows
+			String killScriptPath = "./killscript.sh";
 			
+			// if is windows ...
+			if(SystemUtils.IS_OS_WINDOWS) {
+				killScriptPath = "./killscript.cmd";
+			}
 			ProcessBuilder killBuilder = null;
-			File killScript = new File("./killscript.sh");
+			File killScript = new File(killScriptPath);
 			
 			if(killScript.exists()) {
-				killBuilder = new ProcessBuilder("./killscript.sh");
+				killBuilder = new ProcessBuilder(killScriptPath);
 			} else {
 				if(doLog)
 					LOGGER.warning("Killscript not found locally. Trying in jar location");
 				URL jarLocation = getClass().getProtectionDomain().getCodeSource().getLocation();	
 				File classPathDir = new File(jarLocation.toURI());
-				killScript = new File(classPathDir.getParent(), "killscript.sh");
+				killScript = new File(classPathDir.getParent(), killScriptPath);
 				if(killScript.exists()) {
 					killBuilder = new ProcessBuilder(killScript.getAbsolutePath());
 				} else {
