@@ -11,10 +11,12 @@ public class MiniBrassVotingKeywords {
 	protected Map<String, String> keywordLookup;
 	
 	public MiniBrassVotingKeywords() {
-		keywordLookup = new HashMap<String, String>();
+		keywordLookup = new HashMap<>();
 		keywordLookup.put("voterCount", VOTER_COUNT);
 		keywordLookup.put("voterEnum", VOTER_ENUM);
 		keywordLookup.put("voterStringNames", VOTER_STRING_NAMES);
+		// a synonym for voterStringNames
+		keywordLookup.put("voterIdentifiers", VOTER_STRING_NAMES);
 	}
 
 	public String lookup(String key) {

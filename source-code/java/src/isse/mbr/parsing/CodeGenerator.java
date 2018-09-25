@@ -133,7 +133,7 @@ public class CodeGenerator {
 
 	}
 	
-	private void addBindings(StringBuilder sb, MiniBrassAST model) {
+	private void addBindings(StringBuilder sb, MiniBrassAST model) throws MiniBrassParseException {
 		// take care of optional bindings
 		MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
 		for(MiniZincBinding binding : model.getBindings()) {
@@ -142,7 +142,11 @@ public class CodeGenerator {
 			VotingInstance vi = (VotingInstance) scopeInst;
 			
 			// binding.minizincVariable = VOTER_COUNT ... 
-			String encodedMetaVar = kw.lookup(binding.getMetaVariable()) + vi.getName();
+			String metaVariablePrefix = kw.lookup(binding.getMetaVariable()); 
+			if(metaVariablePrefix == null) {
+				throw new MiniBrassParseException("Unknown meta-variable specified in MiniBrass model: "+ binding.getMetaVariable());
+			}
+			String encodedMetaVar = metaVariablePrefix + vi.getName();
 			String mznVar = binding.getMinizincVariable();
 			String genBinding = String.format("%s = %s;\n", mznVar, encodedMetaVar);
 			sb.append(genBinding);
