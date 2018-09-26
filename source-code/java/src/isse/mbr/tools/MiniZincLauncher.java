@@ -19,14 +19,16 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import isse.mbr.tools.execution.MiniZincConfiguration;
 import isse.mbr.tools.processsources.DefaultMiniZincSource;
 
 
 /**
  * This class allows easy access to MiniZinc/MiniSearch models and their solutions
  * @author Alexander Schiendorfer
- *
+ * @deprecated  As of MiniZinc 2.2.1, replaced by {@link MiniZincRunner}
  */
+@Deprecated
 public class MiniZincLauncher {
 	Collection<MiniZincResultListener> listeners;
 

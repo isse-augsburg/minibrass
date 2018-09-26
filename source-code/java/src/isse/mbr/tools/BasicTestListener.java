@@ -35,8 +35,7 @@ public class BasicTestListener implements MiniZincResultListener {
 		this.objectives = new HashMap<>();
 		this.lastSolution = new HashMap<>();
 		this.objectiveSequences = new HashMap<>(); 
-	}
-	
+	}	
 	
 	@Override
 	public void notifyOptimality() {
