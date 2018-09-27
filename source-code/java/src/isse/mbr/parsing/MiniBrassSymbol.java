@@ -39,6 +39,12 @@ public enum MiniBrassSymbol {
 	SetSy,              // set 
 	MSetSy,             // mset (multiset)
 	ArraySy,            // array
+	Array1dSy,          // array1d
+	Array2dSy,          // array2d
+	Array3dSy,          // array3d
+	Array4dSy,          // array4d
+	Array5dSy,          // array5d
+	Array6dSy,          // array6d
 	OfSy,               // of
 	IntSy,              // int
 	BoolSy,             // bool

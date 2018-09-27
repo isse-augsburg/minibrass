@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,9 +62,9 @@ public class MiniBrassParser {
 
 	private final static Logger LOGGER = Logger.getGlobal();
 
-	private Scanner scanner;
-	private MiniBrassSymbol currSy;
-	private MiniBrassLexer lexer;
+	protected Scanner scanner;
+	protected MiniBrassSymbol currSy;
+	protected MiniBrassLexer lexer;
 	private Set<File> visited;
 	private Set<InputStream> visitedStreams;
 	private Set<File> worklist;
@@ -1109,11 +1110,11 @@ public class MiniBrassParser {
 		}
 	}
 
-	private String readVerbatimUntil(char c) {
+	protected String readVerbatimUntil(char c) {
 		return lexer.readVerbatimUntil(c);
 	}
 
-	private void expectSymbolAndNext(MiniBrassSymbol sy) throws MiniBrassParseException {
+	protected void expectSymbolAndNext(MiniBrassSymbol sy) throws MiniBrassParseException {
 		expectSymbol(sy);
 		getNextSy();
 	}
@@ -1123,7 +1124,7 @@ public class MiniBrassParser {
 	 * 
 	 * @throws MiniBrassParseException
 	 */
-	private MiniZincParType MiniZincParType(PVSType scopeType) throws MiniBrassParseException {
+	protected MiniZincParType MiniZincParType(PVSType scopeType) throws MiniBrassParseException {
 		if (currSy == MiniBrassSymbol.ArraySy) {
 
 			ArrayType arrayType = MiniZincArrayType(scopeType);
@@ -1155,7 +1156,7 @@ public class MiniBrassParser {
 	 * 
 	 * @throws MiniBrassParseException
 	 */
-	private MiniZincVarType MiniZincVarType(PVSType scopeType) throws MiniBrassParseException {
+	protected MiniZincVarType MiniZincVarType(PVSType scopeType) throws MiniBrassParseException {
 		if (currSy == MiniBrassSymbol.SetSy) {
 			getNextSy();
 			expectSymbol(MiniBrassSymbol.OfSy);
@@ -1262,13 +1263,21 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 	}
 
-	private void expectSymbol(MiniBrassSymbol expectedSy) throws MiniBrassParseException {
+	protected void expectSymbol(MiniBrassSymbol expectedSy) throws MiniBrassParseException {
 		if (currSy != expectedSy) {
-			throw new MiniBrassParseException("Expected symbol " + expectedSy + " but found " + currSy);
+			throw new MiniBrassParseException("Expected symbol " + expectedSy + " but found " + currSy + " (last string "+lexer.getLastIdent()+ ")");
 		}
 	}
 
-	private void getNextSy() {
+	protected void expectSymbol(List<MiniBrassSymbol> acceptableSymbols) throws MiniBrassParseException {
+		for(MiniBrassSymbol sym : acceptableSymbols) {
+			if(currSy == sym)
+				return;
+		}
+		throw new MiniBrassParseException("Expected either symbol of " + Arrays.toString(acceptableSymbols.toArray()) + " but found " + currSy);
+	}
+	
+	protected void getNextSy() {
 		currSy = lexer.getNextSymbol();
 		// System.out.println("Returning symbol: "+currSy);
 	}

@@ -1,6 +1,7 @@
 package isse.mbr.parsing;
 
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 
@@ -18,9 +19,12 @@ public class MiniBrassLexer {
 	private char currentChar;
 	private String line;
 	private int colPtr;
+	private Stack<StringBuilder> buffers;
+	private boolean buffering = false;
 	
 
 	// to be accessed from ATGs
+	String bufferContent;
 	String lastIdent;
 	int lastInt;
 	double lastFloat;
@@ -29,6 +33,10 @@ public class MiniBrassLexer {
 
 	// for better error messages 
 	int lineNo;
+	
+	public MiniBrassLexer() {
+		buffers = new Stack<>();
+	}
 	
 	public void setScanner(Scanner scanner) {
 		this.scanner = scanner;
@@ -198,6 +206,18 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.SetSy;
 				case "mset":
 					return MiniBrassSymbol.MSetSy;
+				case "array1d":
+					return MiniBrassSymbol.Array1dSy;
+				case "array2d":
+					return MiniBrassSymbol.Array2dSy;
+				case "array3d":
+					return MiniBrassSymbol.Array3dSy;
+				case "array4d":
+					return MiniBrassSymbol.Array4dSy;
+				case "array5d":
+					return MiniBrassSymbol.Array5dSy;
+				case "array6d":
+					return MiniBrassSymbol.Array6dSy;
 				case "array":
 					return MiniBrassSymbol.ArraySy;
 				case "of":
@@ -259,8 +279,29 @@ public class MiniBrassLexer {
 		return sym;
 	}
 
+	/**
+	 * Useful if we want to read a string also verbatim while parsing it
+	 * */
+	public void startBuffering() {
+		buffers.add(new StringBuilder());
+		buffering = true;
+	}
+	
+	public String closeBuffer() {
+		bufferContent = buffers.pop().toString();
+		if(buffers.isEmpty())
+			buffering = false;
+		return bufferContent;
+	}
+	
+	private void reportToBuffer() {
+		if(buffering) 
+			for (StringBuilder buffer : buffers)
+				buffer.append(currentChar);
+	}
+	
 	public boolean readNextChar() {
-
+		reportToBuffer();
 		boolean endOfLine = false; 
 			
 		if (line == null || ( colPtr > line.length() - 1)) {
@@ -287,10 +328,10 @@ public class MiniBrassLexer {
 		
 		if(endOfLine) {
 			currentChar = '\n';
-			
 			return true;
 		}
 		currentChar = line.charAt(colPtr);
+
 		++colPtr;
 		
 		if (currentChar == '%') { // line end comment
@@ -367,6 +408,10 @@ public class MiniBrassLexer {
 
 	public void setLastStringLitChar(char lastStringLitChar) {
 		this.lastStringLitChar = lastStringLitChar;
+	}
+
+	public String getBufferContent() {
+		return bufferContent;
 	}
 
 }

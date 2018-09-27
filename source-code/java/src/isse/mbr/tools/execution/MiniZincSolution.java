@@ -2,7 +2,9 @@ package isse.mbr.tools.execution;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
+
+import isse.mbr.parsing.DznParser;
+import isse.mbr.parsing.MiniBrassParseException;
 
 /**
  * Represents a particular MiniZinc solution
@@ -16,10 +18,12 @@ public class MiniZincSolution {
 	// internal data structures
 	private String rawDznSolution;
 	private StringBuilder rawDznSolutionBuilder;
+	private DznParser dznParser;
 	
 	public MiniZincSolution() {
 		rawDznSolutionBuilder = new StringBuilder();
 		variableStore = new HashMap<>();
+		dznParser = new DznParser();
 	}
 	
 	/**
@@ -27,26 +31,17 @@ public class MiniZincSolution {
 	 * @param plainSolutionLine
 	 */
 	public void processSolutionLine(String plainSolutionLine) {
+		System.out.println("Processing: " + plainSolutionLine);
 		rawDznSolutionBuilder.append(plainSolutionLine);
-		StringTokenizer tokenizer = new StringTokenizer(plainSolutionLine, " ");
-		String varIdent = tokenizer.nextToken();
-		tokenizer.nextToken(); // equals sign
-		String value = tokenizer.nextToken(";").trim();
-		
-		MiniZincVariable nextVariable = parseVariable(varIdent, value);
-		variableStore.put(varIdent, nextVariable);
-		System.out.println(varIdent + " -> "+value);
-	}
-	
-	private MiniZincVariable parseVariable(String varIdent, String value) {
-		if(value.contains("{")) { // will be a set
-			
-		} else if (value.contains("[")) { // will be an array
-			
-		} else { // should be int
-			
+		MiniZincVariable nextVariable = null; 
+		try {
+			nextVariable = dznParser.parseVariable(plainSolutionLine.trim());
+		} catch (MiniBrassParseException e) {
+			System.out.println("Error here");
+			e.printStackTrace();
 		}
-		return null;
+		variableStore.put(nextVariable.getName(), nextVariable);
+		System.out.println(nextVariable.getName() + " -> "+ nextVariable.getValue());
 	}
 
 	public void flush() {
