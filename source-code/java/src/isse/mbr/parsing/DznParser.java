@@ -194,7 +194,8 @@ public class DznParser extends MiniBrassParser {
 			
 			String mznExpr = lexer.closeBuffer().trim();
 			// TODO this is kinda ugly, maybe we could do better
-			mznExpr = mznExpr.substring(0, mznExpr.length() - 1);
+			if(!"true".equals(mznExpr) && !"false".equals(mznExpr))
+				mznExpr = mznExpr.substring(0, mznExpr.length() - 1);
 			var.setMznExpression(mznExpr);
 
 			if(currSy == MiniBrassSymbol.CommaSy) {

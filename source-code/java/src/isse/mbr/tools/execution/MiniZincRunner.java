@@ -110,7 +110,6 @@ public class MiniZincRunner {
 			while ((line = reader.readLine()) != null) {
 				result.processRawMiniZincOutputLine(line);
 			}
-			
 			if(timeout > 0) {
 				Timer timer = new Timer();
 				int timeoutInMillisecs = timeout * 1000;
@@ -128,6 +127,7 @@ public class MiniZincRunner {
 			}
 			cleanup();
 		} catch (Exception e) {
+			System.out.println(e);
 			LOGGER.severe(e.getMessage());
 			result.invalidate();
 		} 

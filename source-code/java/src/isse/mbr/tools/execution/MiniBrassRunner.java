@@ -37,6 +37,7 @@ public class MiniBrassRunner {
 	
 		while( (solution = hasNextSolution(miniZincFile)) != null) {
 			// print solution 
+			
 			// process getBetterConstraint with actual solution
 			// add constraint to model
 			// solve again
