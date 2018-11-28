@@ -100,14 +100,15 @@ public class MiniBrassCompiler {
 		new MiniBrassCompiler().doMain(args);
 	}
 
-	public void compile(File input) throws IOException, MiniBrassParseException {
+	public String compile(File input) throws IOException, MiniBrassParseException {
 		String inputPath = input.getAbsolutePath();
 		String mbrFilePrefix = inputPath.substring(0, inputPath.lastIndexOf('.'));
 		File defaultOutput = new File(mbrFilePrefix + "_o.mzn");
-		compile(input, defaultOutput);
+		String generatedCode = compile(input, defaultOutput);
+		return generatedCode;
 	}
 
-	public void compile(File input, File output) throws IOException, MiniBrassParseException {
+	public String compile(File input, File output) throws IOException, MiniBrassParseException {
 		FileInputStream fileInputStream = new FileInputStream(input);
 
 		String generatedCode = compile(fileInputStream);
@@ -116,6 +117,7 @@ public class MiniBrassCompiler {
 		FileWriter fw = new FileWriter(output);
 		fw.write(generatedCode);
 		fw.close();
+		return generatedCode;
 	}
 
 	public String compile(InputStream input) throws MiniBrassParseException {

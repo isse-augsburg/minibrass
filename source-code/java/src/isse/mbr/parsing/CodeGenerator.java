@@ -196,39 +196,39 @@ public class CodeGenerator {
 		addPvs(topLevelInstance, sb, model);
 
 		// get the improvement predicates
-		if (!onlyMiniZinc) {
-			String pvsBetter = encodeString(MiniZincKeywords.POST_GET_BETTER, topLevelInstance);
-			String pvsNotWorse = encodeString(MiniZincKeywords.POST_NOT_GET_WORSE, topLevelInstance);
-			sb.append(String.format("\nfunction ann: %s() = post(%s);\n", pvsBetter,
-					topLevelInstance.getGeneratedBetterPredicate()));
+		String pvsBetter = encodeString(MiniZincKeywords.POST_GET_BETTER, topLevelInstance);
+		String pvsNotWorse = encodeString(MiniZincKeywords.POST_NOT_GET_WORSE, topLevelInstance);
+		if(!onlyMiniZinc)
+			sb.append(String.format("\nfunction ann: %s() = post(%s);\n", pvsBetter, topLevelInstance.getGeneratedBetterPredicate()));
 
-			StringBuilder equalityBuilder = new StringBuilder();
-			boolean firstLeaf = true;
-			for (PVSInstance leafInstance : leafInstances) {
-				String leafValuation = getOverallValuation(leafInstance);
-				if (firstLeaf)
-					firstLeaf = false;
-				else
-					equalityBuilder.append(" /\\ ");
-				// now this must be available for arrays as well
-				if (leafInstance.getType().instance.getElementType() instanceof MiniZincArrayLike) {
-					ArrayType at = ((MiniZincArrayLike) leafInstance.getType().instance.getElementType())
-							.getArrayType();
-					String comprehensionString = getComprehensionString(at, leafInstance);
-					String indexString = getIndexString(at, leafInstance);
-					String equalArrays = String.format(
-							"[ sol(%s[" + indexString + "]) | " + comprehensionString + "] = %s ", leafValuation,
-							leafValuation);
-					equalityBuilder.append(equalArrays);
-				} else {
-					equalityBuilder.append(String.format("sol(%s) = %s", leafValuation, leafValuation));
-				}
+		StringBuilder equalityBuilder = new StringBuilder();
+		boolean firstLeaf = true;
+		for (PVSInstance leafInstance : leafInstances) {
+			String leafValuation = getOverallValuation(leafInstance);
+			if (firstLeaf)
+				firstLeaf = false;
+			else
+				equalityBuilder.append(" /\\ ");
+			// now this must be available for arrays as well
+			if (leafInstance.getType().instance.getElementType() instanceof MiniZincArrayLike) {
+				ArrayType at = ((MiniZincArrayLike) leafInstance.getType().instance.getElementType())
+						.getArrayType();
+				String comprehensionString = getComprehensionString(at, leafInstance);
+				String indexString = getIndexString(at, leafInstance);
+				String equalArrays = String.format(
+						"[ sol(%s[" + indexString + "]) | " + comprehensionString + "] = %s ", leafValuation,
+						leafValuation);
+				equalityBuilder.append(equalArrays);
+			} else {
+				equalityBuilder.append(String.format("sol(%s) = %s", leafValuation, leafValuation));
 			}
-
-			String negatedGetNotWorse = "not ( (" + equalityBuilder.toString() + ") \\/ ("
-					+ topLevelInstance.getGeneratedNotWorsePredicate() + "))";
-			sb.append(String.format("\nfunction ann: %s() = post(%s);\n", pvsNotWorse, negatedGetNotWorse));
 		}
+
+		String negatedGetNotWorse = "not ( (" + equalityBuilder.toString() + ") \\/ ("
+				+ topLevelInstance.getGeneratedNotWorsePredicate() + "))";
+		if(!onlyMiniZinc)
+			sb.append(String.format("\nfunction ann: %s() = post(%s);\n", pvsNotWorse, negatedGetNotWorse));
+	
 
 		// add output line for valuation-carrying variables
 		
@@ -497,8 +497,8 @@ public class CodeGenerator {
 		
 		// -------------------------------------------------------------
 		// MiniSearch predicates variables
-		if(!onlyMiniZinc)
-			addMiniSearchPredicates(inst, sb, model, subs, overallIdent, instanceArguments);
+		// if(!onlyMiniZinc) // add them anyway (not to the code though)
+		addMiniSearchPredicates(inst, sb, model, subs, overallIdent, instanceArguments);
 		
 		// -------------------------------------------------------------
 		// Soft constraints

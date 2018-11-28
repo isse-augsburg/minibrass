@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import isse.mbr.model.parsetree.AbstractPVSInstance;
 import isse.mbr.model.parsetree.MiniZincBinding;
 import isse.mbr.model.parsetree.Morphism;
+import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.types.PVSType;
 import isse.mbr.parsing.MiniBrassParser;
 
@@ -55,7 +56,12 @@ public class MiniBrassAST {
 	public AbstractPVSInstance getSolveInstance() {
 		return solveInstance;
 	}
-
+	
+	public AbstractPVSInstance getDereferencedSolveInstance() {
+		return ReferencedPVSInstance.deref(solveInstance);
+	}
+	
+	
 	public void setSolveInstance(AbstractPVSInstance solveInstance) {
 		this.solveInstance = solveInstance;
 		LOGGER.fine("Registering PVS instance ... " + MiniBrassParser.TOP_LEVEL_PVS_REF + " -> "+ solveInstance.getName());

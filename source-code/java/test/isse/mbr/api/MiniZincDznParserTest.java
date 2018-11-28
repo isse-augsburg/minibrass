@@ -14,16 +14,20 @@ import isse.mbr.model.types.IntType;
 import isse.mbr.model.types.SetType;
 import isse.mbr.parsing.DznParser;
 import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.tools.execution.MiniBrassPostProcessor;
+import isse.mbr.tools.execution.MiniZincSolution;
 import isse.mbr.tools.execution.MiniZincTensor;
 import isse.mbr.tools.execution.MiniZincVariable;
 
 public class MiniZincDznParserTest {
 
 	private DznParser dznParser;
-
+	private MiniBrassPostProcessor postProcessor;
+	
 	@Before
 	public void setUp() throws Exception {
 		dznParser = new DznParser();
+		postProcessor = new MiniBrassPostProcessor();
 	}
 
 	@After
@@ -89,5 +93,17 @@ public class MiniZincDznParserTest {
 		Assert.assertTrue( parsedB.getType() instanceof  ArrayType);
 		Assert.assertEquals("array1d(0..2, [1, 4, 2])", parsedB.getMznExpression());
 	}
-
+	
+	@Test
+	public void testMiniBrassPostProcessing() {
+		MiniZincSolution solution = new MiniZincSolution();
+		solution.processSolutionLine("a = 1;");
+		solution.processSolutionLine("b = 3;");
+		
+		String mznConstraint = "a > sol(a) /\\ b > sol(b)";
+		System.out.println(mznConstraint);
+		String expectedAfterReplacement = "a > (1) /\\ b > (3)";
+		String actualAfterReplacement = postProcessor.processSolution(mznConstraint, solution);
+		Assert.assertEquals(expectedAfterReplacement, actualAfterReplacement);
+	}
 }

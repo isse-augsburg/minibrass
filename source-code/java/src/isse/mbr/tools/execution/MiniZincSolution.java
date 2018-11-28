@@ -1,6 +1,8 @@
 package isse.mbr.tools.execution;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import isse.mbr.parsing.DznParser;
@@ -50,5 +52,13 @@ public class MiniZincSolution {
 	
 	public String getRawDznSolution() {
 		return rawDznSolution;
+	}
+	
+	public List<MiniZincVariable> getAllVariables() {
+		return new ArrayList<MiniZincVariable>(variableStore.values());
+	}
+	
+	public MiniZincVariable getVariable(String key) {
+		return variableStore.get(key);
 	}
 }

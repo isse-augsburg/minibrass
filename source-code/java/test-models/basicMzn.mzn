@@ -28,5 +28,5 @@ constraint arrayOfSetType = array1d(1..2, [{}, {}]);
 %constraint array1dType = [1,1,1];
 constraint array2dOfSetType = array2d(1..2, 1..2, [{}, {}, {}, {}]);
 
-% output ["MyOutput: A = \(a), B = \(b), C = \(c)"];
+output ["MyOutput: A = \(a), B = \(b), C = \(c)"];
 solve satisfy;
