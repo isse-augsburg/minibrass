@@ -232,6 +232,10 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.VotingSy;
 				case "output":
 					return MiniBrassSymbol.OutputSy;
+				case "false":
+					return MiniBrassSymbol.FalseLitSy;
+				case "true":
+					return MiniBrassSymbol.TrueLitSy;
 				}
 				// otherwise it's an ident
 				lastIdent = s;

@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import isse.mbr.model.types.ArrayType;
+import isse.mbr.model.types.BoolType;
 import isse.mbr.model.types.FloatType;
 import isse.mbr.model.types.IntType;
 import isse.mbr.model.types.IntervalType;
@@ -122,7 +123,15 @@ public class DznParser extends MiniBrassParser {
 			variable.setValue(litVal);
 			variable.setType(new FloatType());
 			getNextSy();
-		} 
+		} else if (currSy == MiniBrassSymbol.FalseLitSy || currSy == MiniBrassSymbol.TrueLitSy) {
+			if(currSy == MiniBrassSymbol.TrueLitSy) {
+				variable.setValue(true);
+			} else {
+				variable.setValue(false);
+			}
+			variable.setType(new BoolType());
+			getNextSy();
+		}
 	}
 
 	private Set<Integer> getContinuousSet(int litVal, int upper) {

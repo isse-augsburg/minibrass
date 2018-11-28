@@ -51,6 +51,8 @@ public enum MiniBrassSymbol {
 	FloatSy,            // float
 	IntLitSy,           // any integer
 	FloatLitSy,         // any float
+	FalseLitSy,         // false
+	TrueLitSy,          // true
 	DotsSy,             // ..
 	DotSy,              // .
 	ParamsSy,           // "params"

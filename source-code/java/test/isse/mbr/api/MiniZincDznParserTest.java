@@ -109,18 +109,18 @@ public class MiniZincDznParserTest {
 
 	@Test
 	public void testBooleanArray() throws MiniBrassParseException {
-		String testDznLine = "mbr_valuations_cr1 = array1d(1..3, [false, false, false]);";
-		MiniZincVariable parsedB = dznParser.parseVariable(testDznLine);
-		Assert.assertEquals("B", parsedB.getName());
+		String testDznLine = "valuations = array1d(1..3, [false, false, true]);";
+		MiniZincVariable parsedValuations = dznParser.parseVariable(testDznLine);
+		Assert.assertEquals("valuations", parsedValuations.getName());
 
-		MiniZincTensor b = (MiniZincTensor) parsedB.getValue();
-		int[] B = new int[] { 1, 4, 2 };
-		for (int i = 0; i < B.length; ++i) {
-			MiniZincVariable field = b.get(i);
-			Assert.assertEquals(B[i], field.getValue());
+		MiniZincTensor b = (MiniZincTensor) parsedValuations.getValue();
+		boolean[] expecteds = new boolean[] { false, false, true };
+		for (int i = 0; i < expecteds.length; ++i) {
+			MiniZincVariable field = b.get(i+1);
+			Assert.assertEquals(expecteds[i], field.getValue());
 		}
-		Assert.assertTrue( parsedB.getType() instanceof  ArrayType);
-		Assert.assertEquals("array1d(0..2, [1, 4, 2])", parsedB.getMznExpression());
+		Assert.assertTrue( parsedValuations.getType() instanceof  ArrayType);
+		Assert.assertEquals("array1d(1..3, [false, false, true])", parsedValuations.getMznExpression());
 	}
 	
 }
