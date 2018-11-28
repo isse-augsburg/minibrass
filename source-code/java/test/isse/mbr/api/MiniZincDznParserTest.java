@@ -106,4 +106,21 @@ public class MiniZincDznParserTest {
 		String actualAfterReplacement = postProcessor.processSolution(mznConstraint, solution);
 		Assert.assertEquals(expectedAfterReplacement, actualAfterReplacement);
 	}
+
+	@Test
+	public void testBooleanArray() throws MiniBrassParseException {
+		String testDznLine = "mbr_valuations_cr1 = array1d(1..3, [false, false, false]);";
+		MiniZincVariable parsedB = dznParser.parseVariable(testDznLine);
+		Assert.assertEquals("B", parsedB.getName());
+
+		MiniZincTensor b = (MiniZincTensor) parsedB.getValue();
+		int[] B = new int[] { 1, 4, 2 };
+		for (int i = 0; i < B.length; ++i) {
+			MiniZincVariable field = b.get(i);
+			Assert.assertEquals(B[i], field.getValue());
+		}
+		Assert.assertTrue( parsedB.getType() instanceof  ArrayType);
+		Assert.assertEquals("array1d(0..2, [1, 4, 2])", parsedB.getMznExpression());
+	}
+	
 }
