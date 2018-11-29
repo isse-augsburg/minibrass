@@ -33,17 +33,15 @@ public class MiniZincSolution {
 	 * @param plainSolutionLine
 	 */
 	public void processSolutionLine(String plainSolutionLine) {
-		System.out.println("Processing: " + plainSolutionLine);
 		rawDznSolutionBuilder.append(plainSolutionLine);
+		rawDznSolutionBuilder.append("\n");
 		MiniZincVariable nextVariable = null; 
 		try {
 			nextVariable = dznParser.parseVariable(plainSolutionLine.trim());
 		} catch (MiniBrassParseException e) {
-			System.out.println("Error here");
 			e.printStackTrace();
 		}
 		variableStore.put(nextVariable.getName(), nextVariable);
-		System.out.println(nextVariable.getName() + " -> "+ nextVariable.getValue());
 	}
 
 	public void flush() {

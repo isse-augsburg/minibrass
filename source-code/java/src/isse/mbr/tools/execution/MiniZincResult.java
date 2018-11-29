@@ -8,6 +8,7 @@ public class MiniZincResult {
 	private boolean solved;
 	private boolean optimal; 
 	private boolean invalidated;
+	private boolean unsatisfiable;
 	private String formattedOutput;
 	private List<MiniZincSolution> solutions;
 	
@@ -18,9 +19,13 @@ public class MiniZincResult {
 	// constants
 	private final static String OPTIMALITY_SEP = "==========";
 	private final static String SOLUTION_SEP = "----------";
+	private final static String UNSATISFIABLE_SEP = "=====UNSATISFIABLE=====";
+	
+	
 	public MiniZincResult() {
 		solved = false;
 		optimal = false;
+		unsatisfiable = false;
 		solutions = new LinkedList<>();
 		formattedOutput = null;
 		invalidated = false;
@@ -36,7 +41,6 @@ public class MiniZincResult {
 		completeOutputBuilder.append(line);
 		completeOutputBuilder.append("\n");
 		
-		System.out.println("Line: "+line);
 		boolean plainSolutionLine = true;
 		
 		if (line.contains(OPTIMALITY_SEP)) {
@@ -51,12 +55,19 @@ public class MiniZincResult {
 			prepareForNextSolution();
 		}
 		
+		if(line.contains(UNSATISFIABLE_SEP)) {
+			solved = false;
+			invalidate();
+			plainSolutionLine = false;
+			unsatisfiable = true;
+		}
+		
 		if (line.toLowerCase().contains("error") ) {
 			invalidate();
 			plainSolutionLine = false;
 		}
 		
-		if(plainSolutionLine) {
+		if(plainSolutionLine && !invalidated) {
 			nextSolution.processSolutionLine(line);
 		}
 	}
@@ -117,5 +128,13 @@ public class MiniZincResult {
 
 	public void setSolutions(List<MiniZincSolution> solutions) {
 		this.solutions = solutions;
+	}
+
+	public boolean isUnsatisfiable() {
+		return unsatisfiable;
+	}
+
+	public void setUnsatisfiable(boolean unsatisfiable) {
+		this.unsatisfiable = unsatisfiable;
 	}
 }

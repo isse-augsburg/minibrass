@@ -106,7 +106,7 @@ public class MiniZincDznParserTest {
 		String actualAfterReplacement = postProcessor.processSolution(mznConstraint, solution);
 		Assert.assertEquals(expectedAfterReplacement, actualAfterReplacement);
 	}
-
+	
 	@Test
 	public void testBooleanArray() throws MiniBrassParseException {
 		String testDznLine = "valuations = array1d(1..3, [false, false, true]);";
@@ -123,4 +123,20 @@ public class MiniZincDznParserTest {
 		Assert.assertEquals("array1d(1..3, [false, false, true])", parsedValuations.getMznExpression());
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSet() throws MiniBrassParseException {
+		String testDznLine = "overall = {1,3};";
+		MiniZincVariable parsedOverall = dznParser.parseVariable(testDznLine);
+		Assert.assertEquals("overall", parsedOverall.getName());
+		
+		Set<Integer> expectedSet = new HashSet<>();
+		expectedSet.add(1);
+		expectedSet.add(3);
+
+		Set<Integer> b = (Set<Integer>) parsedOverall.getValue();
+		Assert.assertEquals(expectedSet, b);
+		Assert.assertTrue( parsedOverall.getType() instanceof  SetType);
+		Assert.assertEquals("{1,3}", parsedOverall.getMznExpression());
+	}
 }

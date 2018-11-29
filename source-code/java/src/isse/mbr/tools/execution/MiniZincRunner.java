@@ -94,7 +94,6 @@ public class MiniZincRunner {
 		MiniZincResult result = new MiniZincResult();
 		
 		LOGGER.info("About to start: " + pb.command());
-		System.out.println("About to start: " + pb.command());
 				
 		pb.inheritIO();
 		pb.redirectErrorStream(true);
@@ -127,7 +126,6 @@ public class MiniZincRunner {
 			}
 			cleanup();
 		} catch (Exception e) {
-			System.out.println(e);
 			LOGGER.severe(e.getMessage());
 			result.invalidate();
 		} 

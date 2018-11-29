@@ -1,7 +1,5 @@
 package isse.mbr.api;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -30,7 +28,7 @@ public class MiniBrassRunnerTest {
 	
 	@Test
 	public void test() throws IOException, MiniBrassParseException {
-		minibrassRunner.executeBranchAndBound(constraintModelFile, preferenceModelFile, Collections.EMPTY_LIST);
+		minibrassRunner.executeBranchAndBound(constraintModelFile, preferenceModelFile, Collections.emptyList());
 	}
 
 }

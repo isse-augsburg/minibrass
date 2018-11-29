@@ -28,7 +28,7 @@ public class DznParser extends MiniBrassParser {
 		lexer = new MiniBrassLexer();
 		lexer.setScanner(scanner);
 		lexer.readNextChar(); // to initialize
-		System.out.println("DZN Parsing: " + dznLine);
+		//System.out.println("DZN Parsing: " + dznLine);
 		// top level non-terminal, initialize before
 		getNextSy();
 		
@@ -55,7 +55,6 @@ public class DznParser extends MiniBrassParser {
 		lexer.closeBuffer();
 		
 		String mznExpression = lexer.getBufferContent().replaceAll(";", "");
-		System.out.println("What is the MZN expression of my solution? "+mznExpression);
 		variable.setMznExpression(mznExpression);
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 
@@ -244,11 +243,12 @@ public class DznParser extends MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
 		Set<Integer> returnSet = new HashSet<>();
 		while (currSy != MiniBrassSymbol.RightCurlSy) {
+			if(currSy == MiniBrassSymbol.CommaSy)
+				getNextSy();
 			expectSymbol(MiniBrassSymbol.IntLitSy);
 			int intVal = lexer.getLastInt();
 			returnSet.add(intVal);
 			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 		}
 		expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
 		return returnSet;
