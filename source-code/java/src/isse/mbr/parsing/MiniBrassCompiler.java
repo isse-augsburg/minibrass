@@ -99,6 +99,17 @@ public class MiniBrassCompiler {
 
 		new MiniBrassCompiler().doMain(args);
 	}
+	
+	/**
+	 * This compilation does not write an _o.mzn output
+	 * @param input
+	 * @return
+	 * @throws IOException
+	 * @throws MiniBrassParseException
+	 */
+	public String compileInMemory(File input) throws IOException, MiniBrassParseException {
+		return compile(new FileInputStream(input));
+	}
 
 	public String compile(File input) throws IOException, MiniBrassParseException {
 		String inputPath = input.getAbsolutePath();

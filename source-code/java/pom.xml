@@ -82,6 +82,30 @@
 
 						</configuration>
 					</execution>
+					<!--  
+					<execution>
+						<id>assembly-minibrass</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>
+										isse.mbr.tools.PairwiseComparator
+									</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>condorcetAnalysis</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+
+						</configuration>
+					</execution>
+					 -->
 				</executions>
 
 			</plugin>

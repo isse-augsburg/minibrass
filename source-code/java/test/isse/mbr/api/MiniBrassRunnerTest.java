@@ -28,6 +28,7 @@ public class MiniBrassRunnerTest {
 		configuration.setSolverId("Chuffed");
 		configuration.setUseAllSolutions(true);
 		minibrassRunner = new MiniBrassRunner();
+		minibrassRunner.setDebug(false);
 		String constraintModel = "test-models/classicNoSearch.mzn";
 		constraintModelFile = new File(constraintModel);
 		constraintModelFileForPareto = new File("test-models/new-api/classicNoSearchPareto.mzn");

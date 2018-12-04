@@ -1,7 +1,4 @@
 
-include "classicNoSearchPareto_o.mzn"; % output of minibrass
-%include "soft_constraints/pvs_gen_search.mzn"; % for minibrass-search style using the generated predicate
-
 % the basic, simple "classic" CSP 
 set of int: DOM = 1..3;
 
