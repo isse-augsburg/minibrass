@@ -18,5 +18,4 @@ PVS: cr2 = new ConstraintPreferences("cr2") {
    crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
    useSPD: 'true' ;
 }; 
-
 solve cr1 pareto cr2;

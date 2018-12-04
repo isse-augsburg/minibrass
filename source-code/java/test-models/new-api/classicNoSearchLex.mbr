@@ -16,7 +16,9 @@ PVS: cr2 = new ConstraintPreferences("cr2") {
    soft-constraint c3: 'x + y <= 3';
    
    crEdges : '[| mbr.c2, mbr.c1 | mbr.c3, mbr.c1 |]';
-   useSPD: 'true' ;
+   useSPD: 'false' ;
 }; 
 
+% WARNING: This test case is not immediately executable with Gecode due to reification issues 
+% in alldifferent_except_0
 solve cr1 lex cr2;

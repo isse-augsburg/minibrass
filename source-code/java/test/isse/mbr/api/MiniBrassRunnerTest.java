@@ -25,10 +25,12 @@ public class MiniBrassRunnerTest {
 	@Before
 	public void setup () {
 		MiniZincConfiguration configuration = new MiniZincConfiguration();
-		configuration.setSolverId("Chuffed");
-		configuration.setUseAllSolutions(true);
+		configuration.setSolverId("Gecode");
+		configuration.setUseAllSolutions(false);
 		minibrassRunner = new MiniBrassRunner();
 		minibrassRunner.setDebug(false);
+		minibrassRunner.setMiniZincConfiguration(configuration);
+		
 		String constraintModel = "test-models/classicNoSearch.mzn";
 		constraintModelFile = new File(constraintModel);
 		constraintModelFileForPareto = new File("test-models/new-api/classicNoSearchPareto.mzn");
