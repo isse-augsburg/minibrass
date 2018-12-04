@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
+import isse.mbr.tools.execution.MiniZincConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,6 +19,9 @@ public class MiniBrassRunnerTest {
 	
 	@Before
 	public void setup () {
+		MiniZincConfiguration configuration = new MiniZincConfiguration();
+		configuration.setSolverId("Chuffed");
+		configuration.setUseAllSolutions(true);
 		minibrassRunner = new MiniBrassRunner();
 		String constraintModel = "test-models/classicNoSearch.mzn";
 		constraintModelFile = new File(constraintModel);

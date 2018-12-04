@@ -20,16 +20,29 @@ import isse.mbr.parsing.MiniBrassParser;
  */
 public class MiniBrassRunner {
 	private MiniZincRunner miniZincRunner;
+	private MiniZincConfiguration miniZincConfiguration;
 	private MiniBrassCompiler miniBrassCompiler;
 	private boolean writeIntermediateFiles;
+	private boolean debug;
 	private int modelIndex;
 	private File originalMiniZincFile;
 	
 	public MiniBrassRunner() {
 		miniZincRunner = new MiniZincRunner();
 		MiniZincConfiguration config = new MiniZincConfiguration();
-		config.setUseAllSolutions(false);
+		config.setUseAllSolutions(true);
+		//config.setSolverId("Chuffed");
 		miniZincRunner.setConfiguration(config);
+		miniBrassCompiler = new MiniBrassCompiler();
+		writeIntermediateFiles = true;
+		debug = false;
+		modelIndex = 0;
+	}
+
+	public MiniBrassRunner(MiniZincConfiguration configuration)
+	{
+		miniZincRunner = new MiniZincRunner();
+		miniZincRunner.setConfiguration(configuration);
 		miniBrassCompiler = new MiniBrassCompiler();
 		writeIntermediateFiles = true;
 		modelIndex = 0;
@@ -45,7 +58,7 @@ public class MiniBrassRunner {
 		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
 				
 		File workingMiniZincModel = miniZincFile;
-		while( (solution = hasNextSolution(workingMiniZincModel)) != null) {
+		while( (solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
 			// print solution 
 			System.out.println("Found solution: ");
 			System.out.println(solution.getRawDznSolution());
@@ -81,12 +94,32 @@ public class MiniBrassRunner {
 	}
 
 	private void cleanup(File miniZincFile) {
-		if(!miniZincFile.equals(originalMiniZincFile))
+		if(!miniZincFile.equals(originalMiniZincFile) && !debug)
 			FileUtils.deleteQuietly(miniZincFile);
 	}
-	private MiniZincSolution hasNextSolution(File miniZincFile) {
-		MiniZincResult result = miniZincRunner.solve(miniZincFile);
+	private MiniZincSolution hasNextSolution(File miniZincFile, List<File> dataFiles) {
+		MiniZincResult result = miniZincRunner.solve(miniZincFile, dataFiles, -1);
 		return !result.isInvalidated() && result.isSolved() ? result.getLastSolution() : null;
+	}
+
+	public MiniZincConfiguration getMiniZincRunnerConfiguration()
+	{
+		return miniZincRunner.getConfiguration();
+	}
+
+	public void setMiniZincConfiguration(MiniZincConfiguration configuration)
+	{
+		miniZincRunner.setConfiguration(configuration);
+	}
+
+	public boolean isDebug()
+	{
+		return debug;
+	}
+
+	public void setDebug(boolean debug)
+	{
+		this.debug = debug;
 	}
 }
 
