@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CollectionToIntMapper<T> {
 
@@ -31,5 +32,9 @@ public class CollectionToIntMapper<T> {
 
 	public T getElementForIntId(int intId) {
 		return fromIntIdToLogicalId.get(intId);
+	}
+
+	public Set<Integer> getIntIdSet() {
+		return fromIntIdToLogicalId.keySet();
 	}
 }
