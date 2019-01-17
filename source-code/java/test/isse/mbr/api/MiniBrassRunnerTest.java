@@ -2,9 +2,15 @@ package isse.mbr.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 import isse.mbr.tools.execution.MiniZincConfiguration;
+import isse.mbr.tools.execution.MiniZincResult;
+import isse.mbr.tools.execution.MiniZincSolution;
+import isse.mbr.tools.execution.MiniZincVariable;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,4 +63,20 @@ public class MiniBrassRunnerTest {
 	public void testLex() throws IOException, MiniBrassParseException {
 		minibrassRunner.executeBranchAndBound(constraintModelFileForLex, preferenceModelFileLex, Collections.emptyList());
 	}
+	
+	
+	@Test
+	public void testDebug() throws IOException, MiniBrassParseException {
+		String model = "test-models/debug/testModel.mzn";
+		File modelFile = new File(model);
+		File dataFile = new File("test-models/debug/testModel.dzn");
+		File preferenceFile = new File("test-models/debug/preferenceDay_0.mbr");
+		MiniZincConfiguration configuration = new MiniZincConfiguration();
+		configuration.setSolverId("OSICBC");
+		configuration.setUseAllSolutions(false);
+		minibrassRunner.setDebug(true);
+		minibrassRunner.setMiniZincConfiguration(configuration);
+		minibrassRunner.executeBranchAndBound(modelFile, preferenceFile, Arrays.asList(dataFile));
+	}
+	
 }

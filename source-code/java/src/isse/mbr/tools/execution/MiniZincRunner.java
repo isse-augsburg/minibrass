@@ -8,6 +8,7 @@ import java.lang.ProcessBuilder.Redirect;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -106,9 +107,12 @@ public class MiniZincRunner {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = null;
 			
+			List<String> lines = new LinkedList<>();
 			while ((line = reader.readLine()) != null) {
-				result.processRawMiniZincOutputLine(line);
+				lines.add(line);
+				result.lookForError(line);
 			}
+			result.processRawMiniZincOutputLines(lines);
 			if(timeout > 0) {
 				Timer timer = new Timer();
 				int timeoutInMillisecs = timeout * 1000;

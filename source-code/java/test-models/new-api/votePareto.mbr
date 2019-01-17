@@ -1,0 +1,27 @@
+include "defs.mbr";
+
+% MaxCostFunctionNetwork to maximize
+PVS: a = new MaxCostFunctionNetwork("a")
+{
+soft-constraint sc1: 'voteVal';
+};
+
+% CostFunctionNetwork to minimize
+PVS: b = new CostFunctionNetwork("b")
+{
+soft-constraint sc1: 'voteVal';
+};
+
+% MaxCostFunctionNetwork to maximize
+PVS: c = new MaxCostFunctionNetwork("c")
+{
+soft-constraint sc1: 'voteVal';
+};
+
+% CostFunctionNetwork to maximize
+PVS: otherObjective = new CostFunctionNetwork("otherObjective")
+{
+soft-constraint sc1: 'objective';
+};
+
+solve vote([a, b, c], condorcet) pareto otherObjective ;

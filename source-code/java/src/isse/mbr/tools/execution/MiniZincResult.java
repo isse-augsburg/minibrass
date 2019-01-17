@@ -14,6 +14,7 @@ public class MiniZincResult {
 	
 	// internal data structures
 	private MiniZincSolution nextSolution;
+	private List<String> dznLines;
 	private StringBuilder completeOutputBuilder;
 	
 	// constants
@@ -31,6 +32,27 @@ public class MiniZincResult {
 		invalidated = false;
 		completeOutputBuilder = new StringBuilder();
 		prepareForNextSolution();
+	}
+
+	public void processRawMiniZincOutputLines(List<String> lines) {
+		for(String line : lines) 
+			processRawMiniZincOutputLine(line);		
+	}
+	
+	/**
+	 * This is for a first pass over the dzn output - if we find model inconsistencies already
+	 * @param line
+	 */
+	public void lookForError(String line) {
+		if(line.contains(UNSATISFIABLE_SEP)) {
+			solved = false;
+			invalidate();
+			unsatisfiable = true;
+		}
+		
+		if (line.toLowerCase().contains("error") ) {
+			invalidate();
+		}
 	}
 	
 	/**
@@ -55,17 +77,6 @@ public class MiniZincResult {
 			prepareForNextSolution();
 		}
 		
-		if(line.contains(UNSATISFIABLE_SEP)) {
-			solved = false;
-			invalidate();
-			plainSolutionLine = false;
-			unsatisfiable = true;
-		}
-		
-		if (line.toLowerCase().contains("error") ) {
-			invalidate();
-			plainSolutionLine = false;
-		}
 		
 		if(plainSolutionLine && !invalidated) {
 			nextSolution.processSolutionLine(line);
@@ -85,6 +96,7 @@ public class MiniZincResult {
 			solutions.add(nextSolution);
 		}
 		nextSolution = new MiniZincSolution();
+		dznLines = new LinkedList<>();
 	}
 	//================== Setters and getters start =====================
 	public MiniZincSolution getLastSolution() {
@@ -137,4 +149,5 @@ public class MiniZincResult {
 	public void setUnsatisfiable(boolean unsatisfiable) {
 		this.unsatisfiable = unsatisfiable;
 	}
+
 }

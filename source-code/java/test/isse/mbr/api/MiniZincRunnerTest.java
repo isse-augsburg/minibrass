@@ -43,4 +43,7 @@ public class MiniZincRunnerTest {
 		Assert.assertEquals(expectedC, lastSolution.getVariable("c").getValue());
 	}
 
+	
+
+
 }
