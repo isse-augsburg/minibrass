@@ -3,6 +3,7 @@ package isse.mbr.tools.execution;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -27,7 +28,8 @@ public class MiniBrassRunner {
 	private boolean debug;
 	private int modelIndex;
 	private File originalMiniZincFile;
-
+	private List<MiniZincSolution> allSolutions;
+	
 	public MiniBrassRunner() {
 		miniZincRunner = new MiniZincRunner();
 		MiniZincConfiguration config = new MiniZincConfiguration();
@@ -45,9 +47,10 @@ public class MiniBrassRunner {
 		miniZincRunner.setConfiguration(configuration);
 	}
 
-	public void executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
+	public MiniZincSolution executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
 			throws IOException, MiniBrassParseException {
 		MiniZincSolution solution;
+		allSolutions = new LinkedList<>();
 		miniBrassCompiler.setMinizincOnly(true);
 		String compiledMiniBrassCode = miniBrassCompiler.compileInMemory(miniBrassFile);
 		originalMiniZincFile = miniZincFile;
@@ -58,6 +61,9 @@ public class MiniBrassRunner {
 		File workingMiniZincModel = appendMiniZincCode(miniZincFile, compiledMiniBrassCode);
 
 		while ((solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
+			// append solution
+			allSolutions.add(solution);
+			
 			// print solution
 			System.out.println("Found solution: ");
 			System.out.println(solution.getRawDznSolution());
@@ -75,6 +81,7 @@ public class MiniBrassRunner {
 			// solve again
 		}
 		cleanup(workingMiniZincModel);
+		return solution;
 	}
 
 	private File appendMiniZincCode(File miniZincFile, String updatedConstraint) throws IOException {
@@ -118,6 +125,14 @@ public class MiniBrassRunner {
 
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	public List<MiniZincSolution> getAllSolutions() {
+		return allSolutions;
+	}
+
+	public void setAllSolutions(List<MiniZincSolution> allSolutions) {
+		this.allSolutions = allSolutions;
 	}
 
 }
