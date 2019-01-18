@@ -50,6 +50,8 @@ public class MiniBrassRunner {
 	public MiniZincSolution executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
 			throws IOException, MiniBrassParseException {
 		MiniZincSolution solution;
+		MiniZincSolution lastSolution = null;
+		
 		allSolutions = new LinkedList<>();
 		miniBrassCompiler.setMinizincOnly(true);
 		String compiledMiniBrassCode = miniBrassCompiler.compileInMemory(miniBrassFile);
@@ -63,6 +65,7 @@ public class MiniBrassRunner {
 		while ((solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
 			// append solution
 			allSolutions.add(solution);
+			lastSolution = solution;
 			
 			// print solution
 			System.out.println("Found solution: ");
@@ -81,7 +84,7 @@ public class MiniBrassRunner {
 			// solve again
 		}
 		cleanup(workingMiniZincModel);
-		return solution;
+		return lastSolution;
 	}
 
 	private File appendMiniZincCode(File miniZincFile, String updatedConstraint) throws IOException {

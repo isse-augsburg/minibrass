@@ -51,7 +51,7 @@ public class MiniBrassRunnerTest {
 	
 	@Test
 	public void testBasic() throws IOException, MiniBrassParseException {
-		minibrassRunner.executeBranchAndBound(constraintModelFile, preferenceModelFile, Collections.emptyList());
+		MiniZincSolution solution = minibrassRunner.executeBranchAndBound(constraintModelFile, preferenceModelFile, Collections.emptyList());
 	}
 	
 	@Test
