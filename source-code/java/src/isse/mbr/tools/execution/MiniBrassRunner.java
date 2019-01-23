@@ -140,6 +140,7 @@ public class MiniBrassRunner {
 		options = new Options();
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("d", "debug", false, "write intermediate files");
+		options.addOption("s", "solver", true, "solver to use for branch-and-bound");
 
 		formatter = new HelpFormatter();
 		String minibrassFile = null;
@@ -156,6 +157,10 @@ public class MiniBrassRunner {
 			if (line.hasOption('h')) {
 				printUsage();
 				System.exit(0);
+			}
+			
+			if (line.hasOption("solver")) {
+				miniZincRunner.getConfiguration().setSolverId(line.getOptionValue("solver"));
 			}
 
 			if (argList.size() < 2) {
