@@ -82,7 +82,7 @@
 
 						</configuration>
 					</execution>
-					<!--  
+
 					<execution>
 						<id>assembly-minibrass</id>
 						<phase>package</phase>
@@ -93,19 +93,19 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										isse.mbr.tools.PairwiseComparator
+										isse.mbr.tools.execution.MiniBrassRunner
 									</mainClass>
 								</manifest>
 							</archive>
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
-							<finalName>condorcetAnalysis</finalName>
+							<finalName>minibrass</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 
 						</configuration>
 					</execution>
-					 -->
+
 				</executions>
 
 			</plugin>
@@ -135,6 +135,17 @@
 						<configuration>
 							<sourceFile>${project.build.directory}/condorcetAnalysis.jar</sourceFile>
 							<destinationFile>condorcetAnalysis.jar</destinationFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-minibrass</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<sourceFile>${project.build.directory}/minibrass.jar</sourceFile>
+							<destinationFile>minibrass.jar</destinationFile>
 						</configuration>
 					</execution>
 				</executions>
