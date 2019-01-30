@@ -213,6 +213,10 @@ public class MiniZincRunner {
 			pb.command().add("--solver");
 			pb.command().add(configuration.getSolverId());
 		}
+		if(configuration.getTimeout() != null)  {
+			pb.command().add("--time-limit");
+			pb.command().add(configuration.getTimeout().toString());
+		}
 	}
 	
 	//================== Setters and getters start =====================

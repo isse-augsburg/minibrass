@@ -11,10 +11,12 @@ package isse.mbr.tools.execution;
 public class MiniZincConfiguration {
 	private boolean useAllSolutions;
 	private String solverId;
+	private Integer timeout; // in milliseconds
 	
 	public MiniZincConfiguration() {
 		useAllSolutions = true;
 		solverId = "Gecode";
+		timeout = null;
 	}
 	/**
 	 * @return should we solve for all solutions (-a) or just return the first found solution
@@ -42,5 +44,13 @@ public class MiniZincConfiguration {
 	 */
 	public void setSolverId(String solverId) {
 		this.solverId = solverId;
+	}
+	
+	public Integer getTimeout() {
+		return timeout;
+	}
+	
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
 	}
 }
