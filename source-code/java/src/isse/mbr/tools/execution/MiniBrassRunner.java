@@ -141,7 +141,8 @@ public class MiniBrassRunner {
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("d", "debug", false, "write intermediate files");
 		options.addOption("s", "solver", true, "solver to use for branch-and-bound");
-
+		options.addOption("t", "timeout", true, "timeout in milliseconds");
+		
 		formatter = new HelpFormatter();
 		String minibrassFile = null;
 		String minizincModelFile = null;
@@ -161,6 +162,10 @@ public class MiniBrassRunner {
 			
 			if (line.hasOption("solver")) {
 				miniZincRunner.getConfiguration().setSolverId(line.getOptionValue("solver"));
+			}
+
+			if (line.hasOption("timeout")) {
+				miniZincRunner.getConfiguration().setTimeout(Integer.parseInt(line.getOptionValue("timeout")));
 			}
 
 			if (argList.size() < 2) {
