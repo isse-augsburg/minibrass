@@ -398,32 +398,35 @@ public class CodeGenerator {
 					sb.append(String.format("constraint %s = %s ;\n", overallIdent, vi.getVotingProcedure().getNumericObjective(this, vi.getChildren())));
 				}
 				
-				// write count of voters 
-				String votersCountGenerated = MiniBrassVotingKeywords.VOTER_COUNT+vi.getName();
-				sb.append(String.format("int: %s = %d;\n", votersCountGenerated, vi.getChildren().size()));
-				// write identifiers and enums of voters
-				StringBuilder namesGenerator = new StringBuilder();
-				namesGenerator.append(String.format("array[1..%s] of string: %s = [", votersCountGenerated, MiniBrassVotingKeywords.VOTER_STRING_NAMES+vi.getName()));
-				boolean first = true;
-				int enumCounter = 0;
-				for(AbstractPVSInstance child : vi.getChildren()) {
-					AbstractPVSInstance childDerefed = deref(child);
-					String nameStr = String.format("\"%s\"", childDerefed.getName());
-					if(first) 
-						first = false;
-					else 
-						namesGenerator.append(", ");
+				// write count of voters - only relevant if bindings are present
+				if(!model.getBindings().isEmpty()) {
+					String votersCountGenerated = MiniBrassVotingKeywords.VOTER_COUNT+vi.getName();
+					sb.append(String.format("int: %s = %d;\n", votersCountGenerated, vi.getChildren().size()));
 					
-					namesGenerator.append(nameStr);	
+					// write identifiers and enums of voters
+					StringBuilder namesGenerator = new StringBuilder();
+					namesGenerator.append(String.format("array[1..%s] of string: %s = [", votersCountGenerated, MiniBrassVotingKeywords.VOTER_STRING_NAMES+vi.getName()));
+					boolean first = true;
+					int enumCounter = 0;
+					for(AbstractPVSInstance child : vi.getChildren()) {
+						AbstractPVSInstance childDerefed = deref(child);
+						String nameStr = String.format("\"%s\"", childDerefed.getName());
+						if(first) 
+							first = false;
+						else 
+							namesGenerator.append(", ");
+						
+						namesGenerator.append(nameStr);	
+						
+						// TODO revise
+						// enumName should be a valid MiniZinc string
+						String enumName = toValidMznIdent(childDerefed.getName());
+						sb.append(String.format("int: %s = %d;\n", enumName, (++enumCounter)));
+					}
+					namesGenerator.append("];\n");
 					
-					// TODO revise
-					// enumName should be a valid MiniZinc string
-					String enumName = toValidMznIdent(childDerefed.getName());
-					sb.append(String.format("int: %s = %d;\n", enumName, (++enumCounter)));
-				}
-				namesGenerator.append("];\n");
-				
-				sb.append(namesGenerator.toString());
+					sb.append(namesGenerator.toString());
+					}
 			}
 
 		} else {
