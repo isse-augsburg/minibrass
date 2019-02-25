@@ -1,0 +1,102 @@
+Objective:
+-------------
+solve vote([ToWeighted(anneser), brandt, ToWeighted(martin), ToWeighted(alhomssi),
+            ToWeighted(beeh), ToWeighted(schroll), ToWeighted(keppner), ToWeighted(henrich),
+            ToWeighted(pichlmair), ToWeighted(schwarzmeier), ToWeighted(biederer),
+            ToWeighted(geiger), ToWeighted(sandstede), ToWeighted(rieger),
+            ToWeighted(sosnowski), ToWeighted(goetz), ToWeighted(mueller)], sumMin) lex ToWeighted(companies);
+
+Result:
+------------ 
+Intermediate solution:worksAt = [1, 9, 1, 1, 8, 10, 7, 5, 2, 2, 3, 6, 3, 4, 8, 3, 2] , mbr_overall_MBR_VOT_1 = 10315
+
+Valuations: mbr_overall_ToWeighted_RefTo_anneser_ = 13; mbr_overall_brandt = 51; mbr_overall_ToWeighted_RefTo_martin_ = 8; mbr_overall_ToWeighted_RefTo_alhomssi_ = 4925; mbr_overall_ToWeighted_RefTo_beeh_ = 4925; mbr_overall_ToWeighted_RefTo_schroll_ = 10; mbr_overall_ToWeighted_RefTo_keppner_ = 50; mbr_overall_ToWeighted_RefTo_henrich_ = 3; mbr_overall_ToWeighted_RefTo_pichlmair_ = 45; mbr_overall_ToWeighted_RefTo_schwarzmeier_ = 3; mbr_overall_ToWeighted_RefTo_biederer_ = 6; mbr_overall_ToWeighted_RefTo_geiger_ = 46; mbr_overall_ToWeighted_RefTo_sandstede_ = 47; mbr_overall_ToWeighted_RefTo_rieger_ = 45; mbr_overall_ToWeighted_RefTo_sosnowski_ = 36; mbr_overall_ToWeighted_RefTo_goetz_ = 47; mbr_overall_ToWeighted_RefTo_mueller_ = 46; mbr_overall_ToWeighted_RefTo_companies_ = 222
+----------
+
+Anneser works at Oracle
+Brandt works at SAP
+Martin works at Oracle
+Alhomssi works at Oracle
+Beeh works at MSG
+Schroll works at Capgemini
+Keppner works at QPLIX
+Henrich works at Maiborn
+Pichlmair works at Siemens
+Schwarzmeier works at Siemens
+Biederer works at BMW
+Geiger works at Kuka
+Sandstede works at BMW
+Rieger works at Zuehlke
+Sosnowski works at MSG
+Goetz works at BMW
+Mueller works at Siemens
+----------
+
+Objective:
+-------------
+solve vote([ToWeighted(anneser), brandt, ToWeighted(martin), ToWeighted(alhomssi),
+            ToWeighted(beeh), ToWeighted(schroll), ToWeighted(keppner), ToWeighted(henrich),
+            ToWeighted(pichlmair), ToWeighted(schwarzmeier), ToWeighted(biederer),
+            ToWeighted(geiger), ToWeighted(sandstede), ToWeighted(rieger),
+            ToWeighted(sosnowski), ToWeighted(goetz), ToWeighted(mueller)], sumMin) ;
+
+Result:
+------------ 
+Intermediate solution:worksAt = [2, 2, 1, 8, 8, 10, 1, 6, 3, 2, 9, 3, 3, 4, 5, 7, 1] mbr_overall_MBR_VOT_1 = 16870
+Valuations: mbr_overall_ToWeighted_RefTo_anneser_ = 15; mbr_overall_brandt = 46; mbr_overall_ToWeighted_RefTo_martin_ = 8; mbr_overall_ToWeighted_RefTo_alhomssi_ = 11486; mbr_overall_ToWeighted_RefTo_beeh_ = 4925; mbr_overall_ToWeighted_RefTo_schroll_ = 10; mbr_overall_ToWeighted_RefTo_keppner_ = 49; mbr_overall_ToWeighted_RefTo_henrich_ = 8; mbr_overall_ToWeighted_RefTo_pichlmair_ = 46; mbr_overall_ToWeighted_RefTo_schwarzmeier_ = 3; mbr_overall_ToWeighted_RefTo_biederer_ = 10; mbr_overall_ToWeighted_RefTo_geiger_ = 47; mbr_overall_ToWeighted_RefTo_sandstede_ = 47; mbr_overall_ToWeighted_RefTo_rieger_ = 45; mbr_overall_ToWeighted_RefTo_sosnowski_ = 39; mbr_overall_ToWeighted_RefTo_goetz_ = 46; mbr_overall_ToWeighted_RefTo_mueller_ = 49
+
+----------
+
+Anneser works at Siemens
+Brandt works at Siemens
+Martin works at Oracle
+Alhomssi works at MSG
+Beeh works at MSG
+Schroll works at Capgemini
+Keppner works at Oracle
+Henrich works at Kuka
+Pichlmair works at BMW
+Schwarzmeier works at Siemens
+Biederer works at SAP
+Geiger works at BMW
+Sandstede works at BMW
+Rieger works at Zuehlke
+Sosnowski works at Maiborn
+Goetz works at QPLIX
+Mueller works at Oracle
+----------
+
+
+Objective:
+-------------
+solve minimize vote([ToWeighted(anneser), brandt, ToWeighted(martin), ToWeighted(alhomssi),
+            ToWeighted(beeh), ToWeighted(schroll), ToWeighted(keppner), ToWeighted(henrich),
+            ToWeighted(pichlmair), ToWeighted(schwarzmeier), ToWeighted(biederer),
+            ToWeighted(geiger), ToWeighted(sandstede), ToWeighted(rieger),
+            ToWeighted(sosnowski), ToWeighted(goetz), ToWeighted(mueller)], sumMin) ;
+
+Result:
+------------ 
+worksAt = [8, 5, 1, 1, 8, 10, 5, 2, 2, 9, 3, 6, 1, 4, 8, 7, 3], mbr_overall_MBR_VOT_1 = 10291
+Valuations: mbr_overall_ToWeighted_RefTo_anneser_ = 10; mbr_overall_brandt = 45; mbr_overall_ToWeighted_RefTo_martin_ = 8; mbr_overall_ToWeighted_RefTo_alhomssi_ = 4925; mbr_overall_ToWeighted_RefTo_beeh_ = 4925; mbr_overall_ToWeighted_RefTo_schroll_ = 10; mbr_overall_ToWeighted_RefTo_keppner_ = 45; mbr_overall_ToWeighted_RefTo_henrich_ = 3; mbr_overall_ToWeighted_RefTo_pichlmair_ = 45; mbr_overall_ToWeighted_RefTo_schwarzmeier_ = 6; mbr_overall_ToWeighted_RefTo_biederer_ = 6; mbr_overall_ToWeighted_RefTo_geiger_ = 46; mbr_overall_ToWeighted_RefTo_sandstede_ = 45; mbr_overall_ToWeighted_RefTo_rieger_ = 45; mbr_overall_ToWeighted_RefTo_sosnowski_ = 36; mbr_overall_ToWeighted_RefTo_goetz_ = 46; mbr_overall_ToWeighted_RefTo_mueller_ = 45
+----------
+
+----------
+Anneser works at MSG
+Brandt works at Maiborn
+Martin works at Oracle
+Alhomssi works at Oracle
+Beeh works at MSG
+Schroll works at Capgemini
+Keppner works at Maiborn
+Henrich works at Siemens
+Pichlmair works at Siemens
+Schwarzmeier works at SAP
+Biederer works at BMW
+Geiger works at Kuka
+Sandstede works at Oracle
+Rieger works at Zuehlke
+Sosnowski works at MSG
+Goetz works at QPLIX
+Mueller works at BMW
+----------

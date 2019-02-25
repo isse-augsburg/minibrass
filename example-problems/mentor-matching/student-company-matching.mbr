@@ -1,0 +1,346 @@
+include "defs.mbr";
+
+PVS: grimes = new ConstraintPreferences("grimes") {
+   soft-constraint grimMsg: 'worksAt[grimes] = maz';
+   soft-constraint grimBmw: 'worksAt[grimes] = rav';
+   soft-constraint grimZue: 'worksAt[grimes] = cro';
+   soft-constraint grimOra: 'worksAt[grimes] = apa';
+   soft-constraint grimCap: 'worksAt[grimes] = dre';
+      
+   crEdges : '[| mbr.grimBmw, mbr.grimMsg | mbr.grimZue,  mbr.grimBmw |
+                 mbr.grimOra, mbr.grimZue | mbr.grimCap, mbr.grimOra 
+                  |]';
+   useSPD: 'true' ;
+}; 
+
+PVS: walsh = new WeightedCsp("walsh") {
+   soft-constraint walMai: 'worksAt[walsh] = pin' :: weights('10');
+   soft-constraint walSie: 'worksAt[walsh] = buc' :: weights('9');
+   soft-constraint walMsg: 'worksAt[walsh] = maz' :: weights('8');
+   soft-constraint walZue: 'worksAt[walsh] = cro' :: weights('7');
+   soft-constraint walKuk: 'worksAt[walsh] = won' :: weights('6');
+   soft-constraint walOra: 'worksAt[walsh] = apa' :: weights('5');
+   soft-constraint walSap: 'worksAt[walsh] = woo' :: weights('4');
+   soft-constraint walCap: 'worksAt[walsh] = dre' :: weights('3');
+   soft-constraint walBmw: 'worksAt[walsh] = rav' :: weights('2');
+   soft-constraint walQpl: 'worksAt[walsh] = dra' :: weights('1');    
+}; 
+
+PVS: jones = new ConstraintPreferences("jones") {
+   soft-constraint reallylike : 'worksAt[jones] in { pin, apa }';
+   soft-constraint like : 'worksAt[jones] in { cro, dra }';
+   soft-constraint neutral : 'worksAt[jones] in { won, buc }';
+   soft-constraint dislike : 'worksAt[jones] in { rav, dre, maz, woo }';
+   crEdges : '[| mbr.dislike, mbr.neutral | mbr.neutral, mbr.like | mbr.like, mbr.reallylike |]';
+   
+   useSPD: 'false';
+}; 
+
+PVS: rhee = new ConstraintPreferences("rhee") {
+   soft-constraint apa : 'worksAt[rhee] = apa';
+   soft-constraint maz : 'worksAt[rhee] = maz';
+   soft-constraint rav : 'worksAt[rhee] = rav';
+   soft-constraint cro : 'worksAt[rhee] = cro';
+   soft-constraint buc : 'worksAt[rhee] = buc';
+   soft-constraint dra : 'worksAt[rhee] = dra';
+   soft-constraint woo : 'worksAt[rhee] = woo';
+   soft-constraint pin : 'worksAt[rhee] = pin';
+   soft-constraint won : 'worksAt[rhee] = won';
+   soft-constraint dre : 'worksAt[rhee] = dre';
+   
+   crEdges : '[| mbr.dre, mbr.pin | mbr.pin, mbr.won | mbr.won, mbr.woo | mbr.woo, mbr.dra | mbr.dra, mbr.buc  |
+                 mbr.buc, mbr.cro | mbr.cro, mbr.rav | mbr.rav, mbr.maz | mbr.maz, mbr.apa |]';
+   
+   useSPD: 'false';
+}; 
+
+PVS: horvath = new ConstraintPreferences("horvath") {
+   soft-constraint apa : 'worksAt[horvath] = apa';
+   soft-constraint maz : 'worksAt[horvath] = maz';
+   soft-constraint rav : 'worksAt[horvath] = rav';
+   soft-constraint cro : 'worksAt[horvath] = cro';
+   soft-constraint buc : 'worksAt[horvath] = buc';
+   soft-constraint dra : 'worksAt[horvath] = dra';
+   soft-constraint pin : 'worksAt[horvath] = pin';
+   soft-constraint woo : 'worksAt[horvath] = woo';
+   soft-constraint won : 'worksAt[horvath] = won';
+   soft-constraint dre : 'worksAt[horvath] = dre';
+   
+   crEdges : '[| mbr.won, mbr.woo | mbr.woo, mbr.dra | mbr.dra, mbr.rav | mbr.rav, mbr.apa | mbr.apa, mbr.dre  |
+                 mbr.dre, mbr.cro | mbr.cro, mbr.buc | mbr.buc, mbr.pin | mbr.pin, mbr.maz |]';
+   
+   useSPD: 'false';
+};
+
+PVS: dixon = new ConstraintPreferences("dixon") {
+   soft-constraint maz : 'worksAt[dixon] = maz';
+   soft-constraint rav : 'worksAt[dixon] = rav';
+   soft-constraint cro : 'worksAt[dixon] = cro';
+   soft-constraint buc : 'worksAt[dixon] = buc';
+   soft-constraint dre : 'worksAt[dixon] = dre';
+   
+   crEdges : '[| mbr.maz, mbr.cro | mbr.cro, mbr.buc | mbr.buc, mbr.rav | mbr.rav, mbr.dre |]';   
+   useSPD: 'true';
+};  
+
+PVS: peletier = new ConstraintPreferences("peletier") {
+   soft-constraint apa : 'worksAt[peletier] = apa';
+   soft-constraint maz : 'worksAt[peletier] = maz';
+   soft-constraint rav : 'worksAt[peletier] = rav';
+   soft-constraint cro : 'worksAt[peletier] = cro';
+   soft-constraint buc : 'worksAt[peletier] = buc';
+   soft-constraint dra : 'worksAt[peletier] = dra';
+   soft-constraint pin : 'worksAt[peletier] = pin';
+   soft-constraint woo : 'worksAt[peletier] = woo';
+   soft-constraint won : 'worksAt[peletier] = won';
+   soft-constraint dre : 'worksAt[peletier] = dre';
+   
+   crEdges : '[| mbr.rav, mbr.buc | mbr.buc, mbr.won | mbr.won, mbr.woo | mbr.woo, mbr.dra | mbr.dra, mbr.apa  |
+                 mbr.apa, mbr.cro | mbr.cro, mbr.maz | mbr.maz, mbr.dre | mbr.dre, mbr.pin |]';
+   
+   useSPD: 'true';
+};
+
+
+
+PVS: greene = new ConstraintPreferences("greene") {
+   soft-constraint erst : 'worksAt[greene] in { buc, pin }';
+   soft-constraint zweit : 'worksAt[greene] in { cro, maz }';
+   soft-constraint dritt : 'worksAt[greene] in { rav, dra, dre }';
+   
+   crEdges : '[| mbr.dritt, mbr.zweit | mbr.zweit, mbr.erst  |]';   
+   useSPD: 'false';
+}; 
+
+PVS: blake = new ConstraintPreferences("blake") {
+   soft-constraint apa : 'worksAt[blake] = apa';
+   soft-constraint maz : 'worksAt[blake] = maz';
+   soft-constraint rav : 'worksAt[blake] = rav';
+   soft-constraint cro : 'worksAt[blake] = cro';
+   soft-constraint buc : 'worksAt[blake] = buc';
+   soft-constraint dra : 'worksAt[blake] = dra';
+   soft-constraint pin : 'worksAt[blake] = pin';
+   soft-constraint woo : 'worksAt[blake] = woo';
+   soft-constraint won : 'worksAt[blake] = won';
+   soft-constraint dre : 'worksAt[blake] = dre';
+   
+   crEdges : '[| mbr.maz, mbr.dre | mbr.dre, mbr.woo | mbr.woo, mbr.apa | mbr.apa, mbr.dra | mbr.dra, mbr.cro  |
+                 mbr.cro, mbr.won | mbr.won, mbr.pin | mbr.pin, mbr.rav | mbr.rav, mbr.buc |]';   
+   useSPD: 'true';
+};
+
+
+PVS: williams = new ConstraintPreferences("williams") {
+   soft-constraint apa : 'worksAt[williams] = apa';
+   soft-constraint buc : 'worksAt[williams] = buc';
+   soft-constraint dra : 'worksAt[williams] = dra';
+   
+   crEdges : '[| mbr.dra, mbr.apa | mbr.apa, mbr.buc |]';   
+   useSPD: 'true';
+};  
+
+PVS: stookey = new ConstraintPreferences("stookey") {
+   soft-constraint rav : 'worksAt[stookey] = rav';
+   soft-constraint maz : 'worksAt[stookey] = maz';
+   soft-constraint buc : 'worksAt[stookey] = buc';
+   soft-constraint dra : 'worksAt[stookey] = dra';
+   
+   crEdges : '[| mbr.dra, mbr.buc | mbr.buc, mbr.maz | mbr.maz, mbr.rav  |]';   
+   useSPD: 'true';
+};  
+
+PVS: chambler = new ConstraintPreferences("chambler") {
+   soft-constraint apa : 'worksAt[chambler] = apa';
+   soft-constraint maz : 'worksAt[chambler] = maz';
+   soft-constraint rav : 'worksAt[chambler] = rav';
+   soft-constraint cro : 'worksAt[chambler] = cro';
+   soft-constraint buc : 'worksAt[chambler] = buc';
+   soft-constraint dra : 'worksAt[chambler] = dra';
+   soft-constraint pin : 'worksAt[chambler] = pin';
+   soft-constraint woo : 'worksAt[chambler] = woo';
+   soft-constraint won : 'worksAt[chambler] = won';
+   soft-constraint dre : 'worksAt[chambler] = dre';
+   
+   crEdges : '[| mbr.woo, mbr.dre | mbr.dre, mbr.dra | mbr.dra, mbr.maz | mbr.maz, mbr.cro | mbr.cro, mbr.pin  |
+                 mbr.pin, mbr.apa | mbr.apa, mbr.rav | mbr.rav, mbr.won | mbr.won, mbr.buc |]';   
+   useSPD: 'true';
+};
+
+PVS: ford = new ConstraintPreferences("ford") {
+   soft-constraint apa : 'worksAt[ford] = apa';
+   soft-constraint maz : 'worksAt[ford] = maz';
+   soft-constraint rav : 'worksAt[ford] = rav';
+   soft-constraint cro : 'worksAt[ford] = cro';
+   soft-constraint buc : 'worksAt[ford] = buc';
+   soft-constraint dra : 'worksAt[ford] = dra';
+   soft-constraint pin : 'worksAt[ford] = pin';
+   soft-constraint woo : 'worksAt[ford] = woo';
+   soft-constraint won : 'worksAt[ford] = won';
+   soft-constraint dre : 'worksAt[ford] = dre';
+   
+   crEdges : '[| mbr.dre, mbr.woo | mbr.woo, mbr.maz | mbr.maz, mbr.dra | mbr.dra, mbr.won | mbr.won, mbr.pin  |
+                 mbr.pin, mbr.cro | mbr.cro, mbr.rav | mbr.rav, mbr.buc | mbr.buc, mbr.apa |]';   
+   useSPD: 'true';
+};
+
+PVS: porter = new ConstraintPreferences("porter") {
+   soft-constraint apa : 'worksAt[porter] = apa';
+   soft-constraint maz : 'worksAt[porter] = maz';
+   soft-constraint rav : 'worksAt[porter] = rav';
+   soft-constraint cro : 'worksAt[porter] = cro';
+   soft-constraint buc : 'worksAt[porter] = buc';
+   soft-constraint dra : 'worksAt[porter] = dra';
+   soft-constraint pin : 'worksAt[porter] = pin';
+   soft-constraint woo : 'worksAt[porter] = woo';
+   soft-constraint won : 'worksAt[porter] = won';
+   soft-constraint dre : 'worksAt[porter] = dre';
+   
+   crEdges : '[| mbr.dre, mbr.pin | mbr.pin, mbr.rav | mbr.rav, mbr.woo | mbr.woo, mbr.won | mbr.won, mbr.dra  |
+                 mbr.dra, mbr.buc | mbr.buc, mbr.maz | mbr.maz, mbr.apa | mbr.apa, mbr.cro |]';   
+   useSPD: 'true';
+};
+
+PVS: espinosa = new ConstraintPreferences("espinosa") {
+   soft-constraint pin : 'worksAt[espinosa] = pin';
+   soft-constraint rav : 'worksAt[espinosa] = rav';
+   soft-constraint maz : 'worksAt[espinosa] = maz';
+   soft-constraint cro : 'worksAt[espinosa] = cro';
+   soft-constraint apa : 'worksAt[espinosa] = apa';
+   soft-constraint won : 'worksAt[espinosa] = won';
+   soft-constraint buc : 'worksAt[espinosa] = buc';
+   soft-constraint woo : 'worksAt[espinosa] = woo';
+   soft-constraint dre : 'worksAt[espinosa] = dre';
+   
+   crEdges : '[| mbr.dre, mbr.woo | mbr.woo, mbr.buc | mbr.buc, mbr.won | mbr.won, mbr.apa | mbr.apa, mbr.pin  |
+                 mbr.pin, mbr.rav | mbr.rav, mbr.cro | mbr.cro, mbr.maz |]';   
+   useSPD: 'true';
+};
+
+PVS: stokes = new ConstraintPreferences("stokes") {
+   soft-constraint apa : 'worksAt[stokes] = apa';
+   soft-constraint maz : 'worksAt[stokes] = maz';
+   soft-constraint rav : 'worksAt[stokes] = rav';
+   soft-constraint cro : 'worksAt[stokes] = cro';
+   soft-constraint buc : 'worksAt[stokes] = buc';
+   soft-constraint dra : 'worksAt[stokes] = dra';
+   soft-constraint pin : 'worksAt[stokes] = pin';
+   soft-constraint woo : 'worksAt[stokes] = woo';
+   soft-constraint won : 'worksAt[stokes] = won';
+   soft-constraint dre : 'worksAt[stokes] = dre';
+   
+   crEdges : '[| mbr.apa, mbr.woo | mbr.woo, mbr.cro | mbr.cro, mbr.maz | mbr.maz, mbr.won | mbr.won, mbr.dre  |
+                 mbr.dre, mbr.buc | mbr.buc, mbr.rav | mbr.rav, mbr.dra | mbr.dra, mbr.pin |]';   
+   useSPD: 'true';
+};
+
+PVS: monroe = new ConstraintPreferences("monroe") {
+   soft-constraint apa : 'worksAt[monroe] = apa';
+   soft-constraint maz : 'worksAt[monroe] = maz';
+   soft-constraint rav : 'worksAt[monroe] = rav';
+   soft-constraint cro : 'worksAt[monroe] = cro';
+   soft-constraint buc : 'worksAt[monroe] = buc';
+   soft-constraint dra : 'worksAt[monroe] = dra';
+   soft-constraint pin : 'worksAt[monroe] = pin';
+   soft-constraint woo : 'worksAt[monroe] = woo';
+   soft-constraint won : 'worksAt[monroe] = won';
+   soft-constraint dre : 'worksAt[monroe] = dre';
+   
+   crEdges : '[| mbr.cro, mbr.dra | mbr.dra, mbr.dre | mbr.dre, mbr.woo | mbr.woo, mbr.won | mbr.won, mbr.apa  |
+                 mbr.apa, mbr.pin | mbr.pin, mbr.maz | mbr.maz, mbr.buc | mbr.buc, mbr.rav |]';   
+   useSPD: 'true';
+};
+
+
+/* ================================= COMPANIES ========================== */
+
+PVS: companies = new ConstraintPreferences("companies") {
+   soft-constraint drebie: 'worksAt[stookey] = dre';
+   soft-constraint drekep: 'worksAt[peletier] = dre';
+   soft-constraint dremue: 'worksAt[monroe] = dre';
+   
+   soft-constraint drebeh:  'worksAt[horvath] = dre';
+   soft-constraint dresand: 'worksAt[ford] = dre';
+   soft-constraint dregoe:  'worksAt[stokes] = dre';
+   
+   % draix
+   soft-constraint drasand:  'worksAt[ford] = dra';
+   soft-constraint draschw:  'worksAt[williams] = dra';
+   soft-constraint drastokes:  'worksAt[stokes] = dra';
+   soft-constraint drapeletier:  'worksAt[peletier] = dra';
+   soft-constraint dragreene:  'worksAt[greene] = dra';
+   soft-constraint dradixon:  'worksAt[dixon] = dra';
+   
+   % pinborn
+   soft-constraint pinwalsh:  'worksAt[walsh] = pin';
+   soft-constraint pingeig:  'worksAt[chambler] = pin';
+   soft-constraint pinkepp:  'worksAt[peletier] = pin';
+   soft-constraint pinschw:  'worksAt[williams] = pin';
+   soft-constraint pinstokes:  'worksAt[stokes] = pin';
+   
+   % bucmens 
+   soft-constraint buchorvath:  'worksAt[horvath] = buc';
+   soft-constraint bucmuell:  'worksAt[monroe] = buc';
+   soft-constraint bucrie:  'worksAt[porter] = buc';
+   soft-constraint buckep:  'worksAt[peletier] = buc';
+   soft-constraint bucdixon:  'worksAt[dixon] = buc';
+   
+   % woo
+   soft-constraint woohorvath:  'worksAt[horvath] = woo';
+   soft-constraint woogeig:  'worksAt[chambler] = woo';
+   soft-constraint woostokes:  'worksAt[stokes] = woo';
+   soft-constraint woojones:  'worksAt[jones] = woo';
+   soft-constraint woosand:  'worksAt[ford] = woo';
+
+   % crohlke
+   soft-constraint croann:  'worksAt[grimes] = cro';
+   soft-constraint crobran:  'worksAt[walsh] = cro';
+   soft-constraint crochambler:  'worksAt[chambler] = cro';
+   soft-constraint crohen:  'worksAt[greene] = cro';
+   soft-constraint crosand:  'worksAt[ford] = cro';
+   soft-constraint croschw:  'worksAt[williams] = cro';
+   
+   % Oracle
+   soft-constraint apaann:  'worksAt[grimes] = apa';
+   soft-constraint apabran:  'worksAt[walsh] = apa';
+   soft-constraint apamue:  'worksAt[monroe] = apa';
+   soft-constraint apahen:  'worksAt[blake] = apa';
+   soft-constraint apasand:  'worksAt[ford] = apa';
+   soft-constraint apaschw:  'worksAt[williams] = apa';
+   
+   % BMW
+   soft-constraint ravann:  'worksAt[grimes] = rav';
+   soft-constraint ravbied:  'worksAt[stookey] = rav';
+   soft-constraint ravmue:  'worksAt[monroe] = rav';
+   soft-constraint ravgoe:  'worksAt[stokes] = rav';   
+   
+   crEdges : '[| mbr.drebeh, mbr.drebie | mbr.drebeh, mbr.drekep | mbr.drebeh, mbr.dremue  |  
+                 mbr.dresand, mbr.drebie | mbr.dresand, mbr.drekep | mbr.dresand, mbr.dremue  | 
+                 mbr.dregoe, mbr.drebie | mbr.dregoe, mbr.drekep | mbr.dregoe, mbr.dremue  |
+                 mbr.dradixon, mbr.dragreene | mbr.dragreene, mbr.drapeletier | mbr.drapeletier, mbr.drastokes  | 
+                 mbr.drastokes, mbr.draschw | mbr.draschw, mbr.drasand  |]';
+                 
+   useSPD: 'false' ;
+}; 
+
+
+
+%solve ToWeighted(students) lex ToWeighted(companies);
+% solve ToWeighted(companies) lex ToWeighted(students);
+
+
+output '[ "worksAt = \(worksAt), mbr_overall_MBR_VOT_1 = \(mbr_overall_MBR_VOT_1)"]';
+
+/*
+solve vote([ToWeighted(grimes), walsh, ToWeighted(jones), ToWeighted(rhee),
+            ToWeighted(horvath), ToWeighted(dixon), ToWeighted(peletier), ToWeighted(greene),
+            ToWeighted(blake), ToWeighted(williams), ToWeighted(stookey),
+            ToWeighted(chambler), ToWeighted(ford), ToWeighted(porter),
+            ToWeighted(espinosa), ToWeighted(stokes), ToWeighted(monroe)], sumMin) lex ToWeighted(companies);
+            
+*/            
+solve vote([ToWeighted(grimes), walsh, ToWeighted(jones), ToWeighted(rhee),
+            ToWeighted(horvath), ToWeighted(dixon), ToWeighted(peletier), ToWeighted(greene),
+            ToWeighted(blake), ToWeighted(williams), ToWeighted(stookey),
+            ToWeighted(chambler), ToWeighted(ford), ToWeighted(porter),
+            ToWeighted(espinosa), ToWeighted(stokes), ToWeighted(monroe)], sumMin) ;
+
