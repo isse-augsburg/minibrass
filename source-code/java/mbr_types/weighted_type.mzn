@@ -1,16 +1,16 @@
 % Weighted Constraint Type
 
 predicate is_worse_weighted(var int: x, var int: y, 
-  par int: nScs, par int: k, array[int] of par int: weights) = 
+  par int: nScs, par int: k, array[int] of par int: weights, int: amplifier) = 
   x > y;
 
 function var int: weighted_sum(array[int] of var bool: b, 
-                               par int: nScs, par int: k, array[int] of par int: weights) =
-  sum(i in index_set(b)) ( (1 - bool2int(b[i])) * weights[i]);
+                               par int: nScs, par int: k, array[int] of par int: weights, int: amplifier) =
+  sum(i in index_set(b)) ( (1 - bool2int(b[i])) * (weights[i] * amplifier));
 
 
 function ann: getSearchHeuristicWeighted(array[int] of var bool: degs, var int: overall,  par int: nSoftConstraints,
-                                         int: k, array[int] of int: weights) = 
+                                         int: k, array[int] of int: weights, int: amplifier) = 
 let {
   set of int: softConstraints = 1..nSoftConstraints;
   

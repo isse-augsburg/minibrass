@@ -1,13 +1,17 @@
 % A student-company matching
 include "globals.mzn";
 
-include "fmse2016.mzn";
+include "wise2017.mzn";
 
 int: n; % number of students 
 set of int: STUDENT = 1..n;
+array[STUDENT] of string: studentNames;
+
 
 int: m; % number of companies
 set of int: COMPANY = 1..m;
+array[COMPANY] of string: companyNames;
+
 
 % assign students to companies, not the other way around
 array[STUDENT] of var COMPANY: worksAt;
