@@ -21,6 +21,7 @@ public class MiniZincResult {
 	private final static String OPTIMALITY_SEP = "==========";
 	private final static String SOLUTION_SEP = "----------";
 	private final static String UNSATISFIABLE_SEP = "=====UNSATISFIABLE=====";
+	private final static String UNKNOWN_SEP = "=====UNKNOWN====="; // in case of timeout
 	
 	
 	public MiniZincResult() {
@@ -44,11 +45,12 @@ public class MiniZincResult {
 	 * @param line
 	 */
 	public void lookForError(String line) {
-		if(line.contains(UNSATISFIABLE_SEP)) {
+		if(line.contains(UNSATISFIABLE_SEP) || line.contains(UNKNOWN_SEP)) {
 			solved = false;
 			invalidate();
 			unsatisfiable = true;
 		}
+		
 		
 		if (line.toLowerCase().contains("error") ) {
 			invalidate();
