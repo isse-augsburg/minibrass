@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -36,25 +37,34 @@ import isse.mbr.parsing.MiniBrassParser;
  *
  */
 public class MiniBrassRunner {
+	private static final int RANDOM_SEED_LIMIT = Integer.MAX_VALUE / 2;
 	private MiniZincRunner miniZincRunner;
 	private MiniBrassCompiler miniBrassCompiler;
 	private boolean writeIntermediateFiles;
 	private boolean debug;
+	private int initialRandomSeed;
+	private boolean randomize;
+	private boolean dominationSearch; // solution has to get strictly better (otherwise only have to not be worse)
+	private Random randomSequence;
+	
 	private int modelIndex;
 	private File originalMiniZincFile;
 	private List<MiniZincSolution> allSolutions;
 	private HelpFormatter formatter;
 	private Options options;
 	private static Logger logger;
-	
+
 	public MiniBrassRunner() {
 		miniZincRunner = new MiniZincRunner();
 		MiniZincConfiguration config = new MiniZincConfiguration();
-		config.setUseAllSolutions(true);
+		config.setUseAllSolutions(false);
 
 		miniZincRunner.setConfiguration(config);
 		miniBrassCompiler = new MiniBrassCompiler();
 		writeIntermediateFiles = true;
+		randomize = false;
+		initialRandomSeed = 1337;
+		dominationSearch = true;
 		debug = false;
 		modelIndex = 0;
 	}
@@ -68,31 +78,41 @@ public class MiniBrassRunner {
 			throws IOException, MiniBrassParseException {
 		MiniZincSolution solution;
 		MiniZincSolution lastSolution = null;
-		
+
 		allSolutions = new LinkedList<>();
 		miniBrassCompiler.setMinizincOnly(true);
 		String compiledMiniBrassCode = miniBrassCompiler.compileInMemory(miniBrassFile);
 		originalMiniZincFile = miniZincFile;
 		MiniBrassParser parser = miniBrassCompiler.getUnderlyingParser();
-		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate();
+		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate(); // for domination search
+		
+
+		String branchAndBoundConstraint = getBetterConstraint;
 		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
 
 		File workingMiniZincModel = appendMiniZincCode(miniZincFile, compiledMiniBrassCode);
 
+		if(randomize) {
+			randomSequence = new Random(initialRandomSeed);
+		}
 		while ((solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
 			// append solution
 			allSolutions.add(solution);
 			lastSolution = solution;
-			
-			// print solution
+
+			// print solution in debug mode
+			String updatedConstraint = "constraint " + postProcessor.processSolution(branchAndBoundConstraint, solution)
+					+ ";";
 			System.out.println("Found solution: ");
 			System.out.println(solution.getRawDznSolution());
-			// process getBetterConstraint with actual solution
-			System.out.println("I got the following template constraint: ");
-			System.out.println(getBetterConstraint);
-			String updatedConstraint = "constraint " + postProcessor.processSolution(getBetterConstraint, solution)
-					+ ";";
-			System.out.println(updatedConstraint);
+			if (debug) {
+				
+				// process getBetterConstraint with actual solution
+				System.out.println("I got the following template constraint: ");
+				System.out.println(branchAndBoundConstraint);
+				System.out.println(updatedConstraint);
+
+			}
 
 			// add constraint to model
 			// TODO this is not the best way to do it - we should keep the String in main
@@ -128,11 +148,13 @@ public class MiniBrassRunner {
 
 		new MiniBrassRunner().doMain(args);
 	}
-	
+
 	private void printUsage() {
-		formatter.printHelp("minibrass [<options>] <minibrass-model>.mbr <minizinc-model>.mzn <minizinc-data>.dzn\n\nOptions:\n", options);
+		formatter.printHelp(
+				"minibrass [<options>] <minibrass-model>.mbr <minizinc-model>.mzn <minizinc-data>.dzn\n\nOptions:\n",
+				options);
 	}
-	
+
 	private void doMain(String[] args) {
 		// create the command line parser
 		CommandLineParser parser = new DefaultParser();
@@ -140,26 +162,28 @@ public class MiniBrassRunner {
 		options = new Options();
 		options.addOption("h", "help", false, "print this message");
 		options.addOption("d", "debug", false, "write intermediate files");
+		options.addOption("w", "weak-opt", false, "only use non-domination search");
+		options.addOption("r", "random-seed", true, "initial random seed for branch-and-bound");
 		options.addOption("s", "solver", true, "solver to use for branch-and-bound");
 		options.addOption("t", "timeout", true, "timeout in milliseconds");
-		
+
 		formatter = new HelpFormatter();
 		String minibrassFile = null;
 		String minizincModelFile = null;
 		String minizincDataFile = null;
 		List<File> dataFiles = new LinkedList<>();
-		
+
 		try {
 			// parse the command line arguments
 			CommandLine line = parser.parse(options, args);
 
 			List<String> argList = line.getArgList();
-			
+
 			if (line.hasOption('h')) {
 				printUsage();
 				System.exit(0);
 			}
-			
+
 			if (line.hasOption("solver")) {
 				miniZincRunner.getConfiguration().setSolverId(line.getOptionValue("solver"));
 			}
@@ -168,8 +192,18 @@ public class MiniBrassRunner {
 				miniZincRunner.getConfiguration().setTimeout(Integer.parseInt(line.getOptionValue("timeout")));
 			}
 
+			if(line.hasOption("random-seed")) {
+				randomize = true;
+				initialRandomSeed = Integer.parseInt(line.getOptionValue("random-seed"));
+			}
+
+			if(line.hasOption("weak-opt")) {
+				dominationSearch = false;
+			}
+			
 			if (argList.size() < 2) {
-				System.out.println("minibrass expects one MiniBrass file, one MiniZinc file and optionally some data files as input.");
+				System.out.println(
+						"minibrass expects one MiniBrass file, one MiniZinc file and optionally some data files as input.");
 				printUsage();
 				System.exit(1);
 			} else {
@@ -177,13 +211,13 @@ public class MiniBrassRunner {
 				if (!minibrassFile.endsWith("mbr")) {
 					System.out.println("Warning: MiniBrass file ending on .mbr expected!");
 				}
-				
+
 				minizincModelFile = argList.get(1);
 				if (!minizincModelFile.endsWith("mzn")) {
 					System.out.println("Warning: MiniZinc file ending on .mzn expected!");
 				}
-				
-				if(argList.size() > 2) {
+
+				if (argList.size() > 2) {
 					minizincDataFile = argList.get(2);
 					if (!minizincDataFile.endsWith("dzn")) {
 						System.out.println("Warning: MiniZinc data file ending on .dzn expected!");
@@ -193,12 +227,14 @@ public class MiniBrassRunner {
 			}
 
 			if (line.hasOption("debug")) {
-				debug = true;				
-			} 
-
-			logger.info("Processing " + minibrassFile + " | " + minizincModelFile+ " | " + minizincDataFile +" to file.");
-			executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
+				debug = true;
+				miniZincRunner.setDebug(true);
+			}
 			
+			logger.info(
+					"Processing " + minibrassFile + " | " + minizincModelFile + " | " + minizincDataFile + " to file.");
+			executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
+
 		} catch (ParseException exp) {
 			logger.severe("Unexpected exception:" + exp.getMessage());
 			printUsage();
@@ -212,9 +248,9 @@ public class MiniBrassRunner {
 			logger.severe("IO error: ");
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private File appendMiniZincCode(File miniZincFile, String updatedConstraint) throws IOException {
 		if (writeIntermediateFiles) {
 			String name = miniZincFile.getName();
@@ -238,6 +274,9 @@ public class MiniBrassRunner {
 	}
 
 	private MiniZincSolution hasNextSolution(File miniZincFile, List<File> dataFiles) {
+		if(randomize) {
+			miniZincRunner.getConfiguration().setRandomSeed(randomSequence.nextInt(RANDOM_SEED_LIMIT));
+		}
 		MiniZincResult result = miniZincRunner.solve(miniZincFile, dataFiles, -1);
 		return !result.isInvalidated() && result.isSolved() ? result.getLastSolution() : null;
 	}
@@ -264,6 +303,14 @@ public class MiniBrassRunner {
 
 	public void setAllSolutions(List<MiniZincSolution> allSolutions) {
 		this.allSolutions = allSolutions;
+	}
+
+	public boolean isDominationSearch() {
+		return dominationSearch;
+	}
+
+	public void setDominationSearch(boolean dominationSearch) {
+		this.dominationSearch = dominationSearch;
 	}
 
 }

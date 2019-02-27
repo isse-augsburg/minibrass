@@ -30,6 +30,7 @@ public class MiniZincRunner {
 	
 	// Configuration settings for the runner
 	private boolean doLog = true;
+	private boolean debug = false;
 	private final static Logger LOGGER = Logger.getGlobal();
 
 	// Constants 
@@ -109,6 +110,8 @@ public class MiniZincRunner {
 			
 			List<String> lines = new LinkedList<>();
 			while ((line = reader.readLine()) != null) {
+				if(isDebug())
+					System.out.println(line);
 				lines.add(line);
 				result.lookForError(line);
 			}
@@ -217,6 +220,10 @@ public class MiniZincRunner {
 			pb.command().add("--time-limit");
 			pb.command().add(configuration.getTimeout().toString());
 		}
+		if(configuration.getRandomSeed() != null) {
+			pb.command().add("--random-seed");
+			pb.command().add(configuration.getRandomSeed().toString());
+		}
 	}
 	
 	//================== Setters and getters start =====================
@@ -226,5 +233,13 @@ public class MiniZincRunner {
 
 	public void setConfiguration(MiniZincConfiguration configuration) {
 		this.configuration = configuration;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 }

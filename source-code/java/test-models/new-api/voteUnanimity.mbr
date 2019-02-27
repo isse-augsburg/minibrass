@@ -1,0 +1,22 @@
+include "defs.mbr";
+
+% MaxCostFunctionNetwork to maximize
+PVS: a = new MaxCostFunctionNetwork("a")
+{
+soft-constraint sc1: 'voteValA';
+};
+
+% CostFunctionNetwork to minimize
+PVS: b = new CostFunctionNetwork("b")
+{
+soft-constraint sc1: 'voteValB';
+};
+
+% MaxCostFunctionNetwork to maximize
+PVS: c = new MaxCostFunctionNetwork("c")
+{
+soft-constraint sc1: 'voteValA';
+};
+
+solve vote([a, b, c], unanimity) ;
+

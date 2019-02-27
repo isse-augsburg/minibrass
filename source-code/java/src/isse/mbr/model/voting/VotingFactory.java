@@ -23,6 +23,8 @@ public class VotingFactory {
 			return new SumVoting(false);
 		case "sumMax":	
 			return new SumVoting(true);
+		case "unanimity":
+			return new UnanimityVoting();
 		default:
 				throw new MiniBrassParseException("Voting procedure ["+keyword+"] unknown.");
 		}

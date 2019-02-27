@@ -12,11 +12,13 @@ public class MiniZincConfiguration {
 	private boolean useAllSolutions;
 	private String solverId;
 	private Integer timeout; // in milliseconds
+	private Integer randomSeed; // can be null if not specified
 	
 	public MiniZincConfiguration() {
 		useAllSolutions = true;
 		solverId = "Gecode";
 		timeout = null;
+		randomSeed = null;
 	}
 	/**
 	 * @return should we solve for all solutions (-a) or just return the first found solution
@@ -52,5 +54,12 @@ public class MiniZincConfiguration {
 	
 	public void setTimeout(Integer timeout) {
 		this.timeout = timeout;
+	}
+	
+	public Integer getRandomSeed() {
+		return randomSeed;
+	}
+	public void setRandomSeed(Integer randomSeed) {
+		this.randomSeed = randomSeed;
 	}
 }
