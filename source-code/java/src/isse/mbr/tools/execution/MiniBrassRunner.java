@@ -46,6 +46,7 @@ public class MiniBrassRunner {
 	private boolean randomize;
 	private boolean dominationSearch; // solution has to get strictly better (otherwise only have to not be worse)
 	private Random randomSequence;
+	private Integer timeoutInSeconds; // in milliseconds
 	
 	private int modelIndex;
 	private File originalMiniZincFile;
@@ -60,6 +61,7 @@ public class MiniBrassRunner {
 		config.setUseAllSolutions(false);
 
 		miniZincRunner.setConfiguration(config);
+
 		miniBrassCompiler = new MiniBrassCompiler();
 		writeIntermediateFiles = true;
 		randomize = false;
@@ -67,6 +69,7 @@ public class MiniBrassRunner {
 		dominationSearch = true;
 		debug = false;
 		modelIndex = 0;
+		timeoutInSeconds = null;
 	}
 
 	public MiniBrassRunner(MiniZincConfiguration configuration) {
@@ -84,17 +87,30 @@ public class MiniBrassRunner {
 		String compiledMiniBrassCode = miniBrassCompiler.compileInMemory(miniBrassFile);
 		originalMiniZincFile = miniZincFile;
 		MiniBrassParser parser = miniBrassCompiler.getUnderlyingParser();
-		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate(); // for domination search
-		
+		// for domination search
+		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate(); 
 
 		String branchAndBoundConstraint = getBetterConstraint;
 		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
 
+		if (!writeIntermediateFiles) { // still write a copy for branch and bound
+
+			String name = originalMiniZincFile.getName();
+			String nextName = FilenameUtils.removeExtension(name) + "_0" + ".mzn";
+			File nextFile = new File(originalMiniZincFile.getParentFile(), nextName);
+			FileUtils.copyFile(miniZincFile, nextFile);
+			miniZincFile = nextFile;
+
+		}
 		File workingMiniZincModel = appendMiniZincCode(miniZincFile, compiledMiniBrassCode);
 
-		if(randomize) {
+		if (randomize) {
 			randomSequence = new Random(initialRandomSeed);
 		}
+		
+		// in our configuration, we do not want to see all solutions
+		miniZincRunner.getConfiguration().setUseAllSolutions(false);
+		
 		while ((solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
 			// append solution
 			allSolutions.add(solution);
@@ -103,10 +119,11 @@ public class MiniBrassRunner {
 			// print solution in debug mode
 			String updatedConstraint = "constraint " + postProcessor.processSolution(branchAndBoundConstraint, solution)
 					+ ";";
-			System.out.println("Found solution: ");
-			System.out.println(solution.getRawDznSolution());
+
 			if (debug) {
-				
+				System.out.println("Found solution: ");
+				System.out.println(solution.getRawDznSolution());
+
 				// process getBetterConstraint with actual solution
 				System.out.println("I got the following template constraint: ");
 				System.out.println(branchAndBoundConstraint);
@@ -192,15 +209,15 @@ public class MiniBrassRunner {
 				miniZincRunner.getConfiguration().setTimeout(Integer.parseInt(line.getOptionValue("timeout")));
 			}
 
-			if(line.hasOption("random-seed")) {
-				randomize = true;
-				initialRandomSeed = Integer.parseInt(line.getOptionValue("random-seed"));
+			if (line.hasOption("random-seed")) {
+
+				setInitialRandomSeed(Integer.parseInt(line.getOptionValue("random-seed")));
 			}
 
-			if(line.hasOption("weak-opt")) {
+			if (line.hasOption("weak-opt")) {
 				dominationSearch = false;
 			}
-			
+
 			if (argList.size() < 2) {
 				System.out.println(
 						"minibrass expects one MiniBrass file, one MiniZinc file and optionally some data files as input.");
@@ -230,7 +247,7 @@ public class MiniBrassRunner {
 				debug = true;
 				miniZincRunner.setDebug(true);
 			}
-			
+
 			logger.info(
 					"Processing " + minibrassFile + " | " + minizincModelFile + " | " + minizincDataFile + " to file.");
 			executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
@@ -259,8 +276,8 @@ public class MiniBrassRunner {
 			FileUtils.copyFile(miniZincFile, nextFile);
 			cleanup(miniZincFile);
 			miniZincFile = nextFile;
-
 		}
+
 		FileWriter fw = new FileWriter(miniZincFile, true);
 		fw.write("\n");
 		fw.write(updatedConstraint);
@@ -274,10 +291,10 @@ public class MiniBrassRunner {
 	}
 
 	private MiniZincSolution hasNextSolution(File miniZincFile, List<File> dataFiles) {
-		if(randomize) {
+		if (randomize) {
 			miniZincRunner.getConfiguration().setRandomSeed(randomSequence.nextInt(RANDOM_SEED_LIMIT));
 		}
-		MiniZincResult result = miniZincRunner.solve(miniZincFile, dataFiles, -1);
+		MiniZincResult result = miniZincRunner.solve(miniZincFile, dataFiles, timeoutInSeconds);
 		return !result.isInvalidated() && result.isSolved() ? result.getLastSolution() : null;
 	}
 
@@ -311,6 +328,31 @@ public class MiniBrassRunner {
 
 	public void setDominationSearch(boolean dominationSearch) {
 		this.dominationSearch = dominationSearch;
+	}
+
+	public MiniZincRunner getMiniZincRunner() {
+		return miniZincRunner;
+	}
+
+	public int getInitialRandomSeed() {
+		return initialRandomSeed;
+	}
+
+	public void setInitialRandomSeed(int initialRandomSeed) {
+		this.initialRandomSeed = initialRandomSeed;
+		this.randomize = true;
+	}
+
+	public boolean writeIntermediateFiles() {
+		return writeIntermediateFiles;
+	}
+
+	public void setWriteIntermediateFiles(boolean writeIntermediateFiles) {
+		this.writeIntermediateFiles = writeIntermediateFiles;
+	}
+
+	public void setTimeoutInSeconds(Integer timeout) {
+		this.timeoutInSeconds = timeout;
 	}
 
 }

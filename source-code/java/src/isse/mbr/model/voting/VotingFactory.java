@@ -9,21 +9,29 @@ import isse.mbr.parsing.MiniBrassParseException;
  *
  */
 public class VotingFactory {
+	public static final String UNANIMITY = "unanimity";
+	public static final String SUM_MAX = "sumMax";
+	public static final String SUM_MIN = "sumMin";
+	public static final String SUM = "sum";
+	public static final String APPROVAL = "approval";
+	public static final String MAJORITY_TOPS = "majorityTops";
+	public static final String CONDORCET = "condorcet";
+
 	public static VotingProcedure getVotingProcedure(String keyword) throws MiniBrassParseException {
 		switch(keyword) {
-		case "condorcet":
+		case CONDORCET:
 			return new CondorcetVoting();
-		case "majorityTops":
+		case MAJORITY_TOPS:
 			return new MajorityTopsVoting();
-		case "approval":
+		case APPROVAL:
 			return new ApprovalVoting();
-		case "sum":	
+		case SUM:	
 			return new SumVoting();
-		case "sumMin":	
+		case SUM_MIN:	
 			return new SumVoting(false);
-		case "sumMax":	
+		case SUM_MAX:	
 			return new SumVoting(true);
-		case "unanimity":
+		case UNANIMITY:
 			return new UnanimityVoting();
 		default:
 				throw new MiniBrassParseException("Voting procedure ["+keyword+"] unknown.");

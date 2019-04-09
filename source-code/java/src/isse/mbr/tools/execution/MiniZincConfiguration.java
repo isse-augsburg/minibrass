@@ -10,15 +10,19 @@ package isse.mbr.tools.execution;
  */
 public class MiniZincConfiguration {
 	private boolean useAllSolutions;
+	private Integer stopAfterNSolutions;
 	private String solverId;
 	private Integer timeout; // in milliseconds
 	private Integer randomSeed; // can be null if not specified
+	private Integer parallel;
 	
 	public MiniZincConfiguration() {
 		useAllSolutions = true;
 		solverId = "Gecode";
 		timeout = null;
 		randomSeed = null;
+		stopAfterNSolutions = null;
+		parallel = null;
 	}
 	/**
 	 * @return should we solve for all solutions (-a) or just return the first found solution
@@ -61,5 +65,17 @@ public class MiniZincConfiguration {
 	}
 	public void setRandomSeed(Integer randomSeed) {
 		this.randomSeed = randomSeed;
+	}
+	public Integer getStopAfterNSolutions() {
+		return stopAfterNSolutions;
+	}
+	public void setStopAfterNSolutions(Integer stopAfterNSolutions) {
+		this.stopAfterNSolutions = stopAfterNSolutions;
+	}
+	public Integer getParallel() {
+		return parallel;
+	}
+	public void setParallel(Integer parallel) {
+		this.parallel = parallel;
 	}
 }

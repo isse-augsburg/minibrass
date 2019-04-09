@@ -16,7 +16,9 @@ public class MiniBrassPostProcessor {
 	public String processSolution(String input, MiniZincSolution solution) {
 		String origCopy = new String(input);
 		Matcher m = Pattern.compile("sol\\((.*?)\\)").matcher(input);
-		List<MiniZincVariable> variablesToReplace = solution.getAllVariables(); 
+		List<MiniZincVariable> variablesToReplace = solution.getAllVariables();
+		// replace longer variables before shorter ones to avoid issues with prefixes 
+		variablesToReplace.sort( (MiniZincVariable var1, MiniZincVariable var2) -> var2.getName().compareTo(var1.getName()) );
 		
 		while (m.find()) {
 			String content = m.group(1);
