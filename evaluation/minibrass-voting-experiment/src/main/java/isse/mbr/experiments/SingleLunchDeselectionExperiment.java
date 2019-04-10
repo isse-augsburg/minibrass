@@ -153,10 +153,10 @@ public class SingleLunchDeselectionExperiment {
 		System.out.println(csv);
 		System.out.println("Amplifiers");
 		System.out.println(amplifierKey);
-	/*	FileWriter fw = new FileWriter(getFileName());
+		FileWriter fw = new FileWriter(getFileName());
 		fw.write(csv);
 		fw.close();
-		*/
+		
 	}
 
 	public void setup() {
