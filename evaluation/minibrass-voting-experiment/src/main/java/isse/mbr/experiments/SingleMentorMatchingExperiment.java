@@ -59,6 +59,7 @@ public class SingleMentorMatchingExperiment {
 		
 		settings = new VotingExperimentSettings();
 		settings.setAmplify(true);
+		settings.setAmplificationProbability(0.5);
 	}
 
 	public VotingExperimentSettings getSettings() {

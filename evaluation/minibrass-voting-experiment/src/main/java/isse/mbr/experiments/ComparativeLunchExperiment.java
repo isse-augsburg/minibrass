@@ -17,7 +17,7 @@ public class ComparativeLunchExperiment {
 
 	public static void main(String[] args) throws IOException, MiniBrassParseException {
 		
-		int numberOfExperiments = 5;
+		int numberOfExperiments = 200;
 		for(int i = 0; i < numberOfExperiments; ++i) {
 			SingleLunchDeselectionExperiment experiment = new SingleLunchDeselectionExperiment(1337+i);
 			experiment.setup();

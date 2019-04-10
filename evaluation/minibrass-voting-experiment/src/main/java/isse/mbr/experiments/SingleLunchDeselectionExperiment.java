@@ -59,6 +59,7 @@ public class SingleLunchDeselectionExperiment {
 		timeout = 15*60;
 		settings = new VotingExperimentSettings();
 		settings.setAmplify(true);
+		settings.setAmplificationProbability(.5);
 	}
 
 	public VotingExperimentSettings getSettings() {

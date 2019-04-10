@@ -17,7 +17,7 @@ public class ComparativeExperiment {
 
 	public static void main(String[] args) throws IOException, MiniBrassParseException {
 		
-		int numberOfExperiments = 50;
+		int numberOfExperiments = 200;
 		for(int i = 0; i < numberOfExperiments; ++i) {
 			SingleMentorMatchingExperiment experiment = new SingleMentorMatchingExperiment(1337+i);
 			experiment.setup();
@@ -30,32 +30,32 @@ public class ComparativeExperiment {
 			
 			// first the amplifierKey
 			String amplifierKey = experiment.getAmplifierKey();
-			FileWriter fw = new FileWriter(new File("results/amplifiers_"+i+".csv"));
+			FileWriter fw = new FileWriter(new File("results/mentor-matching-200/amplifiers_"+i+".csv"));
 			fw.write(amplifierKey);
 			fw.close();
 
 			// 1st weighted unbiased
 			experiment.getSettings().setAmplify(false);
 			experiment.setSocialChoiceFunction(VotingFactory.SUM_MIN);
-			experiment.setFileName("results/weights-unbiased_"+i+".csv");
+			experiment.setFileName("results/mentor-matching-200/weights-unbiased_"+i+".csv");
 			experiment.execute(numberOfIterations);
 
 			// 2nd weighted biased
 			experiment.getSettings().setAmplify(true);
 			experiment.setSocialChoiceFunction(VotingFactory.SUM_MIN);
-			experiment.setFileName("results/weights-biased_"+i+".csv");
+			experiment.setFileName("results/mentor-matching-200/weights-biased_"+i+".csv");
 			experiment.execute(numberOfIterations);
 
 			// 3rd condorcet biased
 			experiment.getSettings().setAmplify(true);
 			experiment.setSocialChoiceFunction(VotingFactory.CONDORCET);
-			experiment.setFileName("results/condorcet-biased_"+i+".csv");
+			experiment.setFileName("results/mentor-matching-200/condorcet-biased_"+i+".csv");
 			experiment.execute(numberOfIterations);
 
 			// 4th unanimity
 			experiment.getSettings().setAmplify(true);
 			experiment.setSocialChoiceFunction(VotingFactory.UNANIMITY);
-			experiment.setFileName("results/unanimity_"+i+".csv");
+			experiment.setFileName("results/mentor-matching-200/unanimity_"+i+".csv");
 			experiment.execute(numberOfIterations);
 
 		}
