@@ -1,6 +1,6 @@
-include "../defs.mbr";
+include "defs.mbr";
 
-PVS: students = new ConstraintRelationships("students") {
+PVS: students = new ConstraintPreferences("students") {
    soft-constraint raubholzdelphi: 'worksAt[raubholz] = delphi';
    soft-constraint raubholzyouthlab: 'worksAt[raubholz] = youthlab';
    soft-constraint gleichcupg: 'worksAt[gleich] = cupgainini';
@@ -9,7 +9,7 @@ PVS: students = new ConstraintRelationships("students") {
    useSPD: 'true' ;
 }; 
 
-PVS: companies = new ConstraintRelationships("companies") {
+PVS: companies = new ConstraintPreferences("companies") {
    soft-constraint delphi_meer: 'worksAt[meerfluss] = delphi';
    soft-constraint delphi_gleich: 'worksAt[gleich] = delphi';
    soft-constraint youthlab: 'worksAt[lustig] = youthlab';

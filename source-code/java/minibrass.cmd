@@ -1,1 +1,1 @@
-java -jar %~dp0\mbr2mzn.jar %*
+java -jar %~dp0\minibrass.jar %*

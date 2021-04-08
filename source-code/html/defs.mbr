@@ -7,8 +7,8 @@ type ConstraintPreferences = PVSType<bool, set of 1..nScs> =
     bool: useSPD :: default('true');
   } in 
   instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
-    times -> link_invert_booleans;
-    is_worse -> is_worse_cr;
+    times -> union_violateds;
+    is_worse -> is_worse_constraint_pref;
     top -> {};
   }
   offers {

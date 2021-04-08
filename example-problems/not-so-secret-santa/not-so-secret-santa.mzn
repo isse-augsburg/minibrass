@@ -1,5 +1,3 @@
-include "not-so-secret-santa_o.mzn"; /* the compiled mzn-output */
-include "soft_constraints/minibrass.mzn";  /* MiniBrass prepared searches */
 include "globals.mzn";
 
 /* the actual decision variables and *hard* constraints */
@@ -26,8 +24,8 @@ array[PEOPLE] of set of PEOPLE: excludes;
 constraint inverse(givesTo, getsFrom);
 
 /* people do not give to themselves */
-constraint forall(p in PEOPLE) (givesTo[p] != p);
+constraint forall(p_ in PEOPLE) (givesTo[p_] != p_);
 
 solve 
 %:: int_search(givesTo, input_order, indomain_random, complete)
-search miniBrass();
+satisfy;

@@ -1,4 +1,4 @@
-include "../defs.mbr";
+include "defs.mbr";
 
 PVS: students = new WeightedCsp("students") {
    k: '100';

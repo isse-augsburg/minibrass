@@ -1,6 +1,3 @@
-include "unit-commitment_o.mzn";
-include "soft_constraints/pvs_gen_search.mzn";
-
 int: T = 5; set of int: WINDOW = 1..T;
 array[WINDOW] of int: demand = [20, 21, 25, 30, 29];
 
@@ -19,8 +16,4 @@ array[WINDOW] of var int: violation = [ abs( sum(p in PLANTS) (supply[w, p]) - d
 var int: sviolation = sum(violation);
 
 %solve minimize sviolation ;
-solve 
-search pvs_BAB();
-
-output[ "Obj = \(sviolation)\nsupply=\(supply)"] ++ [ "\nValuations: mbr_overall_Orga = \(mbr_overall_Orga); mbr_overall_biogas = \(mbr_overall_biogas); mbr_overall_ev = \(mbr_overall_ev); mbr_overall_therm1 = \(mbr_overall_therm1); mbr_overall_therm2 = \(mbr_overall_therm2)\n"]
-;
+solve satisfy;

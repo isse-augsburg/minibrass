@@ -1,13 +1,12 @@
-include "../defs.mbr";
+include "defs.mbr";
 
 PVS: orga = new CostFunctionNetwork("Orga") {
     soft-constraint vio_1: 'violation[1]';
     soft-constraint vio_2: 'violation[2]';
     soft-constraint vio_3: 'violation[3]';
-    isWorstCase: 'true';
 };
 
-PVS: biogas = new ConstraintRelationships("biogas") {
+PVS: biogas = new ConstraintPreferences("biogas") {
    soft-constraint gasFull: 'forall(w in WINDOW) (supply[w,biogas] >= 13)';
    soft-constraint ecoSweet: 'forall(w in WINDOW) (supply[w,biogas] >= 14)';
    soft-constraint onOff: 'forall(w in 1..T-1) ( abs(supply[w,biogas] - supply[w+1,biogas]) <= 1)';
@@ -16,7 +15,7 @@ PVS: biogas = new ConstraintRelationships("biogas") {
    useSPD: 'true' ;
 }; 
 
-PVS: ev = new ConstraintRelationships("ev") {
+PVS: ev = new ConstraintPreferences("ev") {
    soft-constraint prefBL: 'forall(w in WINDOW) (supply[w,EV] in 5..8)';
    soft-constraint earlyBird: 'supply[2,EV] = 5 /\ supply[3,EV] = 5';
    soft-constraint limitBU: 'sum(w in WINDOW) ( bool2int(supply[w,EV] == 11) ) <= 2';

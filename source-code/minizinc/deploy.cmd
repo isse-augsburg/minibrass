@@ -22,7 +22,7 @@ set EXP_LIB=%1
 RMDIR /S /Q %EXP_LIB%
 MKDIR %EXP_LIB%
 
-xcopy /s mbr_types %EXP_LIB%
+xcopy ..\java\mbr_types %EXP_LIB%\mbr_types /E/H/C/I
 copy pvs_search.mzn %EXP_LIB%
 copy pvs_gen_search.mzn %EXP_LIB%
 copy minibrass.mzn %EXP_LIB%

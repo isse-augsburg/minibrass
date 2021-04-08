@@ -2,8 +2,6 @@
 include "globals.mzn";
 
 include "fmse2016.mzn"; % instance data 
-include "student-company-matching_o.mzn";
-include "soft_constraints/pvs_gen_search.mzn"; 
 
 
 int: n; % number of students 
@@ -23,8 +21,6 @@ minPerCompany = 1; maxPerCompany = 3;
 
 constraint global_cardinality_low_up ( worksAt, [c | c in COMPANY], [minPerCompany | c in COMPANY], [maxPerCompany | c in COMPANY]); 
 
-solve 
-search pvs_BAB();
+solve satisfy;
 
-output [ "worksAt = \(worksAt)"] ++ 
-[ "\nValuations: mbr_overall_ToWeighted_RefTo_companies_ = \(mbr_overall_ToWeighted_RefTo_companies_); mbr_overall_ToWeighted_RefTo_students_ = \(mbr_overall_ToWeighted_RefTo_students_)\n"];
+output [ "worksAt = \(worksAt)"];

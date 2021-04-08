@@ -1,8 +1,6 @@
 % Exam scheduling example 
 include "globals.mzn";
-include "example-scheduling_o.mzn";
 include "fmsoft2016.mzn";
-include "soft_constraints/pvs_gen_search.mzn";
 int: n; 
 set of int: STUDENT = 1..n; 
 
@@ -34,7 +32,4 @@ constraint  nvalue(scheduledDates, scheduled);
 int: lowerBound = (n div maxPerSlot) + ( n mod maxPerSlot > 0) * 1  ;
 constraint scheduledDates >= lowerBound;
 
-solve 
-search pvs_BAB();
-
-output [ "lowerBound: \(lowerBound) ++ Scheduled: \(scheduled)\n ++ Distinct dates: \(scheduledDates)" ] ++ [ "\nValuations: mbr_overall_students = \(mbr_overall_students); mbr_overall_teachers = \(mbr_overall_teachers)\n"];
+solve satisfy;

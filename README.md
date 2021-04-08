@@ -13,9 +13,6 @@ More specifically, we aim to provide
 
 To see a "Hello, World"-example, consider the following hard constraint model in MiniZinc
 ```c++
-include "classic_o.mzn"; % output of minibrass
-include "soft_constraints/pvs_gen_search.mzn"; % for generic branch and bound
-
 % the basic, "classic" CSP 
 set of int: NURSES = 1..3;
 int: day = 1; int: night = 2; int:off = 3;
@@ -27,7 +24,7 @@ array[NURSES] of var SHIFTS: n;
 
 solve 
 :: pvsSearchHeuristic
-search pvs_BAB();
+satisfy;
 
 output ["n = \(n)"] ++ 
        [ "\nValuations:  topLevelObjective = \(topLevelObjective)\n"];
@@ -41,8 +38,8 @@ type ConstraintPreferences = PVSType<bool, set of 1..nScs> =
     bool: useSPD;
   } in 
   instantiates with "soft_constraints/mbr_types/cr_type.mzn" {
-    times -> link_invert_booleans;
-    is_worse -> is_worse_cr;
+    times -> union_violateds;
+    is_worse -> is_worse_constraint_pref;
     top -> {};
 };
     
@@ -58,6 +55,12 @@ PVS: cr1 = new ConstraintPreferences("cr1") {
 
 solve cr1;
 ```
+
+Execute this pair using
+```
+minibrass nurseHelloWorld.mbr nurseHelloWorld.mzn
+```
+as shown in https://github.com/isse-augsburg/minibrass/tree/master/example-problems/nurse-example 
 
 For a *user-centered* perspective, please refer to our [main page](http://isse-augsburg.github.io/minibrass/).
 
