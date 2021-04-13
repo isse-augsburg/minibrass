@@ -230,6 +230,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.BoolSy;
 				case "float":
 					return MiniBrassSymbol.FloatSy;
+				case "string":
+					return MiniBrassSymbol.StringSy;
 				case "vote":
 					return MiniBrassSymbol.VotingSy;
 				case "output":
