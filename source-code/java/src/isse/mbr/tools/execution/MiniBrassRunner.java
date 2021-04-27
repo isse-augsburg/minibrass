@@ -1,5 +1,13 @@
 package isse.mbr.tools.execution;
 
+import isse.mbr.parsing.MiniBrassCompiler;
+import isse.mbr.parsing.MiniBrassCompiler.StdoutConsoleHandler;
+import isse.mbr.parsing.MiniBrassParseException;
+import isse.mbr.parsing.MiniBrassParser;
+import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -7,32 +15,16 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import isse.mbr.parsing.MiniBrassCompiler;
-import isse.mbr.parsing.MiniBrassCompiler.StdoutConsoleHandler;
-import isse.mbr.parsing.MiniBrassParseException;
-import isse.mbr.parsing.MiniBrassParser;
+import java.util.logging.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The MiniBrass runner is responsible for executing branch-and-bound or other
  * searches that involve executing several MiniZinc processes
- * 
+ *
  * usage: minibrass constraintModel.mzn file.mbr [dataFiles.dzn]
- * 
+ *
  * @author alexander
  *
  */
@@ -47,8 +39,8 @@ public class MiniBrassRunner {
 	private boolean dominationSearch; // solution has to get strictly better (otherwise only have to not be worse)
 	private Random randomSequence;
 	private Integer timeoutInSeconds; // in milliseconds
-	
-	private int modelIndex;
+
+
 	private File originalMiniZincFile;
 	private List<MiniZincSolution> allSolutions;
 	private HelpFormatter formatter;
@@ -68,7 +60,6 @@ public class MiniBrassRunner {
 		initialRandomSeed = 1337;
 		dominationSearch = true;
 		debug = false;
-		modelIndex = 0;
 		timeoutInSeconds = null;
 	}
 
@@ -88,7 +79,7 @@ public class MiniBrassRunner {
 		originalMiniZincFile = miniZincFile;
 		MiniBrassParser parser = miniBrassCompiler.getUnderlyingParser();
 		// for domination search
-		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate(); 
+		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate();
 
 		String branchAndBoundConstraint = getBetterConstraint;
 		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
@@ -107,10 +98,10 @@ public class MiniBrassRunner {
 		if (randomize) {
 			randomSequence = new Random(initialRandomSeed);
 		}
-		
+
 		// in our configuration, we do not want to see all solutions
 		miniZincRunner.getConfiguration().setUseAllSolutions(false);
-		
+
 		while ((solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
 			// append solution
 			allSolutions.add(solution);
@@ -270,9 +261,7 @@ public class MiniBrassRunner {
 
 	private File appendMiniZincCode(File miniZincFile, String updatedConstraint) throws IOException {
 		if (writeIntermediateFiles) {
-			String name = miniZincFile.getName();
-			String nextName = FilenameUtils.removeExtension(name) + "_" + (modelIndex++) + ".mzn";
-			File nextFile = new File(miniZincFile.getParentFile(), nextName);
+			File nextFile = getNextMiniZincFile(miniZincFile);
 			FileUtils.copyFile(miniZincFile, nextFile);
 			cleanup(miniZincFile);
 			miniZincFile = nextFile;
@@ -283,6 +272,19 @@ public class MiniBrassRunner {
 		fw.write(updatedConstraint);
 		fw.close();
 		return miniZincFile;
+	}
+
+	private static File getNextMiniZincFile(File miniZincFile) {
+		String name = FilenameUtils.removeExtension(miniZincFile.getName());
+		int modelIndex = 0;
+		Matcher modelIndexMatcher = Pattern.compile(".*_([0-9]+)$").matcher(name);
+		if (modelIndexMatcher.matches()) {
+			String modelIndexText = modelIndexMatcher.group(1);
+			name = name.substring(0, name.length() - modelIndexText.length() - 1);
+			modelIndex = Integer.parseInt(modelIndexText) + 1;
+		}
+		String nextName = FilenameUtils.removeExtension(name) + "_" + modelIndex + ".mzn";
+		return new File(miniZincFile.getParentFile(), nextName);
 	}
 
 	private void cleanup(File miniZincFile) {
