@@ -41,7 +41,7 @@ import isse.mbr.tools.SolutionRecorder.Solution;
 /**
  * Creates a MiniZinc file that contains all predicates, variables etc. that are
  * needed for minisearch
- * 
+ *
  * @author Alexander Schiendorfer
  *
  */
@@ -49,8 +49,8 @@ public class CodeGenerator {
 
 	private final static Logger LOGGER = Logger.getGlobal();
 
-	private static final String OVERALL_KEY = "overall"; 
-	private static final String VALUATIONS_KEY = "valuations"; 
+	private static final String OVERALL_KEY = "overall";
+	private static final String VALUATIONS_KEY = "valuations";
 	private static final String TOP_KEY = "top";
 	private static final String MBR_PREFIX = "mbr.";
 	public static final String VALUATTIONS_PREFIX = "Valuations:";
@@ -58,26 +58,26 @@ public class CodeGenerator {
 	public static final String SEARCH_HEURISTIC_KEY = "searchHeuristic";
 	public static final String ITER_VARIABLE_PREFIX = "mbr_iter_var_";
 	public static final String AUX_VARIABLE_PREFIX = "mbr_aux_var_";
-	
+
 	private boolean onlyMiniZinc;
 	private boolean genHeuristics;
-	private boolean suppressOutputGeneration = false; // this should not be accessible from outside, better use the new MiniBrass output item 
+	private boolean suppressOutputGeneration = false; // this should not be accessible from outside, better use the new MiniBrass output item
 	private String generatedOutput; // for minisearch
 
 	private boolean writeDecisionVariables = true;
-	private boolean writeSoftConstraints = true; 
-	
+	private boolean writeSoftConstraints = true;
+
 	private List<PVSInstance> leafInstances;
 	private Collection<CodegenAtomicPVSHandler> handlers;
 	private Collection<AbstractPVSInstance> addedInstances;
-	
+
 	public static class AtomicPvsInformation {
 		protected PVSInstance instance;
 		protected String overall;
 		protected String valuationsArray;
 		protected Map<String, String> substitutions;
 		protected StringBuilder instanceArguments;
-		
+
 		public AtomicPvsInformation(PVSInstance instance, String overall, String valuationsArray,
 				Map<String, String> substitutions, StringBuilder instanceArguments) {
 			super();
@@ -108,15 +108,15 @@ public class CodeGenerator {
 		public StringBuilder getInstanceArguments() {
 			return instanceArguments;
 		}
-		
-		
+
+
 	}
 
 	public CodeGenerator() {
 		this.handlers = new ArrayList<>();
 		this.addedInstances = new ArrayList<>();
 	}
-	
+
 	public String generateCode(MiniBrassAST model) throws MiniBrassParseException {
 		LOGGER.fine("Starting code generation");
 		StringBuilder sb = new StringBuilder("% ===============================================\n");
@@ -128,11 +128,11 @@ public class CodeGenerator {
 
 		// only final output here
 		String fileContents = sb.toString();
-	
+
 		return fileContents;
 
 	}
-	
+
 	private void addBindings(StringBuilder sb, MiniBrassAST model) throws MiniBrassParseException {
 		// take care of optional bindings
 		MiniBrassVotingKeywords kw = new MiniBrassVotingKeywords();
@@ -140,9 +140,9 @@ public class CodeGenerator {
 			AbstractPVSInstance scopeInst = ReferencedPVSInstance.deref(binding.getScopeInstRef().instance);
 			// we made sure of typing in semantic check
 			VotingInstance vi = (VotingInstance) scopeInst;
-			
-			// binding.minizincVariable = VOTER_COUNT ... 
-			String metaVariablePrefix = kw.lookup(binding.getMetaVariable()); 
+
+			// binding.minizincVariable = VOTER_COUNT ...
+			String metaVariablePrefix = kw.lookup(binding.getMetaVariable());
 			if(metaVariablePrefix == null) {
 				throw new MiniBrassParseException("Unknown meta-variable specified in MiniBrass model: "+ binding.getMetaVariable());
 			}
@@ -151,7 +151,7 @@ public class CodeGenerator {
 			String genBinding = String.format("%s = %s;\n", mznVar, encodedMetaVar);
 			sb.append(genBinding);
 		}
-		
+
 	}
 
 	public String generateComparisonCode(MiniBrassAST model, Solution left, Solution right) throws MiniBrassParseException {
@@ -164,8 +164,8 @@ public class CodeGenerator {
 
 		// only final output here
 		String fileContents = sb.toString();
-	
-		return fileContents;		
+
+		return fileContents;
 	}
 
 	private void addIncludes(StringBuilder sb, MiniBrassAST model) {
@@ -228,14 +228,14 @@ public class CodeGenerator {
 				+ topLevelInstance.getGeneratedNotWorsePredicate() + "))";
 		if(!onlyMiniZinc)
 			sb.append(String.format("\nfunction ann: %s() = post(%s);\n", pvsNotWorse, negatedGetNotWorse));
-	
+
 
 		// add output line for valuation-carrying variables
-		
+
 		StringBuilder outputBuilder = new StringBuilder();
 		if(model.getProblemOutput() != null)
 			outputBuilder.append(model.getProblemOutput() + " ++ ");
-		
+
 		outputBuilder.append("[ \"\\n" + VALUATTIONS_PREFIX + " ");
 		boolean first = true;
 		for (PVSInstance leafInstance : leafInstances) {
@@ -277,28 +277,28 @@ public class CodeGenerator {
 		// there could be a numeric objective in a voting-PVS
 		String topLevelOverall = null;
 		MiniZincParType elementType = null;
-		
+
 		if(topLevelInstance instanceof VotingInstance) {
 			VotingInstance vi = (VotingInstance) topLevelInstance;
 			if(vi.getVotingProcedure().hasNumericObjective()) {
 				topLevelOverall = getOverallValuation(topLevelInstance);
 				elementType = vi.getVotingProcedure().getObjectiveType(this, vi.getChildren());
-			
+
 			}
 		}
-			
+
 		if (!(topLevelInstance.isComplex())) {
 			topLevelOverall = getOverallValuation(topLevelInstance);
 			PVSInstance pvsInst = (PVSInstance) topLevelInstance;
 			elementType = pvsInst.getType().instance.getElementType();
 		}
-		
+
 		if(topLevelOverall != null) { // either case fits
 			appendOverall(sb, elementType, topLevelInstance, MiniZincKeywords.TOP_LEVEL_OBJECTIVE);
-			sb.append(String.format("constraint %s = %s;\n", MiniZincKeywords.TOP_LEVEL_OBJECTIVE, topLevelOverall));		
+			sb.append(String.format("constraint %s = %s;\n", MiniZincKeywords.TOP_LEVEL_OBJECTIVE, topLevelOverall));
 		}
-	
-			
+
+
 		if (genHeuristics)
 			sb.append("ann: " + MiniZincKeywords.PVS_SEARCH_HEURISTIC + " = "
 					+ CodeGenerator.encodeString(SEARCH_HEURISTIC_KEY, topLevelInstance) + ";\n");
@@ -310,7 +310,7 @@ public class CodeGenerator {
 
 		if(addedInstances.contains(pvsInstance))
 			return;
-		
+
 		if (pvsInstance.isComplex()) {
 
 			Collection<AbstractPVSInstance> children = pvsInstance.getChildren();
@@ -357,7 +357,7 @@ public class CodeGenerator {
 				// equals
 				String generatedEqualsPredicate = String.format("(%s) /\\ (%s)", equalsLeft, equalsRight);
 				comp.setGeneratedEqualsPredicate(generatedEqualsPredicate);
-				
+
 				if (comp.getProductType() == ProductType.DIRECT) {
 					String leftBetter = left.getGeneratedBetterPredicate();
 					String rightBetter = right.getGeneratedBetterPredicate();
@@ -366,17 +366,17 @@ public class CodeGenerator {
 				} else { // lexicographic
 					String leftBetter = left.getGeneratedBetterPredicate();
 					String rightBetter = right.getGeneratedBetterPredicate();
-					
+
 					comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ ( (%s) /\\ %s) )", leftBetter, equalsLeft, rightBetter));
 					comp.setGeneratedNotWorsePredicate(String.format("( (%s) \\/ ( (%s) /\\ %s) )", rightBetter, equalsRight, leftBetter));
 				}
-				
+
 			} else { // has to be vote instance
 				VotingInstance vi = (VotingInstance) pvsInstance;
 				String getBetterPredicate = vi.getVotingProcedure().getVotingPredicate(this, vi.getChildren());
 				vi.setGeneratedBetterPredicate(getBetterPredicate);
-				
-				// TODO implement more reasonably 
+
+				// TODO implement more reasonably
 				vi.setGeneratedNotWorsePredicate("true");
 				StringBuilder equalityBuilder = new StringBuilder("(");
 				boolean f = true;
@@ -384,25 +384,25 @@ public class CodeGenerator {
 					voter = ReferencedPVSInstance.deref(voter);
 					if (f)
 						f = false;
-					else 
+					else
 						equalityBuilder.append(" /\\ ");
-					
+
 					equalityBuilder.append(String.format("(%s)", voter.getGeneratedEqualsPredicate()));
 				}
 				equalityBuilder.append(")");
 				vi.setGeneratedEqualsPredicate(equalityBuilder.toString());
-				
+
 				if(vi.getVotingProcedure().hasNumericObjective()) {
 					String overallIdent = getOverallValuation(vi);
 					appendOverall(sb, vi.getVotingProcedure().getObjectiveType(this, vi.getChildren()), vi, overallIdent);
 					sb.append(String.format("constraint %s = %s ;\n", overallIdent, vi.getVotingProcedure().getNumericObjective(this, vi.getChildren())));
 				}
-				
+
 				// write count of voters - only relevant if bindings are present
 				if(!model.getBindings().isEmpty()) {
 					String votersCountGenerated = MiniBrassVotingKeywords.VOTER_COUNT+vi.getName();
 					sb.append(String.format("int: %s = %d;\n", votersCountGenerated, vi.getChildren().size()));
-					
+
 					// write identifiers and enums of voters
 					StringBuilder namesGenerator = new StringBuilder();
 					namesGenerator.append(String.format("array[1..%s] of string: %s = [", votersCountGenerated, MiniBrassVotingKeywords.VOTER_STRING_NAMES+vi.getName()));
@@ -411,20 +411,20 @@ public class CodeGenerator {
 					for(AbstractPVSInstance child : vi.getChildren()) {
 						AbstractPVSInstance childDerefed = deref(child);
 						String nameStr = String.format("\"%s\"", childDerefed.getName());
-						if(first) 
+						if(first)
 							first = false;
-						else 
+						else
 							namesGenerator.append(", ");
-						
-						namesGenerator.append(nameStr);	
-						
+
+						namesGenerator.append(nameStr);
+
 						// TODO revise
 						// enumName should be a valid MiniZinc string
 						String enumName = toValidMznIdent(childDerefed.getName());
 						sb.append(String.format("int: %s = %d;\n", enumName, (++enumCounter)));
 					}
 					namesGenerator.append("];\n");
-					
+
 					sb.append(namesGenerator.toString());
 					}
 			}
@@ -437,7 +437,7 @@ public class CodeGenerator {
 
 	/**
 	 * Removes umlauts, eszetts and the like from a given MZN Ident
-	 * Be aware: ÄHRE, Ähre, ÄhrÄ, und XÄhre results in the expected 
+	 * Be aware: ÄHRE, Ähre, ÄhrÄ, und XÄhre results in the expected
 	 * AEHRE, Aehre, AehrAE and XAehre.
 	 * BUT: ÄlÄr results in AelAer
 	 * Conventions: use real world names and präfixes followed by nouns; for these the
@@ -453,21 +453,21 @@ public class CodeGenerator {
 	             .replaceAll("ö", "oe")
 	             .replaceAll("ä", "ae")
 	             .replaceAll("ß", "ss");
-	 
+
 	     //first replace all capital umlaute in a non-capitalized context (e.g. Übung)
 	     cleanedOutput =
 	             cleanedOutput
 	             .replaceAll("Ü(?=[a-zäöüß ])", "Ue")
 	             .replaceAll("Ö(?=[a-zäöüß ])", "Oe")
 	             .replaceAll("Ä(?=[a-zäöüß ])", "Ae");
-	 
+
 	     //now replace all the other capital umlaute
 	     cleanedOutput =
 	             cleanedOutput
 	             .replaceAll("Ü", "UE")
 	             .replaceAll("Ö", "OE")
 	             .replaceAll("Ä", "AE");
-	 
+
 	     return cleanedOutput;
 	}
 
@@ -486,33 +486,33 @@ public class CodeGenerator {
 		PVSType pvsType = inst.getType().instance;
 		String overallIdent = getOverallValuation(inst);
 		String valuationsArray = getValuationsArray(inst);
-		
+
 		// first the parameters of the atomic PVS instance
 		Map<String, String> subs = addAtomicPvsParameters(inst, sb, model);
 		StringBuilder instanceArguments = getInstanceArguments(pvsType, inst);
-		
+
 		AtomicPvsInformation api = new AtomicPvsInformation(inst, overallIdent, valuationsArray, subs, instanceArguments);
 
 		// -------------------------------------------------------------
 		// Decision variables
 		if(writeDecisionVariables)
-			addDecisionVariables(inst, sb, model, subs, overallIdent, valuationsArray, instanceArguments);		
-		
+			addDecisionVariables(inst, sb, model, subs, overallIdent, valuationsArray, instanceArguments);
+
 		// -------------------------------------------------------------
 		// MiniSearch predicates variables
 		// if(!onlyMiniZinc) // add them anyway (not to the code though)
 		addMiniSearchPredicates(inst, sb, model, subs, overallIdent, instanceArguments);
-		
+
 		// -------------------------------------------------------------
 		// Soft constraints
 		if(writeSoftConstraints)
 			addSoftConstraints(inst, sb, model, subs, valuationsArray);
-	
+
 		// -------------------------------------------------------------
 		// PVS-specific search heuristics
-		if (genHeuristics) 
+		if (genHeuristics)
 			addHeuristics(inst, sb, model,  overallIdent, instanceArguments, valuationsArray);
-		
+
 		// -------------------------------------------------------------
 		// Additional handlers (needed, e.g., for pairwise comparisons)
 		for(CodegenAtomicPVSHandler handler : handlers) {
@@ -534,7 +534,7 @@ public class CodeGenerator {
 	 * @param instanceArguments
 	 * @param valuationsArray
 	 */
-	private void addHeuristics(PVSInstance inst, StringBuilder sb, MiniBrassAST model, String overallIdent, StringBuilder instanceArguments, String valuationsArray) {	
+	private void addHeuristics(PVSInstance inst, StringBuilder sb, MiniBrassAST model, String overallIdent, StringBuilder instanceArguments, String valuationsArray) {
 		sb.append("\n% Search Heuristics to be used in a model: \n");
 		String heuristicFunc = inst.getType().instance.getOrderingHeuristic();
 
@@ -562,9 +562,9 @@ public class CodeGenerator {
 			String valuationsArray) {
 		sb.append("\n% Soft constraints: \n");
 		PVSType pvsType = inst.getType().instance;
-		
+
 		for (SoftConstraint sc : inst.getSoftConstraints().values()) {
-			if (pvsType.getElementType() instanceof MiniZincArrayLike) {
+			if (pvsType.getSpecType() instanceof MiniZincArrayLike) {
 				MiniZincArrayLike mal = (MiniZincArrayLike) pvsType.getElementType();
 				ArrayType at = mal.getArrayType();
 				String arrayDecisionVariable = getArrayDecisionVariable(pvsType.getElementType(), inst,
@@ -582,7 +582,7 @@ public class CodeGenerator {
 			}
 
 		}
-		
+
 	}
 
 	/**
@@ -619,7 +619,7 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * The decision variables hold the valuations of each soft constraint and the overall combination using the times operation 
+	 * The decision variables hold the valuations of each soft constraint and the overall combination using the times operation
 	 * @param inst
 	 * @param sb
 	 * @param model
@@ -631,29 +631,29 @@ public class CodeGenerator {
 	private void addDecisionVariables(PVSInstance inst, StringBuilder sb, MiniBrassAST model, Map<String, String> subs, String overallIdent, String valuationsArray, StringBuilder instanceArguments) {
 		sb.append("\n% Decision variables: \n");
 		PVSType pvsType = inst.getType().instance;
-		
+
 		appendOverall(sb, pvsType.getElementType(), inst, overallIdent);
 
 		PVSFormalParameter numberSoftConstraints = pvsType.getParamMap().get(PVSType.N_SCS_LIT);
 		IntervalType softConstraintsSet = new IntervalType(new NumericValue(1), new NumericValue(numberSoftConstraints));
 
-		
+
 		MiniZincParType specType = pvsType.getSpecType();
-		if (specType instanceof MiniZincVarType) {
-			sb.append(String.format("array[%s] of var %s: %s;\n", softConstraintsSet.toMzn(inst),
-					encode(pvsType.getSpecType(), inst), valuationsArray));
-		} else {
+		if (specType instanceof MiniZincArrayLike) {
 			MiniZincArrayLike arrayLike = (MiniZincArrayLike) specType;
 			ArrayType arrayType = arrayLike.getArrayType();
 			sb.append(String.format("array[%s,%s] of var %s: %s;\n", softConstraintsSet.toMzn(inst),
 					getArrayIndexSets(arrayType, inst), encode(arrayType.getElementType(), inst), valuationsArray));
+		} else {
+			sb.append(String.format("array[%s] of var %s: %s;\n", softConstraintsSet.toMzn(inst),
+					encode(pvsType.getSpecType(), inst), valuationsArray));
 		}
 		String topIdent = CodeGenerator.encodeString(TOP_KEY, inst);
 		// String topElement = CodeGenerator.encodeString( pvsType.getTop(), inst);
 		String topElement = CodeGenerator.processSubstitutions(pvsType.getTop(), subs);
-		
+
 		sb.append(String.format("%s: %s = %s;\n", encode(pvsType.getElementType(), inst), topIdent, topElement));
-		
+
 		sb.append(String.format("constraint %s = %s (%s,%s);\n", overallIdent, pvsType.getCombination(),
 				valuationsArray, instanceArguments.toString()));
 	}
@@ -667,7 +667,7 @@ public class CodeGenerator {
 	 * @throws MiniBrassParseException
 	 */
 	private Map<String, String> addAtomicPvsParameters(PVSInstance inst, StringBuilder sb, MiniBrassAST model) throws MiniBrassParseException {
-		
+
 		ExternalMorphism em = null;
 		if (inst instanceof MorphedPVSInstance) {
 			MorphedPVSInstance minst = (MorphedPVSInstance) inst;
@@ -682,7 +682,7 @@ public class CodeGenerator {
 		sb.append("\n% ---------------------------------------------------");
 		sb.append("\n%   PVS " + name);
 		sb.append("\n% ---------------------------------------------------\n");
-		
+
 		// first the parameters
 		sb.append("% Parameters: \n");
 
@@ -864,7 +864,7 @@ public class CodeGenerator {
 		}
 		return expression;
 	}
-	
+
 	public void addAtomicPVSHandler(CodegenAtomicPVSHandler handler) {
 		handlers.add(handler);
 	}
@@ -876,7 +876,7 @@ public class CodeGenerator {
 	public String getTopValue(AbstractPVSInstance inst) {
 		return encodeString(TOP_KEY, inst);
 	}
-	
+
 	public AbstractPVSInstance deref(AbstractPVSInstance pvsInstance) {
 		return ReferencedPVSInstance.deref(pvsInstance);
 	}
