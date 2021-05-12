@@ -11,6 +11,7 @@ import org.apache.commons.cli.ParseException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.FileHandler;
@@ -18,21 +19,21 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 public final class MiniBrassRunnerMain {
 	private final Logger logger = setupLogger();
 	private final Options options = setupOptions();
 
-	private MiniBrassRunnerMain() throws IOException {}
+	private MiniBrassRunnerMain() throws IOException { }
 
 	public static void main(String[] args) throws IOException {
 		new MiniBrassRunnerMain().run(args);
 	}
 
 	private void run(String[] args) {
-		String minibrassFile = null;
-		String minizincModelFile = null;
-		String minizincDataFile = null;
+		File miniBrassFile = null;
+		File miniZincFile = null;
 		List<File> dataFiles = new LinkedList<>();
 		MiniBrassRunner miniBrassRunner = new MiniBrassRunner();
 
@@ -67,31 +68,42 @@ public final class MiniBrassRunnerMain {
 				printUsage();
 				System.exit(1);
 			} else {
-				minibrassFile = argList.get(0);
-				if (!minibrassFile.endsWith("mbr")) {
+				String miniBrassFileName = argList.get(0);
+				if (!miniBrassFileName.endsWith("mbr")) {
 					System.out.println("Warning: MiniBrass file ending on .mbr expected!");
 				}
+				miniBrassFile = new File(miniBrassFileName);
 
-				minizincModelFile = argList.get(1);
-				if (!minizincModelFile.endsWith("mzn")) {
+				String miniZincFileName = argList.get(1);
+				if (!miniZincFileName.endsWith("mzn")) {
 					System.out.println("Warning: MiniZinc file ending on .mzn expected!");
 				}
+				miniZincFile = new File(miniZincFileName);
 
 				if (argList.size() > 2) {
-					minizincDataFile = argList.get(2);
-					if (!minizincDataFile.endsWith("dzn")) {
+					String minizincDataFileName = argList.get(2);
+					if (!minizincDataFileName.endsWith("dzn")) {
 						System.out.println("Warning: MiniZinc data file ending on .dzn expected!");
 					}
-					dataFiles.add(new File(minizincDataFile));
+					dataFiles.add(new File(minizincDataFileName));
 				}
 			}
 
 			miniBrassRunner.setDebug(line.hasOption("debug"));
 
 			logger.info(
-					"Processing " + minibrassFile + " | " + minizincModelFile + " | " + minizincDataFile + " to file.");
-			MiniZincSolution solution = miniBrassRunner.executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
-			if (solution != null) System.out.println(solution.getRawDznSolution());
+					String.format("Processing %s | %s | %s to file.", miniBrassFile.getName(), miniZincFile.getName(),
+							dataFiles.stream().map(File::getName).collect(Collectors.joining(" / "))));
+			if (line.hasOption("pareto")) {
+				Collection<MiniZincSolution> solutions = miniBrassRunner.executeBranchAndBoundWithParetoOptima(miniZincFile, miniBrassFile,
+						dataFiles);
+				System.out.println(solutions.stream()
+						.map(MiniZincSolution::getRawDznSolution)
+						.collect(Collectors.joining("\n-----------\n")));
+			} else {
+				MiniZincSolution solution = miniBrassRunner.executeBranchAndBound(miniZincFile, miniBrassFile, dataFiles);
+				if (solution != null) System.out.println(solution.getRawDznSolution());
+			}
 		} catch (ParseException exp) {
 			logger.severe("Unexpected exception:" + exp.getMessage());
 			printUsage();
@@ -139,7 +151,8 @@ public final class MiniBrassRunnerMain {
 				.addOption("w", "weak-opt", false, "only use non-domination search")
 				.addOption("r", "random-seed", true, "initial random seed for branch-and-bound")
 				.addOption("s", "solver", true, "solver to use for branch-and-bound")
-				.addOption("t", "timeout", true, "timeout in milliseconds");
+				.addOption("t", "timeout", true, "timeout in milliseconds")
+				.addOption("p", "pareto", false, "find all pareto-optimal solutions");
 	}
 
 	private void printUsage() {

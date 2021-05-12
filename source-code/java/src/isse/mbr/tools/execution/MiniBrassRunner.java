@@ -2,6 +2,7 @@ package isse.mbr.tools.execution;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -9,6 +10,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -60,6 +63,22 @@ public class MiniBrassRunner {
 		}
 		miniBrassCompiler.setMinizincOnly(true);
 		workingMiniZincModel = FileUtils.readFileToString(miniZincFile, StandardCharsets.UTF_8);
+	}
+
+	public Collection<MiniZincSolution> executeBranchAndBoundWithParetoOptima(File miniZincFile, File miniBrassFile, List<File> dataFiles)
+			throws MiniBrassParseException, IOException {
+		// find single optimal solution
+		executeBranchAndBound(miniZincFile, miniBrassFile, dataFiles);
+
+		// find the other solutions that are equally good
+		replaceMiniZincCode(lastSolvableMiniZincModel);
+		miniZincRunner.getConfiguration().setUseAllSolutions(true);
+		MiniZincResult result = runMiniZinc(workingMiniZincFile, dataFiles);
+		miniZincRunner.getConfiguration().setUseAllSolutions(false);
+		cleanup(workingMiniZincFile);
+
+		// interpret result and return solutions
+		return result.isSolvedAndValid() ? result.getSolutions() : Collections.emptySet();
 	}
 
 	public MiniZincSolution executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
@@ -121,6 +140,15 @@ public class MiniBrassRunner {
 		}
 	}
 
+	private void replaceMiniZincCode(String newCode) throws IOException {
+		workingMiniZincModel = newCode;
+
+		if (writeIntermediateFiles) {
+			workingMiniZincFile = getNextMiniZincFile(workingMiniZincFile);
+		}
+		FileUtils.writeStringToFile(workingMiniZincFile, workingMiniZincModel, StandardCharsets.UTF_8);
+	}
+
 	private void migrateToNewWorkingMiniZincFile() throws IOException {
 		migrateToNewWorkingMiniZincFile(workingMiniZincFile);
 	}
@@ -150,11 +178,15 @@ public class MiniBrassRunner {
 	}
 
 	private MiniZincSolution findNextSolution(File miniZincFile, List<File> dataFiles) {
+		MiniZincResult result = runMiniZinc(miniZincFile, dataFiles);
+		return result.isSolvedAndValid() ? result.getLastSolution() : null;
+	}
+
+	private MiniZincResult runMiniZinc(File miniZincFile, List<File> dataFiles) {
 		if (randomize) {
 			miniZincRunner.getConfiguration().setRandomSeed(randomSequence.nextInt(RANDOM_SEED_LIMIT));
 		}
-		MiniZincResult result = miniZincRunner.solve(miniZincFile, dataFiles, timeoutInSeconds);
-		return !result.isInvalidated() && result.isSolved() ? result.getLastSolution() : null;
+		return miniZincRunner.solve(miniZincFile, dataFiles, timeoutInSeconds);
 	}
 
 	public MiniZincConfiguration getMiniZincRunnerConfiguration() {
