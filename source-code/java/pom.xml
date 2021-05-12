@@ -93,7 +93,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										isse.mbr.tools.execution.MiniBrassRunner
+										isse.mbr.tools.execution.MiniBrassRunnerMain
 									</mainClass>
 								</manifest>
 							</archive>
