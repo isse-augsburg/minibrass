@@ -34,7 +34,6 @@ public class MiniBrassRunner {
 	private boolean debug = false;
 	private int initialRandomSeed = 1337;
 	private boolean randomize = false;
-	private boolean dominationSearch = true; // solution has to get strictly better (otherwise only have to not be worse)
 	private Random randomSequence;
 	private Integer timeoutInSeconds = null; // in milliseconds
 
@@ -213,14 +212,6 @@ public class MiniBrassRunner {
 
 	public void setAllSolutions(List<MiniZincSolution> allSolutions) {
 		this.allSolutions = allSolutions;
-	}
-
-	public boolean isDominationSearch() {
-		return dominationSearch;
-	}
-
-	public void setDominationSearch(boolean dominationSearch) {
-		this.dominationSearch = dominationSearch;
 	}
 
 	public MiniZincRunner getMiniZincRunner() {

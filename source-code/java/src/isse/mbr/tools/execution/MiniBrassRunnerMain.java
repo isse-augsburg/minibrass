@@ -60,8 +60,6 @@ public final class MiniBrassRunnerMain {
 				miniBrassRunner.setInitialRandomSeed(Integer.parseInt(line.getOptionValue("random-seed")));
 			}
 
-			miniBrassRunner.setDominationSearch(!line.hasOption("weak-opt"));
-
 			if (argList.size() < 2) {
 				System.out.println(
 						"minibrass expects one MiniBrass file, one MiniZinc file and optionally some data files as input.");
@@ -148,7 +146,6 @@ public final class MiniBrassRunnerMain {
 		return new Options()
 				.addOption("h", "help", false, "print this message")
 				.addOption("d", "debug", false, "write intermediate files")
-				.addOption("w", "weak-opt", false, "only use non-domination search")
 				.addOption("r", "random-seed", true, "initial random seed for branch-and-bound")
 				.addOption("s", "solver", true, "solver to use for branch-and-bound")
 				.addOption("t", "timeout", true, "timeout in milliseconds")
