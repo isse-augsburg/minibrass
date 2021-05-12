@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -49,6 +50,9 @@ public class MiniBrassRunner {
 
 
 	private File originalMiniZincFile;
+	private File workingMiniZincFile;
+	private String lastSolvableMiniZincModel;
+	private String workingMiniZincModel;
 	private List<MiniZincSolution> allSolutions;
 	private static Logger logger;
 
@@ -73,28 +77,37 @@ public class MiniBrassRunner {
 		miniZincRunner.setConfiguration(configuration);
 	}
 
-	public MiniZincSolution executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
-			throws IOException, MiniBrassParseException {
-		// initialize variables
+	private void initializeBranchAndBound(File miniZincFile) throws IOException {
+		// init fields
 		originalMiniZincFile = miniZincFile;
+		workingMiniZincFile = miniZincFile;
 		allSolutions = new LinkedList<>();
-		MiniZincSolution solution;
-		MiniZincSolution lastSolution = null;
-		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
 		if (randomize) {
 			randomSequence = new Random(initialRandomSeed);
 		}
 		miniZincRunner.getConfiguration().setUseAllSolutions(false); // in our configuration, we do not want to see all solutions
+		miniBrassCompiler.setMinizincOnly(true);
+		workingMiniZincModel = FileUtils.readFileToString(miniZincFile, StandardCharsets.UTF_8);
+	}
+
+	public MiniZincSolution executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
+			throws IOException, MiniBrassParseException {
+		// initialize
+		initializeBranchAndBound(miniZincFile);
+		MiniZincSolution solution;
+		MiniZincSolution lastSolution = null;
+		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
 
 		// parse and compile MiniBrass
-		miniBrassCompiler.setMinizincOnly(true);
 		String compiledMiniBrassCode = miniBrassCompiler.compileInMemory(miniBrassFile);
 		// for domination search
 		String getBetterConstraint = miniBrassCompiler.getUnderlyingParser().getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate();
 
 		// search for solutions
-		File workingMiniZincModel = appendMiniZincCode(originalMiniZincFile, compiledMiniBrassCode, true);
-		while ((solution = findNextSolution(workingMiniZincModel, dataFiles)) != null) {
+		appendMiniZincCode(compiledMiniBrassCode, true);
+		while ((solution = findNextSolution(workingMiniZincFile, dataFiles)) != null) {
+			lastSolvableMiniZincModel = workingMiniZincModel;
+
 			// append solution
 			allSolutions.add(solution);
 			lastSolution = solution;
@@ -110,15 +123,12 @@ public class MiniBrassRunner {
 				System.out.println("I got the following template constraint: ");
 				System.out.println(getBetterConstraint);
 				System.out.println(updatedConstraint);
-
 			}
 
-			// add constraint to model
-			// TODO this is not the best way to do it - we should keep the String in main memory
-			workingMiniZincModel = appendMiniZincCode(workingMiniZincModel, updatedConstraint);
-			// solve again
+			// add constraint to model and solve again
+			appendMiniZincCode(updatedConstraint);
 		}
-		cleanup(workingMiniZincModel);
+		cleanup(workingMiniZincFile);
 		return lastSolution;
 	}
 
@@ -247,23 +257,31 @@ public class MiniBrassRunner {
 
 	}
 
-	private File appendMiniZincCode(File miniZincFile, String updatedConstraint) throws IOException {
-		return appendMiniZincCode(miniZincFile, updatedConstraint, false);
+	private void appendMiniZincCode(String additionalCode) throws IOException {
+		appendMiniZincCode(additionalCode, false);
 	}
 
-	private File appendMiniZincCode(File miniZincFile, String updatedConstraint, boolean enforceIntermediateFile) throws IOException {
-		if (writeIntermediateFiles || enforceIntermediateFile) {
-			File nextFile = getNextMiniZincFile(miniZincFile);
-			FileUtils.copyFile(miniZincFile, nextFile);
-			cleanup(miniZincFile);
-			miniZincFile = nextFile;
-		}
+	private void appendMiniZincCode(String additionalCode, boolean enforceIntermediateFile) throws IOException {
+		// update in-memory model
+		additionalCode = "\n" + additionalCode;
+		workingMiniZincModel += additionalCode;
 
-		FileWriter fw = new FileWriter(miniZincFile, true);
-		fw.write("\n");
-		fw.write(updatedConstraint);
-		fw.close();
-		return miniZincFile;
+		if (writeIntermediateFiles || enforceIntermediateFile) {
+			migrateToNewWorkingMiniZincFile();
+		}
+		try (FileWriter fw = new FileWriter(workingMiniZincFile, true)) {
+			fw.write(additionalCode);
+		}
+	}
+
+	private void migrateToNewWorkingMiniZincFile() throws IOException {
+		migrateToNewWorkingMiniZincFile(workingMiniZincFile);
+	}
+
+	private void migrateToNewWorkingMiniZincFile(File currentFile) throws IOException {
+		workingMiniZincFile = getNextMiniZincFile(currentFile);
+		FileUtils.copyFile(currentFile, workingMiniZincFile);
+		cleanup(currentFile);
 	}
 
 	private File getNextMiniZincFile(File miniZincFile) {
