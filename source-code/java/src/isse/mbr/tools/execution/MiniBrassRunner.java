@@ -38,15 +38,15 @@ import java.util.regex.Pattern;
  */
 public class MiniBrassRunner {
 	private static final int RANDOM_SEED_LIMIT = Integer.MAX_VALUE / 2;
-	private final MiniZincRunner miniZincRunner;
-	private final MiniBrassCompiler miniBrassCompiler;
-	private boolean writeIntermediateFiles;
-	private boolean debug;
-	private int initialRandomSeed;
-	private boolean randomize;
-	private boolean dominationSearch; // solution has to get strictly better (otherwise only have to not be worse)
+	private final MiniZincRunner miniZincRunner = new MiniZincRunner();
+	private final MiniBrassCompiler miniBrassCompiler = new MiniBrassCompiler();
+	private boolean writeIntermediateFiles = true;
+	private boolean debug = false;
+	private int initialRandomSeed = 1337;
+	private boolean randomize = false;
+	private boolean dominationSearch = true; // solution has to get strictly better (otherwise only have to not be worse)
 	private Random randomSequence;
-	private Integer timeoutInSeconds; // in milliseconds
+	private Integer timeoutInSeconds = null; // in milliseconds
 
 
 	private File originalMiniZincFile;
@@ -57,23 +57,11 @@ public class MiniBrassRunner {
 	private static Logger logger;
 
 	public MiniBrassRunner() {
-		miniZincRunner = new MiniZincRunner();
-		MiniZincConfiguration config = new MiniZincConfiguration();
-		config.setUseAllSolutions(false);
-
-		miniZincRunner.setConfiguration(config);
-
-		miniBrassCompiler = new MiniBrassCompiler();
-		writeIntermediateFiles = true;
-		randomize = false;
-		initialRandomSeed = 1337;
-		dominationSearch = true;
-		debug = false;
-		timeoutInSeconds = null;
+		this(new MiniZincConfiguration());
 	}
 
 	public MiniBrassRunner(MiniZincConfiguration configuration) {
-		this();
+		configuration.setUseAllSolutions(false);
 		miniZincRunner.setConfiguration(configuration);
 	}
 
@@ -85,7 +73,6 @@ public class MiniBrassRunner {
 		if (randomize) {
 			randomSequence = new Random(initialRandomSeed);
 		}
-		miniZincRunner.getConfiguration().setUseAllSolutions(false); // in our configuration, we do not want to see all solutions
 		miniBrassCompiler.setMinizincOnly(true);
 		workingMiniZincModel = FileUtils.readFileToString(miniZincFile, StandardCharsets.UTF_8);
 	}
