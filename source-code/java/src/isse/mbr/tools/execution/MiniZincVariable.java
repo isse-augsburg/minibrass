@@ -7,14 +7,19 @@ public class MiniZincVariable {
 	private Object value;
 	private String name;
 	private String mznExpression;
-	
+
+	public MiniZincVariable(MiniZincParType type, Object value, String name, String mznExpression) {
+		this(type, value, name);
+		this.mznExpression = mznExpression;
+	}
+
 	public MiniZincVariable(MiniZincParType type, Object value, String name) {
 		super();
 		this.type = type;
 		this.value = value;
 		this.name = name;
 	}
-	
+
 	public MiniZincVariable(String name) {
 		this.name = name;
 	}
@@ -41,7 +46,6 @@ public class MiniZincVariable {
 	public String getMznExpression() {
 		return mznExpression;
 	}
-
 	public void setMznExpression(String mznExpression) {
 		this.mznExpression = mznExpression;
 	}
