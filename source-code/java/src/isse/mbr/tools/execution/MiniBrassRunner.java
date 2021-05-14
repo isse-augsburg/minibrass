@@ -55,7 +55,8 @@ public class MiniBrassRunner {
 	public Collection<MiniZincSolution> executeBranchAndBoundWithParetoOptima(File miniZincFile, File miniBrassFile, List<File> dataFiles)
 			throws MiniBrassParseException, IOException {
 		// find single optimal solution
-		executeBranchAndBound(miniZincFile, miniBrassFile, dataFiles);
+		MiniZincSolution solution = executeBranchAndBound(miniZincFile, miniBrassFile, dataFiles);
+		if (solution == null) return Collections.emptySet();
 
 		// find the other solutions that are equally good
 		workingModelManager.replaceModel(lastSolvableMiniZincModel);
