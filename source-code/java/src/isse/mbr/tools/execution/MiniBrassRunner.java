@@ -2,7 +2,6 @@ package isse.mbr.tools.execution;
 
 import isse.mbr.parsing.MiniBrassCompiler;
 import isse.mbr.parsing.MiniBrassParseException;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -132,10 +131,12 @@ public class MiniBrassRunner {
 		workingMiniZincModel += additionalCode;
 
 		if (writeIntermediateFiles || enforceIntermediateFile) {
-			migrateToNewWorkingMiniZincFile();
-		}
-		try (FileWriter fw = new FileWriter(workingMiniZincFile, true)) {
-			fw.write(additionalCode);
+			writeNewWorkingMiniZincFile();
+		} else {
+			// we can reuse the existing file and only need to append the new code
+			try (FileWriter fw = new FileWriter(workingMiniZincFile, true)) {
+				fw.write(additionalCode);
+			}
 		}
 	}
 
@@ -143,19 +144,21 @@ public class MiniBrassRunner {
 		workingMiniZincModel = newCode;
 
 		if (writeIntermediateFiles) {
-			workingMiniZincFile = getNextMiniZincFile(workingMiniZincFile);
+			writeNewWorkingMiniZincFile();
+		} else {
+			writeWorkingMiniZincFile();
 		}
+	}
+
+	private void writeNewWorkingMiniZincFile() throws IOException {
+		File oldFile = workingMiniZincFile;
+		workingMiniZincFile = getNextMiniZincFile(oldFile);
+		writeWorkingMiniZincFile();
+		cleanup(oldFile);
+	}
+
+	private void writeWorkingMiniZincFile() throws IOException {
 		FileUtils.writeStringToFile(workingMiniZincFile, workingMiniZincModel, StandardCharsets.UTF_8);
-	}
-
-	private void migrateToNewWorkingMiniZincFile() throws IOException {
-		migrateToNewWorkingMiniZincFile(workingMiniZincFile);
-	}
-
-	private void migrateToNewWorkingMiniZincFile(File currentFile) throws IOException {
-		workingMiniZincFile = getNextMiniZincFile(currentFile);
-		FileUtils.copyFile(currentFile, workingMiniZincFile);
-		cleanup(currentFile);
 	}
 
 	private File getNextMiniZincFile(File miniZincFile) {
