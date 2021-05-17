@@ -46,12 +46,13 @@ import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.model.types.SetType;
 import isse.mbr.model.voting.VotingFactory;
 import isse.mbr.model.voting.VotingProcedure;
+import org.apache.commons.lang3.function.FailableFunction;
 
 /**
- * 
+ *
  * Parses a MiniBrass file using an appropriate lexer just a simple recursive
  * descent parser
- * 
+ *
  * @author Alexander Schiendorfer
  *
  */
@@ -77,6 +78,7 @@ public class MiniBrassParser {
 	public static final String VOTING_PREFIX = "MBR_VOT_";
 	public static final String DIR_PROD = "_MBR_DIR_";
 	public static final String LEX_PROD = "_MBR_LEX_";
+	public static final String PARETO_PROD = "_MBR_PARETO_";
 	public static final String TOP_LEVEL_PVS_REF = "topLevelPvsRef";
 
 	public static final String MBR_STD_DIR = MINIBRASS_STANDARD_DIR;
@@ -264,7 +266,7 @@ public class MiniBrassParser {
 
 	/**
 	 * statement (statement)+
-	 * 
+	 *
 	 * @param model2
 	 * @throws MiniBrassParseException
 	 */
@@ -277,7 +279,7 @@ public class MiniBrassParser {
 
 	/**
 	 * The main method for all kinds of items
-	 * 
+	 *
 	 * @param model
 	 * @throws MiniBrassParseException
 	 */
@@ -319,10 +321,10 @@ public class MiniBrassParser {
 
 	/**
 	 * "bind" ident "to" ident ";"
-	 * 
+	 *
 	 * Ex. usage "bind voterCount to s;" or bind vi1.voterCount to s; if we have
 	 * multiple vote items
-	 * 
+	 *
 	 * @param model2
 	 * @throws MiniBrassParseException
 	 */
@@ -361,14 +363,14 @@ public class MiniBrassParser {
 	 * PVS: fuzzyInstance = new FuzzyCsp(3); PVS: weightedInstance = new
 	 * WeightedCsp(3, 8, [2,1,2]); PVS: cr = new ConstraintRelationships(2, [| 1, 2
 	 * |]); PVS: hierarchy = cr lex fuzzyInstance
-	 * 
+	 *
 	 * PVSItem -> "PVS" ":" ident "=" PVSInst ";" PVSInst -> PVSDiProd ( "lex"
 	 * PVSDiProd )* PVSDiProd -> PVSAtom ("*" PVSAtom)* PVSAtom -> "new" ident "("
 	 * stringlit "," int ("," MZNLiteral)* ")" ";" | ident
-	 * 
+	 *
 	 * pvs1, pvs2, pvs3 pvs1 lex pvs2 * pvs3 (should be read as pvs1 lex (pvs2 *
 	 * pvs3) pvs1 * pvs2 lex pvs3
-	 * 
+	 *
 	 * @param model2
 	 * @throws MiniBrassParseException
 	 */
@@ -404,7 +406,7 @@ public class MiniBrassParser {
 
 	/**
 	 * OutputItem -> "output" StringLit ";"
-	 * 
+	 *
 	 * @param model
 	 * @throws MiniBrassParseException
 	 */
@@ -418,55 +420,41 @@ public class MiniBrassParser {
 
 	/**
 	 * PVSInst -> PVSDiProd ( "lex" PVSDiProd )
-	 * 
-	 * @param model2
-	 * *
-	 * @return
-	 * @throws MiniBrassParseException
 	 */
 	private AbstractPVSInstance PVSInst(MiniBrassAST model) throws MiniBrassParseException {
-
-		AbstractPVSInstance first = PVSDiProd(model);
-
-		while (currSy == MiniBrassSymbol.LexSy) {
-			getNextSy();
-
-			AbstractPVSInstance next = PVSDiProd(model);
-
-			CompositePVSInstance composite = new CompositePVSInstance();
-			composite.setLeftHandSide(first);
-			composite.setProductType(ProductType.LEXICOGRAPHIC);
-			composite.setRightHandSide(next);
-
-			// TODO deref would be better
-			String genName = first.getName() + "_MBR_LEX_" + (++productCounter) + next.getName();
-			composite.setName(genName);
-
-			first = composite;
-		}
-		return first;
+		return PVSAnyProd(model, MiniBrassSymbol.LexSy, ProductType.LEXICOGRAPHIC, LEX_PROD, this::PVSDiProd);
 	}
 
 	/**
-	 * PVSDiProd -> PVSAtom ("*" PVSAtom)
-	 * 
-	 * @return *
+	 * PVSDiProd -> PVSPareto ("direct" PVSPareto)
 	 */
 	private AbstractPVSInstance PVSDiProd(MiniBrassAST model) throws MiniBrassParseException {
+		return PVSAnyProd(model, MiniBrassSymbol.DirectSy, ProductType.DIRECT, DIR_PROD, this::PVSPareto);
+	}
 
-		AbstractPVSInstance first = PVSAtom(model);
-		while (currSy == MiniBrassSymbol.ParetoSy) {
+	/**
+	 * PVSPareto -> PVSAtom ("pareto" PVSAtom)
+	 */
+	private AbstractPVSInstance PVSPareto(MiniBrassAST model) throws MiniBrassParseException {
+		return PVSAnyProd(model, MiniBrassSymbol.ParetoSy, ProductType.PARETO, PARETO_PROD, this::PVSAtom);
+	}
+
+	private AbstractPVSInstance PVSAnyProd(MiniBrassAST model, MiniBrassSymbol productSymbol, ProductType productType, String productName,
+	                                       FailableFunction<MiniBrassAST, AbstractPVSInstance, MiniBrassParseException> nextPvsType)
+			throws MiniBrassParseException {
+		AbstractPVSInstance first = nextPvsType.apply(model);
+		while (currSy == productSymbol) {
 			getNextSy();
 
-			AbstractPVSInstance next = PVSAtom(model);
+			AbstractPVSInstance next = nextPvsType.apply(model);
 
 			CompositePVSInstance composite = new CompositePVSInstance();
 			composite.setLeftHandSide(first);
-			composite.setProductType(ProductType.DIRECT);
+			composite.setProductType(productType);
 			composite.setRightHandSide(next);
 
 			// TODO deref would be better
-			String genName = first.getName() + "_MBR_DIR_" + (++productCounter) + next.getName();
+			String genName = first.getName() + productName + (++productCounter) + next.getName();
 			composite.setName(genName);
 
 			first = composite;
@@ -477,9 +465,9 @@ public class MiniBrassParser {
 	/**
 	 * PVSAtom -> "new" ident "(" stringlit "," intlit ("," MZNLiteral)* ")" | ident
 	 * | ident "(" PVSAtom ")" | "(" PVSInst ")"
-	 * 
+	 *
 	 * @throws MiniBrassParseException
-	 * 
+	 *
 	 */
 	private AbstractPVSInstance PVSAtom(MiniBrassAST model) throws MiniBrassParseException {
 		if (currSy == MiniBrassSymbol.NewSy) {
@@ -619,7 +607,7 @@ public class MiniBrassParser {
 
 	/**
 	 * solve ( ident | VoteItem) ;
-	 * 
+	 *
 	 * @throws MiniBrassParseException
 	 */
 	private AbstractPVSInstance solveItem() throws MiniBrassParseException {
@@ -632,7 +620,7 @@ public class MiniBrassParser {
 
 	/**
 	 * vote([ident1,...,identn], voteType)
-	 * 
+	 *
 	 * @param model
 	 * @return
 	 * @throws MiniBrassParseException
@@ -656,17 +644,11 @@ public class MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
 		expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 
-		if (currSy == MiniBrassSymbol.ParetoSy) {
+		if (currSy == MiniBrassSymbol.ParetoSy || currSy == MiniBrassSymbol.LexSy || currSy == MiniBrassSymbol.DirectSy) {
 			getNextSy();
 			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
-			AbstractPVSInstance paretos = recursiveProd(votingPvs, 0, ProductType.DIRECT);
-
-			return paretos;
-		} else if (currSy == MiniBrassSymbol.LexSy) {
-			getNextSy();
-			expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
-
-			return recursiveProd(votingPvs, 0, ProductType.LEXICOGRAPHIC);
+			ProductType productType = getProductTypeForSymbol(currSy);
+			return recursiveProd(votingPvs, 0, productType);
 		}
 
 		expectSymbol(MiniBrassSymbol.IdentSy);
@@ -680,6 +662,15 @@ public class MiniBrassParser {
 		votingInst.setVotingProcedure(vp);
 		votingInst.addAllPvs(votingPvs);
 		return votingInst;
+	}
+
+	private ProductType getProductTypeForSymbol(MiniBrassSymbol symbol) throws MiniBrassParseException {
+		return switch (symbol) {
+			case LexSy -> ProductType.LEXICOGRAPHIC;
+			case DirectSy -> ProductType.DIRECT;
+			case ParetoSy -> ProductType.PARETO;
+			default -> throw new MiniBrassParseException("No product type defined for symbol " + currSy);
+		};
 	}
 
 	private AbstractPVSInstance recursiveProd(ArrayList<AbstractPVSInstance> votingPvs, int i,
@@ -698,7 +689,7 @@ public class MiniBrassParser {
 
 	/**
 	 * morphism ConstraintRelationships -> WeightedCsp: ToWeighted = weight_cr;
-	 * 
+	 *
 	 * @return
 	 */
 	private Morphism morphismItem() throws MiniBrassParseException {
@@ -796,7 +787,7 @@ public class MiniBrassParser {
 	/**
 	 * "type" ident "=" "PVSType" "<" MiniZincType ( "," MiniZincType) ">" [
 	 * "represents" ident]
-	 * 
+	 *
 	 * @throws MiniBrassParseException
 	 */
 	private PVSType typeItem() throws MiniBrassParseException {
@@ -907,7 +898,7 @@ public class MiniBrassParser {
 	/**
 	 * Things like int: k; 1..k: top; array[1..nScs] of 1..k: weights; array[int,
 	 * 1..2] of 1..nScs: crEdges;
-	 * 
+	 *
 	 * @param newType
 	 * @return
 	 * @throws MiniBrassParseException
@@ -1064,7 +1055,7 @@ public class MiniBrassParser {
 
 	/**
 	 * Is either of times -> xyz, is_worse ..., top ... PVS-Sym "->" AnyCharacters
-	 * 
+	 *
 	 * @param newType
 	 * @throws MiniBrassParseException
 	 */
@@ -1120,7 +1111,7 @@ public class MiniBrassParser {
 
 	/**
 	 * set of PRIMTYPE | PRIMTYPE
-	 * 
+	 *
 	 * @throws MiniBrassParseException
 	 */
 	protected MiniZincParType MiniZincParType(PVSType scopeType) throws MiniBrassParseException {
@@ -1152,7 +1143,7 @@ public class MiniBrassParser {
 
 	/**
 	 * set of PRIMTYPE | PRIMTYPE
-	 * 
+	 *
 	 * @throws MiniBrassParseException
 	 */
 	protected MiniZincVarType MiniZincVarType(PVSType scopeType) throws MiniBrassParseException {
@@ -1190,7 +1181,7 @@ public class MiniBrassParser {
 
 	/**
 	 * For now : intLit | floatLit | ident ".." intLit | floatLit | ident
-	 * 
+	 *
 	 * @return
 	 * @throws MiniBrassParseException
 	 */
@@ -1223,7 +1214,7 @@ public class MiniBrassParser {
 
 	/**
 	 * "include" ident ";" (just read ident, when entering
-	 * 
+	 *
 	 * @param model2
 	 * @throws MiniBrassParseException
 	 */
@@ -1275,7 +1266,7 @@ public class MiniBrassParser {
 		}
 		throw new MiniBrassParseException("Expected either symbol of " + Arrays.toString(acceptableSymbols.toArray()) + " but found " + currSy);
 	}
-	
+
 	protected void getNextSy() {
 		currSy = lexer.getNextSymbol();
 		// System.out.println("Returning symbol: "+currSy);

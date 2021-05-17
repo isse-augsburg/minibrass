@@ -353,22 +353,27 @@ public class CodeGenerator {
 
 				String equalsLeft = left.getGeneratedEqualsPredicate();
 				String equalsRight = right.getGeneratedEqualsPredicate();
+				String betterLeft = left.getGeneratedBetterPredicate();
+				String betterRight = right.getGeneratedBetterPredicate();
 
 				// equals
 				String generatedEqualsPredicate = String.format("(%s) /\\ (%s)", equalsLeft, equalsRight);
 				comp.setGeneratedEqualsPredicate(generatedEqualsPredicate);
 
-				if (comp.getProductType() == ProductType.DIRECT) {
-					String leftBetter = left.getGeneratedBetterPredicate();
-					String rightBetter = right.getGeneratedBetterPredicate();
-					comp.setGeneratedBetterPredicate(String.format("( (%s) /\\ (%s) )", leftBetter, rightBetter));
-					comp.setGeneratedNotWorsePredicate(String.format("( (%s) /\\ (%s) )", rightBetter, leftBetter));
-				} else { // lexicographic
-					String leftBetter = left.getGeneratedBetterPredicate();
-					String rightBetter = right.getGeneratedBetterPredicate();
-
-					comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ ( (%s) /\\ %s) )", leftBetter, equalsLeft, rightBetter));
-					comp.setGeneratedNotWorsePredicate(String.format("( (%s) \\/ ( (%s) /\\ %s) )", rightBetter, equalsRight, leftBetter));
+				switch (comp.getProductType()){
+					case DIRECT:
+						comp.setGeneratedBetterPredicate(String.format("( (%s) /\\ (%s) )", betterLeft, betterRight));
+						comp.setGeneratedNotWorsePredicate(String.format("( (%s) /\\ (%s) )", betterRight, betterLeft));
+						break;
+					case LEXICOGRAPHIC:
+						comp.setGeneratedBetterPredicate(String.format("( (%s) \\/ ( (%s) /\\ (%s) ) )", betterLeft, equalsLeft, betterRight));
+						comp.setGeneratedNotWorsePredicate(String.format("( (%s) \\/ ( (%s) /\\ (%s) ) )", betterRight, equalsRight, betterLeft));
+						break;
+					case PARETO:
+						String predicate = String.format("( ( (%s) /\\ (%s) ) \\/ ( (%s) /\\ (%s) ) \\/ ( (%s) /\\ (%s) ) )",
+								betterLeft, betterRight, betterLeft, equalsRight, equalsLeft, betterRight);
+						comp.setGeneratedBetterPredicate(predicate);
+						comp.setGeneratedNotWorsePredicate(predicate);
 				}
 
 			} else { // has to be vote instance
