@@ -3,6 +3,7 @@ package isse.mbr.tools.execution;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
  *
  * @author Elias
  */
-public class WorkingModelManager {
+public class WorkingModelManager implements AutoCloseable {
 	private File file;
 	private String model;
 	private final boolean writeIntermediateFiles;
@@ -100,5 +101,10 @@ public class WorkingModelManager {
 
 	public String getModel() {
 		return model;
+	}
+
+	@Override
+	public void close() throws Exception {
+		cleanup();
 	}
 }

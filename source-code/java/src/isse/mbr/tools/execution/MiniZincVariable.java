@@ -1,6 +1,8 @@
 package isse.mbr.tools.execution;
 
 import isse.mbr.model.types.MiniZincParType;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class MiniZincVariable {
 	private MiniZincParType type;
@@ -48,5 +50,23 @@ public class MiniZincVariable {
 	}
 	public void setMznExpression(String mznExpression) {
 		this.mznExpression = mznExpression;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+
+		if (o == null || getClass() != o.getClass()) return false;
+
+		MiniZincVariable that = (MiniZincVariable) o;
+
+		return new EqualsBuilder()
+				.append(mznExpression, that.mznExpression)
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37).append(mznExpression).toHashCode();
 	}
 }
