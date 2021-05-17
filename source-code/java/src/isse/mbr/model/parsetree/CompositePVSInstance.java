@@ -7,7 +7,7 @@ public class CompositePVSInstance extends AbstractPVSInstance {
 	private ProductType productType;
 	private AbstractPVSInstance leftHandSide;
 	private AbstractPVSInstance rightHandSide;
-	
+
 	public ProductType getProductType() {
 		return productType;
 	}
@@ -30,11 +30,13 @@ public class CompositePVSInstance extends AbstractPVSInstance {
 
 	public void setRightHandSide(AbstractPVSInstance rightHandSide) {
 		this.rightHandSide = rightHandSide;
-	} 
-	
+	}
+
 	@Override
 	public String toString() {
-		return "( " + leftHandSide.toString() + " " + (productType == ProductType.LEXICOGRAPHIC ? "lex" : "pareto") + " " + rightHandSide.toString() + " )";
+		return String.format("( %s %s %s )", leftHandSide.toString(),
+				productType == ProductType.LEXICOGRAPHIC ? "lex" : productType == ProductType.DIRECT ? "direct" : "pareto",
+				rightHandSide.toString());
 	}
 
 	@Override
@@ -46,5 +48,5 @@ public class CompositePVSInstance extends AbstractPVSInstance {
 	public Collection<AbstractPVSInstance> getChildren() {
 		return Arrays.asList(leftHandSide, rightHandSide);
 	}
-	
+
 }

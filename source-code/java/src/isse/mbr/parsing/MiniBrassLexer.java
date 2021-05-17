@@ -7,21 +7,21 @@ import java.util.logging.Logger;
 
 /**
  * Tokenizes an input stream of MiniBrass code
- * 
+ *
  * @author Alexander Schiendorfer
  *
  */
 public class MiniBrassLexer {
 
 	private final static Logger LOGGER = Logger.getGlobal();
-	
+
 	private Scanner scanner;
 	private char currentChar;
 	private String line;
 	private int colPtr;
 	private Stack<StringBuilder> buffers;
 	private boolean buffering = false;
-	
+
 
 	// to be accessed from ATGs
 	String bufferContent;
@@ -31,13 +31,13 @@ public class MiniBrassLexer {
 	private boolean hasNext;
 	private char lastStringLitChar;
 
-	// for better error messages 
+	// for better error messages
 	int lineNo;
-	
+
 	public MiniBrassLexer() {
 		buffers = new Stack<>();
 	}
-	
+
 	public void setScanner(Scanner scanner) {
 		this.scanner = scanner;
 		scanner.useDelimiter("");
@@ -61,13 +61,13 @@ public class MiniBrassLexer {
 				if( peekNextChar() == '.') {
 					readNextChar();
 					return mv(MiniBrassSymbol.DotsSy);
-				} else 
+				} else
 				return mv(MiniBrassSymbol.DotSy);
 			case ':':
 				if( peekNextChar() == ':') {
 					readNextChar();
 					return mv(MiniBrassSymbol.DoubleColonSy);
-				} else 
+				} else
 				return mv(MiniBrassSymbol.ColonSy);
 			case '(':
 				return mv(MiniBrassSymbol.LeftParenSy);
@@ -96,11 +96,11 @@ public class MiniBrassLexer {
 						// could be MinusSy if needed
 						return MiniBrassSymbol.MinusSy;
 					}
-			} 
+			}
 
 			if (Character.isDigit(currentChar)) {
 				boolean isFloatValue = false;
-				
+
 				StringBuilder sb = new StringBuilder();
 				sb.append(currentChar);
 				while (readNextChar() && ( (currentChar == '.' && !isFloatValue) || Character.isDigit(currentChar))) {
@@ -110,7 +110,7 @@ public class MiniBrassLexer {
 							break; // we stand on a '.' now, do not move
 						}
 					}
-					sb.append(currentChar);						
+					sb.append(currentChar);
 					isFloatValue = isFloatValue || (currentChar == '.');
 				}
 				String numberStr = sb.toString();
@@ -137,11 +137,11 @@ public class MiniBrassLexer {
 			} else if(currentChar == '\'' || currentChar == '"') {
 				char initChar = currentChar;
 				StringBuilder sb = new StringBuilder();
-				
+
 				while(readNextChar() && currentChar != initChar) {
 					sb.append(currentChar);
 				}
-				
+
 				lastIdent = sb.toString();
 				lastStringLitChar = initChar;
 				return mv(MiniBrassSymbol.StringLitSy);
@@ -194,6 +194,8 @@ public class MiniBrassLexer {
 					return MiniBrassSymbol.ToSy;
 				case "pareto":
 					return MiniBrassSymbol.ParetoSy;
+				case "direct":
+					return MiniBrassSymbol.DirectSy;
 				case "morph":
 					return MiniBrassSymbol.MorphismSy;
 				case "new":
@@ -250,7 +252,7 @@ public class MiniBrassLexer {
 	 * Only works for the next char only (if we are at the end of a line -> return '\n')
 	 **/
 	private Character peekNextChar() {
-		
+
 		if (line == null || colPtr > line.length() - 1) {
 			return null;
 		}
@@ -273,7 +275,7 @@ public class MiniBrassLexer {
 	/**
 	 * Returns the last symbol and moves the pointer to the next char (if
 	 * applicable)
-	 * 
+	 *
 	 * @param sym
 	 * @return sym
 	 */
@@ -290,24 +292,24 @@ public class MiniBrassLexer {
 		buffers.add(new StringBuilder());
 		buffering = true;
 	}
-	
+
 	public String closeBuffer() {
 		bufferContent = buffers.pop().toString();
 		if(buffers.isEmpty())
 			buffering = false;
 		return bufferContent;
 	}
-	
+
 	private void reportToBuffer() {
-		if(buffering) 
+		if(buffering)
 			for (StringBuilder buffer : buffers)
 				buffer.append(currentChar);
 	}
-	
+
 	public boolean readNextChar() {
 		reportToBuffer();
-		boolean endOfLine = false; 
-			
+		boolean endOfLine = false;
+
 		if (line == null || ( colPtr > line.length() - 1)) {
 			endOfLine = line != null && ( colPtr > line.length() - 1);
 			if (scanner.hasNextLine()) {
@@ -329,7 +331,7 @@ public class MiniBrassLexer {
 				return false;
 			}
 		}
-		
+
 		if(endOfLine) {
 			currentChar = '\n';
 			return true;
@@ -337,11 +339,11 @@ public class MiniBrassLexer {
 		currentChar = line.charAt(colPtr);
 
 		++colPtr;
-		
+
 		if (currentChar == '%') { // line end comment
 			line = null;
-			return readNextChar();			
-		} 
+			return readNextChar();
+		}
 		if (currentChar == '/') {
 			if ((colPtr) <= line.length()-1) {
 				char lookahead = line.charAt(colPtr);
@@ -349,12 +351,12 @@ public class MiniBrassLexer {
 					colPtr += 1; // we're standing on * now
 					boolean commEnded = false;
 					boolean starSeen = false;
-					
+
 					while(!commEnded) {
 						boolean b = readNextChar();
 						if(!b)
 							return false;
-						
+
 						if(currentChar == '*') {
 							starSeen = true;
 						} else  if(starSeen && currentChar != '/'){
