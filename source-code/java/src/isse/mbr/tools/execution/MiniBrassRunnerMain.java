@@ -88,20 +88,16 @@ public final class MiniBrassRunnerMain {
 			}
 
 			miniBrassRunner.setDebug(line.hasOption("debug"));
+			miniBrassRunner.getMiniZincRunnerConfiguration().setUseAllSolutions(line.hasOption("pareto"));
 
 			logger.info(
 					String.format("Processing %s | %s | %s to file.", miniBrassFile.getName(), miniZincFile.getName(),
 							dataFiles.stream().map(File::getName).collect(Collectors.joining(" / "))));
-			if (line.hasOption("pareto")) {
-				Collection<MiniZincSolution> solutions = miniBrassRunner.executeBranchAndBoundWithParetoOptima(miniZincFile, miniBrassFile,
-						dataFiles);
-				System.out.println(solutions.stream()
-						.map(MiniZincSolution::getRawDznSolution)
-						.collect(Collectors.joining("\n-----------\n")));
-			} else {
-				MiniZincSolution solution = miniBrassRunner.executeBranchAndBound(miniZincFile, miniBrassFile, dataFiles);
-				if (solution != null) System.out.println(solution.getRawDznSolution());
-			}
+			Collection<MiniZincSolution> solutions = miniBrassRunner.executeBranchAndBound(miniZincFile, miniBrassFile,
+					dataFiles);
+			System.out.println(solutions.stream()
+					.map(MiniZincSolution::getRawDznSolution)
+					.collect(Collectors.joining("\n-----------\n")));
 		} catch (ParseException exp) {
 			logger.severe("Unexpected exception:" + exp.getMessage());
 			printUsage();

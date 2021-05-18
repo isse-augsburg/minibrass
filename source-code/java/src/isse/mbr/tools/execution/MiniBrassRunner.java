@@ -6,10 +6,11 @@ import org.apache.commons.lang3.stream.Streams;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,8 +36,7 @@ public class MiniBrassRunner {
 
 
 	private WorkingModelManager workingModelManager;
-	private String lastSolvableMiniZincModel;
-	private List<MiniZincSolution> allSolutions;
+	private Set<MiniZincSolution> allSolutions;
 
 	public MiniBrassRunner() {
 		this(new MiniZincConfiguration());
@@ -49,14 +49,22 @@ public class MiniBrassRunner {
 	private void initializeBranchAndBound(File miniZincFile) throws IOException {
 		// init fields
 		workingModelManager = WorkingModelManager.create(miniZincFile, isDebug(), isDebug());
-		allSolutions = new LinkedList<>();
+		allSolutions = new HashSet<>();
 		if (randomize) {
 			randomSequence = new Random(initialRandomSeed);
 		}
 		miniBrassCompiler.setMinizincOnly(true);
 	}
 
-	public Set<MiniZincSolution> executeBranchAndBoundWithParetoOptima(File miniZincFile, File miniBrassFile, List<File> dataFiles)
+	public Optional<MiniZincSolution> executeBranchAndBoundForSingleSolution(File miniZincFile, File miniBrassFile, List<File> dataFiles)
+		throws MiniBrassParseException, IOException {
+		getMiniZincRunnerConfiguration().setUseAllSolutions(false);
+		Set<MiniZincSolution> solutions = executeBranchAndBound(miniZincFile, miniBrassFile, dataFiles);
+		assert solutions.size() <= 1;
+		return solutions.stream().findAny();
+	}
+
+	public Set<MiniZincSolution> executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
 			throws MiniBrassParseException, IOException {
 		// initialize
 		initializeBranchAndBound(miniZincFile);
@@ -69,14 +77,12 @@ public class MiniBrassRunner {
 
 		// search for solutions
 		workingModelManager.appendToModel(compiledMiniBrassCode);
-		miniZincRunner.getConfiguration().setUseAllSolutions(true);
 		MiniZincResult initialResult = runMiniZinc(workingModelManager.getFile(), dataFiles);
 		Set<MiniZincSolution> solutions;
 		if (initialResult.isSolvedAndValid()) {
-			Set<MiniZincSolution> seenSolutions = new HashSet<>(); // do not inline or a new set is created for each solution
 			String model = workingModelManager.getModel(); // do not inline – result may differ because working model is modified
 			solutions = Streams.stream(initialResult.getSolutions())
-					.map(s -> findParetoOptimaForSolution(model, dataFiles, s, getBetterConstraint, postProcessor, seenSolutions))
+					.map(s -> findParetoOptimaForSolution(model, dataFiles, s, getBetterConstraint, postProcessor))
 					.stream().flatMap(s -> s)
 					.collect(Collectors.toSet());
 		} else {
@@ -90,7 +96,7 @@ public class MiniBrassRunner {
 
 	private Stream<MiniZincSolution> findParetoOptimaForSolution(String parentModel, List<File> dataFiles,
 	                                                             MiniZincSolution parentSolution, String getBetterConstraint,
-	                                                             MiniBrassPostProcessor postProcessor, Set<MiniZincSolution> seenSolutions)
+	                                                             MiniBrassPostProcessor postProcessor)
 			throws IOException {
 		String updatedConstraint = "constraint " + postProcessor.processSolution(getBetterConstraint, parentSolution) + ";";
 		workingModelManager.replaceModel(parentModel);
@@ -99,59 +105,9 @@ public class MiniBrassRunner {
 		MiniZincResult result = runMiniZinc(workingModelManager.getFile(), dataFiles);
 		if (!result.isSolvedAndValid()) return Stream.of(parentSolution);
 		return Streams.stream(result.getSolutions())
-				.filter(seenSolutions::add) // ignore all solutions already seen, and ignore new solutions in the future
-				.map(s -> findParetoOptimaForSolution(ownModel, dataFiles, s, getBetterConstraint, postProcessor, seenSolutions))
+				.filter(allSolutions::add) // ignore all solutions already seen, and ignore new solutions in the future
+				.map(s -> findParetoOptimaForSolution(ownModel, dataFiles, s, getBetterConstraint, postProcessor))
 				.stream().flatMap(s -> s);
-	}
-
-	public MiniZincSolution executeBranchAndBound(File miniZincFile, File miniBrassFile, List<File> dataFiles)
-			throws IOException, MiniBrassParseException {
-		// initialize
-		initializeBranchAndBound(miniZincFile);
-		MiniZincSolution solution;
-		MiniZincSolution lastSolution = null;
-		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
-
-		// parse and compile MiniBrass
-		String compiledMiniBrassCode = miniBrassCompiler.compileInMemory(miniBrassFile);
-		// for domination search
-		String getBetterConstraint = miniBrassCompiler.getUnderlyingParser().getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate();
-
-		// search for solutions
-		workingModelManager.appendToModel(compiledMiniBrassCode);
-		miniZincRunner.getConfiguration().setUseAllSolutions(false);
-		while ((solution = findNextSolution(workingModelManager.getFile(), dataFiles)) != null) {
-			lastSolvableMiniZincModel = workingModelManager.getModel();
-
-			// append solution
-			allSolutions.add(solution);
-			lastSolution = solution;
-
-			// print solution in debug mode
-			String updatedConstraint = "constraint " + postProcessor.processSolution(getBetterConstraint, solution) + ";";
-
-			if (debug) {
-				System.out.println("Found solution: ");
-				System.out.println(solution.getRawDznSolution());
-
-				// process getBetterConstraint with actual solution
-				System.out.println("I got the following template constraint: ");
-				System.out.println(getBetterConstraint);
-				System.out.println(updatedConstraint);
-			}
-
-			// add constraint to model and solve again
-			workingModelManager.appendToModel(updatedConstraint);
-		}
-		workingModelManager.cleanup();
-		return lastSolution;
-	}
-
-
-
-	private MiniZincSolution findNextSolution(File miniZincFile, List<File> dataFiles) {
-		MiniZincResult result = runMiniZinc(miniZincFile, dataFiles);
-		return result.isSolvedAndValid() ? result.getLastSolution() : null;
 	}
 
 	private MiniZincResult runMiniZinc(File miniZincFile, List<File> dataFiles) {
@@ -178,20 +134,8 @@ public class MiniBrassRunner {
 		this.miniZincRunner.setDebug(debug);
 	}
 
-	public List<MiniZincSolution> getAllSolutions() {
+	public Collection<MiniZincSolution> getAllSolutions() {
 		return allSolutions;
-	}
-
-	public void setAllSolutions(List<MiniZincSolution> allSolutions) {
-		this.allSolutions = allSolutions;
-	}
-
-	public MiniZincRunner getMiniZincRunner() {
-		return miniZincRunner;
-	}
-
-	public int getInitialRandomSeed() {
-		return initialRandomSeed;
 	}
 
 	public void setInitialRandomSeed(int initialRandomSeed) {
