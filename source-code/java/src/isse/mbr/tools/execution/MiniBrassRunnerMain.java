@@ -21,6 +21,11 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 
+/**
+ * Main function for executing the {@link MiniBrassRunner}.
+ *
+ * @see MiniBrassRunner
+ */
 public final class MiniBrassRunnerMain {
 	private final Logger logger = setupLogger();
 	private final Options options = setupOptions();
