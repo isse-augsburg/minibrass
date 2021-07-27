@@ -30,9 +30,9 @@ import isse.mbr.parsing.MiniBrassParser;
 /**
  * The MiniBrass runner is responsible for executing branch-and-bound or other
  * searches that involve executing several MiniZinc processes
- * 
+ *
  * usage: minibrass constraintModel.mzn file.mbr [dataFiles.dzn]
- * 
+ *
  * @author alexander
  *
  */
@@ -47,7 +47,7 @@ public class MiniBrassRunner {
 	private boolean dominationSearch; // solution has to get strictly better (otherwise only have to not be worse)
 	private Random randomSequence;
 	private Integer timeoutInSeconds; // in milliseconds
-	
+
 	private int modelIndex;
 	private File originalMiniZincFile;
 	private List<MiniZincSolution> allSolutions;
@@ -88,7 +88,7 @@ public class MiniBrassRunner {
 		originalMiniZincFile = miniZincFile;
 		MiniBrassParser parser = miniBrassCompiler.getUnderlyingParser();
 		// for domination search
-		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate(); 
+		String getBetterConstraint = parser.getLastModel().getDereferencedSolveInstance().getGeneratedBetterPredicate();
 
 		String branchAndBoundConstraint = getBetterConstraint;
 		MiniBrassPostProcessor postProcessor = new MiniBrassPostProcessor();
@@ -107,10 +107,10 @@ public class MiniBrassRunner {
 		if (randomize) {
 			randomSequence = new Random(initialRandomSeed);
 		}
-		
+
 		// in our configuration, we do not want to see all solutions
 		miniZincRunner.getConfiguration().setUseAllSolutions(false);
-		
+
 		while ((solution = hasNextSolution(workingMiniZincModel, dataFiles)) != null) {
 			// append solution
 			allSolutions.add(solution);
@@ -250,8 +250,8 @@ public class MiniBrassRunner {
 
 			logger.info(
 					"Processing " + minibrassFile + " | " + minizincModelFile + " | " + minizincDataFile + " to file.");
-			executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
-
+			MiniZincSolution solution = executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
+			if (solution != null) System.out.println(solution.hasOutputItem() ? solution.getOutputItem() : solution.getRawDznSolution());
 		} catch (ParseException exp) {
 			logger.severe("Unexpected exception:" + exp.getMessage());
 			printUsage();

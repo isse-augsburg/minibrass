@@ -30,20 +30,7 @@ import isse.mbr.model.parsetree.ProductType;
 import isse.mbr.model.parsetree.ReferencedPVSInstance;
 import isse.mbr.model.parsetree.SoftConstraint;
 import isse.mbr.model.parsetree.VotingInstance;
-import isse.mbr.model.types.ArrayType;
-import isse.mbr.model.types.BoolType;
-import isse.mbr.model.types.FloatType;
-import isse.mbr.model.types.IntType;
-import isse.mbr.model.types.IntervalType;
-import isse.mbr.model.types.MiniZincParType;
-import isse.mbr.model.types.MiniZincVarType;
-import isse.mbr.model.types.MultiSetType;
-import isse.mbr.model.types.NamedRef;
-import isse.mbr.model.types.NumericValue;
-import isse.mbr.model.types.PVSFormalParameter;
-import isse.mbr.model.types.PVSType;
-import isse.mbr.model.types.PrimitiveType;
-import isse.mbr.model.types.SetType;
+import isse.mbr.model.types.*;
 import isse.mbr.model.voting.VotingFactory;
 import isse.mbr.model.voting.VotingProcedure;
 import org.apache.commons.lang3.function.FailableFunction;
@@ -1159,8 +1146,7 @@ public class MiniBrassParser {
 	}
 
 	private PrimitiveType primType(PVSType scopeType) throws MiniBrassParseException {
-		if (currSy == MiniBrassSymbol.FloatSy || currSy == MiniBrassSymbol.BoolSy || currSy == MiniBrassSymbol.IntSy) {
-			switch (currSy) {
+		switch (currSy) {
 			case FloatSy:
 				getNextSy();
 				return new FloatType();
@@ -1170,13 +1156,12 @@ public class MiniBrassParser {
 			case IntSy:
 				getNextSy();
 				return new IntType();
+			case StringSy:
+				getNextSy();
+				return new StringType();
 			default:
-				throw new MiniBrassParseException("This should not happen");
-			}
-		} else {
-			return intervalType(scopeType);
+				return intervalType(scopeType);
 		}
-
 	}
 
 	/**

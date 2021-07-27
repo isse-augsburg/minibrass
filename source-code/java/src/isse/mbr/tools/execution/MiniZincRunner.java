@@ -21,7 +21,7 @@ import org.apache.commons.lang3.SystemUtils;
 /**
  * API connection to access MiniZinc starting from 2.2.1 The class is responsible for executing MiniZinc with a given
  * configuration and providing the
- * 
+ *
  * @author alexander
  *
  */
@@ -66,7 +66,7 @@ public class MiniZincRunner {
 
 	/**
 	 * Performs a call to MiniZinc with the solver defined in the {@code configuration} object
-	 * 
+	 *
 	 * @param modelFile
 	 *            one MiniZinc constraint model file
 	 * @param dataFiles
@@ -111,30 +111,14 @@ public class MiniZincRunner {
 			p = pb.start();
 
 			if(timeout != null) {
-
 				if(!p.waitFor(timeout, TimeUnit.SECONDS)) {
 					p.destroyForcibly();
 				}
-			/*	Timer timer = new Timer();
-				int timeoutInMillisecs = timeout * 1000;
-				timer.schedule(new TimerTask() {
-
-					@Override
-					public void run() {
-						LOGGER.info("Destroyed by timeout ... ");
-						p.destroy();
-					}
-				}, Math.round(timeoutInMillisecs * 1.05));
-
-				p.waitFor();
-				timer.cancel();
-				*/
 			}
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = null;
-			
-			List<String> lines = new LinkedList<>();
+			String line;
 
+			List<String> lines = new LinkedList<>();
 			while ((line = reader.readLine()) != null) {
 				if(isDebug())
 					System.out.println(line);
@@ -220,6 +204,7 @@ public class MiniZincRunner {
 	private void addOptions(ProcessBuilder pb) {
 		pb.command().add("--output-mode");
 		pb.command().add("dzn");
+		pb.command().add("--output-output-item");
 
 		if (configuration.isUseAllSolutions())
 			pb.command().add("-a");
@@ -239,7 +224,7 @@ public class MiniZincRunner {
 			pb.command().add("-n");
 			pb.command().add(configuration.getStopAfterNSolutions().toString());
 		}
-		
+
 		if (configuration.getParallel() != null) {
 			pb.command().add("-p");
 			pb.command().add(configuration.getParallel().toString());
