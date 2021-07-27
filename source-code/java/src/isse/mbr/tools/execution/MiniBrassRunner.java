@@ -251,7 +251,7 @@ public class MiniBrassRunner {
 			logger.info(
 					"Processing " + minibrassFile + " | " + minizincModelFile + " | " + minizincDataFile + " to file.");
 			MiniZincSolution solution = executeBranchAndBound(new File(minizincModelFile), new File(minibrassFile), dataFiles);
-			if (solution != null) System.out.println(solution.getRawDznSolution());
+			if (solution != null) System.out.println(solution.hasOutputItem() ? solution.getOutputItem() : solution.getRawDznSolution());
 		} catch (ParseException exp) {
 			logger.severe("Unexpected exception:" + exp.getMessage());
 			printUsage();

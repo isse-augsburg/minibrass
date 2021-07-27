@@ -15,11 +15,12 @@ import isse.mbr.model.types.IntervalType;
 import isse.mbr.model.types.NumericValue;
 import isse.mbr.model.types.PrimitiveType;
 import isse.mbr.model.types.SetType;
+import isse.mbr.model.types.StringType;
 import isse.mbr.tools.execution.MiniZincTensor;
 import isse.mbr.tools.execution.MiniZincVariable;
 
 public class DznParser extends MiniBrassParser {
-	
+
 
 	private static List<MiniBrassSymbol> arraySymbols;
 
@@ -31,17 +32,17 @@ public class DznParser extends MiniBrassParser {
 		//System.out.println("DZN Parsing: " + dznLine);
 		// top level non-terminal, initialize before
 		getNextSy();
-		
+
 		// first production
 		MiniZincVariable variable = dznStatement();
 		scanner.close();
 		return variable;
 	}
-	
+
 	/**
 	 * dznStatement := IdentSy "=" dznLiteral
-	 * @return 
-	 * @throws MiniBrassParseException 
+	 * @return
+	 * @throws MiniBrassParseException
 	 */
 	private MiniZincVariable dznStatement() throws MiniBrassParseException {
 		expectSymbol(MiniBrassSymbol.IdentSy);
@@ -49,26 +50,26 @@ public class DznParser extends MiniBrassParser {
 		getNextSy();
 		lexer.startBuffering();
 		expectSymbolAndNext(MiniBrassSymbol.EqualsSy);
-		
+
 		MiniZincVariable variable = new MiniZincVariable(varIdent);
 		dznLiteral(variable);
 		lexer.closeBuffer();
-		
+
 		String mznExpression = lexer.getBufferContent().replaceAll(";", "");
 		variable.setMznExpression(mznExpression);
 		expectSymbolAndNext(MiniBrassSymbol.SemicolonSy);
 
 		return variable;
 	}
-	
+
 	/**
 	 * dznStatement := array( | SetDznLiteral | IntDznLiteral
-	 * @param variable 
-	 * @throws MiniBrassParseException 
+	 * @param variable
+	 * @throws MiniBrassParseException
 	 */
 	private void dznLiteral(MiniZincVariable variable) throws MiniBrassParseException {
 		arraySymbols = Arrays.asList(MiniBrassSymbol.ArraySy,  MiniBrassSymbol.Array1dSy, MiniBrassSymbol.Array2dSy,MiniBrassSymbol.Array3dSy, MiniBrassSymbol.Array4dSy, MiniBrassSymbol.Array5dSy,MiniBrassSymbol.Array6dSy);
-		
+
 		if (arraySymbols.stream().anyMatch(s -> s == currSy)) { // we're dealing with an array type now
 			getArrayLit(variable);
 		} else {
@@ -82,18 +83,18 @@ public class DznParser extends MiniBrassParser {
 			negative = true;
 			getNextSy();
 		}
-		
+
 		if(currSy == MiniBrassSymbol.LeftCurlSy) {
 			Set<Integer> setLit = getSetLit();
 			variable.setValue(setLit);
 			variable.setType(new SetType(new IntType()));
 		} else if (currSy == MiniBrassSymbol.IntLitSy) {
-			int litVal = lexer.getLastInt();			
+			int litVal = lexer.getLastInt();
 			getNextSy();
 
 			if(negative)
 				litVal *= (-1);
-			
+
 			if(currSy == MiniBrassSymbol.DotsSy) {
 				getNextSy();
 				negative = false;
@@ -101,7 +102,7 @@ public class DznParser extends MiniBrassParser {
 					negative = true;
 					getNextSy();
 				}
-					
+
 				expectSymbol(MiniBrassSymbol.IntLitSy);
 				int upper = lexer.getLastInt();
 				if(negative)
@@ -118,7 +119,7 @@ public class DznParser extends MiniBrassParser {
 			double litVal = lexer.getLastFloat();
 			if(negative)
 				litVal *= (-1);
-			
+
 			variable.setValue(litVal);
 			variable.setType(new FloatType());
 			getNextSy();
@@ -129,6 +130,11 @@ public class DznParser extends MiniBrassParser {
 				variable.setValue(false);
 			}
 			variable.setType(new BoolType());
+			getNextSy();
+		} else if (currSy == MiniBrassSymbol.StringLitSy) {
+			String value = lexer.getLastIdent();
+			variable.setValue(value);
+			variable.setType(new StringType());
 			getNextSy();
 		}
 	}
@@ -144,7 +150,7 @@ public class DznParser extends MiniBrassParser {
 	private void getArrayLit(MiniZincVariable variable) throws MiniBrassParseException {
 		expectSymbol(arraySymbols);
 		MiniZincTensor tensor = new MiniZincTensor();
-		
+
 		int dim = 0;
 
 		switch(currSy) {
@@ -171,35 +177,35 @@ public class DznParser extends MiniBrassParser {
 		}
 		getNextSy();
 		expectSymbolAndNext(MiniBrassSymbol.LeftParenSy);
-		
+
 		tensor.setDimension(dim);
-		// read all the index sets 
+		// read all the index sets
 		List<PrimitiveType> indexSets = new ArrayList<>(dim);
-		
+
 		for(int i = 0; i < dim; ++i) {
 			IntervalType it = intervalLitType();
 			expectSymbolAndNext(MiniBrassSymbol.CommaSy);
 			tensor.addIndexSet(it);
 			indexSets.add(it);
 		}
-		boolean firstElement = true; 
+		boolean firstElement = true;
 		int index = 0;
 		expectSymbol(MiniBrassSymbol.LeftBracketSy);
 		lexer.startBuffering();
 		expectSymbolAndNext(MiniBrassSymbol.LeftBracketSy);
-		
+
 		while (currSy != MiniBrassSymbol.RightBracketSy) {
 			MiniZincVariable var = new MiniZincVariable(variable.getName()+"_"+index);
-			
+
 			getElement(var);
-			
-			if(firstElement) { // has to define the element type of the tensor 
+
+			if(firstElement) { // has to define the element type of the tensor
 				isse.mbr.model.types.MiniZincVarType elementType = (isse.mbr.model.types.MiniZincVarType) var.getType();
 				ArrayType at = new ArrayType(elementType, indexSets);
 				variable.setType(at);
 				variable.setValue(tensor);
 			}
-			
+
 			String mznExpr = lexer.closeBuffer().trim();
 			// TODO this is kinda ugly, maybe we could do better
 			if(!"true".equals(mznExpr) && !"false".equals(mznExpr))
@@ -213,8 +219,8 @@ public class DznParser extends MiniBrassParser {
 			tensor.addFlatValue(var);
 			++index;
 		} // parsed all elements
-		
-		
+
+
 		expectSymbolAndNext(MiniBrassSymbol.RightBracketSy);
 		expectSymbolAndNext(MiniBrassSymbol.RightParenSy);
 	}
@@ -227,9 +233,9 @@ public class DznParser extends MiniBrassParser {
 		lower = new NumericValue(lexer.getLastInt());
 		getNextSy();
 		expectSymbolAndNext(MiniBrassSymbol.DotsSy);
-		
+
 		expectSymbol(MiniBrassSymbol.IntLitSy);
-		upper = new NumericValue(lexer.getLastInt());		
+		upper = new NumericValue(lexer.getLastInt());
 		getNextSy();
 		return new IntervalType(lower, upper);
 	}
@@ -237,7 +243,7 @@ public class DznParser extends MiniBrassParser {
 	/**
 	 * Currently, set types can only be integer
 	 * @return
-	 * @throws MiniBrassParseException 
+	 * @throws MiniBrassParseException
 	 */
 	private Set<Integer> getSetLit() throws MiniBrassParseException {
 		expectSymbolAndNext(MiniBrassSymbol.LeftCurlSy);
@@ -253,5 +259,5 @@ public class DznParser extends MiniBrassParser {
 		expectSymbolAndNext(MiniBrassSymbol.RightCurlSy);
 		return returnSet;
 	}
-	
+
 }

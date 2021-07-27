@@ -146,7 +146,7 @@ public class MiniBrassLexer {
 				lastStringLitChar = initChar;
 				return mv(MiniBrassSymbol.StringLitSy);
 			}
-			else if (Character.isLetter(currentChar)) { // either an ident or
+			else if (Character.isLetter(currentChar) || currentChar == '_') { // either an ident or
 															// a keyword
 				// while letters are coming, append them
 				StringBuilder sb = new StringBuilder();
