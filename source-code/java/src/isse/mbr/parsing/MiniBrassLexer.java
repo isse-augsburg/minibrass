@@ -103,15 +103,26 @@ public class MiniBrassLexer {
 
 				StringBuilder sb = new StringBuilder();
 				sb.append(currentChar);
-				while (readNextChar() && ( (currentChar == '.' && !isFloatValue) || Character.isDigit(currentChar))) {
+				while (readNextChar() && ( (currentChar == '.' && !isFloatValue) || Character.isDigit(currentChar) ||
+						Character.toLowerCase(currentChar) == 'e')) {
 					if(currentChar == '.') { // this could be the start of a dotsSy
 						Character peekNext = peekNextChar();
 						if(peekNext == '.') {
 							break; // we stand on a '.' now, do not move
 						}
+						isFloatValue = true;
 					}
 					sb.append(currentChar);
-					isFloatValue = isFloatValue || (currentChar == '.');
+					if (Character.toLowerCase(currentChar) == 'e') { // start of exponent
+						isFloatValue = true;
+						char peekNext = peekNextChar();
+						// there may be an optional sign after e that is also part of the exponent start
+						if (peekNext == '+' || peekNext == '-') {
+							// indeed there is a sign, add it and move forward
+							sb.append(peekNext);
+							readNextChar();
+						}
+					}
 				}
 				String numberStr = sb.toString();
 				if (isFloatValue) {
@@ -146,8 +157,7 @@ public class MiniBrassLexer {
 				lastStringLitChar = initChar;
 				return mv(MiniBrassSymbol.StringLitSy);
 			}
-			else if (Character.isLetter(currentChar)) { // either an ident or
-															// a keyword
+			else if (Character.isLetter(currentChar)) { // either an ident or a keyword
 				// while letters are coming, append them
 				StringBuilder sb = new StringBuilder();
 				sb.append(currentChar);
